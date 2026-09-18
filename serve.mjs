@@ -32,11 +32,48 @@ const mime = {
 
 fs.mkdirSync(dataDirectory, { recursive: true });
 
+const usePostgres = Boolean(process.env.DATABASE_URL);
+let postgresPool = null;
+let postgresSchemaPromise = null;
+
+function getPostgresPool() {
+  if (!postgresPool) {
+    const { Pool } = require("pg");
+    postgresPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+      max: 5
+    });
+  }
+  return postgresPool;
+}
+
+async function ensurePostgresSchema() {
+  if (!usePostgres) return;
+  if (!postgresSchemaPromise) {
+    postgresSchemaPromise = getPostgresPool().query(`
+      CREATE TABLE IF NOT EXISTS starship_players (
+        player_key TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        password_hash TEXT,
+        created_at TIMESTAMPTZ NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL,
+        last_login_at TIMESTAMPTZ,
+        state JSONB NOT NULL
+      )
+    `).catch((error) => {
+      postgresSchemaPromise = null;
+      throw error;
+    });
+  }
+  await postgresSchemaPromise;
+}
+
 function emptyDatabase() {
   return { version: 2, players: {} };
 }
 
-function readDatabase() {
+function readFileDatabase() {
   try {
     const value = JSON.parse(fs.readFileSync(playerDatabasePath, "utf8"));
     return value && value.players ? Object.assign({ version: 2 }, value) : emptyDatabase();
@@ -45,10 +82,72 @@ function readDatabase() {
   }
 }
 
-function writeDatabase(database) {
+function writeFileDatabase(database) {
   const temporaryPath = playerDatabasePath + ".tmp";
   fs.writeFileSync(temporaryPath, JSON.stringify(database, null, 2), "utf8");
   fs.renameSync(temporaryPath, playerDatabasePath);
+}
+
+function normalizedTimestamp(value) {
+  const date = value instanceof Date ? value : new Date(value || Date.now());
+  return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+}
+
+async function readDatabase() {
+  if (!usePostgres) return readFileDatabase();
+  await ensurePostgresSchema();
+  const result = await getPostgresPool().query("SELECT player_key, name, password_hash, created_at, updated_at, last_login_at, state FROM starship_players");
+  const database = emptyDatabase();
+  result.rows.forEach((row) => {
+    database.players[row.player_key] = {
+      name: row.name,
+      passwordHash: row.password_hash,
+      createdAt: normalizedTimestamp(row.created_at),
+      updatedAt: normalizedTimestamp(row.updated_at),
+      lastLoginAt: row.last_login_at ? normalizedTimestamp(row.last_login_at) : undefined,
+      state: row.state || freshPlayerState()
+    };
+  });
+  return database;
+}
+
+async function writeDatabase(database) {
+  if (!usePostgres) {
+    writeFileDatabase(database);
+    return;
+  }
+  await ensurePostgresSchema();
+  const client = await getPostgresPool().connect();
+  try {
+    await client.query("BEGIN");
+    for (const [key, record] of Object.entries(database.players || {})) {
+      await client.query(`
+        INSERT INTO starship_players (player_key, name, password_hash, created_at, updated_at, last_login_at, state)
+        VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
+        ON CONFLICT (player_key) DO UPDATE SET
+          name = EXCLUDED.name,
+          password_hash = EXCLUDED.password_hash,
+          created_at = EXCLUDED.created_at,
+          updated_at = EXCLUDED.updated_at,
+          last_login_at = EXCLUDED.last_login_at,
+          state = EXCLUDED.state
+      `, [
+        key,
+        record.name,
+        record.passwordHash || null,
+        normalizedTimestamp(record.createdAt),
+        normalizedTimestamp(record.updatedAt),
+        record.lastLoginAt ? normalizedTimestamp(record.lastLoginAt) : null,
+        JSON.stringify(record.state || freshPlayerState())
+      ]);
+    }
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 function normalizePlayerName(value) {
@@ -335,7 +434,8 @@ function claimCharacterChoice(currentState, body) {
 
 async function handleApi(request, response, requestUrl) {
   if (requestUrl.pathname === "/api/health" && request.method === "GET") {
-    sendJson(response, 200, { ok: true, service: "starship-gacha", persistence: "server" });
+    await ensurePostgresSchema();
+    sendJson(response, 200, { ok: true, service: "starship-gacha", persistence: usePostgres ? "postgres" : "file" });
     return;
   }
   if (request.method === "OPTIONS") {
@@ -349,7 +449,7 @@ async function handleApi(request, response, requestUrl) {
   }
 
   const body = await readBody(request);
-  const database = readDatabase();
+  const database = await readDatabase();
   try {
     if (requestUrl.pathname === "/api/player/register") {
       const name = normalizePlayerName(body.name);
@@ -364,7 +464,7 @@ async function handleApi(request, response, requestUrl) {
       record.updatedAt = new Date().toISOString();
       record.state = ensurePlayerMilestones(record.state);
       database.players[playerKey(name)] = record;
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, created: !existing, migrated, token: createSession(playerKey(name)), player: publicPlayer(record), state: record.state });
       return;
     }
@@ -377,9 +477,9 @@ async function handleApi(request, response, requestUrl) {
       if (!verifyPassword(body.password, existing.record.passwordHash)) throw new Error("遊戲名稱或密碼不正確");
       existing.record.lastLoginAt = new Date().toISOString();
       existing.record.updatedAt = existing.record.lastLoginAt;
-      writeDatabase(database);
+      await writeDatabase(database);
       existing.record.state = ensurePlayerMilestones(existing.record.state);
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, token: createSession(existing.key), player: publicPlayer(existing.record), state: existing.record.state });
       return;
     }
@@ -395,7 +495,7 @@ async function handleApi(request, response, requestUrl) {
       const completed = completeStoryScene(player.record.state, body);
       player.record.state = completed.state;
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: completed.alreadyClaimed, reward: completed.reward, chapter: { id: completed.chapter.id, title: completed.chapter.title }, scene: completed.scene ? { id: completed.scene.id, title: completed.scene.title } : null });
       return;
     }
@@ -405,7 +505,7 @@ async function handleApi(request, response, requestUrl) {
       const result = claimCharacterChoice(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, card: result.card, rewardKey: result.rewardKey });
       return;
     }
@@ -415,7 +515,7 @@ async function handleApi(request, response, requestUrl) {
       const result = runTrial(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, battle: result.battle, reward: result.reward });
       return;
     }
@@ -437,7 +537,7 @@ async function handleApi(request, response, requestUrl) {
       }
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record), state: player.record.state }, result || {}));
       return;
     }
@@ -448,7 +548,7 @@ async function handleApi(request, response, requestUrl) {
       const result = game.developCharacter({ cardId: body.cardId });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
       return;
     }
@@ -456,7 +556,7 @@ async function handleApi(request, response, requestUrl) {
     if (requestUrl.pathname === "/api/admin/lookup") {
       assertAdmin(body);
       const player = getPlayer(database, body.name);
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state });
       return;
     }
@@ -466,7 +566,7 @@ async function handleApi(request, response, requestUrl) {
       const player = getPlayer(database, body.name);
       player.record.state = updateAdminState(player.record.state, body);
       player.record.updatedAt = new Date().toISOString();
-      writeDatabase(database);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state });
       return;
     }

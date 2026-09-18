@@ -7,5 +7,8 @@
     "test": "node --test test/gacha.test.js test/battle.test.js",
     "serve": "node serve.mjs",
     "start": "node serve.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
   }
 }

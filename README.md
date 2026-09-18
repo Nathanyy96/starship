@@ -46,9 +46,9 @@
 
 ## 做成可分享網址
 
-這個專案已經是可部署的 Node 網站：啟動命令是 `node serve.mjs`（`npm start` 也會執行同一個命令），服務會使用託管平台提供的 `PORT`，並監聽對外網路。專案內附有 `render.yaml`，可作為 Render Blueprint；它會掛載 `/opt/render/project/src/storage`，並把玩家資料寫到 `/opt/render/project/src/storage/data/players.json`。伺服器也支援用 `STARSHIP_DATA_DIR` 改寫資料目錄，讓其他 Node 託管服務可使用自己的持久化磁碟或資料庫掛載路徑。
+這個專案已經是可部署的 Node 網站：啟動命令是 `node serve.mjs`（`npm start` 也會執行同一個命令），服務會使用託管平台提供的 `PORT`，並監聽對外網路。伺服器現在支援 `DATABASE_URL`：設定後會把玩家資料保存到 Postgres 的 `starship_players` 資料表；沒有設定時，才會使用本機 `STARSHIP_DATA_DIR` 下的 `players.json` 備援檔案。專案內附有 `render.yaml`，可用 Render Blueprint 建立免費 Web Service 與免費 Postgres。
 
-正式環境請設定 `NODE_ENV=production`、`STARSHIP_ADMIN_KEY=你自己的長密鑰` 與持久化資料目錄。不要把管理密鑰寫進程式碼或提交到公開儲存庫。部署完成後平台會給一個 `https://...` 網址；把該網址傳給玩家即可，製作者使用同一網址的 `/admin.html`。
+正式環境請設定 `NODE_ENV=production`、`STARSHIP_ADMIN_KEY=你自己的長密鑰` 與 `DATABASE_URL`。不要把管理密鑰或資料庫連線字串寫進程式碼或提交到公開儲存庫。部署完成後平台會給一個 `https://...` 網址；把該網址傳給玩家即可，製作者使用同一網址的 `/admin.html`。
 
 注意：GitHub Pages、一般靜態網頁只能放玩家畫面，不能執行這裡的後端存檔與管理 API；要使用名稱存檔和管理端，必須部署 Node 伺服器與持久化資料。
 

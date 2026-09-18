@@ -2,7 +2,7 @@ services:
   - type: web
     name: starship-gacha
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: npm install
     startCommand: node serve.mjs
     healthCheckPath: /api/health
@@ -11,9 +11,15 @@ services:
         value: production
       - key: STARSHIP_ADMIN_KEY
         sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: starship-db
+          property: connectionString
       - key: STARSHIP_DATA_DIR
-        value: /opt/render/project/src/storage/data
-    disk:
-      name: starship-player-data
-      mountPath: /opt/render/project/src/storage
-      sizeGB: 1
+        value: ./data
+
+databases:
+  - name: starship-db
+    plan: free
+    databaseName: starship
+    user: starship
