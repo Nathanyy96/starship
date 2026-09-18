@@ -131,7 +131,7 @@
       container.innerHTML = entries.map(function (entry) {
         var banner = bannerById(entry.bannerId);
         var title = banner ? banner.name : entry.bannerId;
-        var payment = entry.payment === "ticket" ? "回覆券" : number(entry.cost) + " 星砂";
+        var payment = entry.payment === "ticket" ? "共鳴券" : number(entry.cost) + " 星砂";
         return "<div class=\"history-row\"><span>" + escapeHtml(title) + "</span><span>" + entry.count + " 格｜4★ " + entry.summary.fourStar + "｜" + escapeHtml(payment) + "</span></div>";
       }).join("");
     }

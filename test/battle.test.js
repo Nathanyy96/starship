@@ -21,5 +21,5 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
-  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 793);
+  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 765);
 });

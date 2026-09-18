@@ -15,24 +15,25 @@
    */
   var DEFAULT_RULES = Object.freeze({
     hardPity: 50,
-    noEarlyFourStarPulls: 30,
-    pityStartPull: 31,
+    noEarlyFourStarPulls: 20,
+    pityStartPull: 21,
     pityStartRate: 0.10,
     pityStep: 0.04,
     featuredRate: 0.55,
     threeStarRate: 0.20,
+    bonusStarSandRate: 0.08,
+    bonusStarSandAmount: 40,
     nonCharacterReward: Object.freeze({ echoPowder: 1 }),
     development: Object.freeze({
       maxLevel: 80,
-      baseStarSand: 120,
-      starSandStep: 40,
-      baseEchoPowder: 2,
-      echoPowderStepEvery: 10
+      baseCharacterExp: 80,
+      characterExpStep: 45
     }),
+    constellation: Object.freeze({ max: 6, baseResonanceCore: 1, resonanceCoreStep: 1 }),
     singleCost: 160,
     tenCost: 1600,
-    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50 }),
-    duplicateThreeStar: Object.freeze({ echoPowder: 5 })
+    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, resonanceCore: 1 }),
+    duplicateThreeStar: Object.freeze({ characterExp: 80 })
   });
 
   function clone(value) {
@@ -55,6 +56,7 @@
     rules.duplicateThreeStar = Object.assign({}, DEFAULT_RULES.duplicateThreeStar, input && input.duplicateThreeStar);
     rules.nonCharacterReward = Object.assign({}, DEFAULT_RULES.nonCharacterReward, input && input.nonCharacterReward);
     rules.development = Object.assign({}, DEFAULT_RULES.development, input && input.development);
+    rules.constellation = Object.assign({}, DEFAULT_RULES.constellation, input && input.constellation);
 
     assert(Number.isInteger(rules.hardPity) && rules.hardPity > 0, "hardPity 必須是正整數");
     assert(Number.isInteger(rules.noEarlyFourStarPulls) && rules.noEarlyFourStarPulls >= 0, "noEarlyFourStarPulls 必須是非負整數");
@@ -64,12 +66,15 @@
     assert(rules.pityStep >= 0 && rules.pityStep <= 1, "pityStep 必須介於 0 與 1 之間");
     assert(rules.featuredRate >= 0 && rules.featuredRate <= 1, "featuredRate 必須介於 0 與 1 之間");
     assert(rules.threeStarRate >= 0 && rules.threeStarRate <= 1, "threeStarRate 必須介於 0 與 1 之間");
+    assert(rules.bonusStarSandRate >= 0 && rules.bonusStarSandRate <= 1, "bonusStarSandRate 必須介於 0 與 1 之間");
+    assert(Number.isInteger(rules.bonusStarSandAmount) && rules.bonusStarSandAmount >= 0, "bonusStarSandAmount 必須是非負整數");
     assert(Number.isInteger(rules.nonCharacterReward.echoPowder) && rules.nonCharacterReward.echoPowder >= 0, "nonCharacterReward.echoPowder 必須是非負整數");
     assert(Number.isInteger(rules.development.maxLevel) && rules.development.maxLevel > 1, "development.maxLevel 必須是大於 1 的整數");
-    assert(Number.isInteger(rules.development.baseStarSand) && rules.development.baseStarSand >= 0, "development.baseStarSand 必須是非負整數");
-    assert(Number.isInteger(rules.development.starSandStep) && rules.development.starSandStep >= 0, "development.starSandStep 必須是非負整數");
-    assert(Number.isInteger(rules.development.baseEchoPowder) && rules.development.baseEchoPowder >= 0, "development.baseEchoPowder 必須是非負整數");
-    assert(Number.isInteger(rules.development.echoPowderStepEvery) && rules.development.echoPowderStepEvery > 0, "development.echoPowderStepEvery 必須是正整數");
+    assert(Number.isInteger(rules.development.baseCharacterExp) && rules.development.baseCharacterExp >= 0, "development.baseCharacterExp 必須是非負整數");
+    assert(Number.isInteger(rules.development.characterExpStep) && rules.development.characterExpStep >= 0, "development.characterExpStep 必須是非負整數");
+    assert(Number.isInteger(rules.constellation.max) && rules.constellation.max > 0, "constellation.max 必須是正整數");
+    assert(Number.isInteger(rules.constellation.baseResonanceCore) && rules.constellation.baseResonanceCore >= 0, "constellation.baseResonanceCore 必須是非負整數");
+    assert(Number.isInteger(rules.constellation.resonanceCoreStep) && rules.constellation.resonanceCoreStep >= 0, "constellation.resonanceCoreStep 必須是非負整數");
     assert(Number.isInteger(rules.singleCost) && rules.singleCost >= 0, "singleCost 必須是非負整數");
     assert(Number.isInteger(rules.tenCost) && rules.tenCost >= 0, "tenCost 必須是非負整數");
     return rules;
@@ -78,7 +83,7 @@
   /**
    * 取得「本次是該保底循環第幾抽」的 4★ 機率。
    *
-   * 第 1–30 抽固定為 0%；第 31 抽為 10%；之後每抽增加 4 個百分點；
+   * 第 1–20 抽固定為 0%；第 21 抽為 10%；之後每抽增加 4 個百分點；
    * 第 50 抽直接硬保底。這個函式不依賴隨機數，方便 UI 顯示與測試。
    */
   function getFourStarRate(pullNumber, customRules) {
@@ -92,8 +97,10 @@
       return 1;
     }
 
+    // 保留一格真正的硬保底：前一抽不會因為機率先到 100% 而被誤標成硬保底。
+    // 第 50 抽由 _rollOne 的 isHardPity 直接保證，讓 UI 能清楚區分軟保底與硬保底。
     var rate = rules.pityStartRate + (pullNumber - rules.pityStartPull) * rules.pityStep;
-    return Math.min(1, Math.max(0, rate));
+    return Math.min(0.99, Math.max(0, rate));
   }
 
   function formatPercent(value) {
@@ -159,7 +166,9 @@
         starSand: 160,
         tickets: 3,
         starMarks: 0,
-        echoPowder: 0
+        echoPowder: 0,
+        characterExp: 800,
+        resonanceCore: 2
       },
       pity: {},
       selectedFeatured: {},
@@ -213,7 +222,7 @@
     state.totalPulls = Number.isInteger(source.totalPulls) && source.totalPulls >= 0 ? source.totalPulls : 0;
     state.history = Array.isArray(source.history) ? source.history.slice(-50) : [];
 
-    ["starSand", "tickets", "starMarks", "echoPowder"].forEach(function (key) {
+    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach(function (key) {
       assert(Number.isInteger(state.resources[key]) && state.resources[key] >= 0, "資源數量必須是非負整數：" + key);
     });
 
@@ -257,7 +266,7 @@
   }
 
   function makeEmptyReward() {
-    return { starSand: 0, starMarks: 0, echoPowder: 0 };
+    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, resonanceCore: 0 };
   }
 
   /**
@@ -300,13 +309,24 @@
     var card = this.cardById[cardId];
     assert(card, "找不到角色：" + cardId);
     var saved = isPlainObject(this.state.characterProgress[cardId]) ? this.state.characterProgress[cardId] : {};
-    return Object.assign({ level: 1, affinity: 0 }, saved);
+    return Object.assign({ level: 1, affinity: 0, constellation: 0 }, saved);
+  };
+
+  GachaGame.prototype._grantCardCopy = function (card) {
+    var previousCopies = this.state.collection[card.id] || 0;
+    this.state.collection[card.id] = previousCopies + 1;
+    var progress = this.getCharacterProgress(card.id);
+    if (previousCopies > 0) {
+      progress.constellation = Math.min(this.rules.constellation.max, Math.max(0, Number(progress.constellation) || 0) + 1);
+    }
+    this.state.characterProgress[card.id] = progress;
+    return { previousCopies: previousCopies, progress: progress };
   };
 
   GachaGame.prototype.grantCharacter = function (cardId) {
     var card = this.cardById[cardId];
     assert(card, "找不到角色：" + cardId);
-    this.state.collection[card.id] = (this.state.collection[card.id] || 0) + 1;
+    var copy = this._grantCardCopy(card);
     return { card: clone(card), copies: this.state.collection[card.id], state: this.getState() };
   };
 
@@ -319,15 +339,29 @@
     var level = Number.isInteger(progress.level) && progress.level >= 1 ? progress.level : 1;
     assert(level < this.rules.development.maxLevel, "角色已達目前最高等級");
     var cost = {
-      starSand: this.rules.development.baseStarSand + (level - 1) * this.rules.development.starSandStep,
-      echoPowder: this.rules.development.baseEchoPowder + Math.floor((level - 1) / this.rules.development.echoPowderStepEvery)
+      characterExp: this.rules.development.baseCharacterExp + (level - 1) * this.rules.development.characterExpStep
     };
-    assert(this.state.resources.starSand >= cost.starSand, "星砂不足，需要 " + cost.starSand);
-    assert(this.state.resources.echoPowder >= cost.echoPowder, "回響粉不足，需要 " + cost.echoPowder);
-    this.state.resources.starSand -= cost.starSand;
-    this.state.resources.echoPowder -= cost.echoPowder;
+    assert(this.state.resources.characterExp >= cost.characterExp, "角色經驗不足，需要 " + cost.characterExp);
+    this.state.resources.characterExp -= cost.characterExp;
     progress.level = level + 1;
     progress.affinity = Math.min(100, (Number(progress.affinity) || 0) + 1);
+    this.state.characterProgress[card.id] = progress;
+    return { card: clone(card), cost: cost, progress: clone(progress), state: this.getState() };
+  };
+
+  GachaGame.prototype.enhanceConstellation = function (options) {
+    options = options || {};
+    var card = this.cardById[options.cardId];
+    assert(card, "找不到角色：" + options.cardId);
+    assert((this.state.collection[card.id] || 0) > 0, "尚未取得這名角色，無法提升命座");
+    var progress = this.getCharacterProgress(card.id);
+    var constellation = Math.max(0, Number(progress.constellation) || 0);
+    assert(constellation < this.rules.constellation.max, "角色命座已達目前最高階");
+    var cost = { resonanceCore: this.rules.constellation.baseResonanceCore + constellation * this.rules.constellation.resonanceCoreStep };
+    assert(this.state.resources.resonanceCore >= cost.resonanceCore, "共鳴晶核不足，需要 " + cost.resonanceCore);
+    this.state.resources.resonanceCore -= cost.resonanceCore;
+    progress.constellation = constellation + 1;
+    progress.affinity = Math.min(100, (Number(progress.affinity) || 0) + 3);
     this.state.characterProgress[card.id] = progress;
     return { card: clone(card), cost: cost, progress: clone(progress), state: this.getState() };
   };
@@ -386,6 +420,7 @@
     var card;
     var isFeatured = false;
     var resourceReward = makeEmptyReward();
+    var compensationReward = makeEmptyReward();
 
     if (isFourStar) {
       if (banner.poolKey === "limited") {
@@ -410,8 +445,11 @@
       card = pick(banner.standard3Stars, this.rng.bind(this));
       pity.pullsSince4Star = pityPullNumber;
     } else {
-      // 沿用既有回響粉作為非角色結果，不新增角色或額外卡池。
+      // 非角色結果仍給回響粉；另有 8% 小機率掉落少量星砂。
       resourceReward.echoPowder = this.rules.nonCharacterReward.echoPowder;
+      if (validateRandomValue(this.rng()) < this.rules.bonusStarSandRate) {
+        resourceReward.starSand = this.rules.bonusStarSandAmount;
+      }
       pity.pullsSince4Star = pityPullNumber;
     }
 
@@ -419,20 +457,28 @@
     var previousCopies = card ? (this.state.collection[card.id] || 0) : 0;
     var isFirstAcquisition = Boolean(card) && previousCopies === 0;
     if (card) {
-      this.state.collection[card.id] = previousCopies + 1;
+      this._grantCardCopy(card);
     }
     var duplicateReward = makeEmptyReward();
 
     if (card && !isFirstAcquisition && card.rarity === 4) {
       duplicateReward.starMarks = this.rules.duplicateFourStar.starMarks;
       duplicateReward.starSand = this.rules.duplicateFourStar.starSand;
+      duplicateReward.resonanceCore = this.rules.duplicateFourStar.resonanceCore;
     } else if (card && !isFirstAcquisition && card.rarity === 3) {
-      duplicateReward.echoPowder = this.rules.duplicateThreeStar.echoPowder;
+      duplicateReward.characterExp = this.rules.duplicateThreeStar.characterExp;
     }
 
-    this.state.resources.starSand += duplicateReward.starSand + resourceReward.starSand;
+    // 只有「出了 4★ 但歪到其他 4★」才發放補償，避免普通未出金時變成無限資源。
+    if (banner.poolKey === "limited" && card && card.rarity === 4 && !isFeatured) {
+      compensationReward.starSand = 1000;
+    }
+
+    this.state.resources.starSand += duplicateReward.starSand + resourceReward.starSand + compensationReward.starSand;
     this.state.resources.starMarks += duplicateReward.starMarks + resourceReward.starMarks;
     this.state.resources.echoPowder += duplicateReward.echoPowder + resourceReward.echoPowder;
+    this.state.resources.characterExp += duplicateReward.characterExp + resourceReward.characterExp;
+    this.state.resources.resonanceCore += duplicateReward.resonanceCore + resourceReward.resonanceCore;
 
     return {
       card: card ? clone(card) : null,
@@ -447,6 +493,7 @@
       isFirstAcquisition: isFirstAcquisition,
       resourceReward: resourceReward,
       duplicateReward: duplicateReward,
+      compensationReward: compensationReward,
       pityAfter: clone(pity)
     };
   };
@@ -458,11 +505,11 @@
     var payment = options.payment || "starSand";
     assert(count === 1 || count === 10, "一次只能抽 1 抽或 10 抽");
     assert(payment === "starSand" || payment === "ticket", "支付方式必須是 starSand 或 ticket");
-    assert(payment !== "ticket" || count === 1, "回覆券只能抵用單次召集");
+    assert(payment !== "ticket" || count === 1, "共鳴券只能抵用單次召集");
 
     var cost = payment === "ticket" ? 0 : (count === 10 ? this.rules.tenCost : this.rules.singleCost);
     if (payment === "ticket") {
-      assert(this.state.resources.tickets >= 1, "回覆券不足");
+      assert(this.state.resources.tickets >= 1, "共鳴券不足");
       this.state.resources.tickets -= 1;
     } else {
       assert(this.state.resources.starSand >= cost, "星砂不足，需要 " + cost + " 星砂");
@@ -489,8 +536,10 @@
       if (item.isHardPity) {
         result.hardPity += 1;
       }
+      result.bonusStarSand += item.resourceReward.starSand || 0;
+      result.compensationStarSand += item.compensationReward.starSand || 0;
       return result;
-    }, { total: 0, fourStar: 0, threeStar: 0, resource: 0, featured: 0, hardPity: 0 });
+    }, { total: 0, fourStar: 0, threeStar: 0, resource: 0, featured: 0, hardPity: 0, bonusStarSand: 0, compensationStarSand: 0 });
 
     var record = {
       at: this.now(),
@@ -536,7 +585,7 @@
     this.state.resources.starMarks -= 10;
     this.state.bannerExchanges[banner.id] = true;
     var copies = this.state.collection[card.id] || 0;
-    this.state.collection[card.id] = copies + 1;
+    this._grantCardCopy(card);
 
     return {
       card: clone(card),

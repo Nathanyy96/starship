@@ -167,7 +167,7 @@
     byId("rng-mode").addEventListener("change", function () { rngMode = this.value; });
     byId("fixed-rng").addEventListener("change", function () { fixedRng = Math.min(0.999999, Math.max(0, Number(this.value) || 0)); });
     byId("apply-test").addEventListener("click", function () { applyTestState(); });
-    byId("jump-31").addEventListener("click", function () { byId("test-pity").value = 30; applyTestState(30); });
+    byId("jump-21").addEventListener("click", function () { byId("test-pity").value = 20; applyTestState(20); });
     byId("jump-50").addEventListener("click", function () { byId("test-pity").value = 49; applyTestState(49); });
     byId("test-pull-one").addEventListener("click", function () { pull(1, "starSand"); });
     byId("test-pull-ten").addEventListener("click", function () { pull(10, "starSand"); });

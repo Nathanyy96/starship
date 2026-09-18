@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
 const { banners, storyChapters, characterBattleStats, trialStages } = require("./src/data.js");
-const { simulateBattle } = require("./src/battle.js");
+const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const configuredDataDirectory = process.env.STARSHIP_DATA_DIR || path.join(root, "data");
@@ -323,12 +323,12 @@ function integerOrCurrent(value, current) {
 function updateAdminState(currentState, body) {
   const state = JSON.parse(JSON.stringify(currentState));
   if (body.resources) {
-    ["starSand", "tickets", "starMarks", "echoPowder"].forEach((key) => {
+    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
       state.resources[key] = integerOrCurrent(body.resources[key], state.resources[key]);
     });
   }
   if (body.resourceDelta) {
-    ["starSand", "tickets", "starMarks", "echoPowder"].forEach((key) => {
+    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
       const delta = body.resourceDelta[key] === undefined ? 0 : body.resourceDelta[key];
       if (!Number.isInteger(delta)) throw new Error("資源增減必須是整數");
       state.resources[key] += delta;
@@ -362,6 +362,7 @@ function storySceneById(chapter, sceneId) {
 function completeStoryScene(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const chapter = storyChapterById(body.chapterId);
+  if (chapter.releaseOpen === false) throw new Error("這個版本的劇情已建檔，但尚未開放");
   if (body.action === "select") {
     state.storyProgress.currentChapter = chapter.id;
     return { state: new GachaGame({ banners, state }).getState(), alreadyClaimed: false, reward: { starSand: 0 }, chapter, scene: null };
@@ -398,7 +399,8 @@ function runTrial(currentState, body) {
   if (stage.id > 1 && state.trialProgress.clearedStages.indexOf(stage.id - 1) < 0) throw new Error("請先通關前一關");
   const attempts = Number(state.trialProgress.attempts[stage.id] || 0);
   if (attempts >= 10) throw new Error("本關在目前版本已完成 10 次，請等待下次遊戲更新重置挑戰次數");
-  const battle = simulateBattle({ team, stats: characterBattleStats, stage, rng: Math.random });
+  const effectiveStats = buildEffectiveStats(characterBattleStats, state);
+  const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
   state.trialProgress.selectedTeam = team;
   state.trialProgress.lastBattle = battle;
   if (battle.won) {
@@ -546,6 +548,17 @@ async function handleApi(request, response, requestUrl) {
       const player = playerFromSession(database, body.token);
       const game = new GachaGame({ banners, state: player.record.state });
       const result = game.developCharacter({ cardId: body.cardId });
+      player.record.state = game.getState();
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/character-constellation") {
+      const player = playerFromSession(database, body.token);
+      const game = new GachaGame({ banners, state: player.record.state });
+      const result = game.enhanceConstellation({ cardId: body.cardId });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);

@@ -26,6 +26,38 @@
       return sum + (item ? Math.round(item.maxHp / 10 + item.attack + item.defense) : 0);
     }, 0);
   }
+
+  function buildEffectiveStats(baseStats, state) {
+    var progressMap = state && state.characterProgress ? state.characterProgress : {};
+    var result = {};
+    Object.keys(baseStats || {}).forEach(function (id) {
+      var base = clone(baseStats[id]);
+      var progress = progressMap[id] || {};
+      var level = Math.max(1, Number(progress.level) || 1);
+      var constellation = Math.max(0, Number(progress.constellation) || 0);
+      var multiplier = 1 + (level - 1) * 0.025 + constellation * 0.04;
+      base.maxHp = Math.round(base.maxHp * multiplier);
+      base.attack = Math.round(base.attack * multiplier);
+      base.defense = Math.round(base.defense * (1 + (level - 1) * 0.02 + constellation * 0.035));
+      base.speed = Math.round(base.speed * (1 + (level - 1) * 0.008 + constellation * 0.012));
+      base.level = level;
+      base.constellation = constellation;
+      result[id] = base;
+    });
+    return result;
+  }
+
+  function synergyScore(teamIds, stats) {
+    var roles = teamIds.map(function (id) { return stats[id] && stats[id].role; }).filter(Boolean);
+    var score = 0;
+    if (roles.some(function (role) { return role === "治療" || role === "拾音"; })) score += 0.12;
+    if (roles.some(function (role) { return role === "守衛" || role === "重裝"; })) score += 0.1;
+    if (roles.some(function (role) { return role === "指揮" || role === "支援" || role === "節奏"; })) score += 0.08;
+    if (roles.some(function (role) { return role === "獵人" || role === "斥候" || role === "射手" || role === "爆發"; })) score += 0.08;
+    if (new Set(roles).size >= 3) score += 0.08;
+    if (roles.length >= 4 && new Set(roles).size === 1) score -= 0.12;
+    return clamp(score, -0.12, 0.34);
+  }
   function hit(target, rawDamage) {
     var damage = Math.max(1, Math.round(rawDamage * (1 - clamp(target.defense / 420, 0, .62))));
     if (target.guard) { damage = Math.max(1, Math.round(damage * (1 - target.guard))); target.guard = 0; }
@@ -74,13 +106,25 @@
     if (!stage) throw new Error("找不到試煉關卡");
     if (!teamIds.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
     var rng = typeof options.rng === "function" ? options.rng : Math.random;
+    var synergy = synergyScore(teamIds, stats);
+    var luck = 0.84 + rng() * 0.28;
+    var teamFactor = 0.84 + rng() * 0.24 + synergy * 0.45;
+    var enemyFactor = 0.96 + rng() * 0.14 - synergy * 0.15;
     var team = teamIds.map(function (id) {
       var data = stats[id];
       if (!data) throw new Error("找不到角色戰鬥數值：" + id);
-      return Object.assign({ id: id, name: id, hp: data.maxHp, maxHp: data.maxHp, guard: 0, buff: null, skillReady: true }, clone(data));
+      var scaled = clone(data);
+      scaled.attack = Math.max(1, Math.round(scaled.attack * teamFactor * luck));
+      scaled.defense = Math.max(1, Math.round(scaled.defense * (0.94 + synergy * 0.3)));
+      scaled.maxHp = Math.max(1, Math.round(scaled.maxHp * (0.96 + synergy * 0.18)));
+      return Object.assign({ id: id, name: id, hp: scaled.maxHp, maxHp: scaled.maxHp, guard: 0, buff: null, skillReady: true }, scaled);
     });
     var enemies = expandEnemies(stage);
-    var logs = ["第 " + stage.id + " 關：" + stage.name + "，自走棋戰鬥開始。"];
+    enemies.forEach(function (enemy) {
+      enemy.attack = Math.max(1, Math.round(enemy.attack * enemyFactor));
+      enemy.defense = Math.max(1, Math.round(enemy.defense * (0.98 + (1 - luck) * 0.12)));
+    });
+    var logs = ["第 " + stage.id + " 關：" + stage.name + "，自走棋戰鬥開始。", "隊伍協同 " + Math.round(synergy * 100) + "%，本局變動 " + Math.round(luck * 100) + "。"];
     var round = 0;
     var maxRounds = 40;
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
@@ -97,7 +141,7 @@
         var target = chooseTarget(actor, targets);
         if (!target) return;
         var damage = hit(target, actor.attack);
-        logs.push(displayName(actor) + " 攻擊 " + displayName(target) + "，造成 " + damage + " 傷害。");
+        logs.push(displayName(actor) + " 使用「" + (actor.attackName || "基本攻擊") + "」攻擊 " + displayName(target) + "，造成 " + damage + " 傷害。");
         if (target.hp <= 0) logs.push(displayName(target) + " 已離場。");
       });
     }
@@ -109,6 +153,8 @@
       stageName: stage.name,
       rounds: round,
       teamPower: teamPower(teamIds, stats),
+      synergy: synergy,
+      luck: luck,
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp }; }),
       enemies: enemies.map(function (unit) { return { name: unit.name, hp: unit.hp, maxHp: unit.maxHp }; }),
       logs: logs.slice(-80),
@@ -116,5 +162,5 @@
     };
   }
 
-  return { simulateBattle: simulateBattle, teamPower: teamPower };
+  return { simulateBattle: simulateBattle, teamPower: teamPower, buildEffectiveStats: buildEffectiveStats, synergyScore: synergyScore };
 }));
