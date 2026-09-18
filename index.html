@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>星界之律｜遊戲大廳</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">STAR-LAW / MAIN HUB</p>
+        <h1>星界之律</h1>
+        <p class="subtitle">界痕、回覆台與旅者的記錄，從這裡開始。</p>
+      </div>
+      <div id="player-badge" class="player-badge" hidden><small>PLAYER / SECURE SESSION</small><strong id="player-name">尚未登入</strong><span class="player-badge-actions"><button id="sync-player" class="small-button" type="button">同步</button><button id="change-player" class="small-button" type="button">切換帳號</button></span></div>
+    </header>
+
+    <section id="player-gate" class="player-gate auth-gate">
+      <div class="auth-gate-visual" aria-hidden="true">
+        <div class="auth-gate-orbit orbit-one"></div>
+        <div class="auth-gate-orbit orbit-two"></div>
+        <div class="auth-gate-sigil">✦</div>
+        <span class="auth-gate-caption">STAR-LAW<br>ARCHIVE</span>
+      </div>
+      <div class="auth-gate-content">
+        <p class="eyebrow">STAR-LAW ID / SECURE ENTRY</p>
+        <h2 id="auth-title">要進入回覆召集大廳嗎？</h2>
+        <p id="auth-description">玩家進度、抽卡紀錄、保底與角色收集都會綁定在你的帳號。請先選擇登入方式。</p>
+        <div id="auth-choice" class="auth-choice">
+          <button id="known-player-button" class="primary-action auth-choice-button" type="button"><strong>我登入過</strong><small>使用遊戲名稱與密碼</small></button>
+          <button id="new-player-button" class="secondary-action auth-choice-button" type="button"><strong>第一次登入</strong><small>設定名稱與專屬密碼</small></button>
+        </div>
+        <form id="player-form" class="player-form auth-form" hidden>
+          <div id="auth-mode-badge" class="auth-mode-badge">RETURNING PLAYER / LOGIN</div>
+          <label>遊戲名稱<input id="player-name-input" maxlength="24" autocomplete="username" placeholder="例如：Natha" required></label>
+          <label>密碼<input id="player-password-input" minlength="6" maxlength="72" type="password" autocomplete="current-password" placeholder="至少 6 個字元" required></label>
+          <label id="password-confirm-field" hidden>確認密碼<input id="player-password-confirm" minlength="6" maxlength="72" type="password" autocomplete="new-password" placeholder="再次輸入密碼" required></label>
+          <div class="auth-form-actions"><button id="auth-back" class="small-button" type="button">返回</button><button id="auth-submit" class="primary-action" type="submit">登入抽卡大廳</button></div>
+        </form>
+        <div id="player-gate-message" class="message" role="status"></div>
+      </div>
+    </section>
+
+    <section id="game-lobby" class="game-lobby" hidden>
+      <div class="lobby-hero panel">
+        <div class="lobby-hero-copy">
+          <p class="eyebrow">STAR-LAW / HOME TERMINAL</p>
+          <h2>界痕回覆中樞</h2>
+          <p>在回覆台之間整理線索，推進文件中的旅程，召集角色並培養已取得的夥伴。</p>
+          <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span></div>
+        </div>
+        <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><b>✦</b></div>
+      </div>
+      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>文件資料同步中</span></div>
+      <div class="lobby-menu-grid">
+        <button id="open-story" class="lobby-menu-card story-menu" type="button"><span class="menu-index">01</span><span class="menu-icon">◈</span><strong>劇情</strong><small>閱讀界痕調查與各版本角色線</small><span class="menu-arrow">→</span></button>
+        <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
+        <button id="open-characters" class="lobby-menu-card character-menu" type="button"><span class="menu-index">03</span><span class="menu-icon">◇</span><strong>角色培養</strong><small>查看已獲得角色與培養進度</small><span class="menu-arrow">→</span></button>
+        <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
+      </div>
+      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–1.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
+      <div id="milestone-rewards" class="milestone-rewards"></div>
+    </section>
+
+    <section id="story-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">1.0–1.5</span></div>
+      <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0–1.5</button><button id="story-side-tab" class="small-button" type="button">支線 1.0–1.5</button></div>
+      <div class="story-layout"><nav id="story-chapters" class="story-chapters" aria-label="劇情章節"></nav><article id="story-reader" class="story-reader"></article></div>
+    </section>
+
+    <section id="character-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
+      <div class="character-intro"><div><strong>培養回覆台夥伴</strong><p>使用回響粉與星砂提升已取得角色的等級；角色資料皆來自文件現有角色。</p></div><div class="character-resource-note"><span>星砂 <b id="character-star-sand">0</b></span><span>回響粉 <b id="character-echo-powder">0</b></span></div></div>
+      <div id="character-list" class="character-list"></div>
+    </section>
+
+    <section id="trial-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
+      <div class="trial-layout">
+        <aside class="trial-stage-rail">
+          <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>最多 4 名角色參戰</strong><small>選好編隊後，戰鬥會依速度與技能自動進行。</small></div>
+          <div id="trial-stages" class="trial-stages"></div>
+        </aside>
+        <section class="trial-arena">
+          <div id="trial-stage-details" class="trial-stage-details"></div>
+          <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>出戰編隊</h3></div><span id="trial-team-count">0 / 4</span></div>
+          <div id="trial-team-list" class="trial-team-list"></div>
+          <button id="start-trial-battle" class="primary-action trial-start-button" type="button">開始自走棋戰鬥</button>
+          <div id="trial-battle-result" class="trial-battle-result"></div>
+        </section>
+      </div>
+    </section>
+
+    <div id="gacha-hall" class="gacha-hall" hidden>
+    <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–1.5 角色池</span></div>
+    <section class="resource-bar" aria-label="資源">
+      <div class="resource"><span class="resource-icon sand">✦</span><span><small>星砂</small><strong id="star-sand">0</strong></span></div>
+      <div class="resource"><span class="resource-icon ticket">↩</span><span><small>回覆券</small><strong id="tickets">0</strong></span></div>
+      <div class="resource"><span class="resource-icon mark">◇</span><span><small>星痕</small><strong id="star-marks">0</strong></span></div>
+      <div class="resource"><span class="resource-icon powder">·</span><span><small>回響粉</small><strong id="echo-powder">0</strong></span></div>
+    </section>
+
+    <section class="banner-layout">
+      <div id="banner-panel" class="panel banner-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">CURRENT TERMINAL</p>
+            <h2>選擇回覆台</h2>
+          </div>
+          <select id="banner-select" aria-label="選擇卡池"></select>
+        </div>
+        <p id="banner-description" class="banner-description"></p>
+        <div class="banner-subline" aria-label="卡池標籤"><span>1.0—1.5 角色回音</span><span>50 抽硬保底</span><span>前 30 抽無 4★</span></div>
+        <div class="featured-heading"><span>從文件角色選一隻限定 4★</span><select id="featured-select" aria-label="選擇限定 4 星角色"></select></div>
+        <div id="featured-card" class="featured-card"></div>
+
+        <div class="pity-panel">
+          <div class="pity-heading"><span>4★ 保底計數</span><strong id="pity-count">0 / 50</strong></div>
+          <div class="pity-track"><div id="pity-fill" class="pity-fill"></div></div>
+          <div class="pity-details"><span id="pity-distance">距離 4★ 硬保底還有 50 格</span><span>下格機率 <b id="pity-rate">0%</b></span></div>
+          <p id="featured-guarantee" class="guarantee-copy"></p>
+        </div>
+
+        <div class="pull-actions">
+          <button id="pull-one" class="primary-action"><span>單次召集</span><small>160 星砂</small></button>
+          <button id="pull-ten" class="primary-action"><span>十次召集</span><small>1,600 星砂</small></button>
+          <button id="pull-ticket" class="ticket-action"><span>使用回覆券</span><small>免費單抽</small></button>
+        </div>
+        <button id="exchange-featured" class="exchange-action">10 星痕兌換精選</button>
+        <div id="message" class="message" role="status"></div>
+      </div>
+
+      <aside class="panel rules-panel">
+        <p class="eyebrow">VISIBLE RULES</p>
+        <h2>公開機率</h2>
+        <div class="rule-list">
+          <div><span>第 1–30 抽</span><strong>0%</strong><small>不會提早出現 4★</small></div>
+          <div><span>選中限定 4★</span><strong>55%</strong><small>每次 4★ 判定時選中者的機率</small></div>
+          <div><span>其他 4★ 合計</span><strong>45%</strong><small>同一池其餘文件角色合計</small></div>
+          <div><span>三星角色</span><strong>20%</strong><small>非 4★ 結果中的角色機率；1.0–1.5 三星共用</small></div>
+          <div><span>一般回響</span><strong>80%</strong><small>非 4★ 結果的其餘部分，轉為回響粉</small></div>
+          <div><span>第 31 抽</span><strong>10%</strong><small>開始進入提升段</small></div>
+          <div><span>之後每抽</span><strong>+4%</strong><small>按單格逐抽計算</small></div>
+          <div class="hard-rule"><span>第 50 抽</span><strong>100%</strong><small>硬保底，必定 4★</small></div>
+        </div>
+        <p class="rules-footnote">十連只是操作便利，不把 4★ 藏到最後一格；限定與復刻共用限定計數，常駐獨立。</p>
+      </aside>
+    </section>
+
+    <section id="results" class="panel results-panel">
+      <div class="empty">選擇召集方式後，結果會在這裡逐格顯示。</div>
+    </section>
+
+    <section class="lower-grid">
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">ARCHIVE</p><h2>角色收集</h2></div><span id="collection-count" class="count-badge">0 / 0</span></div>
+        <div id="collection" class="collection-list"></div>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">PUBLIC LOG</p><h2>召集紀錄</h2></div><button id="reset-save" class="small-button" type="button">切換玩家</button></div>
+        <div id="history" class="history-list"></div>
+      </section>
+    </section>
+
+    <footer>
+      <span>現行實作：50 抽硬保底／前 30 抽無 4★／31 抽起每抽 +4%</span>
+      <span>卡面中的名稱、星級與元素為固定辨識資訊</span>
+    </footer>
+    </div>
+  </main>
+  <script src="./src/gacha.js"></script>
+  <script src="./src/data.js"></script>
+  <script src="./src/battle.js"></script>
+  <script src="./src/player-app.js"></script>
+</body>
+</html>

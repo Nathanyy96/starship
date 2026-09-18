@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: starship-gacha
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node serve.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: STARSHIP_ADMIN_KEY
+        sync: false
+      - key: STARSHIP_DATA_DIR
+        value: /opt/render/project/src/storage/data
+    disk:
+      name: starship-player-data
+      mountPath: /opt/render/project/src/storage
+      sizeGB: 1

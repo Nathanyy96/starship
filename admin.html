@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>星界之律｜管理端</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="page-shell test-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">STAR-LAW / OPERATOR CONSOLE</p>
+        <h1>玩家資料管理</h1>
+        <p class="subtitle">只有知道管理密鑰的人可以進入；玩家版不會顯示此頁入口。</p>
+      </div>
+      <div class="save-badge"><span class="save-dot"></span>後端管理端</div>
+    </header>
+
+    <section class="panel admin-access">
+      <p class="eyebrow">SECURE LOOKUP</p>
+      <h2>尋找玩家</h2>
+      <div class="admin-access-grid">
+        <label>管理密鑰<input id="admin-key" type="password" autocomplete="off" placeholder="STARSHIP_ADMIN_KEY"></label>
+        <label>遊戲名稱<input id="admin-player" maxlength="24" placeholder="輸入玩家名稱"></label>
+        <button id="admin-lookup" class="primary-action" type="button">載入玩家資料</button>
+      </div>
+      <div id="admin-message" class="message" role="status"></div>
+    </section>
+
+    <section id="admin-editor" class="admin-editor" hidden>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">PLAYER RESOURCES</p><h2 id="admin-player-title">玩家</h2></div><span id="admin-updated" class="count-badge"></span></div>
+        <div class="admin-form-grid">
+          <label>星砂<input id="admin-star-sand" type="number" min="0" step="1"></label>
+          <label>回覆券<input id="admin-tickets" type="number" min="0" step="1"></label>
+          <label>星痕<input id="admin-star-marks" type="number" min="0" step="1"></label>
+          <label>回響粉<input id="admin-echo-powder" type="number" min="0" step="1"></label>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">PITY CONTROL</p><h2>保底與精選</h2></div></div>
+        <div class="admin-form-grid">
+          <label>限定／復刻保底<input id="admin-limited-pity" type="number" min="0" max="49" step="1"></label>
+          <label>常駐保底<input id="admin-standard-pity" type="number" min="0" max="49" step="1"></label>
+          <label class="check-row"><input id="admin-guarantee" type="checkbox"> 下一張限定 4★ 強制精選</label>
+          <label>精選 4★<select id="admin-featured"></select></label>
+        </div>
+        <button id="admin-save" class="secondary-action" type="button">儲存玩家修改</button>
+      </section>
+      <section class="panel test-state-panel admin-state">
+        <div class="section-heading"><div><p class="eyebrow">RAW STATE</p><h2>伺服器狀態</h2></div></div>
+        <pre id="admin-state" class="state-output"></pre>
+      </section>
+    </section>
+  </main>
+  <script src="./src/admin-app.js"></script>
+</body>
+</html>

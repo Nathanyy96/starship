@@ -1,0 +1,11 @@
+{
+  "name": "starship-response-gacha",
+  "version": "1.0.0",
+  "private": true,
+  "description": "星界之律｜回覆召集的可測試抽卡核心與瀏覽器試玩介面",
+  "scripts": {
+    "test": "node --test test/gacha.test.js test/battle.test.js",
+    "serve": "node serve.mjs",
+    "start": "node serve.mjs"
+  }
+}

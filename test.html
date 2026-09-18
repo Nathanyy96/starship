@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>星界之律｜測試抽卡</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="page-shell test-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">STAR-LAW / QA TERMINAL</p>
+        <h1>測試抽卡</h1>
+        <p class="subtitle">僅供製作者驗證保底、精選、三星機率與卡池資料；本頁存檔與玩家版分開。</p>
+      </div>
+      <div class="save-badge"><span class="save-dot"></span>測試存檔</div>
+    </header>
+
+    <section class="test-grid">
+      <section class="panel test-controls">
+        <p class="eyebrow">TEST CONTROLS</p>
+        <h2>測試條件</h2>
+        <label>卡池<select id="test-banner"></select></label>
+        <label>精選 4★<select id="test-featured"></select></label>
+        <label>隨機模式<select id="rng-mode">
+          <option value="random">正常隨機</option>
+          <option value="low">固定 0（容易觸發）</option>
+          <option value="high">固定 0.999999（不主動觸發）</option>
+          <option value="fixed">自訂固定值</option>
+        </select></label>
+        <label>自訂隨機值<input id="fixed-rng" type="number" min="0" max="0.999999" step="0.000001" value="0.5"></label>
+        <label>目前保底計數<input id="test-pity" type="number" min="0" max="49" step="1" value="0"></label>
+        <label class="check-row"><input id="test-guarantee" type="checkbox"> 下一張 4★ 強制精選</label>
+        <label>星砂<input id="test-sand" type="number" min="0" step="160" value="100000"></label>
+        <label>回覆券<input id="test-tickets" type="number" min="0" step="1" value="10"></label>
+        <button id="apply-test" class="secondary-action">套用測試條件</button>
+        <div class="test-shortcuts">
+          <button id="jump-31" class="small-button">設為第 31 抽</button>
+          <button id="jump-50" class="small-button">設為第 50 抽</button>
+        </div>
+      </section>
+
+      <section class="panel test-runner">
+        <p class="eyebrow">TEST RUNNER</p>
+        <h2>執行抽卡</h2>
+        <div class="test-status">
+          <span>保底 <strong id="test-pity-status">0 / 50</strong></span>
+          <span>下格 4★ <strong id="test-rate">0%</strong></span>
+          <span>精選 <strong id="test-selected">－</strong></span>
+        </div>
+        <div class="pull-actions">
+          <button id="test-pull-one" class="primary-action"><span>單抽</span><small>160 星砂</small></button>
+          <button id="test-pull-ten" class="primary-action"><span>十連</span><small>1,600 星砂</small></button>
+          <button id="test-pull-ticket" class="ticket-action"><span>回覆券</span><small>免費單抽</small></button>
+        </div>
+        <button id="test-reset" class="exchange-action">清除測試存檔</button>
+        <div id="test-message" class="message" role="status"></div>
+        <div id="test-results" class="test-results"><div class="empty">尚未執行測試。</div></div>
+      </section>
+    </section>
+
+    <section class="panel test-state-panel">
+      <div class="section-heading"><div><p class="eyebrow">SERIALIZED STATE</p><h2>目前狀態</h2></div></div>
+      <pre id="test-state" class="state-output"></pre>
+    </section>
+  </main>
+  <script src="./src/gacha.js"></script>
+  <script src="./src/data.js"></script>
+  <script src="./src/test-app.js"></script>
+</body>
+</html>
