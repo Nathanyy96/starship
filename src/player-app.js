@@ -31,6 +31,7 @@
     var currentPetEffectId = "starlit";
     var petShowcases = [];
     var currentCharacterId = "";
+    var currentCharacterSkinId = "";
     var game = null;
 
     function byId(id) { return document.getElementById(id); }
@@ -490,22 +491,34 @@
       var stats = effectiveBattleStats(state);
       return window.StarshipBattle && stats[cardId] ? window.StarshipBattle.teamPower([cardId], stats) : 0;
     }
+    function seasonSkinFor(cardId) {
+      var skin = data.voyageConfig && data.voyageConfig.seasonSkin;
+      return skin && skin.characterId === cardId ? skin : null;
+    }
+    function characterSkinUnlocked(state, skin) {
+      return Boolean(skin && state && state.cosmetics && state.cosmetics.skins && state.cosmetics.skins[skin.id]);
+    }
+    function characterSkinMarkup(card, state, skin, active) {
+      if (!skin) return "<section class=\"character-skin-panel skin-empty\"><div><span class=\"eyebrow\">CHARACTER OUTFIT</span><h4>目前沒有專屬造型</h4><p>之後有角色造型時，會在這裡顯示預覽與取得方式。</p></div></section>";
+      var unlocked = characterSkinUnlocked(state, skin); var previewImage = skin.previewImage || card.image || card.backgroundImage || ""; var status = unlocked ? "已解鎖" : "尚未解鎖"; var buttonLabel = active ? "顯示原始立繪" : (unlocked ? "查看造型立繪" : "預覽造型");
+      return "<section class=\"character-skin-panel " + (active ? "skin-active " : "") + (unlocked ? "skin-unlocked" : "skin-locked") + "\" style=\"--skin-accent:" + escapeHtml(skin.accent || card.accent || "#9e92ff") + "\"><div class=\"character-skin-preview\"><img src=\"" + escapeHtml(previewImage) + "\" alt=\"" + escapeHtml(card.name + "「" + skin.name + "」造型預覽") + "\" loading=\"lazy\"><div class=\"skin-preview-ribbon\"><span>SEASON OUTFIT</span><strong>流光檔案</strong></div><i class=\"skin-preview-orbit\"></i></div><div class=\"character-skin-copy\"><div class=\"skin-copy-heading\"><div><span class=\"eyebrow\">角色造型</span><h4>" + escapeHtml(skin.name) + "</h4></div><b class=\"skin-status\">" + status + "</b></div><p>" + escapeHtml(skin.description || "只改變角色外觀，不改變戰鬥數值。") + "</p><small>取得方式｜" + escapeHtml(skin.source || "特殊結局獎勵") + "</small><button class=\"secondary-action skin-preview-button\" data-skin-preview=\"" + escapeHtml(skin.id) + "\" type=\"button\" aria-pressed=\"" + (active ? "true" : "false") + "\">" + buttonLabel + "</button></div></section>";
+    }
     function renderCharacterDetail(cardId) {
       var state = game && game.getState(); var card = data.cards[cardId]; var detail = byId("character-detail");
       if (!state || !card || !detail) return;
       var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var stats = characterStatsFor(card.id, progress) || {}; var power = characterPower(card.id, state);
       // 角色詳情直接使用原始 PNG，避免 SVG 內嵌立繪在部分手機瀏覽器被阻擋；
       // 名稱、星級與元素固定疊在畫面底部，仍保留完整立繪比例。
-      var image = card.image || card.backgroundImage;
+      var skin = seasonSkinFor(card.id); var skinActive = Boolean(skin && currentCharacterSkinId === skin.id); var image = skinActive && skin.previewImage ? skin.previewImage : card.image || card.backgroundImage;
       var portraitLabel = "<div class=\"portrait-label\"><strong>" + escapeHtml(card.name) + "</strong><span>" + "★".repeat(card.rarity) + "　" + escapeHtml(card.element) + "</span><small>" + escapeHtml(card.romanizedName) + "</small></div>";
       var developAction = !copies ? "<button class=\"primary-action\" type=\"button\" disabled>尚未取得</button>" : needBreakthrough ? "<button class=\"primary-action\" type=\"button\" disabled>請先完成 80 等突破</button>" : atMax ? "<button class=\"primary-action\" type=\"button\" disabled>已達現行上限 90 等</button>" : "<button class=\"primary-action\" data-detail-develop=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">升級　" + cost.characterExp + " 角色經驗</button>";
       var breakthroughAction = needBreakthrough && requirement ? "<button class=\"secondary-action breakthrough-detail-action\" data-detail-breakthrough=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (materialAmount + universalAmount < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>" : "";
       var breakthroughNote = requirement ? (progress.breakthrough ? "已完成 80 等突破，可繼續升到 90 等" : "建議 Boss｜" + escapeHtml((bossStageById(requirement.bossId) || {}).name || "未設定") + "　指定材料｜" + escapeHtml(requirement.materialName) + " " + materialAmount + "/" + requirement.cost + "　通用印記｜" + universalAmount + "（可替代）") : "突破材料設定尚未載入";
-      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-frame\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + portraitLabel + "</div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div><div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div><div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + developAction + breakthroughAction + "</div><p class=\"detail-resource-hint\">4★每級提升幅度與經驗成本較高；3★較容易培養。重複抽到角色時命座會立即自動增加，不需要在這裡再次按提升；角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
+      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && skin ? "「" + skin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && skin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + portraitLabel + "</div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div><div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + characterSkinMarkup(card, state, skin, skinActive) + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + developAction + breakthroughAction + "</div><p class=\"detail-resource-hint\">4★每級提升幅度與經驗成本較高；3★較容易培養。重複抽到角色時命座會立即自動增加，不需要在這裡再次按提升；角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
       detail.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-    function openCharacterDetail(cardId) { currentCharacterId = cardId; renderCharacterDetail(cardId); }
+    function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); }
     function updateStorySelection(chapterId) {
       var chapter = storyChapterById(chapterId); if (!chapter || chapter.releaseOpen === false) return;
       currentStoryChapterId = chapterId; currentStorySceneId = chapter.scenes[0].id;
@@ -1115,7 +1128,8 @@
     });
     byId("character-list").addEventListener("keydown", function (event) { if (event.key === "Enter" || event.key === " ") { var card = event.target.closest("[data-open-character]"); if (card) { event.preventDefault(); openCharacterDetail(card.getAttribute("data-open-character")); } } });
     byId("character-detail").addEventListener("click", function (event) {
-       if (event.target.closest("[data-close-character]")) { byId("character-detail").hidden = true; currentCharacterId = ""; return; }
+       if (event.target.closest("[data-close-character]")) { byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
+       var skinButton = event.target.closest("[data-skin-preview]"); if (skinButton) { var skinId = skinButton.getAttribute("data-skin-preview"); currentCharacterSkinId = currentCharacterSkinId === skinId ? "" : skinId; renderCharacterDetail(currentCharacterId); return; }
        var developButton = event.target.closest("[data-detail-develop]"); if (developButton) { developCharacter(developButton.getAttribute("data-detail-develop")); return; }
        var breakthroughButton = event.target.closest("[data-detail-breakthrough]"); if (breakthroughButton) { breakthroughCharacter(breakthroughButton.getAttribute("data-detail-breakthrough")); return; }
     });

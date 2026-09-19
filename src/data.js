@@ -329,7 +329,7 @@
       hidden: { starSand: 280, characterExp: 700, petTokens: 1 },
       special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-luminous-archive" }
     },
-    seasonSkin: { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", accent: "#d06cff" }
+    seasonSkin: { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" }
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
