@@ -32,6 +32,7 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
   const futureStory = storyChapters.filter((chapter) => Number(chapter.version) >= 3);
   assert.equal(liveStory.length, 24);
   assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length === 3 && chapter.scenes.every((scene) => scene.body)), true);
+  assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => String(scene.body).trim().length >= 20)), true);
   assert.equal(futureStory.length, 24);
   assert.equal(futureStory.every((chapter) => chapter.releaseOpen === false && chapter.scenes.length === 3), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-3-5"), true);
@@ -42,6 +43,25 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
 test("星港委託提供額外玩法與非抽卡獎勵", () => {
   assert.equal(dispatchMissions.length, 3);
   assert.equal(dispatchMissions.every((mission) => mission.enemies.length > 0 && mission.reward.starSand > 0), true);
+});
+
+test("版本遷移保留角色、等級、命座晶核與已完成劇情", () => {
+  const migrated = game({
+    state: state({
+      collection: { celesia: 2, lia: 5 },
+      characterProgress: {
+        celesia: { level: 28, affinity: 12, constellation: 1, constellationCore: 1 },
+        lia: { level: 41, affinity: 22, constellation: 4, constellationCore: 4 }
+      },
+      storyProgress: { currentChapter: "main-1-5", completedScenes: { "main-1-0:scene-1": { starSand: 100 } } },
+      trialProgress: { version: "1.0-1.5", clearedStages: [1, 2], attempts: { 1: 1 }, bestStage: 2 }
+    })
+  }).getState();
+  assert.deepEqual(migrated.collection, { celesia: 2, lia: 5 });
+  assert.deepEqual(migrated.characterProgress.celesia, { level: 28, affinity: 12, constellation: 1, constellationCore: 1 });
+  assert.deepEqual(migrated.characterProgress.lia, { level: 41, affinity: 22, constellation: 4, constellationCore: 4 });
+  assert.ok(migrated.storyProgress.completedScenes["main-1-0:scene-1"]);
+  assert.equal(migrated.trialProgress.version, "1.0-1.5");
 });
 
 function state(overrides) {

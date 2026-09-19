@@ -127,8 +127,28 @@
       byId("player-password-confirm").value = "";
       showAuthChoice();
     }
+    function preserveCharacterData(input, state) {
+      var source = input && typeof input === "object" ? input : {};
+      var savedCollection = source.collection && typeof source.collection === "object" ? source.collection : {};
+      var savedProgress = source.characterProgress && typeof source.characterProgress === "object" ? source.characterProgress : {};
+      state.collection = state.collection || {};
+      state.characterProgress = state.characterProgress || {};
+      Object.keys(savedCollection).forEach(function (cardId) {
+        var savedCopies = Math.max(0, Number(savedCollection[cardId]) || 0);
+        state.collection[cardId] = Math.max(Number(state.collection[cardId]) || 0, savedCopies);
+      });
+      Object.keys(savedProgress).forEach(function (cardId) {
+        var saved = savedProgress[cardId]; if (!saved || typeof saved !== "object") return;
+        var current = state.characterProgress[cardId] && typeof state.characterProgress[cardId] === "object" ? state.characterProgress[cardId] : {};
+        state.characterProgress[cardId] = Object.assign({}, current, saved);
+        ["level", "affinity", "constellation", "constellationCore"].forEach(function (field) {
+          state.characterProgress[cardId][field] = Math.max(Number(saved[field]) || 0, Number(current[field]) || 0);
+        });
+      });
+    }
     function ensurePlayerState(input) {
       var state = new api.GachaGame({ banners: data.banners, state: input || undefined }).getState();
+      preserveCharacterData(input, state);
       state.collection = state.collection || {};
       state.recruitment = state.recruitment || {};
       // 登入或建立帳號後一律補齊主角，兼容早期沒有 starterGranted 的舊存檔。
@@ -159,7 +179,9 @@
         state.dispatchProgress.claimed = {};
         state.dispatchProgress.lastMission = null;
       }
-      return new api.GachaGame({ banners: data.banners, state: state }).getState();
+      var migratedState = new api.GachaGame({ banners: data.banners, state: state }).getState();
+      preserveCharacterData(input, migratedState);
+      return new api.GachaGame({ banners: data.banners, state: migratedState }).getState();
     }
     function syncViewState(state) {
       currentStoryChapterId = state.storyProgress && state.storyProgress.currentChapter ? state.storyProgress.currentChapter : "main-1-0";
@@ -314,6 +336,11 @@
     function renderStory() {
       if (!game) return;
       var state = game.getState(); var chapters = storyChapterList(); var current = storyChapterById(currentStoryChapterId);
+      if (!chapters.length) {
+        byId("story-chapters").innerHTML = "<div class=\"empty\">劇情資料尚未載入，請重新整理頁面；玩家存檔不會因此被清除。</div>";
+        byId("story-reader").innerHTML = "<div class=\"empty\">目前沒有可顯示的已開放劇情。若重新整理後仍看不到，請聯絡管理員檢查部署版本。</div>";
+        return;
+      }
       if (!current || current.type !== currentStoryTab || current.releaseOpen === false) { current = chapters[0]; currentStoryChapterId = current.id; currentStorySceneId = current.scenes[0].id; }
       byId("story-main-tab").classList.toggle("active", currentStoryTab === "main"); byId("story-side-tab").classList.toggle("active", currentStoryTab === "side");
       var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(chapter.version) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕</small></span></button>"; }).join("");

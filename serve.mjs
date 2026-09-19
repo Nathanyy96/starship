@@ -14,12 +14,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const configuredDataDirectory = process.env.STARSHIP_DATA_DIR || path.join(root, "data");
 const dataDirectory = path.resolve(configuredDataDirectory);
 const playerDatabasePath = path.join(dataDirectory, "players.json");
+const playerDatabaseBackupPath = playerDatabasePath + ".bak";
 const port = Number(process.env.PORT || 8080);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 const currentUpdateVersion = "2.0-2.5";
 const updateReward = Object.freeze({ starSand: 3200 });
 const sessions = new Map();
+const databaseBaselines = new WeakMap();
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -75,19 +77,74 @@ function emptyDatabase() {
   return { version: 2, players: {} };
 }
 
-function readFileDatabase() {
+function parseFileDatabase(filePath) {
   try {
-    const value = JSON.parse(fs.readFileSync(playerDatabasePath, "utf8"));
-    return value && value.players ? Object.assign({ version: 2 }, value) : emptyDatabase();
+    const value = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return value && value.players ? Object.assign({ version: 2 }, value) : null;
   } catch (error) {
-    return emptyDatabase();
+    return null;
   }
+}
+
+function readFileDatabase() {
+  const primary = parseFileDatabase(playerDatabasePath);
+  const backup = parseFileDatabase(playerDatabaseBackupPath);
+  if (!primary && backup) return backup;
+  if (!primary) return emptyDatabase();
+  // 沒有刪除玩家的功能；若主檔因部署中斷少了帳號，從上一份備份補回。
+  if (backup) {
+    Object.entries(backup.players || {}).forEach(([key, record]) => {
+      if (!primary.players[key]) primary.players[key] = record;
+    });
+  }
+  return primary;
 }
 
 function writeFileDatabase(database) {
   const temporaryPath = playerDatabasePath + ".tmp";
+  if (fs.existsSync(playerDatabasePath)) fs.copyFileSync(playerDatabasePath, playerDatabaseBackupPath);
   fs.writeFileSync(temporaryPath, JSON.stringify(database, null, 2), "utf8");
   fs.renameSync(temporaryPath, playerDatabasePath);
+}
+
+function cloneDatabase(database) {
+  return JSON.parse(JSON.stringify(database || emptyDatabase()));
+}
+
+function assertPlayerStateContinuity(previousState, nextState, playerKey) {
+  if (!previousState || !nextState) return;
+  const oldCollection = previousState.collection && typeof previousState.collection === "object" ? previousState.collection : {};
+  const nextCollection = nextState.collection && typeof nextState.collection === "object" ? nextState.collection : {};
+  Object.entries(oldCollection).forEach(([cardId, oldCopies]) => {
+    const oldCount = Math.max(0, Number(oldCopies) || 0);
+    const nextCount = Math.max(0, Number(nextCollection[cardId]) || 0);
+    if (oldCount > nextCount) throw new Error("更新保護中止：玩家 " + playerKey + " 的角色持有數量不可被降低");
+  });
+
+  const oldProgress = previousState.characterProgress && typeof previousState.characterProgress === "object" ? previousState.characterProgress : {};
+  const nextProgress = nextState.characterProgress && typeof nextState.characterProgress === "object" ? nextState.characterProgress : {};
+  ["level", "affinity", "constellation", "constellationCore"].forEach((field) => {
+    Object.entries(oldProgress).forEach(([cardId, progress]) => {
+      const oldValue = Math.max(0, Number(progress && progress[field]) || 0);
+      const nextValue = Math.max(0, Number(nextProgress[cardId] && nextProgress[cardId][field]) || 0);
+      if (oldValue > nextValue) throw new Error("更新保護中止：玩家 " + playerKey + " 的角色培養進度不可被降低");
+    });
+  });
+
+  const oldScenes = previousState.storyProgress && previousState.storyProgress.completedScenes && typeof previousState.storyProgress.completedScenes === "object" ? previousState.storyProgress.completedScenes : {};
+  const nextScenes = nextState.storyProgress && nextState.storyProgress.completedScenes && typeof nextState.storyProgress.completedScenes === "object" ? nextState.storyProgress.completedScenes : {};
+  Object.keys(oldScenes).forEach((sceneKey) => {
+    if (!nextScenes[sceneKey]) throw new Error("更新保護中止：玩家 " + playerKey + " 的已完成劇情不可被移除");
+  });
+}
+
+function assertDatabaseContinuity(previousDatabase, nextDatabase) {
+  if (!previousDatabase) return;
+  Object.entries(previousDatabase.players || {}).forEach(([key, record]) => {
+    const nextRecord = nextDatabase.players && nextDatabase.players[key];
+    if (!nextRecord) throw new Error("更新保護中止：玩家帳號不可被移除");
+    assertPlayerStateContinuity(record.state, nextRecord.state, key);
+  });
 }
 
 function normalizedTimestamp(value) {
@@ -113,7 +170,8 @@ async function readDatabase() {
   return database;
 }
 
-async function writeDatabase(database) {
+async function writeDatabase(database, previousDatabase) {
+  assertDatabaseContinuity(previousDatabase || databaseBaselines.get(database), database);
   if (!usePostgres) {
     writeFileDatabase(database);
     return;
@@ -178,8 +236,39 @@ function freshPlayerState() {
   return new GachaGame({ banners, state }).getState();
 }
 
+function snapshotPlayerProgress(currentState) {
+  const source = currentState && typeof currentState === "object" ? currentState : {};
+  return {
+    collection: source.collection && typeof source.collection === "object" ? JSON.parse(JSON.stringify(source.collection)) : {},
+    characterProgress: source.characterProgress && typeof source.characterProgress === "object" ? JSON.parse(JSON.stringify(source.characterProgress)) : {}
+  };
+}
+
+function restorePlayerProgress(state, snapshot) {
+  const savedCollection = snapshot && snapshot.collection ? snapshot.collection : {};
+  const savedProgress = snapshot && snapshot.characterProgress ? snapshot.characterProgress : {};
+  state.collection = state.collection || {};
+  state.characterProgress = state.characterProgress || {};
+  Object.entries(savedCollection).forEach(([cardId, copies]) => {
+    const count = Math.max(0, Number(copies) || 0);
+    state.collection[cardId] = Math.max(Number(state.collection[cardId]) || 0, count);
+  });
+  Object.entries(savedProgress).forEach(([cardId, saved]) => {
+    if (!saved || typeof saved !== "object") return;
+    const current = state.characterProgress[cardId] && typeof state.characterProgress[cardId] === "object" ? state.characterProgress[cardId] : {};
+    state.characterProgress[cardId] = Object.assign({}, current, saved);
+    ["level", "affinity", "constellation", "constellationCore"].forEach((field) => {
+      const oldValue = Math.max(0, Number(saved[field]) || 0);
+      const currentValue = Math.max(0, Number(current[field]) || 0);
+      state.characterProgress[cardId][field] = Math.max(oldValue, currentValue);
+    });
+  });
+}
+
 function ensurePlayerMilestones(currentState) {
+  const preservedProgress = snapshotPlayerProgress(currentState);
   const state = new GachaGame({ banners, state: currentState || freshPlayerState() }).getState();
+  restorePlayerProgress(state, preservedProgress);
   state.collection = state.collection || {};
   state.recruitment = state.recruitment || {};
   // 任何登入都要確保主角存在；這也會修復早期建立、但尚未有 starterGranted
@@ -215,7 +304,9 @@ function ensurePlayerMilestones(currentState) {
     state.dispatchProgress.claimed = {};
     state.dispatchProgress.lastMission = null;
   }
-  return new GachaGame({ banners, state }).getState();
+  const migratedState = new GachaGame({ banners, state }).getState();
+  restorePlayerProgress(migratedState, preservedProgress);
+  return new GachaGame({ banners, state: migratedState }).getState();
 }
 
 function findPlayer(database, name) {
@@ -500,6 +591,7 @@ async function handleApi(request, response, requestUrl) {
 
   const body = await readBody(request);
   const database = await readDatabase();
+  databaseBaselines.set(database, cloneDatabase(database));
   try {
     if (requestUrl.pathname === "/api/player/register") {
       const name = normalizePlayerName(body.name);
@@ -669,7 +761,9 @@ const server = http.createServer((request, response) => {
       response.end(error.code === "ENOENT" ? "Not found" : "Server error");
       return;
     }
-    response.writeHead(200, { "Content-Type": mime[path.extname(filePath)] || "application/octet-stream" });
+    const extension = path.extname(filePath).toLowerCase();
+    const cacheControl = [".html", ".css", ".js"].includes(extension) ? "no-cache, must-revalidate" : "public, max-age=31536000, immutable";
+    response.writeHead(200, { "Content-Type": mime[extension] || "application/octet-stream", "Cache-Control": cacheControl });
     response.end(content);
   });
 });
