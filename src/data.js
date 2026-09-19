@@ -101,6 +101,18 @@
   var version2Three = version2Cards.filter(function (item) { return item.rarity === 3; });
   var version3Cards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster];
 
+  // 角色培養頁的動態立繪；素材檔名沿用角色 id，之後新增影片時只要補進這份清單。
+  var characterAnimationDirectory = "./video/astralyn-1.0-1.5/";
+  var characterAnimationIds = ["celesia", "reyn", "lia", "isar", "chodan", "magenta", "hina", "siyeon", "veyra", "harlow", "rena", "elorna", "eda", "mave"];
+  var characterAnimations = Object.freeze(characterAnimationIds.reduce(function (animations, cardId) {
+    animations[cardId] = Object.freeze({
+      id: cardId,
+      src: characterAnimationDirectory + cardId + "_5s.mp4",
+      durationSeconds: 5
+    });
+    return animations;
+  }, {}));
+
   // 星界試煉的自走棋數值；4★ 的基礎戰力整體高於 3★，但不是單一數值碾壓。
   // attackName / skillName 會直接出現在戰報，讓每個角色有自己的攻擊手段。
   var characterBattleStats = {
@@ -283,6 +295,7 @@
   var voyageVersion = "2.0-2.5";
   var maveLuminousSkin = { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", themeLabel: "ARCHIVE OUTFIT", previewTitle: "流光檔案", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" };
   var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第一個夏日造型測試；保留梅芙的臉部特徵，改變服裝、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
+  var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第二個夏日造型測試；保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
   var voyageConfig = {
     version: voyageVersion,
     title: "星海迷航",
@@ -333,7 +346,7 @@
     },
     // seasonSkin 保留給舊版航程與相容性；seasonSkins 讓角色培養頁可同時預覽多個造型。
     seasonSkin: maveLuminousSkin,
-    seasonSkins: [maveLuminousSkin, maveSummerSkin]
+    seasonSkins: [maveLuminousSkin, maveSummerSkin, harlowSummerSkin]
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
@@ -1081,6 +1094,7 @@
     version3Cards: version3Cards,
     activeFour: activeFour,
     activeThree: activeThree,
+    characterAnimations: characterAnimations,
     banners: banners,
     version2Cards: version2Cards,
     version4Cards: version4Cards,

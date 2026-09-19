@@ -104,9 +104,12 @@ test("通用突破印記可以讓玩家不用被指定高難度 Boss 卡住", ()
 test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此分離", () => {
   assert.equal(voyageConfig.routes.length, 3);
   assert.ok(voyageConfig.endingRewards.hidden && voyageConfig.endingRewards.special.skinId);
-  assert.equal(voyageConfig.seasonSkins.length, 2);
+  assert.equal(voyageConfig.seasonSkins.length, 3);
   assert.equal(voyageConfig.seasonSkins[1].id, "skin-mave-summer-beach-party");
   assert.equal(voyageConfig.seasonSkins[1].characterId, "mave");
+  assert.equal(voyageConfig.seasonSkins[2].id, "skin-harlow-summer-beach-party");
+  assert.equal(voyageConfig.seasonSkins[2].characterId, "harlow");
+  assert.equal(voyageConfig.seasonSkins[2].rarity, 4);
   assert.equal(petDefinitions.length, 4);
   assert.ok(petOutfits.length >= 3 && petEffects.length >= 3);
   assert.equal(talentRules.maxLevel, 5);

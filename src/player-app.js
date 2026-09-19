@@ -85,6 +85,7 @@
       ["banner-select", "featured-select", "pull-one", "pull-ten", "exchange-featured", "reset-save"].forEach(function (id) { byId(id).disabled = !enabled; });
     }
     function hideGameViews() {
+      closeCharacterAnimation();
       ["game-lobby", "story-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
@@ -529,6 +530,42 @@
       var stats = effectiveBattleStats(state);
       return window.StarshipBattle && stats[cardId] ? window.StarshipBattle.teamPower([cardId], stats) : 0;
     }
+    function characterAnimationFor(cardId) {
+      return data.characterAnimations && data.characterAnimations[cardId] || null;
+    }
+    function resetCharacterAnimationVideo() {
+      var video = byId("character-animation-video");
+      if (!video) return;
+      video.pause();
+      video.removeAttribute("src");
+      video.removeAttribute("poster");
+      video.load();
+    }
+    function closeCharacterAnimation() {
+      var dialog = byId("character-animation-dialog");
+      if (!dialog) return;
+      if (dialog.open && typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+      resetCharacterAnimationVideo();
+    }
+    function openCharacterAnimation(cardId) {
+      var card = data.cards[cardId]; var animation = characterAnimationFor(cardId); var dialog = byId("character-animation-dialog"); var video = byId("character-animation-video");
+      if (!card || !animation || !dialog || !video) {
+        showMessage("這名角色目前尚未收錄角色動畫。", true);
+        return;
+      }
+      byId("character-animation-title").textContent = card.name + "｜角色動畫";
+      byId("character-animation-subtitle").textContent = card.romanizedName + " · " + card.releaseVersion + " 版本動態立繪";
+      byId("character-animation-caption").textContent = "1.0–1.5 角色動態立繪 · 約 " + (animation.durationSeconds || 5) + " 秒";
+      byId("character-animation-empty").hidden = true;
+      video.setAttribute("aria-label", card.name + "角色動畫");
+      if (card.image) video.setAttribute("poster", card.image);
+      video.src = animation.src;
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+      var playback = video.play();
+      if (playback && typeof playback.catch === "function") playback.catch(function () { /* 瀏覽器可能禁止自動播放，保留控制列供玩家手動播放。 */ });
+    }
     function seasonSkinsFor(cardId) {
       var config = data.voyageConfig || {};
       var skins = Array.isArray(config.seasonSkins) ? config.seasonSkins : (config.seasonSkin ? [config.seasonSkin] : []);
@@ -651,6 +688,22 @@
         return "<article class=\"enemy-intel-card\"><div class=\"enemy-intel-art\"><img src=\"" + escapeHtml(enemyArtFor(enemy)) + "\" alt=\"" + escapeHtml(enemy.name + " 敵人圖鑑") + "\"><span>×" + number(enemy.count || 1) + "</span></div><div class=\"enemy-intel-copy\"><strong>" + escapeHtml(enemy.name) + "</strong>" + mythicBadge + "<small>敵方單位 · 速度 " + number(enemy.speed || 0) + "</small><div><span>HP <b>" + number(hp) + "</b></span><span>攻 <b>" + number(enemy.attack || 0) + "</b></span><span>防 <b>" + number(enemy.defense || 0) + "</b></span></div><em>威脅值 " + number(threat) + " · 會依關卡特性行動</em></div></article>";
       }).join("");
     }
+    function battleCharacterById(id) {
+      return data.cards[id] || data.activeCards.find(function (card) { return card.id === id; }) || null;
+    }
+    function battleHealthPercent(unit) {
+      var maxHp = Math.max(1, Number(unit && unit.maxHp) || 1); return Math.max(0, Math.min(100, Math.round((Number(unit && unit.hp) || 0) / maxHp * 100)));
+    }
+    function battleUnitMarkup(unit, state, isEnemy) {
+      var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && (card.image || card.backgroundImage); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var detail = isEnemy ? "敵方單位" : card ? (card.note || "已編入戰鬥") : "已編入戰鬥"; var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
+      return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><div class=\"battle-unit-visual\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></div><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
+    }
+    function battleSceneMarkup(battle, state, stage, mode) {
+      if (!battle) return "";
+      var team = Array.isArray(battle.team) ? battle.team : []; var enemies = Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
+      var title = stage && stage.name ? stage.name : battle.stageName || "自走棋戰鬥"; var environment = battle.environment || stage && stage.environment || "一般戰鬥"; var rule = battle.enemyTrait || stage && stage.enemyTrait || "一般特性";
+      return "<section class=\"battle-scene " + (battle.won ? "battle-clear" : "battle-failed") + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / LIVE RESULT</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit) { return battleUnitMarkup(unit, state, false); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit) { return battleUnitMarkup(unit, state, true); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(line) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
+    }
     function decorateTrialMythic(stage) {
       if (!stage || !stage.mythicTheme) return;
       var details = byId("trial-stage-details");
@@ -680,11 +733,11 @@
     function renderTrialBattleResult(state) {
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
       if (!battle || Number(battle.stageId) !== Number(currentTrialStageId)) { container.innerHTML = "<div class=\"trial-result-empty\">完成一場自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
-      var rewardExp = Number((trialStageById(battle.stageId) || {}).reward && (trialStageById(battle.stageId) || {}).reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
-      var reward = battle.won ? "本次獎勵：+" + number(Number((trialStageById(battle.stageId) || {}).reward && (trialStageById(battle.stageId) || {}).reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : "本次未通關，不會扣除挑戰次數";
+      var stage = trialStageById(battle.stageId) || {}; var rewardExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
+      var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : "本次未通關，不會扣除挑戰次數";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
       var environment = battle.environment ? "環境「" + battle.environment + "」" : "";
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div><details><summary>查看自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "TRIAL") + "<details><summary>查看完整自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderTrial() {
       if (!game) return;
@@ -753,7 +806,7 @@
       var stage = bossStageById(battle.stageId) || {}; var reward = stage.reward || {};
       var rewardCopy = battle.won ? "本次獎勵：+" + number(reward.amount || 0) + " " + escapeHtml(reward.materialName || "突破材料") + "、+" + number(reward.universalAmount || 1) + " 星界通用突破印記、+" + number(reward.characterExp || 0) + " 角色經驗" : "本次未通關，不會取得突破材料";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "><div><span class=\"eyebrow\">BOSS REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "Boss 挑戰成功" : "Boss 挑戰失敗") + " · " + escapeHtml(stage.name || "Boss") + " · " + battle.rounds + " 回合</strong><small>" + rewardCopy + "｜隊伍協同 " + escapeHtml(synergy) + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div><details><summary>查看 Boss 自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BOSS REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "Boss 挑戰成功" : "Boss 挑戰失敗") + " · " + escapeHtml(stage.name || "Boss") + " · " + battle.rounds + " 回合</strong><small>" + rewardCopy + "｜隊伍協同 " + escapeHtml(synergy) + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "BOSS") + "<details><summary>查看完整 Boss 自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderBoss() {
       if (!game || !byId("boss-stages")) return;
@@ -812,8 +865,8 @@
       var container = byId("dispatch-result"); if (!container) return;
       var progress = dispatchProgress(state); var result = progress.lastMission;
       if (!result || result.missionId !== currentDispatchMissionId || !result.battle) { container.innerHTML = "<div class=\"trial-result-empty\">完成一份星港委託後，戰報與獎勵會顯示在這裡。</div>"; return; }
-      var battle = result.battle; var reward = battle.won ? rewardText((dispatchMissionById(result.missionId) || {}).reward || {}) : "未通關不會領取獎勵";
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">DISPATCH REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "委託完成" : "委託未完成") + " · " + escapeHtml((dispatchMissionById(result.missionId) || {}).name || "星港委託") + "</strong><small>" + escapeHtml(battle.won ? "獲得：" + reward : reward) + "｜隊伍協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div><details><summary>查看委託戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      var battle = result.battle; var mission = dispatchMissionById(result.missionId) || {}; var reward = battle.won ? rewardText(mission.reward || {}) : "未通關不會領取獎勵";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">DISPATCH REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "委託完成" : "委託未完成") + " · " + escapeHtml(mission.name || "星港委託") + "</strong><small>" + escapeHtml(battle.won ? "獲得：" + reward : reward) + "｜隊伍協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, mission, "DISPATCH") + "<details><summary>查看完整委託戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderDispatch() {
       if (!game || !byId("dispatch-missions")) return;
@@ -916,7 +969,7 @@
       var progress = voyageProgress(state); var battle = progress.lastBattle; var ending = progress.lastEnding;
       if (!battle && !ending) { container.innerHTML = "<div class=\"trial-result-empty\">完成一個航程節點後，戰報與結局獎勵會顯示在這裡。</div>"; return; }
       var parts = [];
-      if (battle) parts.push("<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">VOYAGE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "航道突破成功" : "航道暫時封鎖") + " · " + number(battle.rounds || 0) + " 回合</strong><small>隊伍戰力 " + number(battle.teamPower || 0) + "｜協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">" + (battle.won ? "繼續前進" : "可重新開航") + "</span></div>");
+      if (battle) { var voyageStage = trialStageById(battle.stageId) || {}; parts.push("<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">VOYAGE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "航道突破成功" : "航道暫時封鎖") + " · " + number(battle.rounds || 0) + " 回合</strong><small>隊伍戰力 " + number(battle.teamPower || 0) + "｜協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">" + (battle.won ? "繼續前進" : "可重新開航") + "</span></div>"); parts.push(battleSceneMarkup(battle, state, voyageStage, "VOYAGE")); }
       if (ending) {
         var endingLabel = ending.id === "special" ? "協鳴特殊結局" : ending.id === "hidden" ? "隱藏結局" : "一般結局";
         parts.push("<div class=\"voyage-ending-card\"><span class=\"eyebrow\">ENDING UNLOCKED</span><h3>" + endingLabel + "</h3><p>" + (ending.alreadyClaimed ? "這個結局的本期獎勵已領取過，仍可再次探索路線。" : "已將本期結局獎勵寫入你的帳號。") + "</p><strong>" + escapeHtml(rewardText(ending.reward || {})) + "</strong></div>");
