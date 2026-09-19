@@ -26,18 +26,20 @@
     nonCharacterReward: Object.freeze({ echoPowder: 1 }),
     development: Object.freeze({
       maxLevel: 80,
-      baseCharacterExp: 80,
-      characterExpStep: 45,
-      threeStarBaseCharacterExp: 60,
-      threeStarCharacterExpStep: 30,
-      fourStarBaseCharacterExp: 100,
-      fourStarCharacterExpStep: 55
+      baseCharacterExp: 60,
+      characterExpStep: 30,
+      // 角色經驗改成「可大量取得、單次升級負擔較低」：
+      // 三星保留較低的培養門檻，四星仍然需要更多資源以維持稀有度差異。
+      threeStarBaseCharacterExp: 45,
+      threeStarCharacterExpStep: 18,
+      fourStarBaseCharacterExp: 70,
+      fourStarCharacterExpStep: 32
     }),
     constellation: Object.freeze({ max: 6, characterCoreCost: 1, baseResonanceCore: 1, resonanceCoreStep: 1 }),
     singleCost: 160,
     tenCost: 1600,
-    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, resonanceCore: 1 }),
-    duplicateThreeStar: Object.freeze({ characterExp: 80 })
+    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, resonanceCore: 1, characterExp: 240 }),
+    duplicateThreeStar: Object.freeze({ characterExp: 160 })
   });
 
   function clone(value) {

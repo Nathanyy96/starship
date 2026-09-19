@@ -319,9 +319,22 @@
       var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
       var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
       if (byId("lobby-update-label")) byId("lobby-update-label").textContent = updateClaimed ? "大更新獎勵 +3,200 星砂（已領取）" : "大更新獎勵 +3,200 星砂";
-      byId("lobby-continue-title").textContent = chapter.version + "｜" + chapter.title;
+      byId("lobby-continue-title").textContent = (chapter.versionLabel || chapter.version) + "｜" + chapter.title;
       byId("lobby-continue-copy").textContent = chapter.summary;
       renderMilestoneRewards();
+    }
+    function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
+    function storyBodyMarkup(text, className) {
+      var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
+      var bodyClass = className || "story-body";
+      return "<div class=\"" + bodyClass + "\">" + blocks.map(function (block) {
+        var timeline = /^【時間線|^章節定位/.test(block);
+        return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>";
+      }).join("") + "</div>";
+    }
+    function storyLength(chapter) {
+      if (chapter.fullBody) return String(chapter.fullBody).replace(/\s/g, "").length;
+      return chapter.scenes.reduce(function (sum, scene) { return sum + String(scene.body || "").replace(/\s/g, "").length; }, 0);
     }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
@@ -329,9 +342,12 @@
       var claimed = sceneClaimed(state, chapter.id, scene.id);
       var sceneButtons = chapter.scenes.map(function (item) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(item.title) + "</span><small>" + (sceneClaimed(state, chapter.id, item.id) ? "已領取 100 星砂" : "完成後 +100 星砂") + "</small></button>"; }).join("");
       var fullChapter = chapter.scenes.map(function (item, index) {
-        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(item.title) + "</h4><p>" + escapeHtml(item.body) + "</p></article>";
+        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(item.title) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body") + "</article>";
       }).join("");
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\">" + escapeHtml(chapter.version + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次</span><small>每幕首次完成可獲得 100 星砂</small></div>" + sceneButtons + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4><p>" + escapeHtml(scene.body) + "</p><div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已直接展開，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
+      var characterCount = chapter.characters.filter(function (id) { return Boolean(data.cards[id]); }).length;
+      var length = storyLength(chapter);
+      var sourceLabel = chapter.sourceStatus === "document-tab-missing" ? "補充正文" : "文件正文";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p><div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4>" + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>每幕首次完成可獲得 100 星砂；正文可向下捲動閱讀</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已整理成長篇閱讀格式，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
     }
     function moveStoryPlotToTop() {
       var reader = byId("story-reader");
@@ -350,8 +366,8 @@
       }
       if (!current || current.type !== currentStoryTab || current.releaseOpen === false) { current = chapters[0]; currentStoryChapterId = current.id; currentStorySceneId = current.scenes[0].id; }
       byId("story-main-tab").classList.toggle("active", currentStoryTab === "main"); byId("story-side-tab").classList.toggle("active", currentStoryTab === "side");
-      var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(chapter.version) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕</small></span></button>"; }).join("");
-      var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(chapter.version) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
+      var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕 · " + number(storyLength(chapter)) + " 字</small></span></button>"; }).join("");
+      var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
       byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–4.5 已建檔" : "支線 1.0–2.5｜3.0–4.5 已建檔";
       renderStoryReader(state, current);
@@ -470,7 +486,8 @@
     function renderTrialBattleResult(state) {
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
       if (!battle || Number(battle.stageId) !== Number(currentTrialStageId)) { container.innerHTML = "<div class=\"trial-result-empty\">完成一場自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
-      var reward = battle.won ? "本次獎勵：+100 星砂、+1 共鳴券、+120 角色經驗" : "本次未通關，不會扣除挑戰次數";
+      var rewardExp = Number((trialStageById(battle.stageId) || {}).reward && (trialStageById(battle.stageId) || {}).reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
+      var reward = battle.won ? "本次獎勵：+100 星砂、+1 共鳴券、+" + number(rewardExp) + " 角色經驗" : "本次未通關，不會扣除挑戰次數";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
       var environment = battle.environment ? "環境「" + battle.environment + "」" : "";
       container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div><details><summary>查看自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";

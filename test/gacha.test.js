@@ -30,9 +30,15 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
 test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保持鎖定", () => {
   const liveStory = storyChapters.filter((chapter) => Number(chapter.version) <= 2.5);
   const futureStory = storyChapters.filter((chapter) => Number(chapter.version) >= 3);
-  assert.equal(liveStory.length, 24);
-  assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length === 3 && chapter.scenes.every((scene) => scene.body)), true);
+  assert.equal(liveStory.length, 18);
+  assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body)), true);
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => String(scene.body).trim().length >= 20)), true);
+  assert.equal(liveStory.every((chapter) => Number(chapter.fullBody && chapter.fullBody.length) > 800), true);
+  assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").sourceStatus, "document-tab-missing");
+  assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.4").fullBody.includes("附錄｜"), false);
+  assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").scenes.length, 3);
+  assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("見證人的空白"), false);
+  assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("角色圖鑑｜第三大版本"), false);
   assert.equal(futureStory.length, 24);
   assert.equal(futureStory.every((chapter) => chapter.releaseOpen === false && chapter.scenes.length === 3), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-3-5"), true);

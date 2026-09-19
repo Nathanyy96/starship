@@ -337,7 +337,7 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .auth-gate-orbit { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #70e9df; box-shadow: 0 0 24px 8px rgba(112,233,223,.65); }
 .orbit-one { top: 24%; left: 20%; }
 .orbit-two { right: 18%; bottom: 26%; background: #a99bff; box-shadow: 0 0 24px 8px rgba(169,155,255,.65); }
-.auth-gate-sigil { position: relative; z-index: 2; display: block; width: 92px; height: 92px; padding: 0; border: 1px solid rgba(223, 247, 255, .65); border-radius: 28px; object-fit: cover; background: linear-gradient(135deg, rgba(125,109,255,.55), rgba(55,188,187,.32)); box-shadow: 0 0 46px rgba(112,233,223,.3), inset 0 0 22px rgba(255,255,255,.12); }
+.auth-gate-sigil { position: relative; z-index: 2; display: block; width: 132px; height: 132px; padding: 0; border: 1px solid rgba(223, 247, 255, .65); border-radius: 36px; object-fit: cover; background: linear-gradient(135deg, rgba(125,109,255,.55), rgba(55,188,187,.32)); box-shadow: 0 0 54px rgba(112,233,223,.34), inset 0 0 22px rgba(255,255,255,.12); }
 .auth-gate-caption { position: absolute; bottom: 42px; color: rgba(206, 235, 255, .7); font-size: .62rem; letter-spacing: .2em; line-height: 1.7; text-align: center; }
 .auth-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 620px; margin-top: 30px; }
 .auth-choice-button { display: flex; min-height: 88px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; padding: 16px 18px; border: 1px solid rgba(187, 213, 255, .24); border-radius: 16px; color: #f7fbff; text-align: left; }
@@ -369,7 +369,7 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
   .auth-gate { grid-template-columns: 1fr; }
   .auth-gate-visual { min-height: 170px; }
   .auth-gate-caption { bottom: 18px; }
-  .auth-gate-sigil { width: 70px; height: 70px; font-size: 1.9rem; }
+  .auth-gate-sigil { width: 96px; height: 96px; border-radius: 27px; font-size: 1.9rem; }
   .auth-gate-content { padding: 28px 24px 30px; }
 }
 @media (max-width: 520px) {
@@ -486,6 +486,21 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .story-full-heading small { color: #7f91b0; font-size: .63rem; }
 .story-scene-reader::before { display: block; margin-bottom: 10px; color: #9ee9e0; content: "劇情正文"; font-size: .78rem; font-weight: 700; letter-spacing: .08em; }
 .story-scene-reader > p { white-space: pre-line; }
+.story-reader-kicker { align-items: center; flex-wrap: wrap; }
+.story-source-badge { padding: 4px 7px; border: 1px solid rgba(112,233,223,.28); border-radius: 999px; color: #a4eee6; background: rgba(112,233,223,.07); font-size: .56rem; letter-spacing: .08em; }
+.story-reader-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 4px; }
+.story-reader-meta span { padding: 7px 9px; border: 1px solid rgba(187,213,255,.14); border-radius: 9px; color: #91a2c0; background: rgba(255,255,255,.035); font-size: .63rem; }
+.story-reader-meta b { margin-left: 3px; color: #e8f2ff; }
+.story-body { max-width: 76ch; color: #c3cee2; font-size: .84rem; line-height: 2; letter-spacing: .015em; }
+.story-body p { margin: 0 0 1.05em; white-space: pre-line; }
+.story-body p:last-child { margin-bottom: 0; }
+.story-body .story-timeline { margin-bottom: 1.2em; padding-left: 11px; border-left: 2px solid rgba(112,233,223,.55); color: #8edbd4; font-size: .72rem; line-height: 1.75; letter-spacing: .04em; }
+.story-scene-reader .story-body { padding-top: 2px; }
+.complete-scene-block { padding: 20px 8px; }
+.complete-scene-block h4 { margin: 8px 0 15px; color: #f5f7ff; font-size: 1rem; }
+.complete-scene-block + .complete-scene-block { margin-top: 2px; }
+.story-full-body { max-width: 78ch; color: #aebbd5; font-size: .78rem; line-height: 1.95; }
+.story-full-chapter { scroll-margin-top: 18px; }
 .character-power-line { color: #ffe1a0 !important; font-weight: 700; }
 .growth-stats span:first-child b, .detail-progress span:first-child b { color: #ffe1a0; }
 

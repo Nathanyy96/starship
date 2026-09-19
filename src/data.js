@@ -7,6 +7,14 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 
+  // 長篇劇情以獨立生成檔載入，避免把 20 萬字正文塞進規則與角色資料同一段。
+  // Node 測試透過 require 載入；瀏覽器則由 index.html / test.html 先載入全域物件。
+  var storySource = null;
+  if (typeof require === "function") {
+    try { storySource = require("./story-source.js"); } catch (error) { storySource = null; }
+  }
+  if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
+
   function card(id, name, romanizedName, rarity, element, accent, releaseVersion, note, image, backgroundImage) {
     return Object.freeze({
       id: id,
@@ -136,7 +144,9 @@
 
   var trialVersion = "2.0-2.5";
   var trialMaxRewards = 10;
-  var trialReward = Object.freeze({ starSand: 100, tickets: 1, characterExp: 120 });
+  // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
+  // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。
+  var trialReward = Object.freeze({ starSand: 100, tickets: 1, characterExp: 600 });
   // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
   var trialStages = [
@@ -174,9 +184,9 @@
 
   var dispatchVersion = "2.0-2.5";
   var dispatchMissions = [
-    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 220, echoPowder: 4 } },
-    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 220, characterExp: 260, tickets: 1 } },
-    { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 300, starMarks: 1 } }
+    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1200, echoPowder: 4 } },
+    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 220, characterExp: 1500, tickets: 1 } },
+    { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
   ];
 
   // 劇情入口開放文件 1.0–2.5；每幕由前端與後端共用 id，完成獎勵才能安全地只領一次。
@@ -665,6 +675,49 @@
     }
   ];
 
+  function mergeImportedStory(chapters) {
+    var imported = storySource && storySource.chapters ? storySource.chapters : {};
+    var importedIds = Object.keys(imported);
+    var merged = chapters.filter(function (chapter) {
+      // 文件支線是跨版本合併篇章，移除程式早期為每個版本建立的短版重複頁。
+      if (Number(chapter.version) <= 2.5) return Boolean(imported[chapter.id]);
+      return true;
+    }).map(function (chapter) {
+      return imported[chapter.id] ? Object.assign({}, chapter, imported[chapter.id], {
+        sourceDocumentId: storySource.documentId,
+        sourceStatus: imported[chapter.id].sourceStatus || "document"
+      }) : chapter;
+    });
+
+    // 若未來文件新增章節而程式尚未有摘要，仍讓它能出現在讀取器；
+    // 目前 1.0–2.5 的既有 id 都會走上面的 metadata 合併路徑。
+    importedIds.forEach(function (id) {
+      if (merged.some(function (chapter) { return chapter.id === id; })) return;
+      var sourceChapter = imported[id];
+      var versionMatch = String(id).match(/(?:main|side)-([0-9]+(?:\.[0-9]+)?)/);
+      var version = versionMatch ? versionMatch[1] : "0.0";
+      merged.push({
+        id: id,
+        type: id.indexOf("side-") === 0 ? "side" : "main",
+        version: version,
+        versionLabel: version,
+        releaseOpen: Number(version) <= 2.5,
+        title: sourceChapter.sourceLabel,
+        region: "界痕記錄",
+        summary: "文件正文已整理，可從幕次導覽開始閱讀。",
+        characters: [],
+        sourceDocumentId: storySource.documentId,
+        sourceStatus: sourceChapter.sourceStatus || "document",
+        fullBody: sourceChapter.fullBody,
+        scenes: sourceChapter.scenes
+      });
+    });
+    return merged;
+  }
+
+  var liveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
+  var allStoryChapters = liveStoryChapters.concat(version3StoryChapters, version4StoryChapters);
+
   return {
     cards: cards,
     activeCards: activeCards,
@@ -676,11 +729,12 @@
     version2Cards: version2Cards,
     version4Cards: version4Cards,
     // 1.0–2.5 是 live 劇情；3.0–4.5 先完整建檔但保持鎖定，供後續版本開放。
-    storyChapters: storyChapters.concat(version2StoryChapters, version3StoryChapters, version4StoryChapters),
-    liveStoryChapters: storyChapters.concat(version2StoryChapters),
+    storyChapters: allStoryChapters,
+    liveStoryChapters: liveStoryChapters,
     version2StoryChapters: version2StoryChapters,
     version3StoryChapters: version3StoryChapters,
     version4StoryChapters: version4StoryChapters,
+    storySource: storySource,
     characterBattleStats: characterBattleStats,
     trialStages: trialStages,
     trialVersion: trialVersion,
