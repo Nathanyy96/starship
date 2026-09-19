@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, updateReward } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, updateReward, tutorialSteps, tutorialReward, announcements } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -49,6 +49,26 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
 test("星港委託提供額外玩法與非抽卡獎勵", () => {
   assert.equal(dispatchMissions.length, 3);
   assert.equal(dispatchMissions.every((mission) => mission.enemies.length > 0 && mission.reward.starSand > 0), true);
+});
+
+test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
+  assert.equal(tutorialSteps.length >= 7, true);
+  assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
+  assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
+  assert.equal(announcements.length >= 3, true);
+  assert.equal(announcements.some((item) => item.id === "tutorial-launch"), true);
+  const gacha = game();
+  const before = gacha.getState().resources;
+  const first = gacha.completeTutorial({ version: "2.0-2.5", reward: tutorialReward });
+  assert.equal(first.alreadyClaimed, false);
+  assert.equal(first.reward.starSand, tutorialReward.starSand);
+  assert.equal(first.reward.tickets, tutorialReward.tickets);
+  assert.equal(first.reward.characterExp, tutorialReward.characterExp);
+  assert.equal(first.state.tutorialProgress.rewardClaimed, true);
+  assert.equal(first.state.resources.starSand, before.starSand + tutorialReward.starSand);
+  const second = gacha.completeTutorial({ version: "2.0-2.5", reward: tutorialReward });
+  assert.equal(second.alreadyClaimed, true);
+  assert.equal(second.state.resources.starSand, first.state.resources.starSand);
 });
 
 test("版本遷移保留角色、等級、命座晶核與已完成劇情", () => {

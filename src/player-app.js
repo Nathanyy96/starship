@@ -73,7 +73,7 @@
       ["banner-select", "featured-select", "pull-one", "pull-ten", "pull-ticket", "exchange-featured", "reset-save"].forEach(function (id) { byId(id).disabled = !enabled; });
     }
     function hideGameViews() {
-      ["game-lobby", "story-view", "character-view", "trial-view", "dispatch-view", "gacha-hall"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
+      ["game-lobby", "story-view", "character-view", "trial-view", "dispatch-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
       if (!currentPlayerName || !game) {
@@ -83,6 +83,8 @@
       hideGameViews();
       byId(viewId).hidden = false;
       if (viewId === "game-lobby") { renderLobby(); }
+      if (viewId === "tutorial-view") { renderTutorial(); }
+      if (viewId === "announcement-view") { renderAnnouncements(); }
       if (viewId === "story-view") { renderStory(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -292,6 +294,41 @@
     function constellationCost(constellation) {
       var rules = api.DEFAULT_RULES.constellation;
       return rules.characterCoreCost;
+    }
+    function tutorialProgress(state) {
+      state.tutorialProgress = state.tutorialProgress || { version: data.updateVersion || "2.0-2.5", completed: false, rewardClaimed: false, completedAt: null };
+      return state.tutorialProgress;
+    }
+    function renderTutorial() {
+      if (!game || !byId("tutorial-steps")) return;
+      var state = game.getState();
+      var progress = tutorialProgress(state);
+      var done = progress.rewardClaimed === true;
+      var reward = data.tutorialReward || { starSand: 600, tickets: 2, characterExp: 600 };
+      byId("tutorial-status").textContent = done ? "已完成 · 獎勵已領取" : "尚未完成";
+      byId("tutorial-summary").innerHTML = "<div><span class=\"eyebrow\">START HERE</span><strong>先了解星界之律的主要循環，再開始你的旅程。</strong><p>這份教學會把登入保存、劇情獎勵、回覆召集、角色培養、戰力判讀與自走棋試煉整理在同一頁。已經熟悉系統的玩家也能直接完成並領取一次獎勵。</p></div><span class=\"tutorial-progress-mark\">" + (done ? "✓ 已完成" : "7 個重點") + "</span>";
+      byId("tutorial-steps").innerHTML = (data.tutorialSteps || []).map(function (step, index) { return "<article class=\"tutorial-step-card\"><span class=\"tutorial-step-index\">" + String(index + 1).padStart(2, "0") + "</span><span class=\"tutorial-step-icon\">" + escapeHtml(step.icon) + "</span><h3>" + escapeHtml(step.title) + "</h3><p>" + escapeHtml(step.copy) + "</p></article>"; }).join("");
+      byId("tutorial-reward").innerHTML = "<div><span class=\"eyebrow\">FIRST FLIGHT REWARD</span><strong>完成新手教學可獲得 " + escapeHtml(rewardText(reward)) + "</strong><p>獎勵只會發放一次，並直接儲存到目前登入的玩家帳號。</p></div><button class=\"primary-action\" id=\"complete-tutorial\" type=\"button\"" + (done ? " disabled" : "") + ">" + (done ? "已完成並領取" : "完成教學並領取獎勵") + "</button>";
+    }
+    function renderAnnouncements() {
+      if (!byId("announcement-list")) return;
+      var list = data.announcements || [];
+      byId("announcement-list").innerHTML = list.length ? list.map(function (item, index) { return "<article class=\"announcement-card " + (index === 0 ? "featured" : "") + "\"><div class=\"announcement-card-head\"><span class=\"announcement-badge\">" + escapeHtml(item.badge) + "</span><span>" + escapeHtml(item.date) + "</span></div><h3>" + escapeHtml(item.title) + "</h3><p>" + escapeHtml(item.copy) + "</p><div class=\"announcement-highlights\">" + (item.highlights || []).map(function (highlight) { return "<span>✓ " + escapeHtml(highlight) + "</span>"; }).join("") + "</div><div class=\"announcement-reward\"><span>獎勵／重點</span><strong>" + escapeHtml(item.reward) + "</strong></div></article>"; }).join("") : "<div class=\"empty\">目前沒有公告。</div>";
+    }
+    function completeTutorial() {
+      if (!game || !currentPlayerName) { showGate(); return; }
+      var reward = data.tutorialReward || { starSand: 600, tickets: 2, characterExp: 600 };
+      if (remoteMode) {
+        apiRequest("/api/player/tutorial-complete", {}).then(function (payload) { updateGameFromState(payload.state); renderTutorial(); renderLobby(); render(); showMessage(payload.alreadyClaimed ? "新手教學獎勵已經領取過。" : "新手教學完成：已獲得 " + rewardText(payload.reward || reward) + "。", false); }).catch(function (error) { showMessage(error.message, true); });
+        return;
+      }
+      try {
+        var result = game.completeTutorial({ version: data.updateVersion || "2.0-2.5", reward: reward });
+        updateGameFromState(result.state);
+        saveLocalState();
+        renderTutorial(); renderLobby(); render();
+        showMessage(result.alreadyClaimed ? "新手教學獎勵已經領取過。" : "新手教學完成：已獲得 " + rewardText(result.reward) + "。", false);
+      } catch (error) { showMessage(error.message, true); }
     }
     function renderMilestoneRewards() {
       var container = byId("milestone-rewards");
@@ -601,6 +638,7 @@
     function rewardText(reward) {
       var parts = [];
       if (reward && reward.starSand) { parts.push("+" + reward.starSand + " 星砂"); }
+      if (reward && reward.tickets) { parts.push("+" + reward.tickets + " 共鳴券"); }
       if (reward && reward.starMarks) { parts.push("+" + reward.starMarks + " 星痕"); }
       if (reward && reward.echoPowder) { parts.push("+" + reward.echoPowder + " 回響粉"); }
       if (reward && reward.characterExp) { parts.push("+" + reward.characterExp + " 角色經驗"); }
@@ -710,7 +748,10 @@
     byId("open-characters").addEventListener("click", function () { showView("character-view"); });
     byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
     byId("open-dispatch").addEventListener("click", function () { showView("dispatch-view"); });
+    byId("open-tutorial").addEventListener("click", function () { showView("tutorial-view"); });
+    byId("open-announcements").addEventListener("click", function () { showView("announcement-view"); });
     byId("continue-story").addEventListener("click", function () { showView("story-view"); });
+    byId("tutorial-reward").addEventListener("click", function (event) { if (event.target.closest("#complete-tutorial")) completeTutorial(); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });
     byId("story-main-tab").addEventListener("click", function () { currentStoryTab = "main"; currentStoryChapterId = "main-1-0"; currentStorySceneId = ""; renderStory(); });
     byId("story-side-tab").addEventListener("click", function () { currentStoryTab = "side"; currentStoryChapterId = "side-1-0-village"; currentStorySceneId = ""; renderStory(); });

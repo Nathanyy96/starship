@@ -207,8 +207,14 @@
       updateRewards: {
         claimedVersions: {}
       },
-      dispatchProgress: {
+      tutorialProgress: {
         version: "2.0-2.5",
+        completed: false,
+        rewardClaimed: false,
+        completedAt: null
+      },
+      dispatchProgress: {
+       version: "2.0-2.5",
         selectedTeam: [],
         claimed: {},
         lastMission: null
@@ -260,6 +266,11 @@
     state.trialProgress.bestStage = Number.isInteger(state.trialProgress.bestStage) && state.trialProgress.bestStage >= 0 ? state.trialProgress.bestStage : 0;
     state.updateRewards = Object.assign(initialState().updateRewards, isPlainObject(source.updateRewards) ? source.updateRewards : {});
     state.updateRewards.claimedVersions = isPlainObject(state.updateRewards.claimedVersions) ? state.updateRewards.claimedVersions : {};
+    state.tutorialProgress = Object.assign(initialState().tutorialProgress, isPlainObject(source.tutorialProgress) ? source.tutorialProgress : {});
+    state.tutorialProgress.version = typeof state.tutorialProgress.version === "string" && state.tutorialProgress.version ? state.tutorialProgress.version : "2.0-2.5";
+    state.tutorialProgress.completed = state.tutorialProgress.completed === true;
+    state.tutorialProgress.rewardClaimed = state.tutorialProgress.rewardClaimed === true;
+    state.tutorialProgress.completedAt = typeof state.tutorialProgress.completedAt === "string" ? state.tutorialProgress.completedAt : null;
     state.dispatchProgress = Object.assign(initialState().dispatchProgress, isPlainObject(source.dispatchProgress) ? source.dispatchProgress : {});
     state.dispatchProgress.selectedTeam = Array.isArray(state.dispatchProgress.selectedTeam) ? state.dispatchProgress.selectedTeam.slice(0, 4) : [];
     state.dispatchProgress.claimed = isPlainObject(state.dispatchProgress.claimed) ? state.dispatchProgress.claimed : {};
@@ -645,6 +656,26 @@
       cost: { starMarks: 10 },
       state: this.getState()
     };
+  };
+
+  GachaGame.prototype.completeTutorial = function (options) {
+    options = options || {};
+    var progress = this.state.tutorialProgress;
+    var reward = Object.assign({ starSand: 600, tickets: 2, characterExp: 600 }, options.reward || {});
+    ["starSand", "tickets", "characterExp"].forEach(function (key) {
+      assert(Number.isInteger(reward[key]) && reward[key] >= 0, "新手教學獎勵必須是非負整數：" + key);
+    });
+    if (progress.rewardClaimed) {
+      return { alreadyClaimed: true, reward: { starSand: 0, tickets: 0, characterExp: 0 }, state: this.getState() };
+    }
+    progress.version = String(options.version || progress.version || "2.0-2.5");
+    progress.completed = true;
+    progress.rewardClaimed = true;
+    progress.completedAt = this.now();
+    this.state.resources.starSand += reward.starSand;
+    this.state.resources.tickets += reward.tickets;
+    this.state.resources.characterExp += reward.characterExp;
+    return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
   };
 
   GachaGame.prototype.reset = function () {

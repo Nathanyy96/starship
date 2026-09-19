@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -136,6 +136,11 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
   Object.keys(oldScenes).forEach((sceneKey) => {
     if (!nextScenes[sceneKey]) throw new Error("更新保護中止：玩家 " + playerKey + " 的已完成劇情不可被移除");
   });
+  const oldTutorial = previousState.tutorialProgress && typeof previousState.tutorialProgress === "object" ? previousState.tutorialProgress : {};
+  const nextTutorial = nextState.tutorialProgress && typeof nextState.tutorialProgress === "object" ? nextState.tutorialProgress : {};
+  if (oldTutorial.rewardClaimed === true && nextTutorial.rewardClaimed !== true) {
+    throw new Error("更新保護中止：玩家 " + playerKey + " 的新手教學獎勵狀態不可被移除");
+  }
 }
 
 function assertDatabaseContinuity(previousDatabase, nextDatabase) {
@@ -493,6 +498,12 @@ function completeStoryScene(currentState, body) {
   return { state: new GachaGame({ banners, state }).getState(), alreadyClaimed: false, reward: { starSand: 100 }, chapter, scene };
 }
 
+function completeTutorial(currentState) {
+  const state = ensurePlayerMilestones(currentState);
+  const game = new GachaGame({ banners, state });
+  return game.completeTutorial({ version: currentUpdateVersion, reward: tutorialReward });
+}
+
 function trialStageById(stageId) {
   const numericId = Number(stageId);
   const stage = trialStages.find((item) => item.id === numericId);
@@ -639,6 +650,16 @@ async function handleApi(request, response, requestUrl) {
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: completed.alreadyClaimed, reward: completed.reward, chapter: { id: completed.chapter.id, title: completed.chapter.title }, scene: completed.scene ? { id: completed.scene.id, title: completed.scene.title } : null });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/tutorial-complete") {
+      const player = playerFromSession(database, body.token);
+      const result = completeTutorial(player.record.state);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: result.alreadyClaimed, reward: result.reward });
       return;
     }
 

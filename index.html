@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=2.0-2.5-persistence-fix">
+  <link rel="stylesheet" href="./styles.css?v=tutorial-announcement-2">
 </head>
 <body>
   <main class="page-shell">
@@ -64,9 +64,24 @@
         <button id="open-characters" class="lobby-menu-card character-menu" type="button"><span class="menu-index">03</span><span class="menu-icon">◇</span><strong>角色培養</strong><small>查看已獲得角色與培養進度</small><span class="menu-arrow">→</span></button>
         <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
         <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
+        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
+        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
+    </section>
+
+    <section id="tutorial-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / PLAYER GUIDE</p><h2>新手教學</h2></div><span id="tutorial-status">尚未完成</span></div>
+      <div id="tutorial-summary" class="tutorial-summary"></div>
+      <div id="tutorial-steps" class="tutorial-step-grid"></div>
+      <div id="tutorial-reward" class="tutorial-reward-panel"></div>
+    </section>
+
+    <section id="announcement-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / NOTICE BOARD</p><h2>公告</h2></div><span>更新資訊與獎勵</span></div>
+      <div class="announcement-intro"><div><strong>星界之律｜回覆台公告</strong><p>在這裡查看版本內容、額外獎勵與重要系統變更。公告只會說明規則，不會取代你的玩家存檔。</p></div><span class="announcement-signal">LIVE UPDATE</span></div>
+      <div id="announcement-list" class="announcement-list"></div>
     </section>
 
     <section id="story-view" class="game-view panel" hidden>
@@ -195,10 +210,10 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=2.0-2.5-persistence-fix"></script>
+  <script src="./src/gacha.js?v=tutorial-announcement-2"></script>
   <script src="./src/story-source.js?v=story-document-import-1"></script>
-  <script src="./src/data.js?v=2.0-2.5-persistence-fix"></script>
-  <script src="./src/battle.js?v=2.0-2.5-persistence-fix"></script>
-  <script src="./src/player-app.js?v=2.0-2.5-persistence-fix"></script>
+  <script src="./src/data.js?v=tutorial-announcement-2"></script>
+  <script src="./src/battle.js?v=tutorial-announcement-2"></script>
+  <script src="./src/player-app.js?v=tutorial-announcement-2"></script>
 </body>
 </html>
