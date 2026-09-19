@@ -2,3 +2,4 @@ data/players.json
 data/players.json.tmp
 data/players.json.bak
 _docx_qa_*/
+tools/__pycache__/

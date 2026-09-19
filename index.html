@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=story-reward-sand-pool-balance-1">
+  <link rel="stylesheet" href="./styles.css?v=trial-reward-50-boss-level-3">
 </head>
 <body>
   <main class="page-shell">
@@ -65,8 +65,10 @@
         <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
         <button id="open-boss" class="lobby-menu-card boss-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">♢</span><strong>Boss</strong><small>取得角色 80 等突破材料與角色經驗</small><span class="menu-arrow">→</span></button>
         <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
-        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
-        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
+        <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
+        <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
+        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">09</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
+        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">10</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
@@ -93,7 +95,7 @@
 
     <section id="character-view" class="game-view panel" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
-      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複角色會立即增加命座，並留下該角色專用晶核供後續提升。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>命座晶核總數 <b id="character-core">0</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
+      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複抽到角色時命座會立即自動增加，培養頁不再放置多餘的命座按鈕。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>命座規則 <b>重複自動 +1</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
       <div id="character-list" class="character-list"></div>
       <section id="character-detail" class="character-detail" hidden></section>
     </section>
@@ -120,7 +122,7 @@
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">BOSS BREAKTHROUGH</p><h2>Boss</h2></div><span id="boss-view-status">選擇首領</span></div>
       <div class="trial-layout boss-layout">
         <aside class="trial-stage-rail">
-          <div class="trial-rule"><span class="eyebrow">LEVEL 80 BREAKTHROUGH</span><strong>六種 Boss · 每次最多 4 名角色</strong><small>角色到達 80 等後，依照角色的指定需求挑戰 Boss，收集足夠突破材料後才能完成突破並繼續升到 90 等。每個 Boss 每版本最多領取 10 次獎勵；100 等尚未開放。</small></div>
+          <div class="trial-rule"><span class="eyebrow">LEVEL 80 BREAKTHROUGH</span><strong>六種 Boss · Lv.1–3 三檔獎勵 · 每次最多 4 名角色</strong><small>六種 Boss 分成 Lv.1–3 三個獎勵檔位，不是角色突破的硬門檻。每場勝利會給專屬材料與星界通用突破印記，通用印記可以替代任何角色的指定材料；每個 Boss 每版本最多領取 10 次獎勵，100 等尚未開放。</small></div>
           <div id="boss-material-inventory" class="boss-material-inventory" aria-label="突破材料庫存"></div>
           <div id="boss-stages" class="trial-stages"></div>
         </aside>
@@ -151,6 +153,18 @@
           <div id="dispatch-result" class="trial-battle-result"></div>
         </section>
       </div>
+    </section>
+
+    <section id="voyage-view" class="game-view panel voyage-view" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
+      <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商店、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>本期特殊裝扮</span><strong id="voyage-skin-name">流光檔案裝</strong><small id="voyage-skin-copy">特殊結局可取得，不改變角色戰鬥數值。</small></div></div>
+      <div class="voyage-layout"><aside class="voyage-rail"><div class="trial-rule"><span class="eyebrow">ROGUELITE ROUTE</span><strong>每次航程都會留下不同選擇</strong><small>航程失敗可以重新開始；三種結局獎勵每期各領一次，版本更新後航線與獎勵重新輪換。</small></div><div id="voyage-route-list" class="voyage-route-list"></div><button id="start-voyage" class="primary-action" type="button">開始新的航程</button></aside><section class="voyage-arena"><div id="voyage-node-list" class="voyage-node-list"></div><div id="voyage-node-details" class="voyage-node-details"></div><div id="voyage-node-enemy" class="trial-enemy-intel"></div><div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>迷航出戰隊伍</h3></div><span id="voyage-team-count">0 / 4</span></div><div id="voyage-team-list" class="trial-team-list"></div><div id="voyage-node-actions" class="voyage-node-actions"></div><div id="voyage-result" class="trial-battle-result"></div></section></div>
+    </section>
+
+    <section id="pet-view" class="game-view panel pet-view" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-COMPANION WORKSHOP</p><h2>星伴培育</h2></div><span id="pet-view-status">獨立寵物資料</span></div>
+      <div class="pet-intro"><div><strong>這裡的寵物不會影響主線與角色養成</strong><p>寵物有自己的食物、玩具、星伴代幣、等級、心情與親密度。你可以只自己收藏，也可以公開作品讓其他玩家參觀與評分。</p></div><div class="pet-resource-row"><span>飼料 <b id="pet-food">0</b></span><span>玩具 <b id="pet-toys">0</b></span><span>星伴代幣 <b id="pet-tokens">0</b></span><span>展示小獎勵 <b id="pet-showcase-reward">0</b></span></div></div>
+      <div class="pet-layout"><section class="pet-workbench"><div id="pet-selected-card" class="pet-selected-card"></div><div class="pet-customization-panel"><div class="pet-panel-heading"><div><p class="eyebrow">CUSTOMIZATION</p><h3>外觀與特效</h3></div><label class="pet-public-toggle"><input id="pet-public-toggle" type="checkbox"><span>公開我的寵物</span></label></div><div id="pet-outfit-list" class="pet-option-list"></div><div id="pet-effect-list" class="pet-option-list"></div><button id="save-pet-showcase" class="primary-action" type="button">儲存展示設定</button><p class="pet-privacy-note">關閉公開後，其他玩家將看不到你的展示，也不會影響你自己的寵物進度。</p></div></section><aside class="pet-catalog"><div class="pet-panel-heading"><div><p class="eyebrow">PET CATALOG</p><h3>我的星伴</h3></div><span id="pet-catalog-count">0 / 4</span></div><div id="pet-catalog-list" class="pet-catalog-list"></div><div class="pet-showcase-heading"><div><p class="eyebrow">COMMUNITY SHOWCASE</p><h3>其他玩家的寵物</h3></div><button id="refresh-pet-showcase" class="small-button" type="button">重新整理</button></div><div id="pet-showcase-list" class="pet-showcase-list"></div></aside></div><div id="pet-action-message" class="message" role="status"></div>
     </section>
 
     <div id="gacha-hall" class="gacha-hall" hidden>
@@ -228,10 +242,10 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=boss-breakthrough-level-1"></script>
-  <script src="./src/story-source.js?v=boss-breakthrough-level-1"></script>
-  <script src="./src/data.js?v=boss-breakthrough-level-1"></script>
-  <script src="./src/battle.js?v=boss-breakthrough-level-1"></script>
-  <script src="./src/player-app.js?v=boss-breakthrough-level-1"></script>
+  <script src="./src/gacha.js?v=trial-reward-50-boss-level-3"></script>
+  <script src="./src/story-source.js?v=trial-reward-50-boss-level-3"></script>
+  <script src="./src/data.js?v=trial-reward-50-boss-level-3"></script>
+  <script src="./src/battle.js?v=trial-reward-50-boss-level-3"></script>
+  <script src="./src/player-app.js?v=trial-reward-50-boss-level-3"></script>
 </body>
 </html>

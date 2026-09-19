@@ -142,23 +142,44 @@
     ,elyra: { rarity: 4, role: "支援", maxHp: 1240, attack: 172, defense: 150, speed: 112, range: 2, attackName: "律式回覆", skillName: "第二條律", skillPower: 1.34, skillEffect: "讓隊伍獲得可撤回的減傷，並重置一名隊友技能冷卻" }
   };
 
-  // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調，
-  // 避免少數高面板 3★ 在戰力與培養後數值上反過來壓過 4★。
+  // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調。
+  // 低基礎戰力的 4★ 會進入「平衡成長帶」：不是依性別加成，而是依實際面板
+  // 補足起始戰力並提高 70–90 等成長，避免法師、支援或治療因功能定位被判定為低人一等。
   Object.keys(characterBattleStats).forEach(function (id) {
     var stats = characterBattleStats[id];
-    if (stats.rarity !== 4) return;
+    if (stats.rarity !== 4) {
+      stats.growthRates = { main: 0.03, defense: 0.022, speed: 0.009 };
+      return;
+    }
     stats.maxHp = Math.round(stats.maxHp * 1.16);
     stats.attack = Math.round(stats.attack * 1.16);
     stats.defense = Math.round(stats.defense * 1.16);
     stats.speed = Math.round(stats.speed * 1.06);
+    var basePower = Math.round(stats.maxHp / 10 + stats.attack + stats.defense);
+    // 520 是四星非坦克與高面板坦克之間的共同戰力帶目標；
+    // 仍保留重裝／守門的耐久優勢，但不讓功能型四星在後期只因初始面板低而落後。
+    var parityTarget = 520;
+    if (basePower < parityTarget) {
+      var deficit = parityTarget - basePower;
+      stats.maxHp += Math.round(deficit * 1.5);
+      stats.attack += Math.round(deficit * 0.5);
+      stats.defense += Math.round(deficit * 0.35);
+      stats.speed = Math.max(stats.speed, 100);
+      stats.growthBand = "parity";
+      stats.growthRates = { main: 0.05, defense: 0.036, speed: 0.014 };
+    } else {
+      stats.growthBand = "standard";
+      stats.growthRates = { main: 0.04, defense: 0.03, speed: 0.012 };
+    }
   });
 
   var trialVersion = "2.0-2.5";
   var trialMaxRewards = 10;
   // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
-  // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。
+  // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。完成 30 關並使用版本內
+  // 的可重複獎勵後，足以養成一支 4★ 隊伍，不需要依賴重複抽卡。
   // 原共鳴券已取消；每張券按單抽等價 160 星砂併入獎勵。
-  var trialReward = Object.freeze({ starSand: 260, characterExp: 600 });
+  var trialReward = Object.freeze({ starSand: 50, characterExp: 1500 });
   // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
   var trialStages = [
@@ -195,7 +216,8 @@
   ];
 
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
-  // 讓玩家可以透過戰鬥穩定準備突破材料，同時保留隊伍搭配與重複挑戰的空間。
+  // 六種素材來源分成 Lv.1–3 三個獎勵檔位，讓玩家可以透過戰鬥穩定準備突破材料，
+  // 同時保留隊伍搭配與重複挑戰的空間。每個檔位安排兩個 Boss，避免刪除既有角色的素材來源。
   var bossVersion = "2.0-2.5";
   var bossMaxRewards = 10;
   var bossStages = [
@@ -206,6 +228,22 @@
     { id: "boss-wind-hunt", name: "風廊獵王", region: "北門風廊", description: "獵王會鎖定最脆弱的隊員，高速斥候與射手可以先處理獵影，替隊伍爭取回合。", recommendedPower: 2350, environment: "高空風廊", environmentEffect: "敵我速度波動變大，標記與先手控制更重要", enemyTrait: "獵王標記", enemyTraitEffect: "敵方集中攻擊生命比例最低的角色", trialRule: "mark", modifiers: { enemySpeed: 1.14, teamSpeed: 1.08, enemyAttack: 1.06 }, enemies: [{ name: "風廊獵影", maxHp: 4500, attack: 315, defense: 210, speed: 150, count: 2 }, { name: "風廊獵王", maxHp: 8200, attack: 340, defense: 270, speed: 104, count: 1 }], reward: { materialId: "wind-core", materialName: "風標獵核", amount: 1, characterExp: 360 } },
     { id: "boss-mirror-arbiter", name: "霧鏡裁定核", region: "霧鏡議庭", description: "裁定核會複寫隊伍的增益，仲裁、校準與清除效果可以把鏡像變回弱點。", recommendedPower: 2600, environment: "霧鏡審理場", environmentEffect: "敵方第一次取得增益時會轉成護盾，清除後才會露出核心", enemyTrait: "鏡像裁定", enemyTraitEffect: "敵方技能會短暫複寫一個正面效果", trialRule: "copy", modifiers: { enemyAttack: 1.08, enemyDefense: 1.12, teamAttack: 1.04 }, enemies: [{ name: "霧鏡執行獸", maxHp: 5100, attack: 330, defense: 255, speed: 118, count: 2 }, { name: "霧鏡裁定核", maxHp: 9200, attack: 375, defense: 330, speed: 86, count: 1 }], reward: { materialId: "mirror-core", materialName: "霧鏡映核", amount: 1, characterExp: 360 } }
   ];
+
+  // Boss 等級現在只代表 Lv.1–3 獎勵檔位，而不是角色能不能突破的硬門檻。
+  // 每個 Boss 都會給對應專屬材料，並額外給通用突破印記，讓玩家即使先挑戰較容易的 Boss，
+  // 也不會因為角色被分配到高等 Boss 而卡住 80 等突破。
+  bossStages.forEach(function (stage, index) {
+    var level = Math.min(3, Math.floor(index / 2) + 1);
+    stage.bossLevel = level;
+    stage.difficultyLabel = "Boss Lv." + level;
+    stage.recommendedPower = 1450 + (level - 1) * 140;
+    stage.reward = Object.assign({}, stage.reward, {
+      amount: 1 + Math.floor((level - 1) / 2),
+      characterExp: 420 + (level - 1) * 120,
+      universalAmount: 1 + Math.floor((level - 1) / 3)
+    });
+  });
+  var universalBreakthroughMaterial = Object.freeze({ materialId: "universal-core", materialName: "星界通用突破印記" });
 
   var breakthroughMaterialTemplates = {
     "boss-star-warden": { materialId: "star-crest", materialName: "星序碎晶" },
@@ -240,24 +278,138 @@
     { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
   ];
 
+  // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
+  // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
+  var voyageVersion = "2.0-2.5";
+  var voyageConfig = {
+    version: voyageVersion,
+    title: "星海迷航",
+    description: "在不改寫主線的漂流航線上，收集星海碎片、處理事件並找出隱藏終點。",
+    maxRewards: 3,
+    routes: [
+      { id: "route-echo", name: "回聲航線", description: "追著多次回響的方向前進，最容易觸發協鳴終局。", nodeIds: ["voyage-start", "voyage-combat-1", "voyage-harmonics", "voyage-rest", "voyage-combat-2", "voyage-final"] },
+      { id: "route-market", name: "漂流商路", description: "在碎片商站交換臨時增益，適合先累積資源再挑戰終局。", nodeIds: ["voyage-start", "voyage-combat-1", "voyage-market", "voyage-signal", "voyage-combat-2", "voyage-final"] },
+      { id: "route-hidden", name: "無名檔案線", description: "表面獎勵較少，但藏著通往特殊終點的檔案門。", nodeIds: ["voyage-start", "voyage-archive", "voyage-combat-1", "voyage-market", "voyage-secret-gate", "voyage-final"] }
+    ],
+    nodes: [
+      { id: "voyage-start", type: "start", name: "漂流起點", region: "星海外環", description: "航船脫離回覆台的固定座標，接下來的路線會由星海自行排列。" },
+      { id: "voyage-combat-1", type: "combat", name: "碎光狹道", region: "碎光帶", description: "小型敵群封住狹道，先確認隊伍的前後排與技能循環。", stageId: 6, fragmentReward: 1 },
+      { id: "voyage-harmonics", type: "event", name: "三重回音室", region: "回音室", description: "三道不同頻率的回聲同時抵達，選擇要聆聽、調和或暫時靜音。", choices: [
+        { id: "listen", label: "聽取殘響", description: "收集一道額外線索。", incrementFlag: "echoes", fragmentDelta: 1 },
+        { id: "tune", label: "調和兩種頻率", description: "三星與四星共同工作時，可以開啟協鳴條件。", requiresMixedTeam: true, flag: "harmonized", buff: "harmony" },
+        { id: "mute", label: "暫時靜音", description: "避開干擾，取得穩定的防護增益。", buff: "quiet" }
+      ] },
+      { id: "voyage-rest", type: "rest", name: "無重力泊位", region: "泊位環", description: "在沒有方向的泊位短暫停靠，選擇補給或觀察遠方航標。", choices: [
+        { id: "anchor", label: "固定航標", description: "多拿一枚碎片並獲得穩定增益。", fragmentDelta: 1, buff: "anchor" },
+        { id: "observe", label: "觀察潮汐", description: "記錄回聲，為隱藏路線留下線索。", incrementFlag: "echoes" }
+      ] },
+      { id: "voyage-market", type: "shop", name: "漂流商站", region: "碎片集市", description: "商站只接受星海碎片，臨時增益會在本次航程結束後失效。", choices: [
+        { id: "buy-lens", label: "購買棱鏡鏡片（2 碎片）", description: "提高隊伍對首領的爆發窗口。", costFragments: 2, buff: "lens" },
+        { id: "buy-rations", label: "換取航行補給（1 碎片）", description: "保存一次失敗後的重整機會。", costFragments: 1, buff: "rations" },
+        { id: "pass-market", label: "不交易，保留碎片", description: "不消耗碎片，繼續前進。" }
+      ] },
+      { id: "voyage-signal", type: "event", name: "失焦航標", region: "暗面航道", description: "一座沒有名字的航標正在反覆切換方向，任何選擇都會留下不同的回覆。", choices: [
+        { id: "follow", label: "跟隨最亮的訊號", description: "收集回聲並取得一枚碎片。", incrementFlag: "echoes", fragmentDelta: 1 },
+        { id: "reroute", label: "替它改寫路線", description: "留下檔案標記，之後可能找到特殊門。", flag: "archive", buff: "reroute" },
+        { id: "record", label: "只做觀測記錄", description: "不冒險，獲得小幅攻擊增益。", buff: "record" }
+      ] },
+      { id: "voyage-archive", type: "event", name: "無名檔案室", region: "無名檔案線", description: "這裡沒有角色的故事，只有被刪除又重新留下的航行紀錄。", choices: [
+        { id: "read", label: "讀完空白頁", description: "得到兩道回聲與檔案門的線索。", incrementFlag: "echoes", fragmentDelta: 1, flag: "archive" },
+        { id: "leave", label: "尊重空白，繼續前進", description: "取得一個安靜增益。", buff: "quiet" }
+      ] },
+      { id: "voyage-secret-gate", type: "event", name: "回覆檔案門", region: "隱藏座標", description: "只有帶著檔案線索，門才會回覆真正的問題。", choices: [
+        { id: "open", label: "開啟檔案門", description: "需要先取得檔案標記，成功後可觸發隱藏結局。", requiresFlag: "archive", flag: "secretGate", buff: "archive-key" },
+        { id: "wait", label: "在門前等待", description: "不打開門，但留下回聲線索。", incrementFlag: "echoes" }
+      ] },
+      { id: "voyage-combat-2", type: "combat", name: "折光風暴", region: "折光風暴帶", description: "敵人會複製隊伍剛使用的增益，必須安排技能順序。", stageId: 18, fragmentReward: 2, buff: "storm-proof" },
+      { id: "voyage-final", type: "boss", final: true, name: "星海終端守門者", region: "未命名終端", description: "守門者不屬於任何版本的主線，只有完整的隊伍協同能讓它暫停回擊。", stageId: 30, fragmentReward: 3 }
+    ],
+    endingRewards: {
+      normal: { starSand: 160, characterExp: 500 },
+      hidden: { starSand: 280, characterExp: 700, petTokens: 1 },
+      special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-luminous-archive" }
+    },
+    seasonSkin: { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", accent: "#d06cff" }
+  };
+
+  // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
+  var petVersion = "2.0-2.5";
+  var petDefinitions = [
+    { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
+    { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
+    { id: "wind-bird", name: "風鈴雀", temperament: "敏捷", icon: "◇", accent: "#86b8ff", maxLevel: 30, description: "會把風向變成旋律，喜歡停在航路標記的最高處。" },
+    { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" }
+  ];
+  var petOutfits = [
+    { id: "default", name: "原野本色", description: "保留寵物的自然外觀。", accent: "#9e92ff" },
+    { id: "moon-scarf", name: "月紗圍巾", description: "一條會在移動時留下月光的圍巾。", accent: "#91b9e8" },
+    { id: "tide-cape", name: "潮泡披肩", description: "由不會破裂的潮泡織成。", accent: "#71d8dc" },
+    { id: "archive-crown", name: "檔案小冠", description: "星海迷航特殊結局可使用的紀念裝扮。", accent: "#d06cff" }
+  ];
+  var petEffects = [
+    { id: "starlit", name: "星屑環", description: "出場時散落小型星屑。", icon: "✦", color: "#f4c66b" },
+    { id: "aurora", name: "極光帶", description: "移動時留下淡淡的極光尾跡。", icon: "〰", color: "#71d8dc" },
+    { id: "bubbles", name: "泡泡訊號", description: "互動時冒出三枚透明泡泡。", icon: "○", color: "#86b8ff" },
+    { id: "paper-stars", name: "紙星回覆", description: "評分展示時飄出紙製星星。", icon: "✧", color: "#d06cff" }
+  ];
+
+  // 天賦先作為後續版本的低幅度資料預留，不在 2.0–2.5 玩家頁開放。
+  // 每個角色固定三條分支、每條 5 級，總增益受 10% 上限約束，避免日後數值失控。
+  var talentVersion = "3.0+";
+  var talentRules = Object.freeze({
+    unlockLevel: 40,
+    maxLevel: 5,
+    totalBonusCap: 0.10,
+    materialId: "talent-manual",
+    materialName: "專屬天賦手冊",
+    branches: Object.freeze([
+      Object.freeze({ id: "technique", name: "攻擊手段", effect: "skillPower", perLevel: 0.012, cap: 0.06 }),
+      Object.freeze({ id: "role", name: "定位專精", effect: "roleUtility", perLevel: 0.01, cap: 0.05 }),
+      Object.freeze({ id: "resonance", name: "界痕共鳴", effect: "teamUtility", perLevel: 0.008, cap: 0.04 })
+    ]),
+    costByLevel: Object.freeze([0, 1, 2, 3, 4, 5])
+  });
+  var talentDefinitions = {};
+  Object.keys(characterBattleStats).forEach(function (id) {
+    var stats = characterBattleStats[id];
+    talentDefinitions[id] = talentRules.branches.map(function (branch) {
+      return {
+        id: branch.id,
+        name: branch.name,
+        maxLevel: talentRules.maxLevel,
+        effect: branch.effect,
+        perLevel: branch.perLevel,
+        cap: branch.cap,
+        preview: branch.id === "technique"
+          ? "提升「" + stats.skillName + "」效果，最高 +6%"
+          : branch.id === "role"
+            ? "強化「" + stats.role + "」定位的協同效果，最高 +5%"
+            : "提升隊伍協同的低幅度穩定性，最高 +4%"
+      };
+    });
+  });
+
   // 劇情入口開放文件 1.0–2.5；每幕由前端與後端共用 id，完成獎勵才能安全地只領一次。
   var tutorialReward = Object.freeze({ starSand: 920, characterExp: 600 });
   var tutorialSteps = Object.freeze([
     Object.freeze({ id: "account", icon: "✦", title: "先看懂你的星界帳號", copy: "進度會綁定遊戲名稱與密碼；登入後抽卡、資源、保底、角色與劇情完成狀態都會自動保存。" }),
     Object.freeze({ id: "lobby", icon: "◇", title: "從星界之律大廳出發", copy: "大廳的劇情、抽卡、角色培養、星界試煉、星港委託、公告與本教學都必須登入後才能使用。" }),
-    Object.freeze({ id: "story", icon: "◈", title: "閱讀劇情並取得星砂", copy: "主線與支線 1.0–2.5 已開放。每幕首次完成可獲得 100 星砂，長篇正文可在劇情頁直接閱讀。" }),
+    Object.freeze({ id: "story", icon: "◈", title: "閱讀劇情並取得養成資源", copy: "主線與支線 1.0–2.5 已開放。每幕首次完成可獲得 100 星砂與 650 角色經驗，長篇正文可在劇情頁直接閱讀。" }),
     Object.freeze({ id: "gacha", icon: "✧", title: "了解回覆召集", copy: "限定 4★ 可先選目標；前 20 抽不出 4★，第 21 抽起機率逐步提高，第 50 抽必定出 4★。歪到其他 4★ 會有星砂補償。" }),
     Object.freeze({ id: "growth", icon: "⬡", title: "培養與戰力", copy: "角色培養會提升生命、攻擊、防禦、速度與戰力；重複角色會增加命座並留下該角色專用晶核。三星與四星的基礎數值和成長倍率不同。" }),
     Object.freeze({ id: "trial", icon: "✹", title: "星界試煉與隊伍協同", copy: "最多派出 4 名角色。每關會顯示推薦戰力、敵人數值與特性；總戰力只是參考，治療、護盾、減防、速度和技能搭配都會影響勝負。" }),
     Object.freeze({ id: "dispatch", icon: "⌁", title: "用額外玩法取得養成資源", copy: "星港委託是每版本一次的短篇戰鬥任務，能取得星砂、角色經驗、回響粉或星痕；版本更新後任務進度會重置，角色不會消失。" }),
-    Object.freeze({ id: "boss", icon: "♢", title: "80 等突破與 Boss", copy: "角色升到 80 等後不能直接繼續升級；請在 Boss 選單挑戰指定首領，收集該角色需要的專屬突破材料，再完成突破並升到現行上限 90 等。100 等仍是後續版本預留內容。" })
+    Object.freeze({ id: "boss", icon: "♢", title: "80 等突破與 Boss", copy: "角色升到 80 等後不能直接繼續升級；請在 Boss 選單挑戰 Lv.1–3 三檔首領，收集專屬材料或星界通用突破印記，再完成突破並升到現行上限 90 等。100 等仍是後續版本預留內容。" }),
+    Object.freeze({ id: "voyage", icon: "✹", title: "星海迷航與特殊結局", copy: "這是獨立於主線的短局航程。選擇事件、商店與休整方式，找出一般、隱藏和協鳴特殊結局；本期特殊四星裝扮藏在特殊結局獎勵裡。" }),
+    Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
   ]);
   var announcements = Object.freeze([
     Object.freeze({ id: "update-2.0-2.5", badge: "大更新", date: "2.0–2.5", title: "第二大版本｜潮眼回覆正式開放", copy: "主線與支線 1.0–2.5 已接入長篇閱讀器；2.0–2.5 角色、星界試煉與星港委託一起加入星界之律大廳。", reward: "+3,200 星砂更新獎勵；每個帳號可領取一次。", highlights: ["劇情正文不再只顯示標題", "星界試煉擴充為 30 關", "版本進度更新不會刪除角色與培養資料"] }),
     Object.freeze({ id: "tutorial-launch", badge: "新手支援", date: "本次更新", title: "新手教學上線", copy: "第一次進入大廳後，可以從新手教學快速了解劇情、抽卡、培養、戰力、星界試煉與星港委託。", reward: "+920 星砂、+600 角色經驗。", highlights: ["完成一次即可領取", "獎勵會寫入目前登入的玩家帳號", "舊玩家也可以補看並領取一次"] }),
-    Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功可取得 260 星砂與 600 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
+    Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功可取得 50 星砂與 1,500 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
     Object.freeze({ id: "system-stability", badge: "系統優化", date: "資料保存", title: "玩家進度保存與介面穩定性改善", copy: "登入後的角色持有、命座、專用晶核、等級、資源、保底與劇情紀錄會持續保存；更新時只重置公告明確標示的版本玩法進度。", reward: "角色與養成資料不會因遊戲更新被重置。", highlights: ["修正劇情長文顯示與章節邊界", "角色列表與詳情加入戰力", "圖標、行動版排版與大廳入口調整"] }),
-    Object.freeze({ id: "breakthrough-boss", badge: "養成更新", date: "角色培養", title: "80 等突破與 Boss 挑戰開放", copy: "角色升到 80 等後，必須依照角色的專屬需求挑戰指定 Boss，收集突破材料後才能繼續升到 90 等。", reward: "Boss 勝利可取得突破材料與角色經驗；玩家角色與培養進度不會被重置。", highlights: ["六種 Boss 對應不同角色群", "角色詳情顯示指定 Boss、材料與戰力", "100 等保留為後續版本玩法，不在本次開放"] })
+    Object.freeze({ id: "breakthrough-boss", badge: "養成更新", date: "角色培養", title: "80 等突破與 Boss 挑戰開放", copy: "六種 Boss 分成 Lv.1–3 三檔獎勵；每場勝利會給專屬材料與通用突破印記，避免任何角色因指定 Boss 太難而卡住。", reward: "Boss 勝利可取得突破材料、通用印記與角色經驗；玩家角色與培養進度不會被重置。", highlights: ["Lv.3 的獎勵更豐富", "通用印記可替代任何指定材料", "100 等保留為後續版本玩法，不在本次開放"] }),
+    Object.freeze({ id: "star-sea-pet", badge: "玩法更新", date: "星海迷航／星伴培育", title: "主線之外的兩個獨立遊玩區域", copy: "星海迷航提供隨機航線、事件選擇與特殊結局；星伴培育讓玩家照顧寵物、設計外觀與特效，並決定是否公開展示。", reward: "特殊結局可取得本期四星裝扮；寵物探索與社群評分可取得獨立小獎勵。", highlights: ["三條航線與三種結局", "每期隨機一名四星角色裝扮", "公開／私人展示由玩家自行設定"] })
   ]);
   var storyChapters = [
     {
@@ -811,6 +963,15 @@
     trialReward: trialReward,
     dispatchVersion: dispatchVersion,
     dispatchMissions: dispatchMissions,
+    voyageVersion: voyageVersion,
+    voyageConfig: voyageConfig,
+    petVersion: petVersion,
+     petDefinitions: petDefinitions,
+     petOutfits: petOutfits,
+     petEffects: petEffects,
+     talentVersion: talentVersion,
+     talentRules: talentRules,
+     talentDefinitions: talentDefinitions,
     bossVersion: bossVersion,
     bossMaxRewards: bossMaxRewards,
     bossStages: bossStages,

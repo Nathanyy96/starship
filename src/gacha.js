@@ -39,10 +39,10 @@
       fourStarBaseCharacterExp: 70,
       fourStarCharacterExpStep: 32
     }),
-    constellation: Object.freeze({ max: 6, characterCoreCost: 1, baseResonanceCore: 1, resonanceCoreStep: 1 }),
+    constellation: Object.freeze({ max: 6, characterCoreCost: 1 }),
     singleCost: 160,
     tenCost: 1600,
-    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, resonanceCore: 1, characterExp: 240 }),
+    duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, characterExp: 240 }),
     duplicateThreeStar: Object.freeze({ characterExp: 160 })
   });
 
@@ -90,8 +90,6 @@
     assert(Number.isInteger(rules.development.fourStarCharacterExpStep) && rules.development.fourStarCharacterExpStep >= 0, "development.fourStarCharacterExpStep 必須是非負整數");
     assert(Number.isInteger(rules.constellation.max) && rules.constellation.max > 0, "constellation.max 必須是正整數");
     assert(Number.isInteger(rules.constellation.characterCoreCost) && rules.constellation.characterCoreCost > 0, "constellation.characterCoreCost 必須是正整數");
-    assert(Number.isInteger(rules.constellation.baseResonanceCore) && rules.constellation.baseResonanceCore >= 0, "constellation.baseResonanceCore 必須是非負整數");
-    assert(Number.isInteger(rules.constellation.resonanceCoreStep) && rules.constellation.resonanceCoreStep >= 0, "constellation.resonanceCoreStep 必須是非負整數");
     assert(Number.isInteger(rules.singleCost) && rules.singleCost >= 0, "singleCost 必須是非負整數");
     assert(Number.isInteger(rules.tenCost) && rules.tenCost >= 0, "tenCost 必須是非負整數");
     return rules;
@@ -183,8 +181,7 @@
         starSand: 160,
         starMarks: 0,
         echoPowder: 0,
-        characterExp: 800,
-        resonanceCore: 2
+        characterExp: 800
       },
       pity: {},
       selectedFeatured: {},
@@ -232,6 +229,37 @@
         claimed: {},
         lastMission: null
       },
+      voyageProgress: {
+        version: "2.0-2.5",
+        status: "idle",
+        routeId: null,
+        route: [],
+        nodeIndex: 0,
+        selectedTeam: [],
+        fragments: 0,
+        buffs: [],
+        flags: {},
+        claimedRewards: {},
+        lastBattle: null,
+        lastEnding: null
+      },
+      cosmetics: {
+        skins: {}
+      },
+      petProgress: {
+        version: "2.0-2.5",
+        selectedPetId: "star-fox",
+        selectedOutfitId: "default",
+        selectedEffectId: "starlit",
+        pets: {
+          "star-fox": { owned: true, level: 1, exp: 0, bond: 0, mood: 80, training: { care: 0, play: 0, focus: 0 } }
+        },
+        resources: { petFood: 6, petToys: 3, petTokens: 3, showcaseToken: 0 },
+        exploreCount: 0,
+        showcase: { isPublic: false, featuredPetId: "star-fox", outfitId: "default", effectId: "starlit", ratingTotal: 0, ratingCount: 0, ratedBy: {} },
+        ratedShowcases: {},
+        lastAction: null
+      },
       bannerExchanges: {},
       totalPulls: 0,
       history: []
@@ -249,6 +277,9 @@
     }
     state.resources = Object.assign(state.resources, isPlainObject(source.resources) ? source.resources : {});
     delete state.resources.tickets;
+    // 舊版的全域共鳴晶核沒有實際用途；現在只保留各角色自己的命座晶核。
+    // 載入舊存檔時直接移除，不影響角色、命座、等級或其他資源。
+    delete state.resources.resonanceCore;
     if (legacyTickets > 0) state.resources.starSand += legacyTickets * DEFAULT_RULES.singleCost;
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
@@ -310,6 +341,52 @@
     state.dispatchProgress = Object.assign(initialState().dispatchProgress, isPlainObject(source.dispatchProgress) ? source.dispatchProgress : {});
     state.dispatchProgress.selectedTeam = Array.isArray(state.dispatchProgress.selectedTeam) ? state.dispatchProgress.selectedTeam.slice(0, 4) : [];
     state.dispatchProgress.claimed = isPlainObject(state.dispatchProgress.claimed) ? state.dispatchProgress.claimed : {};
+    state.voyageProgress = Object.assign(initialState().voyageProgress, isPlainObject(source.voyageProgress) ? source.voyageProgress : {});
+    state.voyageProgress.version = typeof state.voyageProgress.version === "string" && state.voyageProgress.version ? state.voyageProgress.version : "2.0-2.5";
+    state.voyageProgress.status = ["idle", "active", "complete", "failed"].indexOf(state.voyageProgress.status) >= 0 ? state.voyageProgress.status : "idle";
+    state.voyageProgress.routeId = typeof state.voyageProgress.routeId === "string" ? state.voyageProgress.routeId : null;
+    state.voyageProgress.route = Array.isArray(state.voyageProgress.route) ? state.voyageProgress.route.map(String) : [];
+    state.voyageProgress.nodeIndex = Number.isInteger(state.voyageProgress.nodeIndex) && state.voyageProgress.nodeIndex >= 0 ? state.voyageProgress.nodeIndex : 0;
+    state.voyageProgress.selectedTeam = Array.isArray(state.voyageProgress.selectedTeam) ? state.voyageProgress.selectedTeam.slice(0, 4) : [];
+    state.voyageProgress.fragments = Number.isInteger(state.voyageProgress.fragments) && state.voyageProgress.fragments >= 0 ? state.voyageProgress.fragments : 0;
+    state.voyageProgress.buffs = Array.isArray(state.voyageProgress.buffs) ? state.voyageProgress.buffs.map(String) : [];
+    state.voyageProgress.flags = isPlainObject(state.voyageProgress.flags) ? state.voyageProgress.flags : {};
+    state.voyageProgress.claimedRewards = isPlainObject(state.voyageProgress.claimedRewards) ? state.voyageProgress.claimedRewards : {};
+    state.voyageProgress.lastBattle = isPlainObject(state.voyageProgress.lastBattle) ? state.voyageProgress.lastBattle : null;
+    state.voyageProgress.lastEnding = isPlainObject(state.voyageProgress.lastEnding) ? state.voyageProgress.lastEnding : null;
+    state.cosmetics = Object.assign(initialState().cosmetics, isPlainObject(source.cosmetics) ? source.cosmetics : {});
+    state.cosmetics.skins = isPlainObject(state.cosmetics.skins) ? state.cosmetics.skins : {};
+    state.petProgress = Object.assign(initialState().petProgress, isPlainObject(source.petProgress) ? source.petProgress : {});
+    state.petProgress.version = typeof state.petProgress.version === "string" && state.petProgress.version ? state.petProgress.version : "2.0-2.5";
+    state.petProgress.selectedPetId = typeof state.petProgress.selectedPetId === "string" ? state.petProgress.selectedPetId : "star-fox";
+    state.petProgress.selectedOutfitId = typeof state.petProgress.selectedOutfitId === "string" ? state.petProgress.selectedOutfitId : "default";
+    state.petProgress.selectedEffectId = typeof state.petProgress.selectedEffectId === "string" ? state.petProgress.selectedEffectId : "starlit";
+    state.petProgress.pets = isPlainObject(state.petProgress.pets) ? state.petProgress.pets : {};
+    if (!state.petProgress.pets["star-fox"]) state.petProgress.pets["star-fox"] = clone(initialState().petProgress.pets["star-fox"]);
+    Object.keys(state.petProgress.pets).forEach(function (id) {
+      var pet = isPlainObject(state.petProgress.pets[id]) ? state.petProgress.pets[id] : {};
+      pet.owned = pet.owned !== false;
+      pet.level = Number.isInteger(pet.level) && pet.level >= 1 ? pet.level : 1;
+      pet.exp = Number.isInteger(pet.exp) && pet.exp >= 0 ? pet.exp : 0;
+      pet.bond = Number.isInteger(pet.bond) && pet.bond >= 0 ? pet.bond : 0;
+      pet.mood = Number.isInteger(pet.mood) && pet.mood >= 0 ? Math.min(100, pet.mood) : 80;
+      pet.training = isPlainObject(pet.training) ? pet.training : {};
+      ["care", "play", "focus"].forEach(function (key) { pet.training[key] = Number.isInteger(pet.training[key]) && pet.training[key] >= 0 ? pet.training[key] : 0; });
+      state.petProgress.pets[id] = pet;
+    });
+    state.petProgress.resources = Object.assign(initialState().petProgress.resources, isPlainObject(state.petProgress.resources) ? state.petProgress.resources : {});
+    ["petFood", "petToys", "petTokens", "showcaseToken"].forEach(function (key) { state.petProgress.resources[key] = Number.isInteger(state.petProgress.resources[key]) && state.petProgress.resources[key] >= 0 ? state.petProgress.resources[key] : 0; });
+    state.petProgress.exploreCount = Number.isInteger(state.petProgress.exploreCount) && state.petProgress.exploreCount >= 0 ? state.petProgress.exploreCount : 0;
+    state.petProgress.showcase = Object.assign(initialState().petProgress.showcase, isPlainObject(state.petProgress.showcase) ? state.petProgress.showcase : {});
+    state.petProgress.showcase.isPublic = state.petProgress.showcase.isPublic === true;
+    state.petProgress.showcase.featuredPetId = typeof state.petProgress.showcase.featuredPetId === "string" ? state.petProgress.showcase.featuredPetId : state.petProgress.selectedPetId;
+    state.petProgress.showcase.outfitId = typeof state.petProgress.showcase.outfitId === "string" ? state.petProgress.showcase.outfitId : state.petProgress.selectedOutfitId;
+    state.petProgress.showcase.effectId = typeof state.petProgress.showcase.effectId === "string" ? state.petProgress.showcase.effectId : state.petProgress.selectedEffectId;
+    state.petProgress.showcase.ratingTotal = Number.isInteger(state.petProgress.showcase.ratingTotal) && state.petProgress.showcase.ratingTotal >= 0 ? state.petProgress.showcase.ratingTotal : 0;
+    state.petProgress.showcase.ratingCount = Number.isInteger(state.petProgress.showcase.ratingCount) && state.petProgress.showcase.ratingCount >= 0 ? state.petProgress.showcase.ratingCount : 0;
+    state.petProgress.showcase.ratedBy = isPlainObject(state.petProgress.showcase.ratedBy) ? state.petProgress.showcase.ratedBy : {};
+    state.petProgress.ratedShowcases = isPlainObject(state.petProgress.ratedShowcases) ? state.petProgress.ratedShowcases : {};
+    state.petProgress.lastAction = isPlainObject(state.petProgress.lastAction) ? state.petProgress.lastAction : null;
     state.bannerExchanges = isPlainObject(source.bannerExchanges) ? source.bannerExchanges : {};
     state.totalPulls = Number.isInteger(source.totalPulls) && source.totalPulls >= 0 ? source.totalPulls : 0;
     state.history = Array.isArray(source.history) ? source.history.slice(-50).map(function (entry) {
@@ -323,7 +400,7 @@
       return normalizedEntry;
     }) : [];
 
-    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach(function (key) {
+    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(state.resources[key]) && state.resources[key] >= 0, "資源數量必須是非負整數：" + key);
     });
 
@@ -367,7 +444,7 @@
   }
 
   function makeEmptyReward() {
-    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, resonanceCore: 0, constellationCore: 0 };
+    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, constellationCore: 0, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null };
   }
 
   /**
@@ -380,6 +457,10 @@
     this.rng = typeof options.rng === "function" ? options.rng : Math.random;
     this.now = typeof options.now === "function" ? options.now : function () { return new Date().toISOString(); };
     this.breakthroughRequirements = isPlainObject(options.breakthroughRequirements) ? options.breakthroughRequirements : {};
+    this.voyageConfig = isPlainObject(options.voyageConfig) ? options.voyageConfig : {};
+    this.petDefinitions = Array.isArray(options.petDefinitions) ? options.petDefinitions : [];
+    this.petOutfits = Array.isArray(options.petOutfits) ? options.petOutfits : [];
+    this.petEffects = Array.isArray(options.petEffects) ? options.petEffects : [];
     this.banners = (options.banners || []).map(normalizeBanner);
     assert(this.banners.length > 0, "至少要註冊一個卡池");
     this.bannerById = {};
@@ -447,7 +528,7 @@
     assert(level < this.rules.development.maxLevel, "角色已達目前最高等級");
     if (level >= this.rules.development.breakthroughLevel && !progress.breakthrough) {
       var requirement = this.getBreakthroughRequirement(card.id);
-      assert(false, "角色已達 " + this.rules.development.breakthroughLevel + " 等，請先到 Boss 選單取得 " + requirement.materialName + " 並完成突破");
+      assert(false, "角色已達 " + this.rules.development.breakthroughLevel + " 等，請先到 Boss 選單取得 " + requirement.materialName + " 或星界通用突破印記並完成突破");
     }
     var isFourStar = card.rarity === 4;
     var cost = {
@@ -481,11 +562,16 @@
     assert(!progress.breakthrough, "角色已完成 80 等突破");
     var requirement = this.getBreakthroughRequirement(card.id);
     var available = Math.max(0, Number(this.state.breakthroughMaterials[requirement.materialId]) || 0);
-    assert(available >= requirement.cost, "" + requirement.materialName + "不足，需要 " + requirement.cost + " 個；請先挑戰指定 Boss");
-    this.state.breakthroughMaterials[requirement.materialId] = available - requirement.cost;
+    var universalId = "universal-core";
+    var universalAvailable = Math.max(0, Number(this.state.breakthroughMaterials[universalId]) || 0);
+    assert(available + universalAvailable >= requirement.cost, "" + requirement.materialName + "不足，需要 " + requirement.cost + " 個；可用指定 Boss 材料或星界通用突破印記補足");
+    var specificUsed = Math.min(available, requirement.cost);
+    var universalUsed = requirement.cost - specificUsed;
+    this.state.breakthroughMaterials[requirement.materialId] = available - specificUsed;
+    this.state.breakthroughMaterials[universalId] = universalAvailable - universalUsed;
     progress.breakthrough = true;
     this.state.characterProgress[card.id] = progress;
-    return { card: clone(card), requirement: requirement, cost: { materialId: requirement.materialId, amount: requirement.cost }, progress: clone(progress), state: this.getState() };
+    return { card: clone(card), requirement: requirement, cost: { materialId: requirement.materialId, amount: requirement.cost, specificUsed: specificUsed, universalUsed: universalUsed }, progress: clone(progress), state: this.getState() };
   };
 
   GachaGame.prototype.enhanceConstellation = function (options) {
@@ -602,6 +688,7 @@
     if (card && !isFirstAcquisition && card.rarity === 4) {
       duplicateReward.starMarks = this.rules.duplicateFourStar.starMarks;
       duplicateReward.starSand = this.rules.duplicateFourStar.starSand;
+      duplicateReward.characterExp = this.rules.duplicateFourStar.characterExp;
       duplicateReward.constellationCore = copy ? copy.constellationCoreGranted : 0;
     } else if (card && !isFirstAcquisition && card.rarity === 3) {
       duplicateReward.characterExp = this.rules.duplicateThreeStar.characterExp;
@@ -617,8 +704,6 @@
     this.state.resources.starMarks += duplicateReward.starMarks + resourceReward.starMarks;
     this.state.resources.echoPowder += duplicateReward.echoPowder + resourceReward.echoPowder;
     this.state.resources.characterExp += duplicateReward.characterExp + resourceReward.characterExp;
-    // resonanceCore 保留給舊存檔與管理端相容；角色命座只消耗各角色自己的 constellationCore。
-    this.state.resources.resonanceCore += resourceReward.resonanceCore;
 
     return {
       card: card ? clone(card) : null,
@@ -751,6 +836,187 @@
     this.state.resources.starSand += reward.starSand;
     this.state.resources.characterExp += reward.characterExp;
     return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
+  };
+
+  GachaGame.prototype.getVoyageNode = function (nodeId) {
+    var nodes = Array.isArray(this.voyageConfig.nodes) ? this.voyageConfig.nodes : [];
+    var node = nodes.find(function (item) { return item && item.id === nodeId; });
+    assert(node, "找不到星海迷航節點：" + nodeId);
+    return clone(node);
+  };
+
+  GachaGame.prototype.startVoyage = function (options) {
+    options = options || {};
+    var routes = Array.isArray(this.voyageConfig.routes) ? this.voyageConfig.routes : [];
+    assert(routes.length > 0, "星海迷航尚未設定航線");
+    var progress = this.state.voyageProgress;
+    assert(progress.status !== "active", "目前已有進行中的星海迷航航程");
+    var route = options.routeId ? routes.find(function (item) { return item && item.id === options.routeId; }) : null;
+    if (!route) route = pick(routes, this.rng);
+    assert(Array.isArray(route.nodeIds) && route.nodeIds.length > 0, "星海迷航航線沒有節點");
+    progress.version = String(this.voyageConfig.version || progress.version || "2.0-2.5");
+    progress.status = "active";
+    progress.routeId = route.id;
+    progress.route = route.nodeIds.slice();
+    progress.nodeIndex = 0;
+    progress.selectedTeam = Array.isArray(options.team) ? options.team.slice(0, 4) : [];
+    progress.fragments = 0;
+    progress.buffs = [];
+    progress.flags = {};
+    progress.lastBattle = null;
+    progress.lastEnding = null;
+    return { state: this.getState(), route: clone(route), node: this.getVoyageNode(progress.route[0]) };
+  };
+
+  GachaGame.prototype._finishVoyage = function (team) {
+    var progress = this.state.voyageProgress;
+    var hasFour = team.some(function (id) { return this.cardById[id] && this.cardById[id].rarity === 4; }, this);
+    var hasThree = team.some(function (id) { return this.cardById[id] && this.cardById[id].rarity === 3; }, this);
+    var special = progress.flags.harmonized === true && hasFour && hasThree;
+    var hidden = !special && (progress.flags.secretGate === true || (Number(progress.flags.echoes) >= 2 && progress.routeId === "route-hidden"));
+    var endingId = special ? "special" : (hidden ? "hidden" : "normal");
+    var configuredReward = this.voyageConfig.endingRewards && this.voyageConfig.endingRewards[endingId] ? this.voyageConfig.endingRewards[endingId] : {};
+    var reward = makeEmptyReward();
+    Object.keys(configuredReward).forEach(function (key) { reward[key] = configuredReward[key]; });
+    var alreadyClaimed = Boolean(progress.claimedRewards[endingId]);
+    if (!alreadyClaimed) {
+      ["starSand", "starMarks", "echoPowder", "characterExp"].forEach(function (key) {
+        if (Number.isInteger(reward[key]) && reward[key] > 0) this.state.resources[key] += reward[key];
+      }, this);
+      ["petFood", "petToys", "petTokens", "showcaseToken"].forEach(function (key) {
+        if (Number.isInteger(reward[key]) && reward[key] > 0) this.state.petProgress.resources[key] += reward[key];
+      }, this);
+      if (reward.skinId) {
+        this.state.cosmetics.skins[reward.skinId] = { unlockedAt: this.now(), source: "star-sea-voyage", ending: endingId };
+      }
+      progress.claimedRewards[endingId] = { claimedAt: this.now(), skinId: reward.skinId || null };
+    }
+    progress.status = "complete";
+    progress.lastEnding = { id: endingId, alreadyClaimed: alreadyClaimed, reward: clone(reward), completedAt: this.now() };
+    return { endingId: endingId, alreadyClaimed: alreadyClaimed, reward: clone(reward) };
+  };
+
+  GachaGame.prototype.advanceVoyage = function (options) {
+    options = options || {};
+    var progress = this.state.voyageProgress;
+    assert(progress.status === "active", "目前沒有進行中的星海迷航航程");
+    var currentNodeId = progress.route[progress.nodeIndex];
+    assert(currentNodeId === options.nodeId, "星海迷航節點已變更，請重新整理目前航程");
+    var node = this.getVoyageNode(currentNodeId);
+    var team = Array.isArray(options.team) ? options.team.slice(0, 4) : progress.selectedTeam.slice(0, 4);
+    progress.selectedTeam = team;
+    if (node.type === "combat" || node.type === "boss") {
+      assert(isPlainObject(options.battle) && typeof options.battle.won === "boolean", "星海迷航戰鬥需要有效戰報");
+      progress.lastBattle = clone(options.battle);
+      if (!options.battle.won) {
+        progress.status = "failed";
+        return { state: this.getState(), node: node, nextNode: null, battle: clone(options.battle), reward: makeEmptyReward(), ending: null };
+      }
+      progress.fragments += Math.max(0, Number(node.fragmentReward) || 0);
+      if (node.buff) progress.buffs.push(String(node.buff));
+    }
+    if (node.choices && node.choices.length) {
+      var choice = node.choices.find(function (item) { return item && item.id === options.choice; });
+      assert(choice, "請先選擇星海迷航事件處理方式");
+      if (choice.requiresMixedTeam) {
+        var mixed = team.some(function (id) { return this.cardById[id] && this.cardById[id].rarity === 3; }, this) && team.some(function (id) { return this.cardById[id] && this.cardById[id].rarity === 4; }, this);
+        assert(mixed, "這個選項需要同時編入三星與四星角色");
+      }
+      if (choice.requiresFlag) assert(progress.flags[choice.requiresFlag] === true, "尚未取得這個事件的必要線索");
+      if (Number(choice.costFragments || 0) > 0) assert(progress.fragments >= choice.costFragments, "星海碎片不足");
+      progress.fragments = Math.max(0, progress.fragments - Math.max(0, Number(choice.costFragments) || 0) + Number(choice.fragmentDelta || 0));
+      if (choice.buff) progress.buffs.push(String(choice.buff));
+      if (choice.flag) progress.flags[choice.flag] = choice.flagValue === undefined ? true : choice.flagValue;
+      if (choice.incrementFlag) progress.flags[choice.incrementFlag] = Number(progress.flags[choice.incrementFlag] || 0) + 1;
+    }
+    progress.nodeIndex += 1;
+    var ending = null;
+    if (node.final || progress.nodeIndex >= progress.route.length) ending = this._finishVoyage(team);
+    var nextNode = progress.status === "active" ? this.getVoyageNode(progress.route[progress.nodeIndex]) : null;
+    return { state: this.getState(), node: node, nextNode: nextNode, battle: options.battle ? clone(options.battle) : null, reward: ending ? ending.reward : makeEmptyReward(), ending: ending };
+  };
+
+  GachaGame.prototype.getPetDefinition = function (petId) {
+    var definition = this.petDefinitions.find(function (item) { return item && item.id === petId; });
+    assert(definition, "找不到寵物：" + petId);
+    return clone(definition);
+  };
+
+  GachaGame.prototype.setPetCustomization = function (options) {
+    options = options || {};
+    var progress = this.state.petProgress;
+    var petId = options.petId || options.selectedPetId || progress.selectedPetId;
+    assert(progress.pets[petId] && progress.pets[petId].owned, "尚未擁有這隻寵物");
+    var outfitId = options.outfitId || options.selectedOutfitId || progress.selectedOutfitId;
+    var effectId = options.effectId || options.selectedEffectId || progress.selectedEffectId;
+    if (this.petOutfits.length) assert(this.petOutfits.some(function (item) { return item.id === outfitId; }), "找不到寵物裝扮");
+    if (this.petEffects.length) assert(this.petEffects.some(function (item) { return item.id === effectId; }), "找不到寵物特效");
+    progress.selectedPetId = petId;
+    progress.selectedOutfitId = outfitId;
+    progress.selectedEffectId = effectId;
+    progress.showcase.featuredPetId = petId;
+    progress.showcase.outfitId = outfitId;
+    progress.showcase.effectId = effectId;
+    if (options.isPublic !== undefined) progress.showcase.isPublic = options.isPublic === true;
+    return { state: this.getState(), showcase: clone(progress.showcase) };
+  };
+
+  GachaGame.prototype.petAction = function (options) {
+    options = options || {};
+    var action = String(options.action || "");
+    var progress = this.state.petProgress;
+    var petId = String(options.petId || progress.selectedPetId || "star-fox");
+    var definition = this.getPetDefinition(petId);
+    var resources = progress.resources;
+    var reward = { petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, petExp: 0 };
+    if (action === "adopt") {
+      assert(!progress.pets[petId] || !progress.pets[petId].owned, "這隻寵物已經在你的工坊");
+      assert(resources.petTokens >= 3, "星伴代幣不足，需要 3 枚才能領養");
+      resources.petTokens -= 3;
+      progress.pets[petId] = { owned: true, level: 1, exp: 0, bond: 0, mood: 70, training: { care: 0, play: 0, focus: 0 } };
+      progress.selectedPetId = petId;
+    } else {
+      assert(progress.pets[petId] && progress.pets[petId].owned, "尚未擁有這隻寵物");
+      var pet = progress.pets[petId];
+      if (action === "select") {
+        progress.selectedPetId = petId;
+        progress.showcase.featuredPetId = petId;
+      } else if (action === "feed") {
+        assert(resources.petFood >= 1, "寵物飼料不足");
+        resources.petFood -= 1;
+        reward.petExp = 45; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 2); pet.mood = Math.min(100, pet.mood + 5);
+      } else if (action === "play") {
+        assert(resources.petToys >= 1, "寵物玩具不足");
+        resources.petToys -= 1;
+        reward.petExp = 30; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 3); pet.mood = Math.min(100, pet.mood + 8); pet.training.play += 1;
+      } else if (action === "train") {
+        assert(resources.petTokens >= 1, "星伴代幣不足");
+        resources.petTokens -= 1;
+        reward.petExp = 65; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 1); pet.mood = Math.max(0, pet.mood - 2);
+        var focus = ["care", "play", "focus"].indexOf(options.focus) >= 0 ? options.focus : "focus";
+        pet.training[focus] += 1;
+      } else if (action === "explore") {
+        assert(progress.exploreCount < 3, "本期寵物探索已完成 3 次，等待下次版本更新");
+        progress.exploreCount += 1;
+        reward.petExp = 20; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 1); pet.mood = Math.min(100, pet.mood + 2);
+        reward.petFood = 2; reward.petToys = 1; reward.petTokens = 1;
+        resources.petFood += reward.petFood; resources.petToys += reward.petToys; resources.petTokens += reward.petTokens;
+      } else {
+        throw new Error("找不到寵物活動");
+      }
+      if (action !== "select") {
+        var maxLevel = Number(definition.maxLevel || 30);
+        var levelUps = 0;
+        while (pet.level < maxLevel && pet.exp >= 80 + pet.level * 40) {
+          pet.exp -= 80 + pet.level * 40;
+          pet.level += 1;
+          levelUps += 1;
+        }
+        reward.levelUps = levelUps;
+      }
+    }
+    progress.lastAction = { action: action, petId: petId, at: this.now(), reward: clone(reward) };
+    return { state: this.getState(), pet: clone(progress.pets[petId]), definition: definition, reward: reward };
   };
 
   GachaGame.prototype.reset = function () {

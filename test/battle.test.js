@@ -18,13 +18,15 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.ok(battle.logs.length > 0);
   assert.equal(battle.reward.starSand, trialReward.starSand);
   assert.equal(battle.reward.characterExp, trialReward.characterExp);
+  assert.equal(trialReward.starSand, 50);
+  assert.equal(trialReward.characterExp, 1500);
   assert.equal(battle.environment, trialStages[0].environment);
   assert.equal(battle.enemyTrait, trialStages[0].enemyTrait);
   assert.equal(trialMaxRewards, 10);
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
-  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 832);
+  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 866);
 });
 
 test("星界試煉擴充為 30 關並維持逐關升難", () => {
@@ -45,4 +47,14 @@ test("四星培養成長幅度高於三星，重複角色留下個人命座晶�
   const fourPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], characterBattleStats));
   const threePowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 3).map((id) => teamPower([id], characterBattleStats));
   assert.ok(Math.min(...fourPowers) > Math.max(...threePowers));
+});
+
+test("四星低基礎功能型角色在 70–90 等使用平衡成長帶", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const progress = { characterProgress: Object.fromEntries(Object.keys(characterBattleStats).map((id) => [id, { level: 90 }])) };
+  const statsAt90 = buildEffectiveStats(characterBattleStats, progress);
+  const fourStarPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], statsAt90));
+  assert.ok(Math.min(...fourStarPowers) / Math.max(...fourStarPowers) > 0.8);
+  assert.equal(characterBattleStats.mave.growthBand, "parity");
+  assert.equal(characterBattleStats.mave.growthRates.main, 0.05);
 });

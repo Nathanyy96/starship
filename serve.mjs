@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -23,7 +23,7 @@ const updateReward = Object.freeze({ starSand: 3200 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
 function createGame(state) {
-  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs });
+  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, petDefinitions, petOutfits, petEffects });
 }
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -149,6 +149,22 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
   if (oldTutorial.rewardClaimed === true && nextTutorial.rewardClaimed !== true) {
     throw new Error("更新保護中止：玩家 " + playerKey + " 的新手教學獎勵狀態不可被移除");
   }
+  const oldPets = previousState.petProgress && previousState.petProgress.pets && typeof previousState.petProgress.pets === "object" ? previousState.petProgress.pets : {};
+  const nextPets = nextState.petProgress && nextState.petProgress.pets && typeof nextState.petProgress.pets === "object" ? nextState.petProgress.pets : {};
+  Object.entries(oldPets).forEach(([petId, oldPet]) => {
+    const nextPet = nextPets[petId];
+    if (oldPet && oldPet.owned && !(nextPet && nextPet.owned)) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物不可被移除");
+    ["level", "exp", "bond"].forEach((field) => {
+      const oldValue = Math.max(0, Number(oldPet && oldPet[field]) || 0);
+      const nextValue = Math.max(0, Number(nextPet && nextPet[field]) || 0);
+      if (oldValue > nextValue) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物培育進度不可被降低");
+    });
+  });
+  const oldSkins = previousState.cosmetics && previousState.cosmetics.skins && typeof previousState.cosmetics.skins === "object" ? previousState.cosmetics.skins : {};
+  const nextSkins = nextState.cosmetics && nextState.cosmetics.skins && typeof nextState.cosmetics.skins === "object" ? nextState.cosmetics.skins : {};
+  Object.keys(oldSkins).forEach((skinId) => {
+    if (!nextSkins[skinId]) throw new Error("更新保護中止：玩家 " + playerKey + " 的已取得裝扮不可被移除");
+  });
 }
 
 function assertDatabaseContinuity(previousDatabase, nextDatabase) {
@@ -325,6 +341,29 @@ function ensurePlayerMilestones(currentState) {
     state.dispatchProgress.claimed = {};
     state.dispatchProgress.lastMission = null;
   }
+  state.voyageProgress = state.voyageProgress || { version: voyageVersion, status: "idle", routeId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
+  if (state.voyageProgress.version !== voyageVersion) {
+    state.voyageProgress.version = voyageVersion;
+    state.voyageProgress.status = "idle";
+    state.voyageProgress.routeId = null;
+    state.voyageProgress.route = [];
+    state.voyageProgress.nodeIndex = 0;
+    state.voyageProgress.selectedTeam = [];
+    state.voyageProgress.fragments = 0;
+    state.voyageProgress.buffs = [];
+    state.voyageProgress.flags = {};
+    state.voyageProgress.claimedRewards = {};
+    state.voyageProgress.lastBattle = null;
+    state.voyageProgress.lastEnding = null;
+  }
+  state.petProgress = state.petProgress || { version: petVersion, exploreCount: 0, ratedShowcases: {} };
+  if (state.petProgress.version !== petVersion) {
+    state.petProgress.version = petVersion;
+    state.petProgress.exploreCount = 0;
+    state.petProgress.ratedShowcases = {};
+    state.petProgress.showcase = state.petProgress.showcase || {};
+    state.petProgress.showcase.ratedBy = {};
+  }
   const migratedState = createGame(state).getState();
   restorePlayerProgress(migratedState, preservedProgress);
   return createGame(migratedState).getState();
@@ -454,12 +493,12 @@ function integerOrCurrent(value, current) {
 function updateAdminState(currentState, body) {
   const state = JSON.parse(JSON.stringify(currentState));
   if (body.resources) {
-    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
+    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach((key) => {
       state.resources[key] = integerOrCurrent(body.resources[key], state.resources[key]);
     });
   }
   if (body.resourceDelta) {
-    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
+    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach((key) => {
       const delta = body.resourceDelta[key] === undefined ? 0 : body.resourceDelta[key];
       if (!Number.isInteger(delta)) throw new Error("資源增減必須是整數");
       state.resources[key] += delta;
@@ -514,18 +553,20 @@ function completeStoryScene(currentState, body) {
   }
   const scene = storySceneById(chapter, body.sceneId);
   const key = chapter.id + ":" + scene.id;
+  const storyReward = { starSand: 100, characterExp: 650 };
   state.storyProgress = state.storyProgress || { currentChapter: chapter.id, completedScenes: {} };
   state.storyProgress.completedScenes = state.storyProgress.completedScenes || {};
   state.storyProgress.currentChapter = chapter.id;
   if (state.storyProgress.completedScenes[key]) {
-    return { state, alreadyClaimed: true, reward: { starSand: 0 }, chapter, scene };
+    return { state, alreadyClaimed: true, reward: { starSand: 0, characterExp: 0 }, chapter, scene };
   }
-  state.storyProgress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: 100 };
-  state.resources.starSand += 100;
+  state.storyProgress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: storyReward.starSand, characterExp: storyReward.characterExp };
+  state.resources.starSand += storyReward.starSand;
+  state.resources.characterExp += storyReward.characterExp;
   if (chapter.id === "main-1-0" && !state.recruitment.story10ChoiceClaimed) {
     state.recruitment.story10ChoiceAvailable = true;
   }
-  return { state: createGame(state).getState(), alreadyClaimed: false, reward: { starSand: 100 }, chapter, scene };
+  return { state: createGame(state).getState(), alreadyClaimed: false, reward: storyReward, chapter, scene };
 }
 
 function completeTutorial(currentState) {
@@ -594,6 +635,8 @@ function runBoss(currentState, body) {
     const materialId = String(reward.materialId || "");
     const amount = Math.max(0, Number(reward.amount) || 0);
     state.breakthroughMaterials[materialId] = (Number(state.breakthroughMaterials[materialId]) || 0) + amount;
+    const universalAmount = Math.max(0, Number(reward.universalAmount) || 1);
+    state.breakthroughMaterials["universal-core"] = (Number(state.breakthroughMaterials["universal-core"]) || 0) + universalAmount;
     state.resources.characterExp += Math.max(0, Number(reward.characterExp) || 0);
   }
   const attemptsUsed = Number(state.bossProgress.attempts[stage.id] || attempts);
@@ -601,7 +644,7 @@ function runBoss(currentState, body) {
     state: createGame(state).getState(),
     battle,
     boss: stage,
-    reward: battle.won ? { materialId: reward.materialId, materialName: reward.materialName, amount: reward.amount, characterExp: reward.characterExp, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed } : { materialId: reward.materialId, materialName: reward.materialName, amount: 0, characterExp: 0, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed }
+    reward: battle.won ? { materialId: reward.materialId, materialName: reward.materialName, amount: reward.amount, universalMaterialId: "universal-core", universalMaterialName: "星界通用突破印記", universalAmount: reward.universalAmount || 1, characterExp: reward.characterExp, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed } : { materialId: reward.materialId, materialName: reward.materialName, amount: 0, universalMaterialId: "universal-core", universalMaterialName: "星界通用突破印記", universalAmount: 0, characterExp: 0, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed }
   };
 }
 
@@ -631,6 +674,116 @@ function runDispatch(currentState, body) {
   });
   if (battle.won) state.dispatchProgress.claimed[mission.id] = { completedAt: new Date().toISOString() };
   return { state: createGame(state).getState(), battle, reward, mission };
+}
+
+function voyageNodeById(nodeId) {
+  const node = (voyageConfig.nodes || []).find((item) => item.id === String(nodeId || ""));
+  if (!node) throw new Error("找不到星海迷航節點");
+  return node;
+}
+
+function runVoyage(currentState, body) {
+  const state = ensurePlayerMilestones(currentState);
+  const game = createGame(state);
+  const action = String(body.action || "");
+  if (action === "start") {
+    const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
+    if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
+    return game.startVoyage({ routeId: body.routeId, team });
+  }
+  if (action !== "resolve") throw new Error("找不到星海迷航操作");
+  const progress = state.voyageProgress;
+  if (progress.status !== "active") throw new Error("目前沒有進行中的星海迷航航程");
+  const node = voyageNodeById(progress.route[progress.nodeIndex]);
+  const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : progress.selectedTeam)).slice(0, 4);
+  let battle = null;
+  if (node.type === "combat" || node.type === "boss") {
+    if (!team.length) throw new Error("至少派出 1 名角色才能進行星海迷航戰鬥");
+    if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
+    const stage = trialStageById(node.stageId);
+    battle = simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, state), stage, rng: Math.random });
+  }
+  const result = game.advanceVoyage({ nodeId: node.id, choice: body.choice, team, battle });
+  return Object.assign({ state: result.state, node: result.node, nextNode: result.nextNode, battle: result.battle, reward: result.reward, ending: result.ending }, { voyageVersion });
+}
+
+function petAction(currentState, body) {
+  const state = ensurePlayerMilestones(currentState);
+  const game = createGame(state);
+  const action = String(body.action || "");
+  let result;
+  if (action === "customize" || action === "publish") {
+    result = game.setPetCustomization({
+      petId: body.petId,
+      outfitId: body.outfitId,
+      effectId: body.effectId,
+      isPublic: action === "publish" ? body.isPublic === true : body.isPublic
+    });
+  } else {
+    result = game.petAction({ action, petId: body.petId, focus: body.focus });
+  }
+  return result;
+}
+
+function publicPetShowcase(key, record) {
+  const state = createGame(record.state).getState();
+  const progress = state.petProgress || {};
+  const showcase = progress.showcase || {};
+  if (showcase.isPublic !== true) return null;
+  const pet = progress.pets && progress.pets[showcase.featuredPetId];
+  const definition = petDefinitions.find((item) => item.id === showcase.featuredPetId) || petDefinitions[0];
+  const outfit = petOutfits.find((item) => item.id === showcase.outfitId) || petOutfits[0];
+  const effect = petEffects.find((item) => item.id === showcase.effectId) || petEffects[0];
+  if (!pet || !definition) return null;
+  return {
+    playerKey: key,
+    playerName: record.name,
+    pet: { id: definition.id, name: definition.name, temperament: definition.temperament, icon: definition.icon, accent: definition.accent, level: pet.level, bond: pet.bond, mood: pet.mood },
+    outfit: { id: outfit.id, name: outfit.name, description: outfit.description, accent: outfit.accent },
+    effect: { id: effect.id, name: effect.name, description: effect.description, icon: effect.icon, color: effect.color },
+    ratingCount: Number(showcase.ratingCount || 0),
+    ratingAverage: showcase.ratingCount ? Math.round(Number(showcase.ratingTotal || 0) / showcase.ratingCount * 10) / 10 : 0
+  };
+}
+
+function runPetShowcase(database, player, body) {
+  const action = String(body.action || "browse");
+  if (action === "browse") {
+    const list = Object.entries(database.players || {}).map(([key, record]) => key === player.key ? null : publicPetShowcase(key, record)).filter(Boolean).sort((a, b) => b.ratingAverage - a.ratingAverage || b.ratingCount - a.ratingCount).slice(0, 30);
+    return { state: player.record.state, showcases: list };
+  }
+  if (action === "publish") {
+    const result = petAction(player.record.state, body);
+    player.record.state = result.state;
+    player.record.updatedAt = new Date().toISOString();
+    return { state: player.record.state, showcase: publicPetShowcase(player.key, player.record), reward: { petFood: 0 } };
+  }
+  if (action !== "rate") throw new Error("找不到星伴展示操作");
+  const targetKey = String(body.targetKey || "");
+  if (!targetKey || targetKey === player.key) throw new Error("不能評分自己的寵物展示");
+  const target = database.players[targetKey];
+  if (!target) throw new Error("找不到這個公開展示");
+  const targetState = ensurePlayerMilestones(target.state);
+  const targetShowcase = targetState.petProgress && targetState.petProgress.showcase;
+  if (!targetShowcase || targetShowcase.isPublic !== true) throw new Error("這個玩家目前沒有公開寵物");
+  const rating = Number(body.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) throw new Error("評分必須是 1 到 5 顆星");
+  const currentState = ensurePlayerMilestones(player.record.state);
+  currentState.petProgress.ratedShowcases = currentState.petProgress.ratedShowcases || {};
+  if (currentState.petProgress.ratedShowcases[targetKey] && currentState.petProgress.ratedShowcases[targetKey].version === petVersion) throw new Error("本期已經評分過這個寵物展示");
+  targetShowcase.ratedBy = targetShowcase.ratedBy || {};
+  if (targetShowcase.ratedBy[player.key] && targetShowcase.ratedBy[player.key].version === petVersion) throw new Error("本期已經評分過這個寵物展示");
+  targetShowcase.ratingTotal = Number(targetShowcase.ratingTotal || 0) + rating;
+  targetShowcase.ratingCount = Number(targetShowcase.ratingCount || 0) + 1;
+  targetShowcase.ratedBy[player.key] = { version: petVersion, rating, ratedAt: new Date().toISOString() };
+  targetState.petProgress.resources.petToys = Number(targetState.petProgress.resources.petToys || 0) + 1;
+  currentState.petProgress.ratedShowcases[targetKey] = { version: petVersion, rating, ratedAt: new Date().toISOString() };
+  currentState.petProgress.resources.petFood = Number(currentState.petProgress.resources.petFood || 0) + 1;
+  target.state = createGame(targetState).getState();
+  player.record.state = createGame(currentState).getState();
+  target.updatedAt = new Date().toISOString();
+  player.record.updatedAt = target.updatedAt;
+  return { state: player.record.state, showcases: [publicPetShowcase(targetKey, target)], reward: { petFood: 1 }, ownerReward: { petToys: 1 } };
 }
 
 function claimCharacterChoice(currentState, body) {
@@ -767,6 +920,34 @@ async function handleApi(request, response, requestUrl) {
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, battle: result.battle, reward: result.reward, mission: result.mission });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/voyage") {
+      const player = playerFromSession(database, body.token);
+      const result = runVoyage(player.record.state, body);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/pet-action") {
+      const player = playerFromSession(database, body.token);
+      const result = petAction(player.record.state, body);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/pet-showcase") {
+      const player = playerFromSession(database, body.token);
+      const result = runPetShowcase(database, player, body);
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
       return;
     }
 

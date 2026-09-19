@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, talentRules, talentDefinitions } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -70,6 +70,49 @@ test("Boss 依角色分組提供 80 等突破材料，現行上限是 90 並預�
   assert.equal(new Set(activeCards.map((card) => characterBreakthroughs[card.id].bossId)).size >= 4, true);
   assert.equal(characterBreakthroughs.celesia.cost, 4);
   assert.equal(characterBreakthroughs.reyn.cost, 3);
+  assert.deepEqual(bossStages.map((stage) => stage.bossLevel), [1, 1, 2, 2, 3, 3]);
+  assert.equal(Math.max(...bossStages.map((stage) => stage.bossLevel)), 3);
+  assert.ok(bossStages.every((stage) => stage.reward.universalAmount >= 1));
+});
+
+test("通用突破印記可以讓玩家不用被指定高難度 Boss 卡住", () => {
+  const gacha = game({
+    breakthroughRequirements: characterBreakthroughs,
+    state: state({
+      resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 },
+      collection: { celesia: 1 },
+      characterProgress: { celesia: { level: 80, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false } },
+      breakthroughMaterials: { "universal-core": 4 }
+    })
+  });
+  const result = gacha.breakthroughCharacter({ cardId: "celesia" });
+  assert.equal(result.cost.universalUsed, 4);
+  assert.equal(result.state.breakthroughMaterials["universal-core"], 0);
+  assert.equal(result.progress.breakthrough, true);
+});
+
+test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此分離", () => {
+  assert.equal(voyageConfig.routes.length, 3);
+  assert.ok(voyageConfig.endingRewards.hidden && voyageConfig.endingRewards.special.skinId);
+  assert.equal(petDefinitions.length, 4);
+  assert.ok(petOutfits.length >= 3 && petEffects.length >= 3);
+  assert.equal(talentRules.maxLevel, 5);
+  assert.equal(talentRules.totalBonusCap, 0.10);
+  assert.equal(talentDefinitions.celesia.length, 3);
+  const gacha = game({
+    voyageConfig,
+    petDefinitions,
+    petOutfits,
+    petEffects,
+    state: state({ resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 }, collection: { celesia: 1, reyn: 1 } })
+  });
+  const start = gacha.startVoyage({ routeId: "route-echo", team: ["celesia", "reyn"] });
+  assert.equal(start.node.id, "voyage-start");
+  const next = gacha.advanceVoyage({ nodeId: "voyage-start", team: ["celesia", "reyn"] });
+  assert.equal(next.nextNode.id, "voyage-combat-1");
+  const pet = gacha.petAction({ action: "feed", petId: "star-fox" });
+  assert.equal(pet.state.resources.characterExp, 100000);
+  assert.equal(pet.state.petProgress.resources.petFood, 5);
 });
 
 test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
@@ -258,7 +301,7 @@ test("重複角色轉換成文件指定的資源", () => {
   secondState.pity.limited.pullsSince4Star = 20;
   const second = game({ state: secondState, rng: () => 0 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
   assert.equal(second.results[0].isFirstAcquisition, false);
-  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, echoPowder: 0, characterExp: 0, resonanceCore: 0, constellationCore: 1 });
+  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, echoPowder: 0, characterExp: 240, constellationCore: 1, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null });
   assert.equal(second.state.resources.starMarks, 1);
   assert.equal(second.state.resources.starSand, 100000 - 160 * 2 + 50);
   assert.equal(second.state.characterProgress.celesia.constellation, 1);
@@ -279,7 +322,7 @@ test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續�
   const enhanced = gacha.enhanceConstellation({ cardId: "lia" });
   assert.equal(enhanced.state.characterProgress.lia.constellation, 5);
   assert.equal(enhanced.state.characterProgress.lia.constellationCore, 3);
-  assert.equal(enhanced.state.resources.resonanceCore, 2);
+  assert.equal(Object.prototype.hasOwnProperty.call(enhanced.state.resources, "resonanceCore"), false);
 });
 
 test("舊共鳴券會按單抽等價轉成星砂，抽卡只使用星砂", () => {

@@ -585,3 +585,109 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
   .enemy-intel-heading { align-items: flex-start; flex-direction: column; }
   .story-full-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
 }
+
+/* 星海迷航與星伴培育：兩個不依附主線的可長期遊玩區域 */
+.voyage-view, .pet-view { overflow: hidden; }
+.voyage-intro, .pet-intro { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin: 18px 0; padding: 20px 22px; border: 1px solid rgba(119, 228, 222, .2); border-radius: 18px; background: linear-gradient(110deg, rgba(25, 53, 93, .72), rgba(32, 27, 82, .56)); }
+.voyage-intro strong, .pet-intro strong { display: block; color: #fbfcff; font-size: 1.05rem; }
+.voyage-intro p, .pet-intro p { margin: 8px 0 0; color: #aebbd5; font-size: .76rem; line-height: 1.65; }
+.voyage-season-reward { min-width: 220px; padding: 13px 16px; border: 1px solid rgba(246, 199, 111, .34); border-radius: 14px; background: rgba(246, 199, 111, .08); }
+.voyage-season-reward span, .voyage-season-reward small { display: block; color: #d9c994; font-size: .65rem; }
+.voyage-season-reward strong { margin: 4px 0; color: #ffe2a0; font-size: .85rem; }
+.voyage-layout { display: grid; grid-template-columns: minmax(250px, .34fr) minmax(0, .66fr); gap: 18px; }
+.voyage-rail, .voyage-arena, .pet-workbench, .pet-catalog { min-width: 0; }
+.voyage-route-list { display: grid; gap: 8px; margin: 14px 0; }
+.voyage-route-card { display: grid; gap: 5px; width: 100%; padding: 12px 14px; text-align: left; color: #dce7ff; border: 1px solid rgba(125, 157, 218, .24); border-radius: 14px; background: rgba(12, 25, 55, .75); cursor: pointer; transition: .2s ease; }
+.voyage-route-card:hover, .voyage-route-card.selected { border-color: rgba(119, 228, 222, .7); background: linear-gradient(110deg, rgba(45, 91, 126, .68), rgba(42, 39, 91, .8)); transform: translateY(-1px); }
+.voyage-route-card span { font-weight: 700; font-size: .8rem; }
+.voyage-route-card small { color: #8ea4c9; font-size: .64rem; line-height: 1.45; }
+.voyage-rail > .primary-action { width: 100%; }
+.voyage-node-list { display: grid; grid-template-columns: repeat(6, minmax(100px, 1fr)); gap: 7px; overflow-x: auto; padding-bottom: 4px; }
+.voyage-node-pill { display: grid; gap: 4px; min-height: 66px; padding: 8px 9px; border: 1px solid rgba(125, 157, 218, .2); border-radius: 12px; background: rgba(13, 25, 55, .7); }
+.voyage-node-pill span { color: #8ea4c9; font-size: .58rem; }
+.voyage-node-pill strong { color: #dce7ff; font-size: .66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.voyage-node-pill small { color: #6d7fa5; font-size: .58rem; }
+.voyage-node-pill.done { border-color: rgba(112, 219, 184, .45); opacity: .76; }
+.voyage-node-pill.current { border-color: rgba(119, 228, 222, .8); box-shadow: 0 0 22px rgba(119, 228, 222, .12); }
+.voyage-node-pill.current strong { color: #8ff4e7; }
+.voyage-node-pill.locked { opacity: .45; }
+.voyage-node-details { margin-top: 14px; padding: 17px 18px; min-height: 134px; border: 1px solid rgba(125, 157, 218, .2); border-radius: 16px; background: rgba(9, 17, 42, .62); }
+.voyage-node-details h3 { margin: 8px 0 5px; color: #f6f8ff; }
+.voyage-node-details p { color: #aebbd5; font-size: .75rem; line-height: 1.6; }
+.voyage-node-details .trial-detail-stats { margin-top: 10px; }
+.voyage-node-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 14px 0; }
+.voyage-choice-button { display: grid; gap: 5px; padding: 13px; text-align: left; color: #e6edff; border: 1px solid rgba(125, 157, 218, .28); border-radius: 13px; background: rgba(25, 38, 77, .78); cursor: pointer; }
+.voyage-choice-button:hover { border-color: rgba(119, 228, 222, .7); background: rgba(42, 61, 105, .84); }
+.voyage-choice-button strong { color: #8ff4e7; font-size: .76rem; }
+.voyage-choice-button small { color: #aebbd5; font-size: .64rem; line-height: 1.45; }
+.voyage-choice-button.locked { opacity: .4; cursor: not-allowed; }
+.voyage-event-note, .voyage-empty-state, .pet-community-empty { padding: 20px; border: 1px dashed rgba(125, 157, 218, .28); border-radius: 14px; color: #aebbd5; background: rgba(14, 25, 53, .5); }
+.voyage-event-note { margin-top: 12px; }
+.voyage-event-note strong, .voyage-empty-state strong { display: block; margin-top: 7px; color: #dce7ff; }
+.voyage-empty-state { margin-top: 14px; text-align: center; }
+.voyage-empty-state p { margin: 8px 0 0; font-size: .7rem; }
+.voyage-hint { padding: 10px 12px; color: #c7d2e9; border-left: 2px solid #9e92ff; background: rgba(158, 146, 255, .08); font-size: .7rem; line-height: 1.6; }
+.voyage-ending-card { margin: 12px 0; padding: 17px; border: 1px solid rgba(246, 199, 111, .45); border-radius: 15px; background: linear-gradient(120deg, rgba(92, 67, 100, .55), rgba(41, 41, 86, .7)); }
+.voyage-ending-card h3 { margin: 6px 0; color: #ffe2a0; }
+.voyage-ending-card p { margin: 0 0 7px; color: #bfc8dd; font-size: .72rem; }
+.voyage-ending-card strong { color: #fff0bf; font-size: .78rem; }
+
+.pet-resource-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.pet-resource-row span { padding: 7px 10px; color: #aebbd5; border: 1px solid rgba(125, 157, 218, .24); border-radius: 999px; background: rgba(8, 19, 45, .56); font-size: .64rem; }
+.pet-resource-row b { margin-left: 4px; color: #f4f7ff; }
+.pet-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 18px; }
+.pet-workbench, .pet-catalog { padding: 16px; border: 1px solid rgba(125, 157, 218, .21); border-radius: 18px; background: rgba(7, 15, 38, .62); }
+.pet-selected-card { display: grid; gap: 12px; }
+.pet-visual-card { position: relative; display: flex; align-items: center; gap: 22px; min-height: 230px; padding: 22px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--pet-accent) 45%, transparent); border-radius: 18px; background: radial-gradient(circle at 18% 35%, color-mix(in srgb, var(--pet-accent) 24%, transparent), transparent 34%), linear-gradient(130deg, rgba(21, 40, 76, .92), rgba(37, 26, 72, .82)); }
+.pet-visual-card::after { content: ""; position: absolute; inset: auto -15% -40% 32%; height: 150px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--pet-effect) 55%, transparent); transform: rotate(-12deg); opacity: .5; }
+.pet-visual-orbit { display: grid; place-items: center; width: 145px; height: 145px; flex: 0 0 145px; border: 1px solid color-mix(in srgb, var(--pet-effect) 65%, transparent); border-radius: 50%; box-shadow: 0 0 45px color-mix(in srgb, var(--pet-effect) 25%, transparent); }
+.pet-visual-orbit span { color: var(--pet-effect); font-size: 2.1rem; animation: pet-sparkle 2.4s ease-in-out infinite; }
+.pet-visual-icon { position: absolute; left: 96px; top: 98px; z-index: 1; color: var(--pet-accent); font-size: 3.4rem; text-shadow: 0 0 20px color-mix(in srgb, var(--pet-accent) 60%, transparent); }
+.pet-visual-copy { position: relative; z-index: 2; min-width: 0; }
+.pet-visual-copy h3 { margin: 5px 0; color: #f8f9ff; font-size: 1.6rem; }
+.pet-visual-copy p { max-width: 480px; margin: 0 0 12px; color: #b8c6de; font-size: .74rem; line-height: 1.6; }
+.pet-stat-line { display: flex; flex-wrap: wrap; gap: 9px; color: #dce7ff; font-size: .68rem; }
+.pet-exp-track { height: 5px; margin: 12px 0 6px; overflow: hidden; border-radius: 99px; background: rgba(0, 0, 0, .25); }
+.pet-exp-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pet-accent), var(--pet-effect)); }
+.pet-visual-copy > small { color: #879bc0; font-size: .62rem; }
+.pet-action-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pet-action-row button { flex: 1 1 150px; }
+.pet-customization-panel { margin-top: 14px; padding: 15px; border: 1px solid rgba(125, 157, 218, .2); border-radius: 15px; background: rgba(13, 26, 54, .62); }
+.pet-panel-heading, .pet-showcase-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pet-panel-heading h3, .pet-showcase-heading h3 { margin: 4px 0 0; color: #f1f4ff; font-size: .95rem; }
+.pet-public-toggle { display: inline-flex; gap: 7px; align-items: center; color: #9eece2; font-size: .68rem; cursor: pointer; }
+.pet-public-toggle input { accent-color: #71d8dc; }
+.pet-option-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.pet-option-heading { grid-column: 1 / -1; color: #8ea4c9; font-size: .62rem; letter-spacing: .12em; }
+.pet-option-button { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px 8px; padding: 9px; text-align: left; border: 1px solid rgba(125, 157, 218, .2); border-radius: 11px; background: rgba(7, 16, 38, .56); cursor: pointer; }
+.pet-option-button:hover, .pet-option-button.active { border-color: color-mix(in srgb, var(--option-accent) 75%, transparent); background: rgba(36, 48, 88, .78); }
+.pet-option-button > span { grid-row: 1 / span 2; display: grid; place-items: center; width: 18px; height: 18px; color: var(--option-accent); border: 1px solid var(--option-accent); border-radius: 50%; font-size: .68rem; }
+.pet-option-button strong { color: #dce7ff; font-size: .68rem; }
+.pet-option-button small { color: #8497b9; font-size: .58rem; line-height: 1.35; }
+.pet-customization-panel > .primary-action { width: 100%; margin-top: 14px; }
+.pet-privacy-note { margin: 9px 0 0; color: #788bab; font-size: .62rem; line-height: 1.5; }
+.pet-catalog-list { display: grid; gap: 8px; margin: 12px 0 22px; }
+.pet-catalog-card { display: flex; align-items: center; gap: 10px; padding: 9px; text-align: left; color: #dce7ff; border: 1px solid rgba(125, 157, 218, .19); border-radius: 12px; background: rgba(13, 25, 55, .62); cursor: pointer; }
+.pet-catalog-card:hover, .pet-catalog-card.selected { border-color: rgba(119, 228, 222, .62); }
+.pet-catalog-card.locked { opacity: .58; }
+.pet-catalog-icon { display: grid; place-items: center; width: 34px; height: 34px; color: var(--pet-accent); border: 1px solid var(--pet-accent); border-radius: 12px; font-size: 1.1rem; }
+.pet-catalog-card span:nth-child(2) { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.pet-catalog-card strong { font-size: .72rem; }
+.pet-catalog-card small { color: #8ea4c9; font-size: .6rem; }
+.pet-catalog-card em { color: #8ff4e7; font-size: .6rem; font-style: normal; white-space: nowrap; }
+.pet-showcase-heading { padding-top: 15px; border-top: 1px solid rgba(125, 157, 218, .15); }
+.pet-showcase-list { display: grid; gap: 9px; margin-top: 12px; }
+.pet-showcase-card { display: flex; gap: 10px; padding: 10px; border: 1px solid rgba(125, 157, 218, .19); border-radius: 13px; background: rgba(13, 25, 55, .62); }
+.pet-showcase-art { display: grid; place-items: center; width: 62px; min-width: 62px; height: 75px; color: var(--pet-accent); border: 1px solid var(--pet-accent); border-radius: 13px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--pet-effect) 38%, transparent), transparent 56%), rgba(8, 17, 39, .75); }
+.pet-showcase-art span { color: var(--pet-effect); font-size: .85rem; }
+.pet-showcase-art strong { font-size: 1.55rem; text-shadow: 0 0 14px var(--pet-accent); }
+.pet-showcase-copy { min-width: 0; flex: 1; }
+.pet-showcase-copy h4 { margin: 4px 0; color: #f1f4ff; font-size: .76rem; }
+.pet-showcase-copy p, .pet-showcase-copy small { display: block; margin: 3px 0; color: #91a4c5; font-size: .6rem; line-height: 1.45; }
+.pet-rate-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.pet-rate-star { padding: 0 2px; color: #64799e; border: 0; background: transparent; cursor: pointer; }
+.pet-rate-star.on, .pet-rate-star:hover { color: #f6c76f; }
+.pet-rate-actions em { color: #8ff4e7; font-size: .56rem; font-style: normal; }
+@keyframes pet-sparkle { 0%, 100% { transform: translateY(0) scale(1); opacity: .75; } 50% { transform: translateY(-4px) scale(1.12); opacity: 1; } }
+@media (max-width: 980px) { .voyage-layout, .pet-layout { grid-template-columns: 1fr; } .voyage-node-list { grid-template-columns: repeat(3, minmax(110px, 1fr)); } }
+@media (max-width: 640px) { .voyage-intro, .pet-intro { align-items: flex-start; flex-direction: column; } .voyage-season-reward { min-width: 0; width: 100%; } .voyage-node-list { grid-template-columns: repeat(2, minmax(105px, 1fr)); } .voyage-node-actions, .pet-option-list { grid-template-columns: 1fr; } .pet-visual-card { align-items: flex-start; flex-direction: column; } .pet-visual-orbit { width: 110px; height: 110px; flex-basis: 110px; } .pet-visual-icon { left: 72px; top: 78px; } .pet-resource-row { justify-content: flex-start; } }

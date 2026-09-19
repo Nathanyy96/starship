@@ -83,11 +83,17 @@
       var level = Math.max(1, Number(progress.level) || 1);
       var constellation = Math.max(0, Number(progress.constellation) || 0);
       var isFourStar = base.rarity === 4;
-      var multiplier = 1 + (level - 1) * (isFourStar ? 0.032 : 0.022) + constellation * (isFourStar ? 0.05 : 0.03);
+      // 低基礎戰力的四星使用資料層標記的平衡成長帶，讓功能型角色在 70–90 等
+      // 不會因初始面板較低而被永久拉開；這是角色定位平衡，不使用性別判定。
+      var growth = base.growthRates || {};
+      var mainGrowth = Number(growth.main) || (isFourStar ? 0.04 : 0.03);
+      var defenseGrowth = Number(growth.defense) || (isFourStar ? 0.03 : 0.022);
+      var speedGrowth = Number(growth.speed) || (isFourStar ? 0.012 : 0.009);
+      var multiplier = 1 + (level - 1) * mainGrowth + constellation * (isFourStar ? 0.05 : 0.03);
       base.maxHp = Math.round(base.maxHp * multiplier);
       base.attack = Math.round(base.attack * multiplier);
-      base.defense = Math.round(base.defense * (1 + (level - 1) * (isFourStar ? 0.025 : 0.017) + constellation * (isFourStar ? 0.045 : 0.027)));
-      base.speed = Math.round(base.speed * (1 + (level - 1) * (isFourStar ? 0.011 : 0.007) + constellation * (isFourStar ? 0.016 : 0.01)));
+      base.defense = Math.round(base.defense * (1 + (level - 1) * defenseGrowth + constellation * (isFourStar ? 0.045 : 0.027)));
+      base.speed = Math.round(base.speed * (1 + (level - 1) * speedGrowth + constellation * (isFourStar ? 0.016 : 0.01)));
       base.level = level;
       base.constellation = constellation;
       result[id] = base;
