@@ -158,6 +158,23 @@
     <section id="voyage-view" class="game-view panel voyage-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
       <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商店、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>本期特殊裝扮</span><strong id="voyage-skin-name">流光檔案裝</strong><small id="voyage-skin-copy">特殊結局可取得，不改變角色戰鬥數值。</small></div></div>
+      <details class="voyage-guide" open>
+        <summary><span><span class="eyebrow">HOW TO PLAY</span><strong>星海迷航遊玩指引</strong></span><span class="voyage-guide-summary">選航線 → 編隊 → 做選擇 → 打敗終端</span></summary>
+        <div class="voyage-guide-body">
+          <div class="voyage-guide-steps">
+            <div class="voyage-guide-step"><span>01</span><div><strong>選一條航線</strong><p>點選左側航線查看特色；沒有選擇時，開始航程會隨機抽一條。</p></div></div>
+            <div class="voyage-guide-step"><span>02</span><div><strong>編入 1–4 名角色</strong><p>點擊下方角色卡加入隊伍。每個戰鬥節點至少需要 1 名已取得角色，卡片會顯示個人戰力。</p></div></div>
+            <div class="voyage-guide-step"><span>03</span><div><strong>逐個節點前進</strong><p>事件、休整與商店要選一個處理方式；戰鬥節點先查看敵人，再按下方按鈕進入自走棋戰鬥。</p></div></div>
+            <div class="voyage-guide-step"><span>04</span><div><strong>打到星海終端</strong><p>戰鬥勝利才會前進；失敗會結束本次航程，但角色與帳號資源不會被扣除，可以重新開航。</p></div></div>
+          </div>
+          <div class="voyage-guide-rules">
+            <div><strong>航程內資源</strong><p><b>星海碎片</b>只在本次航程使用，可於商店換臨時增益；<b>回聲與增益</b>會影響本趟路線與結局，完成或失敗後重置。</p></div>
+            <div><strong>三種結局</strong><p><b>一般</b>：完成終端。<b>隱藏</b>：開啟檔案門，或在無名檔案線累積 2 道回聲。<b>特殊</b>：三星與四星混編，並在三重回音室選「調和兩種頻率」。</p></div>
+            <div><strong>獎勵規則</strong><p>一般、隱藏、特殊結局的獎勵每個版本各領一次；已領取的結局仍可再次探索，但不會重複發放同一份結局獎勵。</p></div>
+          </div>
+        </div>
+      </details>
+      <div id="voyage-next-step" class="voyage-next-step" aria-live="polite"></div>
       <div class="voyage-layout"><aside class="voyage-rail"><div class="trial-rule"><span class="eyebrow">ROGUELITE ROUTE</span><strong>每次航程都會留下不同選擇</strong><small>航程失敗可以重新開始；三種結局獎勵每期各領一次，版本更新後航線與獎勵重新輪換。</small></div><div id="voyage-route-list" class="voyage-route-list"></div><button id="start-voyage" class="primary-action" type="button">開始新的航程</button></aside><section class="voyage-arena"><div id="voyage-node-list" class="voyage-node-list"></div><div id="voyage-node-details" class="voyage-node-details"></div><div id="voyage-node-enemy" class="trial-enemy-intel"></div><div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>迷航出戰隊伍</h3></div><span id="voyage-team-count">0 / 4</span></div><div id="voyage-team-list" class="trial-team-list"></div><div id="voyage-node-actions" class="voyage-node-actions"></div><div id="voyage-result" class="trial-battle-result"></div></section></div>
     </section>
 

@@ -666,7 +666,9 @@
       if (!game || !byId("boss-stages")) return;
       var state = game.getState(); var progress = bossProgress(state); var bosses = data.bossStages || []; var current = bossStageById(currentBossStageId) || bossStageById(progress.selectedBossId) || bosses[0];
       if (!current) { byId("boss-stages").innerHTML = "<div class=\"empty\">目前沒有開放的 Boss。</div>"; return; }
-      currentBossStageId = current.id; progress.selectedBossId = current.id;
+      // currentBossStageId is the UI selection. Do not write only to the clone returned
+      // by getState(); the selection is persisted by the stage-click handler below.
+      currentBossStageId = current.id;
       var maxRewards = data.bossMaxRewards || 10; var attempts = bossAttempts(state, current.id); var reward = current.reward || {};
       byId("boss-view-status").textContent = current.name + " · " + attempts + " / " + maxRewards + " 次";
       byId("boss-stages").innerHTML = bosses.map(function (stage) { var count = bossAttempts(state, stage.id); return "<button class=\"trial-stage-button boss-stage-button " + (stage.id === current.id ? "active " : "") + (count >= maxRewards ? "cleared" : "") + "\" data-boss-stage=\"" + escapeHtml(stage.id) + "\" type=\"button\"><span class=\"trial-stage-number\">" + escapeHtml(stage.bossLevel ? "L" + stage.bossLevel : "♢") + "</span><span><strong>" + escapeHtml(stage.name) + "</strong><small>" + escapeHtml(stage.region) + " · Boss Lv." + number(stage.bossLevel || 1) + " · 參考 " + number(stage.recommendedPower) + "</small></span><em>" + count + "/" + maxRewards + "</em></button>"; }).join("");
@@ -771,6 +773,51 @@
     }
     function voyageRouteById(id) { return (data.voyageConfig && data.voyageConfig.routes || []).find(function (route) { return route.id === id; }); }
     function voyageBattleStage(node) { return node && node.stageId ? trialStageById(node.stageId) : null; }
+    function voyageNodeTypeLabel(node) {
+      if (!node) return "節點";
+      if (node.final || node.type === "boss") return "終端戰";
+      return ({ start: "起點", combat: "戰鬥", event: "事件", rest: "休整", shop: "商店" })[node.type] || "節點";
+    }
+    function voyageNodeInstruction(node, stage) {
+      if (!node) return "先選擇一條航線，開始本期航程。";
+      if (node.type === "combat" || node.type === "boss") {
+        return node.final ? "這是最後的終端戰。確認最多 4 名角色的編隊，讀完敵方情報後進入自走棋戰鬥；勝利才能結算結局。" : "先從下方編入至少 1 名角色，再讀取敵方情報並進入自走棋戰鬥。戰鬥失敗會中止本次航程，但不會扣除角色或帳號資源。";
+      }
+      if (node.type === "start") return "起點沒有戰鬥，按「確認並繼續航行」進入第一個節點。真正的事件分歧會在後續出現。";
+      if (node.choices && node.choices.length) return "從下方選一個處理方式。選擇會立即記錄，可能消耗星海碎片、取得臨時增益或留下結局線索，不能在同一節點重選。";
+      return stage ? "確認隊伍後進入戰鬥。" : "按下方按鈕確認目前節點並繼續航行。";
+    }
+    function renderVoyageGuide(state, progress, node, stage) {
+      var target = byId("voyage-next-step");
+      if (!target) return;
+      var title = "先選一條航線，準備出發";
+      var copy = "選好航線後按「開始航程」；如果沒有選擇，系統會隨機抽取一條航線。";
+      var nodeType = "尚未出發";
+      if (progress.status === "active" && node) {
+        nodeType = voyageNodeTypeLabel(node);
+        if (node.type === "combat" || node.type === "boss") {
+          title = currentVoyageTeam.length ? "確認敵情後，進入自走棋戰鬥" : "先編入至少 1 名角色，再進入戰鬥";
+          copy = currentVoyageTeam.length ? "下方角色卡可隨時調整隊伍；確認敵人數值、特性與隊伍戰力後，按節點下方的戰鬥按鈕。" : "點擊下方角色卡加入隊伍。戰鬥節點至少需要 1 名已取得角色，最多 4 名。";
+        } else if (node.choices && node.choices.length) {
+          title = "閱讀選項，做出一次航行決定";
+          copy = "先看清楚每個選項的條件與碎片消耗；灰色選項代表目前尚未解鎖，選擇後會立即前進。";
+        } else {
+          title = "按下確認，前往下一個節點";
+          copy = voyageNodeInstruction(node, stage);
+        }
+      } else if (progress.status === "failed") {
+        title = "本次航程已中止，可以重新開航";
+        copy = "重新開始會建立一趟新的航程；上一趟的碎片與臨時增益不會保留，但角色、等級與帳號資源完全不受影響。";
+        nodeType = "航程失敗";
+      } else if (progress.status === "complete") {
+        title = "本次航程已完成，可以探索其他路線";
+        copy = "你可以再挑戰其他航線找不同結局；已領取的結局獎勵不會重複發放。";
+        nodeType = "航程完成";
+      }
+      var routeLength = progress.route && progress.route.length ? progress.route.length : 0;
+      var nodeNumber = progress.status === "active" ? Number(progress.nodeIndex || 0) + 1 : 0;
+      target.innerHTML = "<div class=\"voyage-next-step-copy\"><span class=\"eyebrow\">CURRENT OBJECTIVE</span><strong>現在要做什麼？</strong><h3>" + escapeHtml(title) + "</h3><p>" + escapeHtml(copy) + "</p></div><div class=\"voyage-next-step-meta\"><span>節點 <b>" + (nodeNumber && routeLength ? nodeNumber + " / " + routeLength : nodeType) + "</b></span><span>類型 <b>" + escapeHtml(nodeType) + "</b></span><span>隊伍 <b>" + currentVoyageTeam.length + " / 4</b></span><span>碎片 <b>" + number((progress && progress.fragments) || 0) + " </b></span></div>";
+    }
     function renderVoyageResult(state) {
       var container = byId("voyage-result"); if (!container) return;
       var progress = voyageProgress(state); var battle = progress.lastBattle; var ending = progress.lastEnding;
@@ -788,25 +835,27 @@
       if (!game || !byId("voyage-route-list")) return;
       var state = game.getState(); var progress = voyageProgress(state); var config = data.voyageConfig || {}; var routes = config.routes || [];
       var skin = config.seasonSkin || {};
+      var currentNode = progress.status === "active" ? (voyageNodeById(progress.route[progress.nodeIndex]) || null) : null;
+      var currentStage = voyageBattleStage(currentNode);
       byId("voyage-description").textContent = config.description || "在主線之外探索一段獨立航程。";
       byId("voyage-skin-name").textContent = skin.name || "本期特殊裝扮";
       byId("voyage-skin-copy").textContent = skin.description || "特殊結局獎勵。";
       var activeRoute = progress.routeId ? voyageRouteById(progress.routeId) : null;
       currentVoyageRouteId = activeRoute ? activeRoute.id : currentVoyageRouteId;
       byId("voyage-view-status").textContent = progress.status === "active" ? (activeRoute ? activeRoute.name : "航程進行中") : progress.status === "complete" ? "航程完成 · 可再次探索" : progress.status === "failed" ? "航程中止 · 可重新開航" : "本期航程尚未開始";
-      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\"><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small></button>"; }).join("");
-      var startButton = byId("start-voyage"); startButton.disabled = progress.status === "active"; startButton.textContent = progress.status === "active" ? "航程進行中" : progress.status === "failed" ? "重新開始航程" : "開始新的航程";
+      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\" aria-pressed=\"" + (selected ? "true" : "false") + "\"><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small><em>" + (selected ? "✓ 已選擇這條航線" : "點擊查看並選擇") + "</em></button>"; }).join("");
+      var startButton = byId("start-voyage"); startButton.disabled = progress.status === "active"; startButton.textContent = progress.status === "active" ? "航程進行中" : progress.status === "failed" ? "重新開航（建立新路線）" : "開始航程（未選則隨機）";
       if (progress.status === "idle" || progress.status === "failed" || progress.status === "complete") {
         byId("voyage-node-list").innerHTML = "<div class=\"voyage-empty-state\"><span class=\"eyebrow\">CHOOSE A ROUTE</span><strong>先選一條航線，出發後事件會在途中出現</strong><p>每個結局獎勵每期只領一次；完成後可以再跑其他航線，找出不同條件。</p></div>";
         byId("voyage-node-details").innerHTML = ""; byId("voyage-node-enemy").innerHTML = ""; byId("voyage-node-actions").innerHTML = "<p class=\"voyage-hint\">提示：無名檔案線的特殊門需要先取得檔案標記；協鳴特殊結局需要三星與四星一起出航。</p>";
       } else {
-        var nodeId = progress.route[progress.nodeIndex]; var node = voyageNodeById(nodeId) || {};
-        byId("voyage-node-list").innerHTML = progress.route.map(function (id, index) { var item = voyageNodeById(id) || {}; var status = index < progress.nodeIndex ? "done" : index === progress.nodeIndex ? "current" : "locked"; return "<div class=\"voyage-node-pill " + status + "\"><span>" + String(index + 1).padStart(2, "0") + "</span><strong>" + escapeHtml(item.name || id) + "</strong><small>" + escapeHtml(item.type || "event") + "</small></div>"; }).join("");
-        byId("voyage-node-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>VOYAGE NODE " + String(progress.nodeIndex + 1).padStart(2, "0") + "</span><span>" + escapeHtml(node.region || "星海") + "</span></div><h3>" + escapeHtml(node.name || "航程節點") + "</h3><p>" + escapeHtml(node.description || "") + "</p><div class=\"trial-detail-stats\"><span>星海碎片 <b>" + number(progress.fragments) + "</b></span><span>臨時增益 <b>" + (progress.buffs.length ? escapeHtml(progress.buffs.join("、")) : "無") + "</b></span><span>已收集回聲 <b>" + number(progress.flags.echoes || 0) + "</b></span></div>";
-        var stage = voyageBattleStage(node);
+        var node = currentNode || {};
+        byId("voyage-node-list").innerHTML = progress.route.map(function (id, index) { var item = voyageNodeById(id) || {}; var status = index < progress.nodeIndex ? "done" : index === progress.nodeIndex ? "current" : "locked"; return "<div class=\"voyage-node-pill " + status + "\"><span>" + String(index + 1).padStart(2, "0") + "</span><strong>" + escapeHtml(item.name || id) + "</strong><small>" + escapeHtml(voyageNodeTypeLabel(item)) + "</small></div>"; }).join("");
+        byId("voyage-node-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>VOYAGE NODE " + String(progress.nodeIndex + 1).padStart(2, "0") + "</span><span>" + escapeHtml(voyageNodeTypeLabel(node)) + " · " + escapeHtml(node.region || "星海") + "</span></div><h3>" + escapeHtml(node.name || "航程節點") + "</h3><p>" + escapeHtml(node.description || "") + "</p><div class=\"voyage-node-instruction\"><strong>這一步要做什麼</strong><span>" + escapeHtml(voyageNodeInstruction(node, currentStage)) + "</span></div><div class=\"trial-detail-stats\"><span>星海碎片 <b>" + number(progress.fragments) + "</b></span><span>臨時增益 <b>" + (progress.buffs.length ? escapeHtml(progress.buffs.join("、")) : "無") + "</b></span><span>已收集回聲 <b>" + number(progress.flags.echoes || 0) + "</b></span></div>";
+        var stage = currentStage;
         byId("voyage-node-enemy").innerHTML = stage ? "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>節點敵方情報</strong></div><small>可先讀取敵人資料再決定編隊</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(stage) + "</div>" : "<div class=\"voyage-event-note\"><span class=\"eyebrow\">EVENT / CHOICE</span><strong>這個節點不需要戰鬥，選擇會影響後續結局。</strong></div>";
         if (node.choices && node.choices.length) {
-          byId("voyage-node-actions").innerHTML = node.choices.map(function (choice) { var locked = choice.requiresFlag && progress.flags[choice.requiresFlag] !== true; return "<button class=\"voyage-choice-button " + (locked ? "locked" : "") + "\" data-voyage-choice=\"" + escapeHtml(choice.id) + "\" type=\"button\"" + (locked ? " disabled" : "") + "><strong>" + escapeHtml(choice.label) + "</strong><small>" + escapeHtml(choice.description || "") + (choice.costFragments ? " · 消耗 " + choice.costFragments + " 碎片" : "") + "</small></button>"; }).join("");
+          byId("voyage-node-actions").innerHTML = node.choices.map(function (choice) { var hasThree = currentVoyageTeam.some(function (id) { var card = data.activeCards.find(function (item) { return item.id === id; }); return card && card.rarity === 3; }); var hasFour = currentVoyageTeam.some(function (id) { var card = data.activeCards.find(function (item) { return item.id === id; }); return card && card.rarity === 4; }); var missingFlag = choice.requiresFlag && progress.flags[choice.requiresFlag] !== true; var missingMixed = choice.requiresMixedTeam && !(hasThree && hasFour); var missingFragments = Number(choice.costFragments || 0) > Number(progress.fragments || 0); var locked = missingFlag || missingMixed || missingFragments; var lockReason = missingFlag ? "尚未取得必要線索" : missingMixed ? "需要三星與四星混編" : missingFragments ? "星海碎片不足" : ""; return "<button class=\"voyage-choice-button " + (locked ? "locked" : "") + "\" data-voyage-choice=\"" + escapeHtml(choice.id) + "\" type=\"button\"" + (locked ? " disabled" : "") + "><strong>" + escapeHtml(choice.label) + "</strong><small>" + escapeHtml(choice.description || "") + (choice.costFragments ? " · 消耗 " + choice.costFragments + " 碎片" : "") + (lockReason ? " · " + lockReason : "") + "</small></button>"; }).join("");
         } else {
           byId("voyage-node-actions").innerHTML = "<button class=\"primary-action\" data-voyage-advance=\"1\" type=\"button\">" + (stage ? "進入自走棋戰鬥" : "確認並繼續航行") + "</button>";
         }
@@ -815,6 +864,7 @@
       currentVoyageTeam = currentVoyageTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("voyage-team-count").textContent = currentVoyageTeam.length + " / 4 · 戰力 " + number(trialPower(currentVoyageTeam, state));
       byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = card.image || card.backgroundImage; var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url(\"" + escapeHtml(image) + "\")" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
+      renderVoyageGuide(state, progress, currentNode, currentStage);
       renderVoyageResult(state);
     }
     function toggleVoyageTeam(cardId) {
@@ -859,19 +909,40 @@
     function petOutfitById(id) { return (data.petOutfits || []).find(function (item) { return item.id === id; }); }
     function petEffectById(id) { return (data.petEffects || []).find(function (item) { return item.id === id; }); }
     function petActionMessage(text, isError) { var target = byId("pet-action-message"); if (target) { target.textContent = text; target.className = isError ? "message error" : "message"; } }
+    function petArtMarkup(definition, outfit, effect, compact) {
+      definition = definition || {};
+      outfit = outfit || {};
+      effect = effect || {};
+      var id = String(definition.id || "");
+      var art = {
+        "star-fox": "<path class=\"pet-tail\" d=\"M63 128C24 111 22 67 55 59c27-6 39 18 23 37-8 9-19 12-31 10 21 12 32 20 36 34Z\"/><path class=\"pet-ear\" d=\"M82 76 75 39c-1-7 6-10 11-5l25 27Z\"/><path class=\"pet-ear\" d=\"M137 62 159 35c5-6 12-2 11 5l-7 38Z\"/><ellipse class=\"pet-body\" cx=111\" cy=117\" rx=52\" ry=40\"/><circle class=\"pet-head\" cx=113\" cy=86\" r=38\"/><path class=\"pet-belly\" d=\"M83 120c10 28 57 31 74 0-4 34-19 44-38 44s-33-11-36-44Z\"/><circle class=\"pet-eye\" cx=99\" cy=87\" r=5\"/><circle class=\"pet-eye\" cx=128\" cy=87\" r=5\"/><path class=\"pet-face\" d=\"M108 99q5 6 10 0M113 96v5\"/><path class=\"pet-outfit-mark\" d=\"M74 119q37 18 76 0l-5 16q-34 20-66 0Z\"/>",
+        "tide-otter": "<path class=\"pet-tail\" d=\"M61 132c-25-6-32-27-18-39 11-9 27-2 27 12 0 8-6 14-14 16 16 3 24 7 30 15Z\"/><circle class=\"pet-ear\" cx=82\" cy=72\" r=13\"/><circle class=\"pet-ear\" cx=145\" cy=72\" r=13\"/><ellipse class=\"pet-body\" cx=113\" cy=119\" rx=57\" ry=40\"/><ellipse class=\"pet-belly\" cx=113\" cy=127\" rx=31\" ry=25\"/><ellipse class=\"pet-head\" cx=113\" cy=88\" rx=43\" ry=36\"/><circle class=\"pet-eye\" cx=98\" cy=87\" r=5\"/><circle class=\"pet-eye\" cx=128\" cy=87\" r=5\"/><ellipse class=\"pet-nose\" cx=113\" cy=99\" rx=8\" ry=5\"/><path class=\"pet-face\" d=\"M105 104q8 7 16 0M90 99 70 95M90 104 69 107M136 99l20-4M136 104l21 3\"/><path class=\"pet-outfit-mark\" d=\"M69 115q43 21 88 0l-2 21q-42 20-84 0Z\"/><circle class=\"pet-bubble\" cx=163\" cy=54\" r=7\"/><circle class=\"pet-bubble\" cx=178\" cy=39\" r=4\"/>",
+        "wind-bird": "<path class=\"pet-tail\" d=\"M91 126 50 151c-9 5-15-5-8-12l40-35Z\"/><path class=\"pet-wing\" d=\"M83 92C48 75 33 94 53 119c10 12 26 17 46 14Z\"/><path class=\"pet-wing\" d=\"M144 92c34-17 50 2 30 27-10 12-26 17-46 14Z\"/><path class=\"pet-body\" d=\"M82 117c0-35 18-59 39-59s39 24 39 59c0 31-16 51-39 51s-39-20-39-51Z\"/><path class=\"pet-crest\" d=\"M102 63 91 35c-2-7 5-10 10-5l14 18 13-25c4-7 11-4 10 4l-4 36Z\"/><path class=\"pet-beak\" d=\"M151 84 184 96l-33 12Z\"/><circle class=\"pet-eye\" cx=133\" cy=82\" r=5\"/><path class=\"pet-face\" d=\"M115 121q8 7 16 0\"/><path class=\"pet-outfit-mark\" d=\"M85 122q36 17 71 0l-7 19q-30 17-57 0Z\"/>",
+        "mirror-sprout": "<path class=\"pet-root\" d=\"M109 102c-5-28-26-43-49-36-9 3-8 14 1 16 14 3 25 11 30 28Z\"/><path class=\"pet-root\" d=\"M119 78c7-26 28-39 49-29 9 4 7 15-2 16-14 1-25 8-32 23Z\"/><path class=\"pet-body\" d=\"M78 119c0-29 16-47 35-47s35 18 35 47c0 36-14 53-35 53s-35-17-35-53Z\"/><path class=\"pet-belly\" d=\"M91 126q22-18 44 0v26q-22 13-44 0Z\"/><path class=\"pet-face\" d=\"M94 111q5 7 10 0M119 111q5 7 10 0M104 126q9 6 18 0\"/><circle class=\"pet-eye\" cx=99\" cy=107\" r=4\"/><circle class=\"pet-eye\" cx=124\" cy=107\" r=4\"/><path class=\"pet-outfit-mark\" d=\"M80 126q34 19 67 0l-5 20q-28 17-57 0Z\"/><path class=\"pet-crystal\" d=\"M112 52 126 66 112 80 98 66Z\"/>"
+      }[id] || "<circle class=\"pet-body\" cx=112\" cy=112\" r=48\"/><circle class=\"pet-head\" cx=112\" cy=84\" r=34\"/><circle class=\"pet-eye\" cx=100\" cy=84\" r=5\"/><circle class=\"pet-eye\" cx=124\" cy=84\" r=5\"/><path class=\"pet-face\" d=\"M105 98q7 7 14 0\"/>";
+      var outfitMarkup = outfit.id === "moon-scarf"
+        ? "<path class=\"pet-accessory pet-scarf\" d=\"M70 119q42 25 86 0l-4 16q-40 25-78 0Z\"/><path class=\"pet-accessory pet-scarf-tail\" d=\"M143 129l30 17-12 8-23-17Z\"/>"
+        : outfit.id === "tide-cape"
+          ? "<path class=\"pet-accessory pet-cape\" d=\"M65 108q48 29 97 0l-8 43q-40 20-81 0Z\"/><path class=\"pet-accessory pet-cape-clasp\" d=\"M105 117h15v15h-15Z\"/>"
+          : outfit.id === "archive-crown"
+            ? "<path class=\"pet-accessory pet-crown\" d=\"M78 62 89 35l24 20 24-24 14 32Z\"/><circle class=\"pet-accessory pet-crown-gem\" cx=113\" cy=55\" r=5\"/>"
+            : "";
+      var svgClass = "pet-art-svg" + (compact ? " compact" : "");
+      return "<svg class=\"" + svgClass + "\" viewBox=\"0 0 220 180\" role=\"img\" aria-label=\"" + escapeHtml(definition.name || "星伴") + "的專屬外觀\" style=\"--pet-art-base:" + escapeHtml(definition.accent || "#b897e8") + ";--pet-art-outfit:" + escapeHtml(outfit.accent || definition.accent || "#9e92ff") + ";--pet-art-effect:" + escapeHtml(effect.color || "#f4c66b") + "\"><ellipse class=\"pet-art-shadow\" cx=\"111\" cy=\"164\" rx=\"58\" ry=\"8\"/>" + art + outfitMarkup + "<circle class=\"pet-art-spark\" cx=\"180\" cy=\"124\" r=\"4\"/><circle class=\"pet-art-spark\" cx=\"48\" cy=\"44\" r=\"3\"/></svg>";
+    }
     function petCardMarkup(definition, pet, selected) {
       var petState = petProgressState(game.getState());
       var outfit = petOutfitById(currentPetOutfitId || petState.selectedOutfitId || (petState.showcase || {}).outfitId) || (data.petOutfits || [])[0] || {};
       var effect = petEffectById(currentPetEffectId || petState.selectedEffectId || (petState.showcase || {}).effectId) || (data.petEffects || [])[0] || {};
       var style = "--pet-accent:" + escapeHtml(outfit.accent || definition.accent || "#9e92ff") + ";--pet-effect:" + escapeHtml(effect.color || "#f4c66b");
       var nextExp = 80 + Number(pet.level || 1) * 40;
-      return "<div class=\"pet-visual-card " + (selected ? "selected" : "") + "\" style=\"" + style + "\"><div class=\"pet-visual-orbit\"><span>" + escapeHtml(effect.icon || "✦") + "</span></div><div class=\"pet-visual-icon\">" + escapeHtml(definition.icon) + "</div><div class=\"pet-visual-copy\"><span class=\"eyebrow\">" + escapeHtml(definition.temperament) + " COMPANION</span><h3>" + escapeHtml(definition.name) + "</h3><p>" + escapeHtml(definition.description) + "</p><div class=\"pet-stat-line\"><span>Lv." + number(pet.level || 1) + " / " + number(definition.maxLevel || 30) + "</span><span>親密度 " + number(pet.bond || 0) + "</span><span>心情 " + number(pet.mood || 0) + "</span></div><div class=\"pet-exp-track\"><i style=\"width:" + Math.min(100, Number(pet.exp || 0) / Math.max(1, nextExp) * 100) + "%\"></i></div><small>下級需要 " + number(nextExp) + " 經驗 · 裝扮「" + escapeHtml(outfit.name || "原野本色") + "」· 特效「" + escapeHtml(effect.name || "星屑環") + "」</small></div></div>";
+      return "<div class=\"pet-visual-card " + (selected ? "selected" : "") + "\" style=\"" + style + "\"><div class=\"pet-visual-stage\"><div class=\"pet-visual-orbit\"><span>" + escapeHtml(effect.icon || "✦") + "</span></div><div class=\"pet-visual-art\">" + petArtMarkup(definition, outfit, effect, false) + "</div></div><div class=\"pet-visual-copy\"><span class=\"eyebrow\">" + escapeHtml(definition.temperament) + " COMPANION</span><h3>" + escapeHtml(definition.name) + "</h3><p>" + escapeHtml(definition.description) + "</p><div class=\"pet-stat-line\"><span>Lv." + number(pet.level || 1) + " / " + number(definition.maxLevel || 30) + "</span><span>親密度 " + number(pet.bond || 0) + "</span><span>心情 " + number(pet.mood || 0) + "</span></div><div class=\"pet-exp-track\"><i style=\"width:" + Math.min(100, Number(pet.exp || 0) / Math.max(1, nextExp) * 100) + "%\"></i></div><small>下級需要 " + number(nextExp) + " 經驗 · 裝扮「" + escapeHtml(outfit.name || "原野本色") + "」· 特效「" + escapeHtml(effect.name || "星屑環") + "」</small></div></div>";
     }
     function renderPetShowcases() {
       var container = byId("pet-showcase-list"); if (!container) return;
       if (!remoteMode) { container.innerHTML = "<div class=\"pet-community-empty\">目前是本機存檔模式；部署到同一個線上網址後，這裡會顯示其他玩家的公開寵物。</div>"; return; }
       if (!petShowcases.length) { container.innerHTML = "<div class=\"pet-community-empty\">目前還沒有其他玩家公開寵物，成為第一位展示者吧。</div>"; return; }
-      container.innerHTML = petShowcases.map(function (item) { var stars = Math.round(Number(item.ratingAverage || 0)); return "<article class=\"pet-showcase-card\"><div class=\"pet-showcase-art\" style=\"--pet-accent:" + escapeHtml(item.outfit.accent || item.pet.accent || "#9e92ff") + ";--pet-effect:" + escapeHtml(item.effect.color || "#f4c66b") + "\"><span>" + escapeHtml(item.effect.icon || "✦") + "</span><strong>" + escapeHtml(item.pet.icon || "◌") + "</strong></div><div class=\"pet-showcase-copy\"><span class=\"eyebrow\">PLAYER / " + escapeHtml(item.playerName) + "</span><h4>" + escapeHtml(item.pet.name) + " · Lv." + item.pet.level + "</h4><p>裝扮「" + escapeHtml(item.outfit.name) + "」 · 特效「" + escapeHtml(item.effect.name) + "」</p><small>親密度 " + item.pet.bond + " · 目前 " + item.ratingAverage + " / 5（" + item.ratingCount + " 次）</small><div class=\"pet-rate-actions\"><span>" + [1, 2, 3, 4, 5].map(function (value) { return "<button class=\"pet-rate-star " + (value <= stars ? "on" : "") + "\" data-pet-rate=\"" + escapeHtml(item.playerKey) + "\" data-pet-rating=\"" + value + "\" type=\"button\">★</button>"; }).join("") + "</span><em>評分 +1 飼料</em></div></div></article>"; }).join("");
+      container.innerHTML = petShowcases.map(function (item) { var stars = Math.round(Number(item.ratingAverage || 0)); return "<article class=\"pet-showcase-card\"><div class=\"pet-showcase-art\" style=\"--pet-accent:" + escapeHtml(item.outfit.accent || item.pet.accent || "#9e92ff") + ";--pet-effect:" + escapeHtml(item.effect.color || "#f4c66b") + "\"><span class=\"pet-showcase-effect\">" + escapeHtml(item.effect.icon || "✦") + "</span>" + petArtMarkup(item.pet, item.outfit, item.effect, true) + "</div><div class=\"pet-showcase-copy\"><span class=\"eyebrow\">PLAYER / " + escapeHtml(item.playerName) + "</span><h4>" + escapeHtml(item.pet.name) + " · Lv." + item.pet.level + "</h4><p>裝扮「" + escapeHtml(item.outfit.name) + "」 · 特效「" + escapeHtml(item.effect.name) + "」</p><small>親密度 " + item.pet.bond + " · 目前 " + item.ratingAverage + " / 5（" + item.ratingCount + " 次）</small><div class=\"pet-rate-actions\"><span>" + [1, 2, 3, 4, 5].map(function (value) { return "<button class=\"pet-rate-star " + (value <= stars ? "on" : "") + "\" data-pet-rate=\"" + escapeHtml(item.playerKey) + "\" data-pet-rating=\"" + value + "\" type=\"button\">★</button>"; }).join("") + "</span><em>評分 +1 飼料</em></div></div></article>"; }).join("");
     }
     function renderPets() {
       if (!game || !byId("pet-catalog-list")) return;
@@ -1052,7 +1123,7 @@
      byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
      byId("trial-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-character]"); if (button) toggleTrialTeam(button.getAttribute("data-trial-character")); });
      byId("start-trial-battle").addEventListener("click", runTrialBattle);
-     byId("boss-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-stage]"); if (button) { currentBossStageId = button.getAttribute("data-boss-stage"); currentBossTeam = []; renderBoss(); } });
+     byId("boss-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-stage]"); if (button) { currentBossStageId = button.getAttribute("data-boss-stage"); currentBossTeam = []; var state = game.getState(); var progress = bossProgress(state); progress.selectedBossId = currentBossStageId; progress.selectedTeam = []; updateGameFromState(state); saveLocalState(); renderBoss(); } });
      byId("boss-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-character]"); if (button) toggleBossTeam(button.getAttribute("data-boss-character")); });
      byId("start-boss-battle").addEventListener("click", runBossBattle);
      byId("dispatch-missions").addEventListener("click", function (event) { var button = event.target.closest("[data-dispatch-mission]"); if (button) { currentDispatchMissionId = button.getAttribute("data-dispatch-mission"); currentDispatchTeam = []; renderDispatch(); } });
