@@ -19,7 +19,7 @@
     function setNumber(id, value) { byId(id).value = value === undefined ? 0 : value; }
     function render() {
       if (!state) return;
-      setNumber("admin-star-sand", state.resources.starSand); setNumber("admin-tickets", state.resources.tickets); setNumber("admin-star-marks", state.resources.starMarks); setNumber("admin-echo-powder", state.resources.echoPowder); setNumber("admin-character-exp", state.resources.characterExp); setNumber("admin-resonance-core", state.resources.resonanceCore);
+      setNumber("admin-star-sand", state.resources.starSand); setNumber("admin-star-marks", state.resources.starMarks); setNumber("admin-echo-powder", state.resources.echoPowder); setNumber("admin-character-exp", state.resources.characterExp); setNumber("admin-resonance-core", state.resources.resonanceCore);
       setNumber("admin-limited-pity", state.pity.limited.pullsSince4Star); setNumber("admin-standard-pity", state.pity.standard.pullsSince4Star); byId("admin-guarantee").checked = state.pity.limited.guaranteedFeatured;
       byId("admin-state").textContent = JSON.stringify(state, null, 2);
       byId("admin-player-title").textContent = player.name;
@@ -41,7 +41,7 @@
       var body = {
         adminKey: key,
         name: player.name,
-        resources: { starSand: Number(byId("admin-star-sand").value), tickets: Number(byId("admin-tickets").value), starMarks: Number(byId("admin-star-marks").value), echoPowder: Number(byId("admin-echo-powder").value), characterExp: Number(byId("admin-character-exp").value), resonanceCore: Number(byId("admin-resonance-core").value) },
+        resources: { starSand: Number(byId("admin-star-sand").value), starMarks: Number(byId("admin-star-marks").value), echoPowder: Number(byId("admin-echo-powder").value), characterExp: Number(byId("admin-character-exp").value), resonanceCore: Number(byId("admin-resonance-core").value) },
         pity: { limited: { pullsSince4Star: Number(byId("admin-limited-pity").value), guaranteedFeatured: byId("admin-guarantee").checked }, standard: { pullsSince4Star: Number(byId("admin-standard-pity").value) } },
         selectedFeatured: { limited: byId("admin-featured").value }
       };

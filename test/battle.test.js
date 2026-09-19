@@ -24,7 +24,7 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
-  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 765);
+  assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 832);
 });
 
 test("星界試煉擴充為 30 關並維持逐關升難", () => {
@@ -42,4 +42,7 @@ test("四星培養成長幅度高於三星，重複角色留下個人命座晶�
   const fourBase = characterBattleStats.celesia;
   const threeBase = characterBattleStats.reyn;
   assert.ok(four.attack / fourBase.attack > three.attack / threeBase.attack);
+  const fourPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], characterBattleStats));
+  const threePowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 3).map((id) => teamPower([id], characterBattleStats));
+  assert.ok(Math.min(...fourPowers) > Math.max(...threePowers));
 });

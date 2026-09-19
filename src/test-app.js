@@ -117,7 +117,6 @@
       byId("test-rate").textContent = pity.currentFourStarRateText;
       byId("test-selected").textContent = pity.selectedFeatured ? pity.selectedFeatured.name : "－";
       byId("test-sand").value = state.resources.starSand;
-      byId("test-tickets").value = state.resources.tickets;
       byId("test-pity").value = pity.pullsSince4Star;
       byId("test-guarantee").checked = pity.guaranteedFeatured;
       byId("test-state").textContent = JSON.stringify(state, null, 2);
@@ -131,7 +130,6 @@
       pity.guaranteedFeatured = byId("test-guarantee").checked;
       state.pity[banner.poolKey] = pity;
       state.resources.starSand = Math.max(0, Number(byId("test-sand").value) || 0);
-      state.resources.tickets = Math.max(0, Number(byId("test-tickets").value) || 0);
       game = createGame(state);
       if (banner.type !== "standard" && byId("test-featured").value) {
         game.selectFeatured({ bannerId: selectedBannerId, cardId: byId("test-featured").value });
@@ -171,7 +169,6 @@
     byId("jump-50").addEventListener("click", function () { byId("test-pity").value = 49; applyTestState(49); });
     byId("test-pull-one").addEventListener("click", function () { pull(1, "starSand"); });
     byId("test-pull-ten").addEventListener("click", function () { pull(10, "starSand"); });
-    byId("test-pull-ticket").addEventListener("click", function () { pull(1, "ticket"); });
     byId("test-reset").addEventListener("click", function () {
       game = createGame();
       storageSet(game.getState());

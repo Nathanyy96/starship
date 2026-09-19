@@ -83,11 +83,11 @@
       var level = Math.max(1, Number(progress.level) || 1);
       var constellation = Math.max(0, Number(progress.constellation) || 0);
       var isFourStar = base.rarity === 4;
-      var multiplier = 1 + (level - 1) * (isFourStar ? 0.028 : 0.022) + constellation * (isFourStar ? 0.045 : 0.03);
+      var multiplier = 1 + (level - 1) * (isFourStar ? 0.032 : 0.022) + constellation * (isFourStar ? 0.05 : 0.03);
       base.maxHp = Math.round(base.maxHp * multiplier);
       base.attack = Math.round(base.attack * multiplier);
-      base.defense = Math.round(base.defense * (1 + (level - 1) * (isFourStar ? 0.022 : 0.017) + constellation * (isFourStar ? 0.04 : 0.027)));
-      base.speed = Math.round(base.speed * (1 + (level - 1) * (isFourStar ? 0.009 : 0.007) + constellation * (isFourStar ? 0.014 : 0.01)));
+      base.defense = Math.round(base.defense * (1 + (level - 1) * (isFourStar ? 0.025 : 0.017) + constellation * (isFourStar ? 0.045 : 0.027)));
+      base.speed = Math.round(base.speed * (1 + (level - 1) * (isFourStar ? 0.011 : 0.007) + constellation * (isFourStar ? 0.016 : 0.01)));
       base.level = level;
       base.constellation = constellation;
       result[id] = base;
@@ -322,7 +322,7 @@
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp, skillUses: unit.skillUses }; }),
       enemies: enemies.map(function (unit) { return { name: unit.name, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
       logs: logs.slice(-100),
-      reward: won ? clone(stage.reward || {}) : { starSand: 0, tickets: 0 }
+      reward: won ? clone(stage.reward || {}) : { starSand: 0, characterExp: 0 }
     };
   }
 

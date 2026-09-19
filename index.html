@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=tutorial-announcement-2">
+  <link rel="stylesheet" href="./styles.css?v=story-reward-sand-pool-balance-1">
 </head>
 <body>
   <main class="page-shell">
@@ -63,9 +63,10 @@
         <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
         <button id="open-characters" class="lobby-menu-card character-menu" type="button"><span class="menu-index">03</span><span class="menu-icon">◇</span><strong>角色培養</strong><small>查看已獲得角色與培養進度</small><span class="menu-arrow">→</span></button>
         <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
-        <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
-        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
-        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
+        <button id="open-boss" class="lobby-menu-card boss-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">♢</span><strong>Boss</strong><small>取得角色 80 等突破材料與角色經驗</small><span class="menu-arrow">→</span></button>
+        <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
+        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
+        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
@@ -115,6 +116,25 @@
       </div>
     </section>
 
+    <section id="boss-view" class="game-view panel trial-view boss-view" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">BOSS BREAKTHROUGH</p><h2>Boss</h2></div><span id="boss-view-status">選擇首領</span></div>
+      <div class="trial-layout boss-layout">
+        <aside class="trial-stage-rail">
+          <div class="trial-rule"><span class="eyebrow">LEVEL 80 BREAKTHROUGH</span><strong>六種 Boss · 每次最多 4 名角色</strong><small>角色到達 80 等後，依照角色的指定需求挑戰 Boss，收集足夠突破材料後才能完成突破並繼續升到 90 等。每個 Boss 每版本最多領取 10 次獎勵；100 等尚未開放。</small></div>
+          <div id="boss-material-inventory" class="boss-material-inventory" aria-label="突破材料庫存"></div>
+          <div id="boss-stages" class="trial-stages"></div>
+        </aside>
+        <section class="trial-arena">
+          <div id="boss-stage-details" class="trial-stage-details"></div>
+          <div id="boss-enemy-intel" class="trial-enemy-intel"></div>
+          <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>Boss 出戰編隊</h3></div><span id="boss-team-count">0 / 4</span></div>
+          <div id="boss-team-list" class="trial-team-list"></div>
+          <button id="start-boss-battle" class="primary-action trial-start-button" type="button">開始 Boss 自走棋</button>
+          <div id="boss-battle-result" class="trial-battle-result"></div>
+        </section>
+      </div>
+    </section>
+
     <section id="dispatch-view" class="game-view panel" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>2.0–2.5 限時任務</span></div>
       <div class="dispatch-layout">
@@ -134,10 +154,9 @@
     </section>
 
     <div id="gacha-hall" class="gacha-hall" hidden>
-    <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–2.5 角色池</span></div>
+      <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–2.5 角色池</span></div>
     <section class="resource-bar" aria-label="資源">
       <div class="resource"><span class="resource-icon sand">✦</span><span><small>星砂</small><strong id="star-sand">0</strong></span></div>
-      <div class="resource"><span class="resource-icon ticket">↩</span><span><small>共鳴券</small><strong id="tickets">0</strong></span></div>
       <div class="resource"><span class="resource-icon mark">◇</span><span><small>星痕（重複4★）</small><strong id="star-marks">0</strong></span></div>
       <div class="resource"><span class="resource-icon powder">·</span><span><small>回響粉</small><strong id="echo-powder">0</strong></span></div>
     </section>
@@ -166,7 +185,6 @@
         <div class="pull-actions">
           <button id="pull-one" class="primary-action"><span>單次召集</span><small>160 星砂</small></button>
           <button id="pull-ten" class="primary-action"><span>十次召集</span><small>1,600 星砂</small></button>
-          <button id="pull-ticket" class="ticket-action"><span>使用共鳴券</span><small>免費單抽</small></button>
         </div>
         <button id="exchange-featured" class="exchange-action">10 星痕兌換精選</button>
         <div id="message" class="message" role="status"></div>
@@ -210,10 +228,10 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=tutorial-announcement-2"></script>
-  <script src="./src/story-source.js?v=story-document-import-1"></script>
-  <script src="./src/data.js?v=tutorial-announcement-2"></script>
-  <script src="./src/battle.js?v=tutorial-announcement-2"></script>
-  <script src="./src/player-app.js?v=tutorial-announcement-2"></script>
+  <script src="./src/gacha.js?v=boss-breakthrough-level-1"></script>
+  <script src="./src/story-source.js?v=boss-breakthrough-level-1"></script>
+  <script src="./src/data.js?v=boss-breakthrough-level-1"></script>
+  <script src="./src/battle.js?v=boss-breakthrough-level-1"></script>
+  <script src="./src/player-app.js?v=boss-breakthrough-level-1"></script>
 </body>
 </html>

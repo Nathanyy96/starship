@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -22,6 +22,9 @@ const currentUpdateVersion = "2.0-2.5";
 const updateReward = Object.freeze({ starSand: 3200 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
+function createGame(state) {
+  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs });
+}
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -130,6 +133,11 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
       if (oldValue > nextValue) throw new Error("更新保護中止：玩家 " + playerKey + " 的角色培養進度不可被降低");
     });
   });
+  Object.entries(oldProgress).forEach(([cardId, progress]) => {
+    if (progress && progress.breakthrough === true && !(nextProgress[cardId] && nextProgress[cardId].breakthrough === true)) {
+      throw new Error("更新保護中止：玩家 " + playerKey + " 的角色突破狀態不可被降低");
+    }
+  });
 
   const oldScenes = previousState.storyProgress && previousState.storyProgress.completedScenes && typeof previousState.storyProgress.completedScenes === "object" ? previousState.storyProgress.completedScenes : {};
   const nextScenes = nextState.storyProgress && nextState.storyProgress.completedScenes && typeof nextState.storyProgress.completedScenes === "object" ? nextState.storyProgress.completedScenes : {};
@@ -235,10 +243,10 @@ function newPlayerRecord(name, passwordHash) {
 }
 
 function freshPlayerState() {
-  const state = new GachaGame({ banners }).getState();
+  const state = createGame().getState();
   state.collection.celesia = 1;
   state.recruitment.starterGranted = true;
-  return new GachaGame({ banners, state }).getState();
+  return createGame(state).getState();
 }
 
 function snapshotPlayerProgress(currentState) {
@@ -272,7 +280,7 @@ function restorePlayerProgress(state, snapshot) {
 
 function ensurePlayerMilestones(currentState) {
   const preservedProgress = snapshotPlayerProgress(currentState);
-  const state = new GachaGame({ banners, state: currentState || freshPlayerState() }).getState();
+  const state = createGame(currentState || freshPlayerState()).getState();
   restorePlayerProgress(state, preservedProgress);
   state.collection = state.collection || {};
   state.recruitment = state.recruitment || {};
@@ -302,6 +310,14 @@ function ensurePlayerMilestones(currentState) {
     state.trialProgress.lastBattle = null;
     state.trialProgress.selectedTeam = [];
   }
+  state.bossProgress = state.bossProgress || { version: bossVersion, selectedBossId: "boss-star-warden", selectedTeam: [], attempts: {}, lastBattle: null };
+  if (state.bossProgress.version !== bossVersion) {
+    state.bossProgress.version = bossVersion;
+    state.bossProgress.attempts = {};
+    state.bossProgress.lastBattle = null;
+    state.bossProgress.selectedTeam = [];
+    state.bossProgress.selectedBossId = "boss-star-warden";
+  }
   state.dispatchProgress = state.dispatchProgress || { version: currentUpdateVersion, selectedTeam: [], claimed: {}, lastMission: null };
   if (state.dispatchProgress.version !== currentUpdateVersion) {
     state.dispatchProgress.version = currentUpdateVersion;
@@ -309,9 +325,9 @@ function ensurePlayerMilestones(currentState) {
     state.dispatchProgress.claimed = {};
     state.dispatchProgress.lastMission = null;
   }
-  const migratedState = new GachaGame({ banners, state }).getState();
+  const migratedState = createGame(state).getState();
   restorePlayerProgress(migratedState, preservedProgress);
-  return new GachaGame({ banners, state: migratedState }).getState();
+  return createGame(migratedState).getState();
 }
 
 function findPlayer(database, name) {
@@ -438,16 +454,30 @@ function integerOrCurrent(value, current) {
 function updateAdminState(currentState, body) {
   const state = JSON.parse(JSON.stringify(currentState));
   if (body.resources) {
-    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
+    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
       state.resources[key] = integerOrCurrent(body.resources[key], state.resources[key]);
     });
   }
   if (body.resourceDelta) {
-    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
+    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach((key) => {
       const delta = body.resourceDelta[key] === undefined ? 0 : body.resourceDelta[key];
       if (!Number.isInteger(delta)) throw new Error("資源增減必須是整數");
       state.resources[key] += delta;
       if (state.resources[key] < 0) throw new Error("資源不能低於 0：" + key);
+    });
+  }
+  if (body.breakthroughMaterials) {
+    if (!body.breakthroughMaterials || typeof body.breakthroughMaterials !== "object" || Array.isArray(body.breakthroughMaterials)) throw new Error("突破材料必須是物件");
+    Object.entries(body.breakthroughMaterials).forEach(([materialId, amount]) => {
+      state.breakthroughMaterials[materialId] = integerOrCurrent(amount, state.breakthroughMaterials[materialId] || 0);
+    });
+  }
+  if (body.breakthroughMaterialDelta) {
+    if (!body.breakthroughMaterialDelta || typeof body.breakthroughMaterialDelta !== "object" || Array.isArray(body.breakthroughMaterialDelta)) throw new Error("突破材料增減必須是物件");
+    Object.entries(body.breakthroughMaterialDelta).forEach(([materialId, delta]) => {
+      if (!Number.isInteger(delta)) throw new Error("突破材料增減必須是整數");
+      state.breakthroughMaterials[materialId] = (Number(state.breakthroughMaterials[materialId]) || 0) + delta;
+      if (state.breakthroughMaterials[materialId] < 0) throw new Error("突破材料不能低於 0：" + materialId);
     });
   }
   if (body.pity) {
@@ -459,7 +489,7 @@ function updateAdminState(currentState, body) {
     });
   }
   if (body.selectedFeatured) state.selectedFeatured = Object.assign({}, state.selectedFeatured, body.selectedFeatured);
-  return new GachaGame({ banners, state }).getState();
+  return createGame(state).getState();
 }
 
 function storyChapterById(chapterId) {
@@ -480,7 +510,7 @@ function completeStoryScene(currentState, body) {
   if (chapter.releaseOpen === false) throw new Error("這個版本的劇情已建檔，但尚未開放");
   if (body.action === "select") {
     state.storyProgress.currentChapter = chapter.id;
-    return { state: new GachaGame({ banners, state }).getState(), alreadyClaimed: false, reward: { starSand: 0 }, chapter, scene: null };
+    return { state: createGame(state).getState(), alreadyClaimed: false, reward: { starSand: 0 }, chapter, scene: null };
   }
   const scene = storySceneById(chapter, body.sceneId);
   const key = chapter.id + ":" + scene.id;
@@ -495,12 +525,12 @@ function completeStoryScene(currentState, body) {
   if (chapter.id === "main-1-0" && !state.recruitment.story10ChoiceClaimed) {
     state.recruitment.story10ChoiceAvailable = true;
   }
-  return { state: new GachaGame({ banners, state }).getState(), alreadyClaimed: false, reward: { starSand: 100 }, chapter, scene };
+  return { state: createGame(state).getState(), alreadyClaimed: false, reward: { starSand: 100 }, chapter, scene };
 }
 
 function completeTutorial(currentState) {
   const state = ensurePlayerMilestones(currentState);
-  const game = new GachaGame({ banners, state });
+  const game = createGame(state);
   return game.completeTutorial({ version: currentUpdateVersion, reward: tutorialReward });
 }
 
@@ -522,6 +552,8 @@ function runTrial(currentState, body) {
   if (attempts >= 10) throw new Error("本關在目前版本已完成 10 次，請等待下次遊戲更新重置挑戰次數");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
   const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
+  const rewardStarSand = Number(stage.reward && stage.reward.starSand || 0);
+  const rewardCharacterExp = Number(stage.reward && stage.reward.characterExp || 0);
   state.trialProgress.selectedTeam = team;
   state.trialProgress.lastBattle = battle;
   if (battle.won) {
@@ -529,13 +561,48 @@ function runTrial(currentState, body) {
     if (state.trialProgress.clearedStages.indexOf(stage.id) < 0) {
       state.trialProgress.clearedStages.push(stage.id);
     }
-    state.resources.starSand += 100;
-    state.resources.tickets += 1;
-    state.resources.characterExp += Number(stage.reward && stage.reward.characterExp || 0);
+    state.resources.starSand += rewardStarSand;
+    state.resources.characterExp += rewardCharacterExp;
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true;
   }
-  return { state: new GachaGame({ banners, state }).getState(), battle, reward: battle.won ? { starSand: 100, tickets: 1, characterExp: Number(stage.reward && stage.reward.characterExp || 0), attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, tickets: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
+  return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
+}
+
+function bossStageById(bossId) {
+  const stage = bossStages.find((item) => item.id === String(bossId || ""));
+  if (!stage) throw new Error("找不到 Boss 關卡");
+  return stage;
+}
+
+function runBoss(currentState, body) {
+  const state = ensurePlayerMilestones(currentState);
+  const stage = bossStageById(body.bossId);
+  const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
+  if (!team.length) throw new Error("至少派出 1 名角色才能挑戰 Boss");
+  if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
+  const attempts = Number(state.bossProgress.attempts[stage.id] || 0);
+  if (attempts >= bossMaxRewards) throw new Error("這個 Boss 在目前版本已完成 " + bossMaxRewards + " 次，請等待下次更新重置挑戰次數");
+  const effectiveStats = buildEffectiveStats(characterBattleStats, state);
+  const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
+  state.bossProgress.selectedBossId = stage.id;
+  state.bossProgress.selectedTeam = team;
+  state.bossProgress.lastBattle = battle;
+  const reward = stage.reward || {};
+  if (battle.won) {
+    state.bossProgress.attempts[stage.id] = attempts + 1;
+    const materialId = String(reward.materialId || "");
+    const amount = Math.max(0, Number(reward.amount) || 0);
+    state.breakthroughMaterials[materialId] = (Number(state.breakthroughMaterials[materialId]) || 0) + amount;
+    state.resources.characterExp += Math.max(0, Number(reward.characterExp) || 0);
+  }
+  const attemptsUsed = Number(state.bossProgress.attempts[stage.id] || attempts);
+  return {
+    state: createGame(state).getState(),
+    battle,
+    boss: stage,
+    reward: battle.won ? { materialId: reward.materialId, materialName: reward.materialName, amount: reward.amount, characterExp: reward.characterExp, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed } : { materialId: reward.materialId, materialName: reward.materialName, amount: 0, characterExp: 0, attemptsUsed, attemptsRemaining: bossMaxRewards - attemptsUsed }
+  };
 }
 
 function dispatchMissionById(missionId) {
@@ -563,7 +630,7 @@ function runDispatch(currentState, body) {
     if (battle.won && Object.prototype.hasOwnProperty.call(state.resources, key)) state.resources[key] += amount;
   });
   if (battle.won) state.dispatchProgress.claimed[mission.id] = { completedAt: new Date().toISOString() };
-  return { state: new GachaGame({ banners, state }).getState(), battle, reward, mission };
+  return { state: createGame(state).getState(), battle, reward, mission };
 }
 
 function claimCharacterChoice(currentState, body) {
@@ -576,12 +643,12 @@ function claimCharacterChoice(currentState, body) {
   const claimedKey = rewardKey === "story-1-0" ? "story10ChoiceClaimed" : "trial10ChoiceClaimed";
   if (!state.recruitment[availableKey] || state.recruitment[claimedKey]) throw new Error("這份角色自選獎勵目前不可領取");
   if (rewardKey === "trial-10" && state.collection[cardId] > 0) throw new Error("第 10 關獎勵請選擇尚未取得的角色");
-  const game = new GachaGame({ banners, state });
+  const game = createGame(state);
   const result = game.grantCharacter(cardId);
   const nextState = result.state;
   nextState.recruitment[availableKey] = false;
   nextState.recruitment[claimedKey] = true;
-  return { state: new GachaGame({ banners, state: nextState }).getState(), card: result.card, rewardKey };
+  return { state: createGame(nextState).getState(), card: result.card, rewardKey };
 }
 
 async function handleApi(request, response, requestUrl) {
@@ -683,6 +750,16 @@ async function handleApi(request, response, requestUrl) {
       return;
     }
 
+    if (requestUrl.pathname === "/api/player/boss-battle") {
+      const player = playerFromSession(database, body.token);
+      const result = runBoss(player.record.state, body);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, battle: result.battle, reward: result.reward, boss: result.boss });
+      return;
+    }
+
     if (requestUrl.pathname === "/api/player/dispatch") {
       const player = playerFromSession(database, body.token);
       const result = runDispatch(player.record.state, body);
@@ -699,7 +776,7 @@ async function handleApi(request, response, requestUrl) {
 
     if (requestUrl.pathname === "/api/player/pull" || requestUrl.pathname === "/api/player/select-featured" || requestUrl.pathname === "/api/player/exchange-featured") {
       const player = playerFromSession(database, body.token);
-      const game = new GachaGame({ banners, state: player.record.state });
+      const game = createGame(player.record.state);
       let result;
       if (requestUrl.pathname === "/api/player/pull") {
         result = game.pull({ bannerId: body.bannerId, count: body.count, payment: body.payment });
@@ -717,8 +794,19 @@ async function handleApi(request, response, requestUrl) {
 
     if (requestUrl.pathname === "/api/player/character-development") {
       const player = playerFromSession(database, body.token);
-      const game = new GachaGame({ banners, state: player.record.state });
+      const game = createGame(player.record.state);
       const result = game.developCharacter({ cardId: body.cardId });
+      player.record.state = game.getState();
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/character-breakthrough") {
+      const player = playerFromSession(database, body.token);
+      const game = createGame(player.record.state);
+      const result = game.breakthroughCharacter({ cardId: body.cardId });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
@@ -728,7 +816,7 @@ async function handleApi(request, response, requestUrl) {
 
     if (requestUrl.pathname === "/api/player/character-constellation") {
       const player = playerFromSession(database, body.token);
-      const game = new GachaGame({ banners, state: player.record.state });
+      const game = createGame(player.record.state);
       const result = game.enhanceConstellation({ cardId: body.cardId });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();

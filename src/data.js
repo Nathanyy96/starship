@@ -142,11 +142,23 @@
     ,elyra: { rarity: 4, role: "支援", maxHp: 1240, attack: 172, defense: 150, speed: 112, range: 2, attackName: "律式回覆", skillName: "第二條律", skillPower: 1.34, skillEffect: "讓隊伍獲得可撤回的減傷，並重置一名隊友技能冷卻" }
   };
 
+  // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調，
+  // 避免少數高面板 3★ 在戰力與培養後數值上反過來壓過 4★。
+  Object.keys(characterBattleStats).forEach(function (id) {
+    var stats = characterBattleStats[id];
+    if (stats.rarity !== 4) return;
+    stats.maxHp = Math.round(stats.maxHp * 1.16);
+    stats.attack = Math.round(stats.attack * 1.16);
+    stats.defense = Math.round(stats.defense * 1.16);
+    stats.speed = Math.round(stats.speed * 1.06);
+  });
+
   var trialVersion = "2.0-2.5";
   var trialMaxRewards = 10;
   // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
   // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。
-  var trialReward = Object.freeze({ starSand: 100, tickets: 1, characterExp: 600 });
+  // 原共鳴券已取消；每張券按單抽等價 160 星砂併入獎勵。
+  var trialReward = Object.freeze({ starSand: 260, characterExp: 600 });
   // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
   var trialStages = [
@@ -182,15 +194,54 @@
     { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 13700, environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.22, enemyDefense: 1.18 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態，錯誤的爆發時機會使全隊陷入反擊", trialRule: "finale", finalStage: true, enemies: [{ name: "第二律護衛", maxHp: 16400, attack: 700, defense: 575, speed: 174, count: 2 }, { name: "第二條律王座", maxHp: 22000, attack: 730, defense: 640, speed: 104, count: 1 }], reward: trialReward }
   ];
 
+  // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
+  // 讓玩家可以透過戰鬥穩定準備突破材料，同時保留隊伍搭配與重複挑戰的空間。
+  var bossVersion = "2.0-2.5";
+  var bossMaxRewards = 10;
+  var bossStages = [
+    { id: "boss-star-warden", name: "星序守望者", region: "星序觀測環", description: "守望者以錯位星序建立護盾，指揮與減防角色能更快找到破口。", recommendedPower: 1500, environment: "錯位星序", environmentEffect: "敵方護盾重新排列，支援與破防效果更有價值", enemyTrait: "星序護盾", enemyTraitEffect: "首領首次施放技能會重建一次護盾", trialRule: "shield", modifiers: { enemyDefense: 1.06, teamAttack: 1.03 }, enemies: [{ name: "星序守衛", maxHp: 2700, attack: 190, defense: 145, speed: 82, count: 2 }, { name: "星序守望者", maxHp: 5200, attack: 260, defense: 215, speed: 96, count: 1 }], reward: { materialId: "star-crest", materialName: "星序碎晶", amount: 1, characterExp: 360 } },
+    { id: "boss-tide-archive", name: "潮眼書庫獸", region: "潮汐書庫深層", description: "潮眼把索引頁藏進寄生體的外殼，治療、修復與淨化能降低長線壓力。", recommendedPower: 1700, environment: "深潮索引", environmentEffect: "受到潮蝕的角色治療量降低，修復技能可清除部分效果", enemyTrait: "潮蝕寄生", enemyTraitEffect: "敵人命中後會降低受治療量", trialRule: "corrosion", modifiers: { healing: 0.84, enemyAttack: 1.05 }, enemies: [{ name: "潮眼寄生體", maxHp: 3300, attack: 220, defense: 160, speed: 112, count: 2 }, { name: "書庫潮核", maxHp: 6100, attack: 285, defense: 235, speed: 70, count: 1 }], reward: { materialId: "tide-crystal", materialName: "潮眼晶核", amount: 1, characterExp: 360 } },
+    { id: "boss-clock-sentinel", name: "逆時守鐘人", region: "彼岸鐘庭內庭", description: "守鐘人把行動順序切成不同時段，速度與防守輪轉比單純輸出更可靠。", recommendedPower: 1900, environment: "逆時鐘面", environmentEffect: "敵方每三回合重新取得先手，速度增益會延長一輪", enemyTrait: "逆時敲鐘", enemyTraitEffect: "首領技能週期縮短，不能只依賴一名輸出", trialRule: "time", modifiers: { enemySpeed: 1.1, teamSpeed: 1.05 }, enemies: [{ name: "逆時鐘影", maxHp: 3600, attack: 245, defense: 175, speed: 128, count: 2 }, { name: "守鐘人", maxHp: 6800, attack: 300, defense: 250, speed: 78, count: 1 }], reward: { materialId: "clock-core", materialName: "逆時鐘核", amount: 1, characterExp: 360 } },
+    { id: "boss-forge-colossus", name: "鍛路熔殼王", region: "鍛路鎮熱管區", description: "熔殼王會把傷害轉成高溫護甲，重裝與持續破防角色能穩定拆解它。", recommendedPower: 2150, environment: "熱管過載", environmentEffect: "爆發傷害提高，但首領每三回合強化下一次攻擊", enemyTrait: "熔殼過載", enemyTraitEffect: "首領攻擊會逐輪升溫，必須在護盾窗口完成輸出", trialRule: "overload", modifiers: { teamAttack: 1.06, enemyAttack: 1.1, enemyDefense: 1.08 }, enemies: [{ name: "熱管鎧獸", maxHp: 4300, attack: 290, defense: 230, speed: 76, count: 2 }, { name: "鍛路熔殼王", maxHp: 7600, attack: 360, defense: 295, speed: 68, count: 1 }], reward: { materialId: "forge-core", materialName: "熱管熔核", amount: 1, characterExp: 360 } },
+    { id: "boss-wind-hunt", name: "風廊獵王", region: "北門風廊", description: "獵王會鎖定最脆弱的隊員，高速斥候與射手可以先處理獵影，替隊伍爭取回合。", recommendedPower: 2350, environment: "高空風廊", environmentEffect: "敵我速度波動變大，標記與先手控制更重要", enemyTrait: "獵王標記", enemyTraitEffect: "敵方集中攻擊生命比例最低的角色", trialRule: "mark", modifiers: { enemySpeed: 1.14, teamSpeed: 1.08, enemyAttack: 1.06 }, enemies: [{ name: "風廊獵影", maxHp: 4500, attack: 315, defense: 210, speed: 150, count: 2 }, { name: "風廊獵王", maxHp: 8200, attack: 340, defense: 270, speed: 104, count: 1 }], reward: { materialId: "wind-core", materialName: "風標獵核", amount: 1, characterExp: 360 } },
+    { id: "boss-mirror-arbiter", name: "霧鏡裁定核", region: "霧鏡議庭", description: "裁定核會複寫隊伍的增益，仲裁、校準與清除效果可以把鏡像變回弱點。", recommendedPower: 2600, environment: "霧鏡審理場", environmentEffect: "敵方第一次取得增益時會轉成護盾，清除後才會露出核心", enemyTrait: "鏡像裁定", enemyTraitEffect: "敵方技能會短暫複寫一個正面效果", trialRule: "copy", modifiers: { enemyAttack: 1.08, enemyDefense: 1.12, teamAttack: 1.04 }, enemies: [{ name: "霧鏡執行獸", maxHp: 5100, attack: 330, defense: 255, speed: 118, count: 2 }, { name: "霧鏡裁定核", maxHp: 9200, attack: 375, defense: 330, speed: 86, count: 1 }], reward: { materialId: "mirror-core", materialName: "霧鏡映核", amount: 1, characterExp: 360 } }
+  ];
+
+  var breakthroughMaterialTemplates = {
+    "boss-star-warden": { materialId: "star-crest", materialName: "星序碎晶" },
+    "boss-tide-archive": { materialId: "tide-crystal", materialName: "潮眼晶核" },
+    "boss-clock-sentinel": { materialId: "clock-core", materialName: "逆時鐘核" },
+    "boss-forge-colossus": { materialId: "forge-core", materialName: "熱管熔核" },
+    "boss-wind-hunt": { materialId: "wind-core", materialName: "風標獵核" },
+    "boss-mirror-arbiter": { materialId: "mirror-core", materialName: "霧鏡映核" }
+  };
+  var characterBreakthroughGroups = {
+    "boss-star-warden": ["celesia", "eda", "noreia", "aurelia", "elyra"],
+    "boss-tide-archive": ["lia", "rena", "elorna", "risan", "mirea", "maro", "orivelle", "sumine", "cenya", "talia"],
+    "boss-clock-sentinel": ["reyn", "chodan", "siyeon"],
+    "boss-forge-colossus": ["isar", "harlow", "magenta", "yaoze", "lorne", "kairen", "aster", "kael"],
+    "boss-wind-hunt": ["hina", "ferye", "norell", "sorae"],
+    "boss-mirror-arbiter": ["veyra", "mave", "evelyn", "jiera", "rotea", "neve"]
+  };
+  var characterBreakthroughs = {};
+  Object.keys(characterBreakthroughGroups).forEach(function (bossId) {
+    var template = breakthroughMaterialTemplates[bossId];
+    characterBreakthroughGroups[bossId].forEach(function (cardId) {
+      var cardData = cards[cardId];
+      if (!cardData) return;
+      characterBreakthroughs[cardId] = Object.freeze({ bossId: bossId, materialId: template.materialId, materialName: template.materialName, cost: cardData.rarity === 4 ? 4 : 3 });
+    });
+  });
+
   var dispatchVersion = "2.0-2.5";
   var dispatchMissions = [
     { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1200, echoPowder: 4 } },
-    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 220, characterExp: 1500, tickets: 1 } },
+    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
     { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
   ];
 
   // 劇情入口開放文件 1.0–2.5；每幕由前端與後端共用 id，完成獎勵才能安全地只領一次。
-  var tutorialReward = Object.freeze({ starSand: 600, tickets: 2, characterExp: 600 });
+  var tutorialReward = Object.freeze({ starSand: 920, characterExp: 600 });
   var tutorialSteps = Object.freeze([
     Object.freeze({ id: "account", icon: "✦", title: "先看懂你的星界帳號", copy: "進度會綁定遊戲名稱與密碼；登入後抽卡、資源、保底、角色與劇情完成狀態都會自動保存。" }),
     Object.freeze({ id: "lobby", icon: "◇", title: "從星界之律大廳出發", copy: "大廳的劇情、抽卡、角色培養、星界試煉、星港委託、公告與本教學都必須登入後才能使用。" }),
@@ -198,13 +249,15 @@
     Object.freeze({ id: "gacha", icon: "✧", title: "了解回覆召集", copy: "限定 4★ 可先選目標；前 20 抽不出 4★，第 21 抽起機率逐步提高，第 50 抽必定出 4★。歪到其他 4★ 會有星砂補償。" }),
     Object.freeze({ id: "growth", icon: "⬡", title: "培養與戰力", copy: "角色培養會提升生命、攻擊、防禦、速度與戰力；重複角色會增加命座並留下該角色專用晶核。三星與四星的基礎數值和成長倍率不同。" }),
     Object.freeze({ id: "trial", icon: "✹", title: "星界試煉與隊伍協同", copy: "最多派出 4 名角色。每關會顯示推薦戰力、敵人數值與特性；總戰力只是參考，治療、護盾、減防、速度和技能搭配都會影響勝負。" }),
-    Object.freeze({ id: "dispatch", icon: "⌁", title: "用額外玩法取得養成資源", copy: "星港委託是每版本一次的短篇戰鬥任務，能取得星砂、角色經驗、共鳴券或星痕；版本更新後任務進度會重置，角色不會消失。" })
+    Object.freeze({ id: "dispatch", icon: "⌁", title: "用額外玩法取得養成資源", copy: "星港委託是每版本一次的短篇戰鬥任務，能取得星砂、角色經驗、回響粉或星痕；版本更新後任務進度會重置，角色不會消失。" }),
+    Object.freeze({ id: "boss", icon: "♢", title: "80 等突破與 Boss", copy: "角色升到 80 等後不能直接繼續升級；請在 Boss 選單挑戰指定首領，收集該角色需要的專屬突破材料，再完成突破並升到現行上限 90 等。100 等仍是後續版本預留內容。" })
   ]);
   var announcements = Object.freeze([
     Object.freeze({ id: "update-2.0-2.5", badge: "大更新", date: "2.0–2.5", title: "第二大版本｜潮眼回覆正式開放", copy: "主線與支線 1.0–2.5 已接入長篇閱讀器；2.0–2.5 角色、星界試煉與星港委託一起加入星界之律大廳。", reward: "+3,200 星砂更新獎勵；每個帳號可領取一次。", highlights: ["劇情正文不再只顯示標題", "星界試煉擴充為 30 關", "版本進度更新不會刪除角色與培養資料"] }),
-    Object.freeze({ id: "tutorial-launch", badge: "新手支援", date: "本次更新", title: "新手教學上線", copy: "第一次進入大廳後，可以從新手教學快速了解劇情、抽卡、培養、戰力、星界試煉與星港委託。", reward: "+600 星砂、+2 共鳴券、+600 角色經驗。", highlights: ["完成一次即可領取", "獎勵會寫入目前登入的玩家帳號", "舊玩家也可以補看並領取一次"] }),
-    Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功仍可取得 100 星砂、1 共鳴券與 600 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
-    Object.freeze({ id: "system-stability", badge: "系統優化", date: "資料保存", title: "玩家進度保存與介面穩定性改善", copy: "登入後的角色持有、命座、專用晶核、等級、資源、保底與劇情紀錄會持續保存；更新時只重置公告明確標示的版本玩法進度。", reward: "角色與養成資料不會因遊戲更新被重置。", highlights: ["修正劇情長文顯示與章節邊界", "角色列表與詳情加入戰力", "圖標、行動版排版與大廳入口調整"] })
+    Object.freeze({ id: "tutorial-launch", badge: "新手支援", date: "本次更新", title: "新手教學上線", copy: "第一次進入大廳後，可以從新手教學快速了解劇情、抽卡、培養、戰力、星界試煉與星港委託。", reward: "+920 星砂、+600 角色經驗。", highlights: ["完成一次即可領取", "獎勵會寫入目前登入的玩家帳號", "舊玩家也可以補看並領取一次"] }),
+    Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功可取得 260 星砂與 600 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
+    Object.freeze({ id: "system-stability", badge: "系統優化", date: "資料保存", title: "玩家進度保存與介面穩定性改善", copy: "登入後的角色持有、命座、專用晶核、等級、資源、保底與劇情紀錄會持續保存；更新時只重置公告明確標示的版本玩法進度。", reward: "角色與養成資料不會因遊戲更新被重置。", highlights: ["修正劇情長文顯示與章節邊界", "角色列表與詳情加入戰力", "圖標、行動版排版與大廳入口調整"] }),
+    Object.freeze({ id: "breakthrough-boss", badge: "養成更新", date: "角色培養", title: "80 等突破與 Boss 挑戰開放", copy: "角色升到 80 等後，必須依照角色的專屬需求挑戰指定 Boss，收集突破材料後才能繼續升到 90 等。", reward: "Boss 勝利可取得突破材料與角色經驗；玩家角色與培養進度不會被重置。", highlights: ["六種 Boss 對應不同角色群", "角色詳情顯示指定 Boss、材料與戰力", "100 等保留為後續版本玩法，不在本次開放"] })
   ]);
   var storyChapters = [
     {
@@ -654,7 +707,7 @@
       description: "1.0–1.5 舊版限定池；可從文件既有 4★ 中選一隻，選中者 55%，其餘 4★ 合計 45%。",
       featured4Stars: legacyFour,
       standard4Stars: legacyFour,
-      standard3Stars: legacyThree
+      standard3Stars: activeThree
     },
     {
       id: "rerun-1-0-to-2-0",
@@ -666,7 +719,7 @@
       description: "復刻卡池尚未開放；未來仍會只使用文件既有角色，並承接限定池計數。",
       featured4Stars: legacyFour,
       standard4Stars: legacyFour,
-      standard3Stars: legacyThree
+      standard3Stars: activeThree
     },
     {
       id: "limited-2-0-to-2-5",
@@ -676,7 +729,7 @@
       defaultFeaturedId: "risan",
       description: "2.0–2.5 新限定池；可從璃珊、曜澤、伊芙琳、澪歌、菲芮、諾芮亞、奧薇拉中選一隻，選中者 55%。",
       featured4Stars: version2Four,
-      standard4Stars: activeFour,
+      standard4Stars: version2Four,
       standard3Stars: activeThree
     },
     {
@@ -758,6 +811,10 @@
     trialReward: trialReward,
     dispatchVersion: dispatchVersion,
     dispatchMissions: dispatchMissions,
+    bossVersion: bossVersion,
+    bossMaxRewards: bossMaxRewards,
+    bossStages: bossStages,
+    characterBreakthroughs: characterBreakthroughs,
     tutorialReward: tutorialReward,
     tutorialSteps: tutorialSteps,
     announcements: announcements,

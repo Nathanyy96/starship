@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, updateReward, tutorialSteps, tutorialReward, announcements } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -16,6 +16,12 @@ test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(updateBanner.featured4Stars.every((card) => Number(card.releaseVersion) >= 2 && Number(card.releaseVersion) <= 2.5), true);
   assert.equal(version2Cards.length, 8);
   assert.equal(updateReward.starSand, 3200);
+  const earlyBanner = banners.find((banner) => banner.id === "limited-1-0-to-2-0");
+  const updateBannerForPool = banners.find((banner) => banner.id === "limited-2-0-to-2-5");
+  assert.equal(earlyBanner.standard4Stars.every((card) => Number(card.releaseVersion) <= 1.5), true);
+  assert.equal(updateBannerForPool.standard4Stars.every((card) => Number(card.releaseVersion) >= 2 && Number(card.releaseVersion) <= 2.5), true);
+  assert.equal(earlyBanner.standard3Stars.some((card) => card.id === "maro"), true);
+  assert.equal(updateBannerForPool.standard3Stars.some((card) => card.id === "reyn"), true);
 });
 
 test("後續角色都有完整立繪來源，但不會混入現行卡池", () => {
@@ -35,6 +41,8 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => String(scene.body).trim().length >= 20)), true);
   assert.equal(liveStory.every((chapter) => Number(chapter.fullBody && chapter.fullBody.length) > 800), true);
   assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").sourceStatus, "document-tab-missing");
+  assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => typeof scene.id === "string" && scene.id.length > 0)), true);
+  assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").scenes.at(-1).id, "name-arrival");
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.4").fullBody.includes("附錄｜"), false);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").scenes.length, 3);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("見證人的空白"), false);
@@ -51,6 +59,19 @@ test("星港委託提供額外玩法與非抽卡獎勵", () => {
   assert.equal(dispatchMissions.every((mission) => mission.enemies.length > 0 && mission.reward.starSand > 0), true);
 });
 
+test("Boss 依角色分組提供 80 等突破材料，現行上限是 90 並預留 100 等", () => {
+  const { DEFAULT_RULES } = require("../src/gacha.js");
+  assert.equal(DEFAULT_RULES.development.maxLevel, 90);
+  assert.equal(DEFAULT_RULES.development.breakthroughLevel, 80);
+  assert.equal(DEFAULT_RULES.development.futureMaxLevel, 100);
+  assert.equal(bossStages.length, 6);
+  assert.equal(bossMaxRewards, 10);
+  assert.equal(activeCards.every((card) => characterBreakthroughs[card.id] && characterBreakthroughs[card.id].bossId), true);
+  assert.equal(new Set(activeCards.map((card) => characterBreakthroughs[card.id].bossId)).size >= 4, true);
+  assert.equal(characterBreakthroughs.celesia.cost, 4);
+  assert.equal(characterBreakthroughs.reyn.cost, 3);
+});
+
 test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.length >= 7, true);
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
@@ -62,13 +83,13 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   const first = gacha.completeTutorial({ version: "2.0-2.5", reward: tutorialReward });
   assert.equal(first.alreadyClaimed, false);
   assert.equal(first.reward.starSand, tutorialReward.starSand);
-  assert.equal(first.reward.tickets, tutorialReward.tickets);
   assert.equal(first.reward.characterExp, tutorialReward.characterExp);
   assert.equal(first.state.tutorialProgress.rewardClaimed, true);
   assert.equal(first.state.resources.starSand, before.starSand + tutorialReward.starSand);
   const second = gacha.completeTutorial({ version: "2.0-2.5", reward: tutorialReward });
   assert.equal(second.alreadyClaimed, true);
   assert.equal(second.state.resources.starSand, first.state.resources.starSand);
+  assert.equal(Object.prototype.hasOwnProperty.call(second.state.resources, "tickets"), false);
 });
 
 test("版本遷移保留角色、等級、命座晶核與已完成劇情", () => {
@@ -84,15 +105,15 @@ test("版本遷移保留角色、等級、命座晶核與已完成劇情", () =>
     })
   }).getState();
   assert.deepEqual(migrated.collection, { celesia: 2, lia: 5 });
-  assert.deepEqual(migrated.characterProgress.celesia, { level: 28, affinity: 12, constellation: 1, constellationCore: 1 });
-  assert.deepEqual(migrated.characterProgress.lia, { level: 41, affinity: 22, constellation: 4, constellationCore: 4 });
+  assert.deepEqual(migrated.characterProgress.celesia, { level: 28, affinity: 12, constellation: 1, constellationCore: 1, breakthrough: false });
+  assert.deepEqual(migrated.characterProgress.lia, { level: 41, affinity: 22, constellation: 4, constellationCore: 4, breakthrough: false });
   assert.ok(migrated.storyProgress.completedScenes["main-1-0:scene-1"]);
   assert.equal(migrated.trialProgress.version, "1.0-1.5");
 });
 
 function state(overrides) {
   return Object.assign({
-    resources: { starSand: 100000, tickets: 3, starMarks: 0, echoPowder: 0 },
+    resources: { starSand: 100000, starMarks: 0, echoPowder: 0 },
     pity: {
       limited: { pullsSince4Star: 0, guaranteedFeatured: false },
       standard: { pullsSince4Star: 0, guaranteedFeatured: false }
@@ -112,6 +133,27 @@ function game(options) {
     now: () => "2026-09-16T00:00:00.000Z"
   }, options || {}));
 }
+
+test("角色到 80 等後必須消耗指定 Boss 材料，突破後才能升到 90 等", () => {
+  const gacha = game({
+    breakthroughRequirements: characterBreakthroughs,
+    state: state({
+      resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 },
+      collection: { celesia: 1 },
+      characterProgress: { celesia: { level: 80, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false } },
+      breakthroughMaterials: { "star-crest": 4 }
+    })
+  });
+  assert.throws(() => gacha.developCharacter({ cardId: "celesia" }), /請先到 Boss 選單/);
+  const breakthrough = gacha.breakthroughCharacter({ cardId: "celesia" });
+  assert.equal(breakthrough.progress.breakthrough, true);
+  assert.equal(breakthrough.state.breakthroughMaterials["star-crest"], 0);
+  const levelUp = gacha.developCharacter({ cardId: "celesia" });
+  assert.equal(levelUp.progress.level, 81);
+  const atNinety = levelUp.state;
+  atNinety.characterProgress.celesia.level = 90;
+  assert.throws(() => game({ breakthroughRequirements: characterBreakthroughs, state: atNinety }).developCharacter({ cardId: "celesia" }), /最高等級/);
+});
 
 test("現行保底機率是前 20 抽 0%、21 抽 10%、每抽 +4%、50 抽 100%", () => {
   assert.equal(getFourStarRate(1), 0);
@@ -240,15 +282,17 @@ test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續�
   assert.equal(enhanced.state.resources.resonanceCore, 2);
 });
 
-test("共鳴券只消耗券，不消耗星砂；精選兌換不改保底", () => {
+test("舊共鳴券會按單抽等價轉成星砂，抽卡只使用星砂", () => {
   const gacha = game({
     state: state({ resources: { starSand: 0, tickets: 1, starMarks: 10, echoPowder: 0 } }),
     rng: () => 0.999999
   });
+  assert.equal(gacha.getState().resources.starSand, 160);
+  assert.equal(Object.prototype.hasOwnProperty.call(gacha.getState().resources, "tickets"), false);
   const before = gacha.getPityStatus("limited-1-0-to-2-0");
-  const ticketOutcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "ticket" });
-  assert.equal(ticketOutcome.state.resources.tickets, 0);
-  assert.equal(ticketOutcome.state.resources.starSand, 0);
+  const sandOutcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "starSand" });
+  assert.equal(sandOutcome.state.resources.starSand, 0);
+  assert.throws(() => gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "ticket" }), /只使用星砂/);
 
   const exchanged = gacha.exchangeFeatured({ bannerId: "limited-1-0-to-2-0" });
   assert.equal(exchanged.card.id, "celesia");

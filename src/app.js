@@ -131,7 +131,7 @@
       container.innerHTML = entries.map(function (entry) {
         var banner = bannerById(entry.bannerId);
         var title = banner ? banner.name : entry.bannerId;
-        var payment = entry.payment === "ticket" ? "共鳴券" : number(entry.cost) + " 星砂";
+        var payment = number(entry.cost || api.DEFAULT_RULES.singleCost) + " 星砂";
         return "<div class=\"history-row\"><span>" + escapeHtml(title) + "</span><span>" + entry.count + " 格｜4★ " + entry.summary.fourStar + "｜" + escapeHtml(payment) + "</span></div>";
       }).join("");
     }
@@ -142,7 +142,6 @@
       var pity = game.getPityStatus(selectedBannerId);
 
       byId("star-sand").textContent = number(state.resources.starSand);
-      byId("tickets").textContent = number(state.resources.tickets);
       byId("star-marks").textContent = number(state.resources.starMarks);
       byId("echo-powder").textContent = number(state.resources.echoPowder);
       byId("banner-description").textContent = banner.description;
@@ -174,7 +173,6 @@
 
       byId("pull-one").disabled = state.resources.starSand < api.DEFAULT_RULES.singleCost;
       byId("pull-ten").disabled = state.resources.starSand < api.DEFAULT_RULES.tenCost;
-      byId("pull-ticket").disabled = state.resources.tickets < 1;
       exchangeButton.disabled = banner.type === "standard" || state.resources.starMarks < 10 || Boolean(state.bannerExchanges[banner.id]);
       exchangeButton.textContent = state.bannerExchanges[banner.id] ? "本檔精選已兌換" : "10 星痕兌換精選";
 
@@ -214,7 +212,6 @@
     });
     byId("pull-one").addEventListener("click", function () { pull(1, "starSand"); });
     byId("pull-ten").addEventListener("click", function () { pull(10, "starSand"); });
-    byId("pull-ticket").addEventListener("click", function () { pull(1, "ticket"); });
     exchangeButton.addEventListener("click", function () {
       try {
         var exchanged = game.exchangeFeatured({ bannerId: selectedBannerId });

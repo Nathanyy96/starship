@@ -25,7 +25,11 @@
     bonusStarSandAmount: 40,
     nonCharacterReward: Object.freeze({ echoPowder: 1 }),
     development: Object.freeze({
-      maxLevel: 80,
+      // 80 等後先進行角色專屬突破；現行版本最高開放到 90 等。
+      // 100 等保留給後續版本的第二階段玩法，現在不會出現在玩家介面。
+      maxLevel: 90,
+      breakthroughLevel: 80,
+      futureMaxLevel: 100,
       baseCharacterExp: 60,
       characterExpStep: 30,
       // 角色經驗改成「可大量取得、單次升級負擔較低」：
@@ -76,6 +80,8 @@
     assert(Number.isInteger(rules.bonusStarSandAmount) && rules.bonusStarSandAmount >= 0, "bonusStarSandAmount 必須是非負整數");
     assert(Number.isInteger(rules.nonCharacterReward.echoPowder) && rules.nonCharacterReward.echoPowder >= 0, "nonCharacterReward.echoPowder 必須是非負整數");
     assert(Number.isInteger(rules.development.maxLevel) && rules.development.maxLevel > 1, "development.maxLevel 必須是大於 1 的整數");
+    assert(Number.isInteger(rules.development.breakthroughLevel) && rules.development.breakthroughLevel >= 1 && rules.development.breakthroughLevel < rules.development.maxLevel, "development.breakthroughLevel 必須介於 1 與 maxLevel 之間");
+    assert(Number.isInteger(rules.development.futureMaxLevel) && rules.development.futureMaxLevel > rules.development.maxLevel, "development.futureMaxLevel 必須高於目前 maxLevel");
     assert(Number.isInteger(rules.development.baseCharacterExp) && rules.development.baseCharacterExp >= 0, "development.baseCharacterExp 必須是非負整數");
     assert(Number.isInteger(rules.development.characterExpStep) && rules.development.characterExpStep >= 0, "development.characterExpStep 必須是非負整數");
     assert(Number.isInteger(rules.development.threeStarBaseCharacterExp) && rules.development.threeStarBaseCharacterExp >= 0, "development.threeStarBaseCharacterExp 必須是非負整數");
@@ -175,7 +181,6 @@
       version: 1,
       resources: {
         starSand: 160,
-        tickets: 3,
         starMarks: 0,
         echoPowder: 0,
         characterExp: 800,
@@ -185,6 +190,7 @@
       selectedFeatured: {},
       collection: {},
       characterProgress: {},
+      breakthroughMaterials: {},
       recruitment: {
         starterGranted: false,
         story10ChoiceAvailable: false,
@@ -202,6 +208,13 @@
         clearedStages: [],
         attempts: {},
         bestStage: 0,
+        lastBattle: null
+      },
+      bossProgress: {
+        version: "2.0-2.5",
+        selectedBossId: "boss-star-warden",
+        selectedTeam: [],
+        attempts: {},
         lastBattle: null
       },
       updateRewards: {
@@ -229,7 +242,14 @@
     var source = isPlainObject(input) ? clone(input) : initialState();
     var state = initialState();
     state.version = source.version || 1;
+    var legacyTickets = 0;
+    if (isPlainObject(source.resources) && Object.prototype.hasOwnProperty.call(source.resources, "tickets")) {
+      assert(Number.isInteger(source.resources.tickets) && source.resources.tickets >= 0, "舊版共鳴券數量必須是非負整數");
+      legacyTickets = source.resources.tickets;
+    }
     state.resources = Object.assign(state.resources, isPlainObject(source.resources) ? source.resources : {});
+    delete state.resources.tickets;
+    if (legacyTickets > 0) state.resources.starSand += legacyTickets * DEFAULT_RULES.singleCost;
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
     state.characterProgress = isPlainObject(source.characterProgress) ? source.characterProgress : {};
@@ -239,6 +259,7 @@
       progress.affinity = Number.isInteger(progress.affinity) && progress.affinity >= 0 ? progress.affinity : 0;
       progress.constellation = Number.isInteger(progress.constellation) && progress.constellation >= 0 ? progress.constellation : 0;
       progress.constellationCore = Number.isInteger(progress.constellationCore) && progress.constellationCore >= 0 ? progress.constellationCore : 0;
+      progress.breakthrough = progress.breakthrough === true;
       // 舊版曾把重複角色直接寫成命座；依持有數量補回尚未使用的個人晶核，
       // 讓像「莉亞持有 5 次」的舊帳號也能繼續提升，不會卡在只能按一次。
       var copies = Number(state.collection[id] || 0);
@@ -252,6 +273,12 @@
       if (state.characterProgress[id]) return;
       var copies = Math.max(0, Number(state.collection[id]) || 0);
       state.characterProgress[id] = { level: 1, affinity: 0, constellation: Math.min(6, Math.max(0, copies - 1)), constellationCore: Math.max(0, copies - 1) };
+      state.characterProgress[id].breakthrough = false;
+    });
+    state.breakthroughMaterials = isPlainObject(source.breakthroughMaterials) ? source.breakthroughMaterials : {};
+    Object.keys(state.breakthroughMaterials).forEach(function (id) {
+      var amount = Number(state.breakthroughMaterials[id]);
+      state.breakthroughMaterials[id] = Number.isInteger(amount) && amount >= 0 ? amount : 0;
     });
     state.recruitment = Object.assign(initialState().recruitment, isPlainObject(source.recruitment) ? source.recruitment : {});
     state.storyProgress = Object.assign(initialState().storyProgress, isPlainObject(source.storyProgress) ? source.storyProgress : {});
@@ -264,6 +291,15 @@
       state.trialProgress.attempts[id] = Number.isInteger(state.trialProgress.attempts[id]) && state.trialProgress.attempts[id] >= 0 ? state.trialProgress.attempts[id] : 0;
     });
     state.trialProgress.bestStage = Number.isInteger(state.trialProgress.bestStage) && state.trialProgress.bestStage >= 0 ? state.trialProgress.bestStage : 0;
+    state.bossProgress = Object.assign(initialState().bossProgress, isPlainObject(source.bossProgress) ? source.bossProgress : {});
+    state.bossProgress.version = typeof state.bossProgress.version === "string" && state.bossProgress.version ? state.bossProgress.version : "2.0-2.5";
+    state.bossProgress.selectedBossId = typeof state.bossProgress.selectedBossId === "string" ? state.bossProgress.selectedBossId : "boss-star-warden";
+    state.bossProgress.selectedTeam = Array.isArray(state.bossProgress.selectedTeam) ? state.bossProgress.selectedTeam.slice(0, 4) : [];
+    state.bossProgress.attempts = isPlainObject(state.bossProgress.attempts) ? state.bossProgress.attempts : {};
+    Object.keys(state.bossProgress.attempts).forEach(function (id) {
+      state.bossProgress.attempts[id] = Number.isInteger(state.bossProgress.attempts[id]) && state.bossProgress.attempts[id] >= 0 ? state.bossProgress.attempts[id] : 0;
+    });
+    state.bossProgress.lastBattle = isPlainObject(state.bossProgress.lastBattle) ? state.bossProgress.lastBattle : null;
     state.updateRewards = Object.assign(initialState().updateRewards, isPlainObject(source.updateRewards) ? source.updateRewards : {});
     state.updateRewards.claimedVersions = isPlainObject(state.updateRewards.claimedVersions) ? state.updateRewards.claimedVersions : {};
     state.tutorialProgress = Object.assign(initialState().tutorialProgress, isPlainObject(source.tutorialProgress) ? source.tutorialProgress : {});
@@ -276,9 +312,18 @@
     state.dispatchProgress.claimed = isPlainObject(state.dispatchProgress.claimed) ? state.dispatchProgress.claimed : {};
     state.bannerExchanges = isPlainObject(source.bannerExchanges) ? source.bannerExchanges : {};
     state.totalPulls = Number.isInteger(source.totalPulls) && source.totalPulls >= 0 ? source.totalPulls : 0;
-    state.history = Array.isArray(source.history) ? source.history.slice(-50) : [];
+    state.history = Array.isArray(source.history) ? source.history.slice(-50).map(function (entry) {
+      if (!isPlainObject(entry)) return entry;
+      var normalizedEntry = clone(entry);
+      // 舊版歷史若使用過共鳴券，改以等價單抽星砂顯示。
+      if (normalizedEntry.payment === "ticket") {
+        normalizedEntry.payment = "starSand";
+        normalizedEntry.cost = DEFAULT_RULES.singleCost;
+      }
+      return normalizedEntry;
+    }) : [];
 
-    ["starSand", "tickets", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach(function (key) {
+    ["starSand", "starMarks", "echoPowder", "characterExp", "resonanceCore"].forEach(function (key) {
       assert(Number.isInteger(state.resources[key]) && state.resources[key] >= 0, "資源數量必須是非負整數：" + key);
     });
 
@@ -334,6 +379,7 @@
     this.rules = validateRules(options.rules);
     this.rng = typeof options.rng === "function" ? options.rng : Math.random;
     this.now = typeof options.now === "function" ? options.now : function () { return new Date().toISOString(); };
+    this.breakthroughRequirements = isPlainObject(options.breakthroughRequirements) ? options.breakthroughRequirements : {};
     this.banners = (options.banners || []).map(normalizeBanner);
     assert(this.banners.length > 0, "至少要註冊一個卡池");
     this.bannerById = {};
@@ -365,7 +411,7 @@
     var card = this.cardById[cardId];
     assert(card, "找不到角色：" + cardId);
     var saved = isPlainObject(this.state.characterProgress[cardId]) ? this.state.characterProgress[cardId] : {};
-    return Object.assign({ level: 1, affinity: 0, constellation: 0, constellationCore: 0 }, saved);
+    return Object.assign({ level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }, saved);
   };
 
   GachaGame.prototype._grantCardCopy = function (card) {
@@ -399,6 +445,10 @@
     var progress = this.getCharacterProgress(card.id);
     var level = Number.isInteger(progress.level) && progress.level >= 1 ? progress.level : 1;
     assert(level < this.rules.development.maxLevel, "角色已達目前最高等級");
+    if (level >= this.rules.development.breakthroughLevel && !progress.breakthrough) {
+      var requirement = this.getBreakthroughRequirement(card.id);
+      assert(false, "角色已達 " + this.rules.development.breakthroughLevel + " 等，請先到 Boss 選單取得 " + requirement.materialName + " 並完成突破");
+    }
     var isFourStar = card.rarity === 4;
     var cost = {
       characterExp: (isFourStar ? this.rules.development.fourStarBaseCharacterExp : this.rules.development.threeStarBaseCharacterExp) + (level - 1) * (isFourStar ? this.rules.development.fourStarCharacterExpStep : this.rules.development.threeStarCharacterExpStep)
@@ -409,6 +459,33 @@
     progress.affinity = Math.min(100, (Number(progress.affinity) || 0) + 1);
     this.state.characterProgress[card.id] = progress;
     return { card: clone(card), cost: cost, progress: clone(progress), state: this.getState() };
+  };
+
+  GachaGame.prototype.getBreakthroughRequirement = function (cardId) {
+    var card = this.cardById[cardId];
+    assert(card, "找不到角色：" + cardId);
+    var requirement = this.breakthroughRequirements[card.id];
+    assert(isPlainObject(requirement) && typeof requirement.materialId === "string" && requirement.materialId.length > 0, "找不到角色的突破材料設定：" + card.id);
+    assert(Number.isInteger(requirement.cost) && requirement.cost > 0, "角色突破材料數量設定錯誤：" + card.id);
+    return clone(requirement);
+  };
+
+  GachaGame.prototype.breakthroughCharacter = function (options) {
+    options = options || {};
+    var card = this.cardById[options.cardId];
+    assert(card, "找不到角色：" + options.cardId);
+    assert((this.state.collection[card.id] || 0) > 0, "尚未取得這名角色，無法突破");
+    var progress = this.getCharacterProgress(card.id);
+    assert(progress.level >= this.rules.development.breakthroughLevel, "角色必須先升到 " + this.rules.development.breakthroughLevel + " 等才能突破");
+    assert(progress.level === this.rules.development.breakthroughLevel, "目前只開放 80 等突破");
+    assert(!progress.breakthrough, "角色已完成 80 等突破");
+    var requirement = this.getBreakthroughRequirement(card.id);
+    var available = Math.max(0, Number(this.state.breakthroughMaterials[requirement.materialId]) || 0);
+    assert(available >= requirement.cost, "" + requirement.materialName + "不足，需要 " + requirement.cost + " 個；請先挑戰指定 Boss");
+    this.state.breakthroughMaterials[requirement.materialId] = available - requirement.cost;
+    progress.breakthrough = true;
+    this.state.characterProgress[card.id] = progress;
+    return { card: clone(card), requirement: requirement, cost: { materialId: requirement.materialId, amount: requirement.cost }, progress: clone(progress), state: this.getState() };
   };
 
   GachaGame.prototype.enhanceConstellation = function (options) {
@@ -567,17 +644,11 @@
     var count = options.count === undefined ? 1 : options.count;
     var payment = options.payment || "starSand";
     assert(count === 1 || count === 10, "一次只能抽 1 抽或 10 抽");
-    assert(payment === "starSand" || payment === "ticket", "支付方式必須是 starSand 或 ticket");
-    assert(payment !== "ticket" || count === 1, "共鳴券只能抵用單次召集");
+    assert(payment === "starSand", "目前抽卡只使用星砂；舊版共鳴券已按單抽等價轉換");
 
-    var cost = payment === "ticket" ? 0 : (count === 10 ? this.rules.tenCost : this.rules.singleCost);
-    if (payment === "ticket") {
-      assert(this.state.resources.tickets >= 1, "共鳴券不足");
-      this.state.resources.tickets -= 1;
-    } else {
-      assert(this.state.resources.starSand >= cost, "星砂不足，需要 " + cost + " 星砂");
-      this.state.resources.starSand -= cost;
-    }
+    var cost = count === 10 ? this.rules.tenCost : this.rules.singleCost;
+    assert(this.state.resources.starSand >= cost, "星砂不足，需要 " + cost + " 星砂");
+    this.state.resources.starSand -= cost;
 
     var results = [];
     for (var i = 0; i < count; i += 1) {
@@ -661,19 +732,23 @@
   GachaGame.prototype.completeTutorial = function (options) {
     options = options || {};
     var progress = this.state.tutorialProgress;
-    var reward = Object.assign({ starSand: 600, tickets: 2, characterExp: 600 }, options.reward || {});
-    ["starSand", "tickets", "characterExp"].forEach(function (key) {
+    var reward = Object.assign({ starSand: 920, characterExp: 600 }, options.reward || {});
+    if (Object.prototype.hasOwnProperty.call(reward, "tickets")) {
+      assert(Number.isInteger(reward.tickets) && reward.tickets >= 0, "舊版新手教學共鳴券數量必須是非負整數");
+      reward.starSand += reward.tickets * this.rules.singleCost;
+      delete reward.tickets;
+    }
+    ["starSand", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(reward[key]) && reward[key] >= 0, "新手教學獎勵必須是非負整數：" + key);
-    });
+    }, this);
     if (progress.rewardClaimed) {
-      return { alreadyClaimed: true, reward: { starSand: 0, tickets: 0, characterExp: 0 }, state: this.getState() };
+      return { alreadyClaimed: true, reward: { starSand: 0, characterExp: 0 }, state: this.getState() };
     }
     progress.version = String(options.version || progress.version || "2.0-2.5");
     progress.completed = true;
     progress.rewardClaimed = true;
     progress.completedAt = this.now();
     this.state.resources.starSand += reward.starSand;
-    this.state.resources.tickets += reward.tickets;
     this.state.resources.characterExp += reward.characterExp;
     return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
   };
