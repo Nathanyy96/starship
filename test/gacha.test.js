@@ -154,9 +154,28 @@ test("重複角色轉換成文件指定的資源", () => {
   secondState.pity.limited.pullsSince4Star = 20;
   const second = game({ state: secondState, rng: () => 0 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
   assert.equal(second.results[0].isFirstAcquisition, false);
-  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, echoPowder: 0, characterExp: 0, resonanceCore: 1 });
+  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, echoPowder: 0, characterExp: 0, resonanceCore: 0, constellationCore: 1 });
   assert.equal(second.state.resources.starMarks, 1);
   assert.equal(second.state.resources.starSand, 100000 - 160 * 2 + 50);
+  assert.equal(second.state.characterProgress.celesia.constellation, 1);
+  assert.equal(second.state.characterProgress.celesia.constellationCore, 1);
+});
+
+test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續提升", () => {
+  const gacha = game({
+    state: state({
+      collection: { lia: 5 },
+      characterProgress: {}
+    })
+  });
+  const migrated = gacha.getState().characterProgress.lia;
+  assert.equal(migrated.constellation, 4);
+  assert.equal(migrated.constellationCore, 4);
+
+  const enhanced = gacha.enhanceConstellation({ cardId: "lia" });
+  assert.equal(enhanced.state.characterProgress.lia.constellation, 5);
+  assert.equal(enhanced.state.characterProgress.lia.constellationCore, 3);
+  assert.equal(enhanced.state.resources.resonanceCore, 2);
 });
 
 test("共鳴券只消耗券，不消耗星砂；精選兌換不改保底", () => {

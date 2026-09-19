@@ -165,7 +165,7 @@ body {
 .page-shell { width: min(1400px, calc(100% - 48px)); padding-top: 34px; }
 .topbar { position: relative; margin-bottom: 26px; padding: 20px 2px 14px 78px; }
 .topbar > div:first-child { position: relative; }
-.topbar > div:first-child::before { position: absolute; left: -64px; top: 3px; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid rgba(112, 233, 223, .48); border-radius: 15px; color: #d9faff; background: linear-gradient(135deg, rgba(113, 96, 255, .58), rgba(44, 200, 187, .32)); box-shadow: 0 0 34px rgba(103, 217, 207, .25), inset 0 0 20px rgba(255,255,255,.13); content: "✦"; font-size: 1.35rem; }
+.topbar > div:first-child::before { position: absolute; left: -64px; top: 3px; display: block; width: 46px; height: 46px; border: 1px solid rgba(224, 235, 255, .58); border-radius: 15px; background: url("./assets/ui/game-icon.png") center / cover no-repeat; box-shadow: 0 0 34px rgba(103, 217, 207, .25), inset 0 0 20px rgba(255,255,255,.13); content: ""; }
 .topbar::after { position: absolute; right: 0; bottom: 0; left: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(112,233,223,.4), transparent); content: ""; }
 h1 { color: #fbfdff; text-shadow: 0 8px 32px rgba(127, 137, 255, .45); }
 .subtitle { color: #aab8d7; }
@@ -337,7 +337,7 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .auth-gate-orbit { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #70e9df; box-shadow: 0 0 24px 8px rgba(112,233,223,.65); }
 .orbit-one { top: 24%; left: 20%; }
 .orbit-two { right: 18%; bottom: 26%; background: #a99bff; box-shadow: 0 0 24px 8px rgba(169,155,255,.65); }
-.auth-gate-sigil { position: relative; z-index: 2; display: grid; place-items: center; width: 92px; height: 92px; border: 1px solid rgba(223, 247, 255, .65); border-radius: 28px; color: #f4ffff; background: linear-gradient(135deg, rgba(125,109,255,.55), rgba(55,188,187,.32)); box-shadow: 0 0 46px rgba(112,233,223,.3), inset 0 0 22px rgba(255,255,255,.12); font-size: 2.5rem; }
+.auth-gate-sigil { position: relative; z-index: 2; display: block; width: 92px; height: 92px; padding: 0; border: 1px solid rgba(223, 247, 255, .65); border-radius: 28px; object-fit: cover; background: linear-gradient(135deg, rgba(125,109,255,.55), rgba(55,188,187,.32)); box-shadow: 0 0 46px rgba(112,233,223,.3), inset 0 0 22px rgba(255,255,255,.12); }
 .auth-gate-caption { position: absolute; bottom: 42px; color: rgba(206, 235, 255, .7); font-size: .62rem; letter-spacing: .2em; line-height: 1.7; text-align: center; }
 .auth-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 620px; margin-top: 30px; }
 .auth-choice-button { display: flex; min-height: 88px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; padding: 16px 18px; border: 1px solid rgba(187, 213, 255, .24); border-radius: 16px; color: #f7fbff; text-align: left; }
@@ -394,7 +394,8 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .lobby-hero-radar span { width: 9px; height: 9px; border-radius: 50%; background: #70e9df; box-shadow: 0 0 24px 8px rgba(112,233,223,.7); }
 .lobby-hero-radar i, .lobby-hero-radar b { position: absolute; font-style: normal; }
 .lobby-hero-radar i { width: 88px; height: 1px; background: linear-gradient(90deg, transparent, #70e9df, transparent); transform: rotate(-31deg); }
-.lobby-hero-radar b { color: #f1eaff; font-size: 1.8rem; text-shadow: 0 0 22px rgba(169,155,255,.9); }
+.lobby-hero-radar img { position: relative; z-index: 2; width: 86px; height: 86px; border: 1px solid rgba(224,235,255,.6); border-radius: 25px; object-fit: cover; box-shadow: 0 0 30px rgba(169,155,255,.42); }
+.lobby-hero-radar b { bottom: 25px; color: #f1eaff; font-size: .54rem; letter-spacing: .18em; text-shadow: 0 0 22px rgba(169,155,255,.9); }
 .lobby-heading, .section-heading, .trial-team-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
 .lobby-heading { padding: 8px 2px 0; }
 .lobby-heading h2 { margin-top: 3px; color: #f4f7ff; font-size: 1.15rem; }
@@ -463,6 +464,11 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 }
 
 .trial-arena { background: radial-gradient(circle at 90% 0%, rgba(169,155,255,.12), transparent 34%), linear-gradient(145deg, rgba(17,29,61,.89), rgba(7,14,32,.82)), url("./assets/ui/astral-trial.png") center / cover no-repeat; }
+.trial-stages { max-height: min(760px, calc(100vh - 190px)); overflow-y: auto; padding-right: 3px; }
+.trial-stage-button.final-stage { border-color: rgba(246,199,111,.35); }
+.trial-rule-callout { display: grid; grid-template-columns: auto 1fr; gap: 4px 9px; margin-top: 13px; padding: 10px 12px; border-left: 2px solid rgba(169,155,255,.72); color: #9faed0; background: rgba(169,155,255,.06); font-size: .66rem; line-height: 1.5; }
+.trial-rule-callout strong { color: #d9d2ff; font-size: .65rem; }
+.trial-rule-callout span { min-width: 0; }
 
 /* Every auth-protected section must stay invisible until player-app.js opens it. */
 [hidden] { display: none !important; }

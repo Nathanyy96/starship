@@ -17,9 +17,29 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.equal(typeof battle.won, "boolean");
   assert.ok(battle.logs.length > 0);
   assert.equal(battle.reward.starSand, trialReward.starSand);
+  assert.equal(battle.reward.characterExp, trialReward.characterExp);
+  assert.equal(battle.environment, trialStages[0].environment);
+  assert.equal(battle.enemyTrait, trialStages[0].enemyTrait);
   assert.equal(trialMaxRewards, 10);
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
   assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 765);
+});
+
+test("星界試煉擴充為 20 關並維持逐關升難", () => {
+  assert.equal(trialStages.length, 20);
+  assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 20 }, (_, index) => index + 1));
+  assert.ok(trialStages.every((stage, index) => index === 0 || stage.recommendedPower > trialStages[index - 1].recommendedPower));
+  assert.equal(trialStages[19].finalStage, true);
+  assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
+});
+
+test("四星培養成長幅度高於三星，重複角色留下個人命座晶核", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const four = buildEffectiveStats(characterBattleStats, { characterProgress: { celesia: { level: 20, constellation: 2 } } }).celesia;
+  const three = buildEffectiveStats(characterBattleStats, { characterProgress: { reyn: { level: 20, constellation: 2 } } }).reyn;
+  const fourBase = characterBattleStats.celesia;
+  const threeBase = characterBattleStats.reyn;
+  assert.ok(four.attack / fourBase.attack > three.attack / threeBase.attack);
 });

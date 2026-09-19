@@ -25,7 +25,7 @@
       <div class="auth-gate-visual" aria-hidden="true">
         <div class="auth-gate-orbit orbit-one"></div>
         <div class="auth-gate-orbit orbit-two"></div>
-        <div class="auth-gate-sigil">✦</div>
+        <img class="auth-gate-sigil" src="./assets/ui/game-icon.png" alt="星界之律遊戲圖標">
         <span class="auth-gate-caption">STAR-LAW<br>ARCHIVE</span>
       </div>
       <div class="auth-gate-content">
@@ -55,7 +55,7 @@
           <p>在回覆台之間整理線索，推進文件中的旅程，召集角色並培養已取得的夥伴。</p>
           <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span></div>
         </div>
-        <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><b>✦</b></div>
+        <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
       </div>
       <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>文件資料同步中</span></div>
       <div class="lobby-menu-grid">
@@ -76,7 +76,7 @@
 
     <section id="character-view" class="game-view panel" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
-      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>角色經驗只用於升級，共鳴晶核只用於提升命座，兩者都不會消耗抽卡星砂。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>共鳴晶核 <b id="character-core">0</b></span><span>星痕 <b id="character-star-marks">0</b></span></div></div>
+      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複角色會立即增加命座，並留下該角色專用晶核供後續提升。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>命座晶核總數 <b id="character-core">0</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
       <div id="character-list" class="character-list"></div>
       <section id="character-detail" class="character-detail" hidden></section>
     </section>
@@ -85,7 +85,7 @@
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
       <div class="trial-layout">
         <aside class="trial-stage-rail">
-          <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>最多 4 名角色參戰</strong><small>選好編隊後，戰鬥會依速度與技能自動進行。</small></div>
+          <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>20 關逐關解鎖 · 最多 4 名角色</strong><small>每關有獨立環境與敵方特性；戰鬥依速度、技能冷卻與隊伍協同自動進行。</small></div>
           <div id="trial-stages" class="trial-stages"></div>
         </aside>
         <section class="trial-arena">

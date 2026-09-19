@@ -410,10 +410,11 @@ function runTrial(currentState, body) {
     }
     state.resources.starSand += 100;
     state.resources.tickets += 1;
+    state.resources.characterExp += Number(stage.reward && stage.reward.characterExp || 0);
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true;
   }
-  return { state: new GachaGame({ banners, state }).getState(), battle, reward: battle.won ? { starSand: 100, tickets: 1, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, tickets: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
+  return { state: new GachaGame({ banners, state }).getState(), battle, reward: battle.won ? { starSand: 100, tickets: 1, characterExp: Number(stage.reward && stage.reward.characterExp || 0), attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, tickets: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
 }
 
 function claimCharacterChoice(currentState, body) {

@@ -27,9 +27,13 @@
     development: Object.freeze({
       maxLevel: 80,
       baseCharacterExp: 80,
-      characterExpStep: 45
+      characterExpStep: 45,
+      threeStarBaseCharacterExp: 60,
+      threeStarCharacterExpStep: 30,
+      fourStarBaseCharacterExp: 100,
+      fourStarCharacterExpStep: 55
     }),
-    constellation: Object.freeze({ max: 6, baseResonanceCore: 1, resonanceCoreStep: 1 }),
+    constellation: Object.freeze({ max: 6, characterCoreCost: 1, baseResonanceCore: 1, resonanceCoreStep: 1 }),
     singleCost: 160,
     tenCost: 1600,
     duplicateFourStar: Object.freeze({ starMarks: 1, starSand: 50, resonanceCore: 1 }),
@@ -72,7 +76,12 @@
     assert(Number.isInteger(rules.development.maxLevel) && rules.development.maxLevel > 1, "development.maxLevel 必須是大於 1 的整數");
     assert(Number.isInteger(rules.development.baseCharacterExp) && rules.development.baseCharacterExp >= 0, "development.baseCharacterExp 必須是非負整數");
     assert(Number.isInteger(rules.development.characterExpStep) && rules.development.characterExpStep >= 0, "development.characterExpStep 必須是非負整數");
+    assert(Number.isInteger(rules.development.threeStarBaseCharacterExp) && rules.development.threeStarBaseCharacterExp >= 0, "development.threeStarBaseCharacterExp 必須是非負整數");
+    assert(Number.isInteger(rules.development.threeStarCharacterExpStep) && rules.development.threeStarCharacterExpStep >= 0, "development.threeStarCharacterExpStep 必須是非負整數");
+    assert(Number.isInteger(rules.development.fourStarBaseCharacterExp) && rules.development.fourStarBaseCharacterExp >= 0, "development.fourStarBaseCharacterExp 必須是非負整數");
+    assert(Number.isInteger(rules.development.fourStarCharacterExpStep) && rules.development.fourStarCharacterExpStep >= 0, "development.fourStarCharacterExpStep 必須是非負整數");
     assert(Number.isInteger(rules.constellation.max) && rules.constellation.max > 0, "constellation.max 必須是正整數");
+    assert(Number.isInteger(rules.constellation.characterCoreCost) && rules.constellation.characterCoreCost > 0, "constellation.characterCoreCost 必須是正整數");
     assert(Number.isInteger(rules.constellation.baseResonanceCore) && rules.constellation.baseResonanceCore >= 0, "constellation.baseResonanceCore 必須是非負整數");
     assert(Number.isInteger(rules.constellation.resonanceCoreStep) && rules.constellation.resonanceCoreStep >= 0, "constellation.resonanceCoreStep 必須是非負整數");
     assert(Number.isInteger(rules.singleCost) && rules.singleCost >= 0, "singleCost 必須是非負整數");
@@ -207,6 +216,26 @@
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
     state.characterProgress = isPlainObject(source.characterProgress) ? source.characterProgress : {};
+    Object.keys(state.characterProgress).forEach(function (id) {
+      var progress = isPlainObject(state.characterProgress[id]) ? state.characterProgress[id] : {};
+      progress.level = Number.isInteger(progress.level) && progress.level >= 1 ? progress.level : 1;
+      progress.affinity = Number.isInteger(progress.affinity) && progress.affinity >= 0 ? progress.affinity : 0;
+      progress.constellation = Number.isInteger(progress.constellation) && progress.constellation >= 0 ? progress.constellation : 0;
+      progress.constellationCore = Number.isInteger(progress.constellationCore) && progress.constellationCore >= 0 ? progress.constellationCore : 0;
+      // 舊版曾把重複角色直接寫成命座；依持有數量補回尚未使用的個人晶核，
+      // 讓像「莉亞持有 5 次」的舊帳號也能繼續提升，不會卡在只能按一次。
+      var copies = Number(state.collection[id] || 0);
+      var earnedByCopies = Math.max(0, copies - 1);
+      var constellationFromCopies = Math.min(6, earnedByCopies);
+      progress.constellation = Math.max(progress.constellation, constellationFromCopies);
+      progress.constellationCore = Math.max(progress.constellationCore, earnedByCopies);
+      state.characterProgress[id] = progress;
+    });
+    Object.keys(state.collection).forEach(function (id) {
+      if (state.characterProgress[id]) return;
+      var copies = Math.max(0, Number(state.collection[id]) || 0);
+      state.characterProgress[id] = { level: 1, affinity: 0, constellation: Math.min(6, Math.max(0, copies - 1)), constellationCore: Math.max(0, copies - 1) };
+    });
     state.recruitment = Object.assign(initialState().recruitment, isPlainObject(source.recruitment) ? source.recruitment : {});
     state.storyProgress = Object.assign(initialState().storyProgress, isPlainObject(source.storyProgress) ? source.storyProgress : {});
     state.storyProgress.completedScenes = isPlainObject(state.storyProgress.completedScenes) ? state.storyProgress.completedScenes : {};
@@ -266,7 +295,7 @@
   }
 
   function makeEmptyReward() {
-    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, resonanceCore: 0 };
+    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, resonanceCore: 0, constellationCore: 0 };
   }
 
   /**
@@ -309,18 +338,23 @@
     var card = this.cardById[cardId];
     assert(card, "找不到角色：" + cardId);
     var saved = isPlainObject(this.state.characterProgress[cardId]) ? this.state.characterProgress[cardId] : {};
-    return Object.assign({ level: 1, affinity: 0, constellation: 0 }, saved);
+    return Object.assign({ level: 1, affinity: 0, constellation: 0, constellationCore: 0 }, saved);
   };
 
   GachaGame.prototype._grantCardCopy = function (card) {
     var previousCopies = this.state.collection[card.id] || 0;
     this.state.collection[card.id] = previousCopies + 1;
     var progress = this.getCharacterProgress(card.id);
+    var constellationCoreGranted = 0;
     if (previousCopies > 0) {
+      // 重複角色立即提升 1 命，並留下 1 枚該角色專用晶核；
+      // 專用晶核可在角色培養頁繼續突破，絕不與其他角色共用。
       progress.constellation = Math.min(this.rules.constellation.max, Math.max(0, Number(progress.constellation) || 0) + 1);
+      progress.constellationCore = Math.max(0, Number(progress.constellationCore) || 0) + 1;
+      constellationCoreGranted = 1;
     }
     this.state.characterProgress[card.id] = progress;
-    return { previousCopies: previousCopies, progress: progress };
+    return { previousCopies: previousCopies, progress: progress, constellationCoreGranted: constellationCoreGranted };
   };
 
   GachaGame.prototype.grantCharacter = function (cardId) {
@@ -338,8 +372,9 @@
     var progress = this.getCharacterProgress(card.id);
     var level = Number.isInteger(progress.level) && progress.level >= 1 ? progress.level : 1;
     assert(level < this.rules.development.maxLevel, "角色已達目前最高等級");
+    var isFourStar = card.rarity === 4;
     var cost = {
-      characterExp: this.rules.development.baseCharacterExp + (level - 1) * this.rules.development.characterExpStep
+      characterExp: (isFourStar ? this.rules.development.fourStarBaseCharacterExp : this.rules.development.threeStarBaseCharacterExp) + (level - 1) * (isFourStar ? this.rules.development.fourStarCharacterExpStep : this.rules.development.threeStarCharacterExpStep)
     };
     assert(this.state.resources.characterExp >= cost.characterExp, "角色經驗不足，需要 " + cost.characterExp);
     this.state.resources.characterExp -= cost.characterExp;
@@ -357,9 +392,10 @@
     var progress = this.getCharacterProgress(card.id);
     var constellation = Math.max(0, Number(progress.constellation) || 0);
     assert(constellation < this.rules.constellation.max, "角色命座已達目前最高階");
-    var cost = { resonanceCore: this.rules.constellation.baseResonanceCore + constellation * this.rules.constellation.resonanceCoreStep };
-    assert(this.state.resources.resonanceCore >= cost.resonanceCore, "共鳴晶核不足，需要 " + cost.resonanceCore);
-    this.state.resources.resonanceCore -= cost.resonanceCore;
+    var cost = { constellationCore: this.rules.constellation.characterCoreCost };
+    var availableCores = Math.max(0, Number(progress.constellationCore) || 0);
+    assert(availableCores >= cost.constellationCore, "該角色的命座晶核不足，需要 " + cost.constellationCore + " 枚；請先取得重複角色");
+    progress.constellationCore = availableCores - cost.constellationCore;
     progress.constellation = constellation + 1;
     progress.affinity = Math.min(100, (Number(progress.affinity) || 0) + 3);
     this.state.characterProgress[card.id] = progress;
@@ -456,17 +492,16 @@
     this.state.totalPulls += 1;
     var previousCopies = card ? (this.state.collection[card.id] || 0) : 0;
     var isFirstAcquisition = Boolean(card) && previousCopies === 0;
-    if (card) {
-      this._grantCardCopy(card);
-    }
+    var copy = card ? this._grantCardCopy(card) : null;
     var duplicateReward = makeEmptyReward();
 
     if (card && !isFirstAcquisition && card.rarity === 4) {
       duplicateReward.starMarks = this.rules.duplicateFourStar.starMarks;
       duplicateReward.starSand = this.rules.duplicateFourStar.starSand;
-      duplicateReward.resonanceCore = this.rules.duplicateFourStar.resonanceCore;
+      duplicateReward.constellationCore = copy ? copy.constellationCoreGranted : 0;
     } else if (card && !isFirstAcquisition && card.rarity === 3) {
       duplicateReward.characterExp = this.rules.duplicateThreeStar.characterExp;
+      duplicateReward.constellationCore = copy ? copy.constellationCoreGranted : 0;
     }
 
     // 只有「出了 4★ 但歪到其他 4★」才發放補償，避免普通未出金時變成無限資源。
@@ -478,7 +513,8 @@
     this.state.resources.starMarks += duplicateReward.starMarks + resourceReward.starMarks;
     this.state.resources.echoPowder += duplicateReward.echoPowder + resourceReward.echoPowder;
     this.state.resources.characterExp += duplicateReward.characterExp + resourceReward.characterExp;
-    this.state.resources.resonanceCore += duplicateReward.resonanceCore + resourceReward.resonanceCore;
+    // resonanceCore 保留給舊存檔與管理端相容；角色命座只消耗各角色自己的 constellationCore。
+    this.state.resources.resonanceCore += resourceReward.resonanceCore;
 
     return {
       card: card ? clone(card) : null,
