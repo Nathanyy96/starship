@@ -37,6 +37,22 @@ test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
 
+test("星海迷航終幕提供可讀的推薦戰力並降低不必要的爆發傷害", () => {
+  const finalStage = trialStages.find((stage) => stage.id === 30);
+  assert.equal(finalStage.recommendedPower, 12800);
+  assert.match(finalStage.recommendedPowerNote, /12,800/);
+  assert.equal(finalStage.modifiers.enemyAttack, 1.08);
+  assert.ok(finalStage.enemies.every((enemy) => enemy.attack <= 560));
+  const battle = simulateBattle({
+    team: ["celesia", "harlow", "lia", "reyn"],
+    stats: characterBattleStats,
+    stage: finalStage,
+    rng: () => 0.5
+  });
+  assert.equal(battle.recommendedPower, 12800);
+  assert.equal(battle.powerRatio, 0.13);
+});
+
 test("試煉 21–30 使用北境神話篇原創敵群與獨立敵人圖像標記", () => {
   const mythicStages = trialStages.filter((stage) => stage.id >= 21);
   assert.equal(mythicStages.length, 10);

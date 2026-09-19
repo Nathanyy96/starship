@@ -224,7 +224,7 @@
     { id: 27, name: "潮眼修復井", region: "潮眼外圍", recommendedPower: 11100, environment: "潮眼脈動", environmentEffect: "敵方護盾會依生命比例重建，爆發與持續傷害都要安排", modifiers: { enemyDefense: 1.14, enemyAttack: 1.12, healing: 0.88 }, enemyTrait: "護盾回潮", enemyTraitEffect: "首領每四回合重建護盾，打斷技能可以延後回潮", trialRule: "shield", enemies: [{ name: "世界根鎧獸", mythicClass: "world-root", maxHp: 12600, attack: 610, defense: 475, speed: 110, count: 2 }, { name: "根脈修復核", mythicClass: "world-root", maxHp: 15400, attack: 540, defense: 530, speed: 72, count: 1 }], reward: trialReward },
     { id: 28, name: "第二條律試讀室", region: "星界終端二層", recommendedPower: 11900, environment: "試讀規則場", environmentEffect: "隊伍第一次倒下不會立刻出局，但會留下永久減益", modifiers: { teamAttack: 1.08, enemyAttack: 1.16, enemyDefense: 1.12 }, enemyTrait: "規則覆寫", enemyTraitEffect: "首領會在血量低於一半時改寫一條環境規則", trialRule: "copy", enemies: [{ name: "霜火規則獸", mythicClass: "fire-giant", maxHp: 13600, attack: 640, defense: 500, speed: 132, count: 2 }, { name: "霜火試讀王座", mythicClass: "fire-giant", maxHp: 16800, attack: 575, defense: 560, speed: 80, count: 1 }], reward: trialReward },
     { id: 29, name: "新曙港邊界", region: "新曙港", recommendedPower: 12750, environment: "新曙潮線", environmentEffect: "所有角色技能效果提高，但敵方會隨回合增加攻擊", modifiers: { teamAttack: 1.1, teamSpeed: 1.04, enemyAttack: 1.18, enemyDefense: 1.14 }, enemyTrait: "曙潮增壓", enemyTraitEffect: "敵方每回合獲得增傷，必須在有限回合內完成突破", trialRule: "decay", enemies: [{ name: "長冬崩解體", mythicClass: "frost-wolf", maxHp: 14800, attack: 670, defense: 530, speed: 150, count: 2 }, { name: "長冬邊界核", mythicClass: "world-root", maxHp: 18200, attack: 600, defense: 590, speed: 92, count: 1 }], reward: trialReward },
-    { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 13700, environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.22, enemyDefense: 1.18 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態，錯誤的爆發時機會使全隊陷入反擊", trialRule: "finale", finalStage: true, enemies: [{ name: "末冬護衛", mythicClass: "rainbow-warden", maxHp: 16400, attack: 700, defense: 575, speed: 174, count: 2 }, { name: "新律王座", mythicClass: "fire-giant", maxHp: 22000, attack: 730, defense: 640, speed: 104, count: 1 }], reward: trialReward }
+    { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 12800, recommendedPowerNote: "建議隊伍戰力約 12,800；低於此值仍可能靠治療、重裝與破防協同通關，但失誤容忍度會明顯降低。", environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.08, enemyDefense: 1.12 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態，錯誤的爆發時機會使全隊陷入反擊；傷害經過下修，血量仍保留終局耐久。", trialRule: "finale", finalStage: true, enemies: [{ name: "末冬護衛", mythicClass: "rainbow-warden", maxHp: 12500, attack: 520, defense: 500, speed: 164, count: 2 }, { name: "新律王座", mythicClass: "fire-giant", maxHp: 18000, attack: 560, defense: 585, speed: 100, count: 1 }], reward: trialReward }
   ];
 
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
@@ -350,24 +350,40 @@
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
-  var petVersion = "2.0-2.5";
+  var petVersion = "2.1-companion-workshop";
   var petDefinitions = [
     { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
     { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
     { id: "wind-bird", name: "風鈴雀", temperament: "敏捷", icon: "◇", accent: "#86b8ff", maxLevel: 30, description: "會把風向變成旋律，喜歡停在航路標記的最高處。" },
-    { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" }
+    { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" },
+    { id: "aurora-fawn", name: "極光幼鹿", temperament: "溫柔", icon: "♢", accent: "#8ee6c7", maxLevel: 30, description: "鹿角會收集夜空的微光，靠近時會讓工坊的星塵變得柔和。" },
+    { id: "rune-drake", name: "符文幼龍", temperament: "頑皮", icon: "✧", accent: "#ff9a94", maxLevel: 30, description: "喜歡把古老符文當作玩具，偶爾會用一聲噴嚏點亮整面牆。" },
+    { id: "cloud-whale", name: "雲潮鯨", temperament: "悠閒", icon: "≈", accent: "#79c9ff", maxLevel: 30, description: "在雲海裡慢慢游動，會把玩家的好心情變成一圈圈潮光。" }
   ];
   var petOutfits = [
     { id: "default", name: "原野本色", description: "保留寵物的自然外觀。", accent: "#9e92ff" },
     { id: "moon-scarf", name: "月紗圍巾", description: "一條會在移動時留下月光的圍巾。", accent: "#91b9e8" },
     { id: "tide-cape", name: "潮泡披肩", description: "由不會破裂的潮泡織成。", accent: "#71d8dc" },
-    { id: "archive-crown", name: "檔案小冠", description: "星海迷航特殊結局可使用的紀念裝扮。", accent: "#d06cff" }
+    { id: "archive-crown", name: "檔案小冠", description: "星海迷航特殊結局可使用的紀念裝扮。", accent: "#d06cff" },
+    { id: "aurora-hood", name: "極光兜帽", description: "把極光縫進帽沿，走動時會留下淡淡的綠藍光。", accent: "#7de4cf" },
+    { id: "star-goggles", name: "星鏡護目", description: "能把遠方星塵放大成一整片閃爍的星河。", accent: "#a58dff" },
+    { id: "sail-pack", name: "浮帆背包", description: "收起來像小背包，展開後能讓寵物輕輕滑過氣流。", accent: "#f3c56d" },
+    { id: "rune-horns", name: "符文角飾", description: "以柔光符文打造的角飾，適合喜歡惡作劇的星伴。", accent: "#ff9a94" }
   ];
   var petEffects = [
     { id: "starlit", name: "星屑環", description: "出場時散落小型星屑。", icon: "✦", color: "#f4c66b" },
     { id: "aurora", name: "極光帶", description: "移動時留下淡淡的極光尾跡。", icon: "〰", color: "#71d8dc" },
     { id: "bubbles", name: "泡泡訊號", description: "互動時冒出三枚透明泡泡。", icon: "○", color: "#86b8ff" },
-    { id: "paper-stars", name: "紙星回覆", description: "評分展示時飄出紙製星星。", icon: "✧", color: "#d06cff" }
+    { id: "paper-stars", name: "紙星回覆", description: "評分展示時飄出紙製星星。", icon: "✧", color: "#d06cff" },
+    { id: "fireflies", name: "螢光微星", description: "互動時會有小螢光繞著寵物排成星座。", icon: "✺", color: "#f0d47a" },
+    { id: "runes", name: "符文浮印", description: "每次完成訓練都會留下短暫的符文印記。", icon: "◇", color: "#d19cff" },
+    { id: "snowfall", name: "霜晶細雪", description: "展示時降下不會融化的細小霜晶。", icon: "❄", color: "#a7dcff" },
+    { id: "tide-prism", name: "潮光棱彩", description: "把泡泡折射成彩色潮光，適合公開展示。", icon: "◌", color: "#6fe6e0" }
+  ];
+  var petChallenges = [
+    { id: "starlight-run", name: "星光追逐", description: "在工坊軌道追上三顆逃跑的星屑。", cost: "petToys", costAmount: 1, reward: { petExp: 90, bond: 2, mood: 4, petFood: 2 } },
+    { id: "tide-treasure", name: "潮汐尋寶", description: "沿著潮泡聲找回被藏起來的小型檔案。", cost: "petFood", costAmount: 1, reward: { petExp: 80, bond: 3, mood: 2, petTokens: 1 } },
+    { id: "northern-riddle", name: "北境符文謎題", description: "解開一段陌生的北境符文，換取短暫的共鳴。", cost: "petTokens", costAmount: 1, reward: { petExp: 110, bond: 1, mood: 1, petToys: 2 } }
   ];
 
   // 天賦先作為後續版本的低幅度資料預留，不在 2.0–2.5 玩家頁開放。
@@ -1120,6 +1136,7 @@
      petDefinitions: petDefinitions,
      petOutfits: petOutfits,
      petEffects: petEffects,
+     petChallenges: petChallenges,
      talentVersion: talentVersion,
      talentRules: talentRules,
      talentDefinitions: talentDefinitions,

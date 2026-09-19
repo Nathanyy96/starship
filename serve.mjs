@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -23,7 +23,7 @@ const updateReward = Object.freeze({ starSand: 3200 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
 function createGame(state) {
-  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, petDefinitions, petOutfits, petEffects });
+  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, petDefinitions, petOutfits, petEffects, petChallenges });
 }
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -34,7 +34,8 @@ const mime = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
-  ".webp": "image/webp"
+  ".webp": "image/webp",
+  ".mp4": "video/mp4"
 };
 
 fs.mkdirSync(dataDirectory, { recursive: true });
@@ -154,10 +155,15 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
   Object.entries(oldPets).forEach(([petId, oldPet]) => {
     const nextPet = nextPets[petId];
     if (oldPet && oldPet.owned && !(nextPet && nextPet.owned)) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物不可被移除");
-    ["level", "exp", "bond"].forEach((field) => {
+    const oldLevel = Math.max(1, Number(oldPet && oldPet.level) || 1);
+    const nextLevel = Math.max(1, Number(nextPet && nextPet.level) || 1);
+    if (oldLevel > nextLevel) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物等級不可被降低");
+    ["exp", "bond"].forEach((field) => {
       const oldValue = Math.max(0, Number(oldPet && oldPet[field]) || 0);
       const nextValue = Math.max(0, Number(nextPet && nextPet[field]) || 0);
-      if (oldValue > nextValue) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物培育進度不可被降低");
+      // 升級會正常消耗當級經驗；只要等級確實上升，exp 歸零不算資料回溯。
+      const consumedForLevelUp = field === "exp" && nextLevel > oldLevel;
+      if (oldValue > nextValue && !consumedForLevelUp) throw new Error("更新保護中止：玩家 " + playerKey + " 的寵物培育進度不可被降低");
     });
   });
   const oldSkins = previousState.cosmetics && previousState.cosmetics.skins && typeof previousState.cosmetics.skins === "object" ? previousState.cosmetics.skins : {};
@@ -360,6 +366,7 @@ function ensurePlayerMilestones(currentState) {
   if (state.petProgress.version !== petVersion) {
     state.petProgress.version = petVersion;
     state.petProgress.exploreCount = 0;
+    state.petProgress.daily = { date: null, groomed: false, challengeCount: 0 };
     state.petProgress.ratedShowcases = {};
     state.petProgress.showcase = state.petProgress.showcase || {};
     state.petProgress.showcase.ratedBy = {};
@@ -720,7 +727,7 @@ function petAction(currentState, body) {
       isPublic: action === "publish" ? body.isPublic === true : body.isPublic
     });
   } else {
-    result = game.petAction({ action, petId: body.petId, focus: body.focus });
+    result = game.petAction({ action, petId: body.petId, focus: body.focus, challengeId: body.challengeId });
   }
   return result;
 }

@@ -323,6 +323,8 @@
       enemyTrait: stage.enemyTrait || "一般",
       rounds: round,
       teamPower: teamPower(teamIds, stats),
+      recommendedPower: Number(stage.recommendedPower || 0),
+      powerRatio: stage.recommendedPower ? Math.round(teamPower(teamIds, stats) / Number(stage.recommendedPower) * 100) / 100 : null,
       synergy: synergy,
       luck: luck,
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp, skillUses: unit.skillUses }; }),

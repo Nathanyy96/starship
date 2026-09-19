@@ -247,7 +247,7 @@
         skins: {}
       },
       petProgress: {
-        version: "2.0-2.5",
+        version: "2.1-companion-workshop",
         selectedPetId: "star-fox",
         selectedOutfitId: "default",
         selectedEffectId: "starlit",
@@ -256,6 +256,7 @@
         },
         resources: { petFood: 6, petToys: 3, petTokens: 3, showcaseToken: 0 },
         exploreCount: 0,
+        daily: { date: null, groomed: false, challengeCount: 0 },
         showcase: { isPublic: false, featuredPetId: "star-fox", outfitId: "default", effectId: "starlit", ratingTotal: 0, ratingCount: 0, ratedBy: {} },
         ratedShowcases: {},
         lastAction: null
@@ -357,7 +358,7 @@
     state.cosmetics = Object.assign(initialState().cosmetics, isPlainObject(source.cosmetics) ? source.cosmetics : {});
     state.cosmetics.skins = isPlainObject(state.cosmetics.skins) ? state.cosmetics.skins : {};
     state.petProgress = Object.assign(initialState().petProgress, isPlainObject(source.petProgress) ? source.petProgress : {});
-    state.petProgress.version = typeof state.petProgress.version === "string" && state.petProgress.version ? state.petProgress.version : "2.0-2.5";
+    state.petProgress.version = typeof state.petProgress.version === "string" && state.petProgress.version ? state.petProgress.version : "2.1-companion-workshop";
     state.petProgress.selectedPetId = typeof state.petProgress.selectedPetId === "string" ? state.petProgress.selectedPetId : "star-fox";
     state.petProgress.selectedOutfitId = typeof state.petProgress.selectedOutfitId === "string" ? state.petProgress.selectedOutfitId : "default";
     state.petProgress.selectedEffectId = typeof state.petProgress.selectedEffectId === "string" ? state.petProgress.selectedEffectId : "starlit";
@@ -377,6 +378,10 @@
     state.petProgress.resources = Object.assign(initialState().petProgress.resources, isPlainObject(state.petProgress.resources) ? state.petProgress.resources : {});
     ["petFood", "petToys", "petTokens", "showcaseToken"].forEach(function (key) { state.petProgress.resources[key] = Number.isInteger(state.petProgress.resources[key]) && state.petProgress.resources[key] >= 0 ? state.petProgress.resources[key] : 0; });
     state.petProgress.exploreCount = Number.isInteger(state.petProgress.exploreCount) && state.petProgress.exploreCount >= 0 ? state.petProgress.exploreCount : 0;
+    state.petProgress.daily = Object.assign(initialState().petProgress.daily, isPlainObject(state.petProgress.daily) ? state.petProgress.daily : {});
+    state.petProgress.daily.date = typeof state.petProgress.daily.date === "string" ? state.petProgress.daily.date : null;
+    state.petProgress.daily.groomed = state.petProgress.daily.groomed === true;
+    state.petProgress.daily.challengeCount = Number.isInteger(state.petProgress.daily.challengeCount) && state.petProgress.daily.challengeCount >= 0 ? Math.min(3, state.petProgress.daily.challengeCount) : 0;
     state.petProgress.showcase = Object.assign(initialState().petProgress.showcase, isPlainObject(state.petProgress.showcase) ? state.petProgress.showcase : {});
     state.petProgress.showcase.isPublic = state.petProgress.showcase.isPublic === true;
     state.petProgress.showcase.featuredPetId = typeof state.petProgress.showcase.featuredPetId === "string" ? state.petProgress.showcase.featuredPetId : state.petProgress.selectedPetId;
@@ -461,6 +466,7 @@
     this.petDefinitions = Array.isArray(options.petDefinitions) ? options.petDefinitions : [];
     this.petOutfits = Array.isArray(options.petOutfits) ? options.petOutfits : [];
     this.petEffects = Array.isArray(options.petEffects) ? options.petEffects : [];
+    this.petChallenges = Array.isArray(options.petChallenges) ? options.petChallenges : [];
     this.banners = (options.banners || []).map(normalizeBanner);
     assert(this.banners.length > 0, "至少要註冊一個卡池");
     this.bannerById = {};
@@ -961,6 +967,17 @@
     return { state: this.getState(), showcase: clone(progress.showcase) };
   };
 
+  function refreshPetDaily(progress, now) {
+    var date = new Date(now || Date.now());
+    var dateKey = Number.isNaN(date.getTime()) ? new Date().toISOString().slice(0, 10) : date.toISOString().slice(0, 10);
+    if (!isPlainObject(progress.daily) || progress.daily.date !== dateKey) {
+      progress.daily = { date: dateKey, groomed: false, challengeCount: 0 };
+    }
+    progress.daily.groomed = progress.daily.groomed === true;
+    progress.daily.challengeCount = Number.isInteger(progress.daily.challengeCount) && progress.daily.challengeCount >= 0 ? Math.min(3, progress.daily.challengeCount) : 0;
+    return progress.daily;
+  }
+
   GachaGame.prototype.petAction = function (options) {
     options = options || {};
     var action = String(options.action || "");
@@ -968,6 +985,7 @@
     var petId = String(options.petId || progress.selectedPetId || "star-fox");
     var definition = this.getPetDefinition(petId);
     var resources = progress.resources;
+    var daily = refreshPetDaily(progress, this.now());
     var reward = { petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, petExp: 0 };
     if (action === "adopt") {
       assert(!progress.pets[petId] || !progress.pets[petId].owned, "這隻寵物已經在你的工坊");
@@ -995,6 +1013,32 @@
         reward.petExp = 65; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 1); pet.mood = Math.max(0, pet.mood - 2);
         var focus = ["care", "play", "focus"].indexOf(options.focus) >= 0 ? options.focus : "focus";
         pet.training[focus] += 1;
+      } else if (action === "groom") {
+        assert(!daily.groomed, "今天已完成梳理，明天再來陪伴吧");
+        daily.groomed = true;
+        reward.petExp = 75; pet.exp += reward.petExp; pet.bond = Math.min(100, pet.bond + 2); pet.mood = Math.min(100, pet.mood + 10); reward.petFood = 1;
+        resources.petFood += reward.petFood;
+      } else if (action === "challenge") {
+        var challenge = this.petChallenges.find(function (item) { return item && item.id === String(options.challengeId || ""); });
+        assert(challenge, "找不到星伴挑戰");
+        assert(daily.challengeCount < 3, "今天的星伴挑戰已完成 3 次，明天再來");
+        var costKey = String(challenge.cost || "");
+        var costAmount = Math.max(1, Number(challenge.costAmount || 1));
+        assert(Object.prototype.hasOwnProperty.call(resources, costKey) && Number(resources[costKey] || 0) >= costAmount, "星伴挑戰所需的資源不足");
+        resources[costKey] -= costAmount;
+        daily.challengeCount += 1;
+        var challengeReward = isPlainObject(challenge.reward) ? challenge.reward : {};
+        reward.petExp = Math.max(0, Number(challengeReward.petExp || 0));
+        pet.exp += reward.petExp;
+        pet.bond = Math.min(100, pet.bond + Math.max(0, Number(challengeReward.bond || 0)));
+        pet.mood = Math.min(100, Math.max(0, pet.mood + Number(challengeReward.mood || 0)));
+        ["petFood", "petToys", "petTokens", "showcaseToken"].forEach(function (key) {
+          var amount = Math.max(0, Number(challengeReward[key] || 0));
+          if (!amount) return;
+          reward[key] = amount;
+          resources[key] += amount;
+        });
+        reward.challengeName = challenge.name;
       } else if (action === "explore") {
         assert(progress.exploreCount < 3, "本期寵物探索已完成 3 次，等待下次版本更新");
         progress.exploreCount += 1;

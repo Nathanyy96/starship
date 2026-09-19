@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=battle-visuals-summer-2">
+  <link rel="stylesheet" href="./styles.css?v=character-animations-1">
 </head>
 <body>
   <main class="page-shell">
@@ -200,7 +200,7 @@
 
     <section id="pet-view" class="game-view panel pet-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-COMPANION WORKSHOP</p><h2>星伴培育</h2></div><span id="pet-view-status">獨立寵物資料</span></div>
-      <div class="pet-intro"><div><strong>這裡的寵物不會影響主線與角色養成</strong><p>寵物有自己的食物、玩具、星伴代幣、等級、心情與親密度。你可以只自己收藏，也可以公開作品讓其他玩家參觀與評分。</p></div><div class="pet-resource-row"><span>飼料 <b id="pet-food">0</b></span><span>玩具 <b id="pet-toys">0</b></span><span>星伴代幣 <b id="pet-tokens">0</b></span><span>展示小獎勵 <b id="pet-showcase-reward">0</b></span></div></div>
+      <div class="pet-intro"><div><strong>這裡的寵物不會影響主線與角色養成</strong><p>寵物有自己的食物、玩具、星伴代幣、等級、心情與親密度。你可以只自己收藏，也可以公開作品讓其他玩家參觀與評分。</p><div class="pet-protection-note"><strong>更新保護已修正</strong><span>先前升級會消耗當級經驗，舊保護機制把「升級後經驗歸零」誤判成資料倒退，所以顯示無法繼續升級。現在只會阻擋真正的寵物刪除、等級回退或親密度回退；正常升級與消耗經驗會正常保存。</span></div></div><div class="pet-resource-row"><span>飼料 <b id="pet-food">0</b></span><span>玩具 <b id="pet-toys">0</b></span><span>星伴代幣 <b id="pet-tokens">0</b></span><span>展示小獎勵 <b id="pet-showcase-reward">0</b></span></div></div>
       <div class="pet-layout"><section class="pet-workbench"><div id="pet-selected-card" class="pet-selected-card"></div><div class="pet-customization-panel"><div class="pet-panel-heading"><div><p class="eyebrow">CUSTOMIZATION</p><h3>外觀與特效</h3></div><label class="pet-public-toggle"><input id="pet-public-toggle" type="checkbox"><span>公開我的寵物</span></label></div><div id="pet-outfit-list" class="pet-option-list"></div><div id="pet-effect-list" class="pet-option-list"></div><button id="save-pet-showcase" class="primary-action" type="button">儲存展示設定</button><p class="pet-privacy-note">關閉公開後，其他玩家將看不到你的展示，也不會影響你自己的寵物進度。</p></div></section><aside class="pet-catalog"><div class="pet-panel-heading"><div><p class="eyebrow">PET CATALOG</p><h3>我的星伴</h3></div><span id="pet-catalog-count">0 / 4</span></div><div id="pet-catalog-list" class="pet-catalog-list"></div><div class="pet-showcase-heading"><div><p class="eyebrow">COMMUNITY SHOWCASE</p><h3>其他玩家的寵物</h3></div><button id="refresh-pet-showcase" class="small-button" type="button">重新整理</button></div><div id="pet-showcase-list" class="pet-showcase-list"></div></aside></div><div id="pet-action-message" class="message" role="status"></div>
     </section>
 
@@ -279,10 +279,10 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=battle-visuals-summer-2"></script>
-  <script src="./src/story-source.js?v=battle-visuals-summer-2"></script>
-  <script src="./src/data.js?v=battle-visuals-summer-2"></script>
-  <script src="./src/battle.js?v=battle-visuals-summer-2"></script>
-  <script src="./src/player-app.js?v=battle-visuals-summer-2"></script>
+  <script src="./src/gacha.js?v=character-animations-1"></script>
+  <script src="./src/story-source.js?v=character-animations-1"></script>
+  <script src="./src/data.js?v=character-animations-1"></script>
+  <script src="./src/battle.js?v=character-animations-1"></script>
+  <script src="./src/player-app.js?v=character-animations-1"></script>
 </body>
 </html>

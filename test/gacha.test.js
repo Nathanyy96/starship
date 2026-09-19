@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -31,6 +31,14 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(version3Cards.some((card) => card.id === "cenya" && card.rarity === 3), true);
   assert.equal(version4Cards.every((card) => card.portraitImage), true);
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
+});
+
+test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
+  const animationIds = Object.keys(characterAnimations);
+  assert.equal(animationIds.length, 14);
+  assert.equal(characterAnimations.celesia.src, "./video/astralyn-1.0-1.5/celesia_5s.mp4");
+  assert.equal(characterAnimations.mave.durationSeconds, 5);
+  assert.equal(animationIds.every((id) => activeCards.some((card) => card.id === id)), true);
 });
 
 test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {
@@ -110,8 +118,11 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.seasonSkins[2].id, "skin-harlow-summer-beach-party");
   assert.equal(voyageConfig.seasonSkins[2].characterId, "harlow");
   assert.equal(voyageConfig.seasonSkins[2].rarity, 4);
-  assert.equal(petDefinitions.length, 4);
-  assert.ok(petOutfits.length >= 3 && petEffects.length >= 3);
+  assert.equal(petDefinitions.length, 7);
+  assert.ok(petDefinitions.some((pet) => pet.id === "rune-drake" && pet.description.length > 20));
+  assert.ok(petOutfits.length >= 8 && petEffects.length >= 8);
+  assert.equal(petChallenges.length, 3);
+  assert.deepEqual(petChallenges.map((challenge) => challenge.cost), ["petToys", "petFood", "petTokens"]);
   assert.equal(talentRules.maxLevel, 5);
   assert.equal(talentRules.totalBonusCap, 0.10);
   assert.equal(talentDefinitions.celesia.length, 3);
@@ -120,6 +131,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
     petDefinitions,
     petOutfits,
     petEffects,
+    petChallenges,
     state: state({ resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 }, collection: { celesia: 1, reyn: 1 } })
   });
   const start = gacha.startVoyage({ routeId: "route-echo", team: ["celesia", "reyn"] });
@@ -129,6 +141,13 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   const pet = gacha.petAction({ action: "feed", petId: "star-fox" });
   assert.equal(pet.state.resources.characterExp, 100000);
   assert.equal(pet.state.petProgress.resources.petFood, 5);
+  const leveled = gacha.petAction({ action: "play", petId: "star-fox" });
+  const trained = gacha.petAction({ action: "train", petId: "star-fox", focus: "care" });
+  assert.equal(trained.reward.levelUps, 1);
+  assert.equal(trained.pet.level, 2);
+  const challenge = gacha.petAction({ action: "challenge", petId: "star-fox", challengeId: "starlight-run" });
+  assert.equal(challenge.reward.challengeName, "星光追逐");
+  assert.equal(challenge.state.petProgress.daily.challengeCount, 1);
 });
 
 test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
