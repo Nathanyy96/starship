@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">裂痕獵犬</title><desc id="desc">藍色高速獵犬敵人圖鑑</desc>
+  <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#7bc8ff"/><stop offset="1" stop-color="#243c83"/></linearGradient></defs>
+  <path d="M39 171 57 96l42-42 22 22 22-22 42 42 18 75-35 52H74Z" fill="url(#g)" stroke="#bde9ff" stroke-width="5"/>
+  <path d="M99 54 66 22l7 57M141 54l33-32-7 57" fill="#2b4e9d" stroke="#8ed8ff" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m68 145-30 14M172 145l30 14" stroke="#89dbff" stroke-width="7" stroke-linecap="round"/>
+  <ellipse cx="91" cy="135" rx="10" ry="13" fill="#fff"/><ellipse cx="149" cy="135" rx="10" ry="13" fill="#fff"/><circle cx="91" cy="136" r="4" fill="#112657"/><circle cx="149" cy="136" r="4" fill="#112657"/>
+  <path d="M91 179c17 10 41 10 58 0" fill="none" stroke="#bff2ff" stroke-width="5" stroke-linecap="round"/><path d="M93 212 73 252M147 212l20 40" stroke="#304b99" stroke-width="14" stroke-linecap="round"/>
+</svg>

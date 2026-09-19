@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">潮蝕寄生體</title><desc id="desc">青綠潮蝕寄生體敵人圖鑑</desc>
+  <defs><radialGradient id="g"><stop stop-color="#b8fff0"/><stop offset=".45" stop-color="#35baa9"/><stop offset="1" stop-color="#164b68"/></radialGradient></defs>
+  <path d="M120 38c-38 0-63 39-54 76-29 11-33 53-4 68 6 37 36 51 58 34 22 17 52 3 58-34 29-15 25-57-4-68 9-37-16-76-54-76Z" fill="url(#g)" stroke="#b0ffed" stroke-width="5"/>
+  <path d="M91 169c-29 19-43 44-51 70M149 169c29 19 43 44 51 70M92 88C66 76 47 75 27 84M148 88c26-12 45-13 65-4" fill="none" stroke="#5de3cf" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="95" cy="125" rx="11" ry="15" fill="#effff8"/><ellipse cx="145" cy="125" rx="11" ry="15" fill="#effff8"/><circle cx="95" cy="127" r="5" fill="#155a68"/><circle cx="145" cy="127" r="5" fill="#155a68"/>
+  <path d="M97 161c15 12 31 12 46 0" fill="none" stroke="#e2fff8" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -20,6 +20,8 @@
     var currentStoryTab = "main";
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
+    var currentDispatchMissionId = "dispatch-library";
+    var currentDispatchTeam = [];
     var currentCharacterId = "";
     var game = null;
 
@@ -71,7 +73,7 @@
       ["banner-select", "featured-select", "pull-one", "pull-ten", "pull-ticket", "exchange-featured", "reset-save"].forEach(function (id) { byId(id).disabled = !enabled; });
     }
     function hideGameViews() {
-      ["game-lobby", "story-view", "character-view", "trial-view", "gacha-hall"].forEach(function (id) { byId(id).hidden = true; });
+      ["game-lobby", "story-view", "character-view", "trial-view", "dispatch-view", "gacha-hall"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
       if (!currentPlayerName || !game) {
@@ -84,6 +86,7 @@
       if (viewId === "story-view") { renderStory(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "trial-view") { renderTrial(); }
+      if (viewId === "dispatch-view") { renderDispatch(); }
       if (viewId === "gacha-hall") { render(); }
       byId(viewId).scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -134,9 +137,27 @@
       var completedScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
       if (Object.keys(completedScenes).some(function (key) { return key.indexOf("main-1-0:") === 0; }) && !state.recruitment.story10ChoiceClaimed) { state.recruitment.story10ChoiceAvailable = true; }
       if (state.trialProgress && state.trialProgress.clearedStages && state.trialProgress.clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) { state.recruitment.trial10ChoiceAvailable = true; }
-      if (state.trialProgress && state.trialProgress.version !== (data.trialVersion || "1.0-1.5")) {
-        state.trialProgress.version = data.trialVersion || "1.0-1.5";
+      var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
+      state.updateRewards = state.updateRewards || { claimedVersions: {} };
+      state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
+      if (!state.updateRewards.claimedVersions[updateVersion]) {
+        state.resources.starSand += Number(data.updateReward && data.updateReward.starSand || 3200);
+        state.updateRewards.claimedVersions[updateVersion] = { starSand: Number(data.updateReward && data.updateReward.starSand || 3200), grantedAt: new Date().toISOString() };
+      }
+      if (state.trialProgress && state.trialProgress.version !== updateVersion) {
+        state.trialProgress.version = updateVersion;
         state.trialProgress.attempts = {};
+        state.trialProgress.clearedStages = [];
+        state.trialProgress.bestStage = 0;
+        state.trialProgress.lastBattle = null;
+        state.trialProgress.selectedTeam = [];
+      }
+      state.dispatchProgress = state.dispatchProgress || { version: updateVersion, selectedTeam: [], claimed: {}, lastMission: null };
+      if (state.dispatchProgress.version !== updateVersion) {
+        state.dispatchProgress.version = updateVersion;
+        state.dispatchProgress.selectedTeam = [];
+        state.dispatchProgress.claimed = {};
+        state.dispatchProgress.lastMission = null;
       }
       return new api.GachaGame({ banners: data.banners, state: state }).getState();
     }
@@ -145,6 +166,9 @@
       var trial = state.trialProgress || {};
       if (!trialStageById(currentTrialStageId)) currentTrialStageId = Number(trial.lastBattle && trial.lastBattle.stageId) || 1;
       if (Array.isArray(trial.selectedTeam)) currentTrialTeam = trial.selectedTeam.slice(0, 4);
+      var dispatch = state.dispatchProgress || {};
+      if (dispatch.lastMission && dispatch.lastMission.missionId) currentDispatchMissionId = dispatch.lastMission.missionId;
+      if (Array.isArray(dispatch.selectedTeam)) currentDispatchTeam = dispatch.selectedTeam.slice(0, 4);
     }
     function activatePlayer(name, payload) {
       currentPlayerName = name;
@@ -235,7 +259,7 @@
     function storyChapterById(id) { return data.storyChapters.find(function (chapter) { return chapter.id === id; }); }
     function storySceneById(chapter, id) { return chapter && chapter.scenes.find(function (scene) { return scene.id === id; }); }
     function sceneKey(chapterId, sceneId) { return chapterId + ":" + sceneId; }
-    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.releaseOpen !== false && Number(chapter.version) <= 1.5; }); }
+    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.releaseOpen !== false && Number(chapter.version) <= 2.5; }); }
     function lockedStoryChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.releaseOpen === false; }); }
     function sceneClaimed(state, chapterId, sceneId) { return Boolean(storyProgress(state).completedScenes[sceneKey(chapterId, sceneId)]); }
     function developmentCost(card, level) {
@@ -270,6 +294,9 @@
       if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
       byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
+      var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
+      var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
+      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = updateClaimed ? "大更新獎勵 +3,200 星砂（已領取）" : "大更新獎勵 +3,200 星砂";
       byId("lobby-continue-title").textContent = chapter.version + "｜" + chapter.title;
       byId("lobby-continue-copy").textContent = chapter.summary;
       renderMilestoneRewards();
@@ -282,7 +309,7 @@
       var fullChapter = chapter.scenes.map(function (item, index) {
         return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(item.title) + "</h4><p>" + escapeHtml(item.body) + "</p></article>";
       }).join("");
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\">" + escapeHtml(chapter.version + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次</span><small>每幕首次完成可獲得 100 星砂</small></div>" + sceneButtons + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4><p>" + escapeHtml(scene.body) + "</p><div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><details class=\"story-complete-chapter\"><summary>展開本章完整劇情（不會遺漏其他幕次）</summary><div>" + fullChapter + "</div></details>";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\">" + escapeHtml(chapter.version + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次</span><small>每幕首次完成可獲得 100 星砂</small></div>" + sceneButtons + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4><p>" + escapeHtml(scene.body) + "</p><div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已直接展開，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
     }
     function renderStory() {
       if (!game) return;
@@ -292,7 +319,7 @@
       var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(chapter.version) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕</small></span></button>"; }).join("");
       var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(chapter.version) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
-      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–1.5｜3.0–3.5 已建檔" : "支線 1.0–1.5｜3.0–3.5 已建檔";
+      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–4.5 已建檔" : "支線 1.0–2.5｜3.0–4.5 已建檔";
       renderStoryReader(state, current);
     }
     function renderCharacters() {
@@ -373,7 +400,7 @@
       } catch (error) { showMessage(error.message, true); }
     }
     function trialProgress(state) {
-      state.trialProgress = state.trialProgress || { version: data.trialVersion || "1.0-1.5", selectedTeam: [], clearedStages: [], attempts: {}, bestStage: 0, lastBattle: null };
+      state.trialProgress = state.trialProgress || { version: data.trialVersion || "2.0-2.5", selectedTeam: [], clearedStages: [], attempts: {}, bestStage: 0, lastBattle: null };
       state.trialProgress.selectedTeam = Array.isArray(state.trialProgress.selectedTeam) ? state.trialProgress.selectedTeam : [];
       state.trialProgress.clearedStages = Array.isArray(state.trialProgress.clearedStages) ? state.trialProgress.clearedStages : [];
       state.trialProgress.attempts = state.trialProgress.attempts || {};
@@ -384,6 +411,23 @@
     function trialUnlocked(state, stageId) { return Number(stageId) === 1 || trialProgress(state).clearedStages.indexOf(Number(stageId) - 1) >= 0; }
     function effectiveBattleStats(state) { return window.StarshipBattle && window.StarshipBattle.buildEffectiveStats ? window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, state) : data.characterBattleStats; }
     function trialPower(team, state) { return window.StarshipBattle ? window.StarshipBattle.teamPower(team, effectiveBattleStats(state)) : 0; }
+    function enemyArtFor(enemy) {
+      var text = String(enemy && enemy.name || "");
+      if (/王座|終局|核心|主核|中樞|燈核|判決核|索引核|修復核|邊界核/.test(text)) return "./assets/enemies/core.svg";
+      if (/獵犬|獵影|風路|風廊|斥候/.test(text)) return "./assets/enemies/hound.svg";
+      if (/潮|寄生|潮眼|深潮|潮蝕/.test(text)) return "./assets/enemies/parasite.svg";
+      if (/書|檔案|空白|索引|規則|記錄/.test(text)) return "./assets/enemies/archive.svg";
+      if (/鎧|護衛|守門|重殼|遺構/.test(text)) return "./assets/enemies/shell.svg";
+      if (/噪音|回音|鏡|折光|影|殘響/.test(text)) return "./assets/enemies/echo.svg";
+      if (/獸|幼體|獵/.test(text)) return "./assets/enemies/beast.svg";
+      return "./assets/enemies/riftling.svg";
+    }
+    function renderEnemyIntel(stage) {
+      return (stage.enemies || []).map(function (enemy) {
+        var hp = Number(enemy.maxHp || 0); var threat = Math.round((Number(enemy.attack || 0) * 1.2) + Number(enemy.defense || 0));
+        return "<article class=\"enemy-intel-card\"><div class=\"enemy-intel-art\"><img src=\"" + escapeHtml(enemyArtFor(enemy)) + "\" alt=\"" + escapeHtml(enemy.name + " 敵人圖鑑") + "\"><span>×" + number(enemy.count || 1) + "</span></div><div class=\"enemy-intel-copy\"><strong>" + escapeHtml(enemy.name) + "</strong><small>敵方單位 · 速度 " + number(enemy.speed || 0) + "</small><div><span>HP <b>" + number(hp) + "</b></span><span>攻 <b>" + number(enemy.attack || 0) + "</b></span><span>防 <b>" + number(enemy.defense || 0) + "</b></span></div><em>威脅值 " + number(threat) + " · 會依關卡特性行動</em></div></article>";
+      }).join("");
+    }
     function renderTrialBattleResult(state) {
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
       if (!battle || Number(battle.stageId) !== Number(currentTrialStageId)) { container.innerHTML = "<div class=\"trial-result-empty\">完成一場自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
@@ -404,6 +448,7 @@
       }).join("");
       var enemyText = current.enemies.map(function (enemy) { return enemy.name + " ×" + enemy.count; }).join("、");
       byId("trial-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>TRIAL " + String(current.id).padStart(2, "0") + "</span><span>" + escapeHtml(current.region) + "</span>" + (current.finalStage ? "<span>FINAL</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>敵方編成：" + escapeHtml(enemyText) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般試煉") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>推薦戰力 <b>" + number(current.recommendedPower) + "</b></span><span>本版本獎勵 <b>100 星砂 + 1 共鳴券 + " + number(trialCharacterExp) + " 經驗</b></span><span>可領次數 <b>" + attempts + " / " + maxRewards + "</b></span></div>";
+      if (byId("trial-enemy-intel")) byId("trial-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>先看敵人的攻防與速度，再安排隊伍協同</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
@@ -439,6 +484,62 @@
         var battle = window.StarshipBattle.simulateBattle({ team: currentTrialTeam, stats: effectiveBattleStats(state), stage: stage }); progress.selectedTeam = currentTrialTeam.slice(); progress.lastBattle = battle;
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += 100; state.resources.tickets += 1; state.resources.characterExp += Number(stage.reward && stage.reward.characterExp || 0); if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true; }
         updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星界試煉通關：已獲得 100 星砂、1 張共鳴券與 " + trialCharacterExp + " 角色經驗。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !battle.won);
+      } catch (error) { showMessage(error.message, true); }
+    }
+    function dispatchProgress(state) {
+      var version = data.dispatchVersion || data.updateVersion || "2.0-2.5";
+      state.dispatchProgress = state.dispatchProgress || { version: version, selectedTeam: [], claimed: {}, lastMission: null };
+      state.dispatchProgress.selectedTeam = Array.isArray(state.dispatchProgress.selectedTeam) ? state.dispatchProgress.selectedTeam : [];
+      state.dispatchProgress.claimed = state.dispatchProgress.claimed || {};
+      return state.dispatchProgress;
+    }
+    function dispatchMissionById(id) { return (data.dispatchMissions || []).find(function (mission) { return mission.id === id; }); }
+    function renderDispatchBattleResult(state) {
+      var container = byId("dispatch-result"); if (!container) return;
+      var progress = dispatchProgress(state); var result = progress.lastMission;
+      if (!result || result.missionId !== currentDispatchMissionId || !result.battle) { container.innerHTML = "<div class=\"trial-result-empty\">完成一份星港委託後，戰報與獎勵會顯示在這裡。</div>"; return; }
+      var battle = result.battle; var reward = battle.won ? rewardText((dispatchMissionById(result.missionId) || {}).reward || {}) : "未通關不會領取獎勵";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">DISPATCH REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "委託完成" : "委託未完成") + " · " + escapeHtml((dispatchMissionById(result.missionId) || {}).name || "星港委託") + "</strong><small>" + escapeHtml(battle.won ? "獲得：" + reward : reward) + "｜隊伍協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div><details><summary>查看委託戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+    }
+    function renderDispatch() {
+      if (!game || !byId("dispatch-missions")) return;
+      var state = game.getState(); var progress = dispatchProgress(state); var missions = data.dispatchMissions || []; var current = dispatchMissionById(currentDispatchMissionId) || missions[0];
+      if (!current) { byId("dispatch-missions").innerHTML = "<div class=\"empty\">目前沒有開放的星港委託。</div>"; return; }
+      currentDispatchMissionId = current.id;
+      if (Array.isArray(progress.selectedTeam) && !currentDispatchTeam.length) currentDispatchTeam = progress.selectedTeam.slice(0, 4);
+      var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
+      currentDispatchTeam = currentDispatchTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
+      byId("dispatch-missions").innerHTML = missions.map(function (mission) { var claimed = Boolean(progress.claimed[mission.id]); return "<button class=\"dispatch-mission-card " + (mission.id === current.id ? "active " : "") + (claimed ? "claimed" : "") + "\" data-dispatch-mission=\"" + escapeHtml(mission.id) + "\" type=\"button\"><span class=\"mission-index\">" + escapeHtml(mission.id.replace("dispatch-", "").slice(0, 2).toUpperCase()) + "</span><span><strong>" + escapeHtml(mission.name) + "</strong><small>" + escapeHtml(mission.region) + " · 推薦 " + number(mission.recommendedPower) + "</small></span><em>" + (claimed ? "已完成" : "可執行") + "</em></button>"; }).join("");
+      var claimed = Boolean(progress.claimed[current.id]);
+      byId("dispatch-mission-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>DISPATCH</span><span>" + escapeHtml(current.region) + "</span>" + (claimed ? "<span>CLAIMED</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>" + escapeHtml(current.description) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般委託") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>推薦戰力 <b>" + number(current.recommendedPower) + "</b></span><span>完成獎勵 <b>" + escapeHtml(rewardText(current.reward || {})) + "</b></span><span>版本完成度 <b>" + (claimed ? "已領取" : "未領取") + "</b></span></div>";
+      if (byId("dispatch-enemy-intel")) byId("dispatch-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>每份委託的敵人特性不同，編隊不只看總戰力</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
+      byId("dispatch-team-count").textContent = currentDispatchTeam.length + " / 4 · 戰力 " + number(trialPower(currentDispatchTeam, state));
+      byId("dispatch-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var selected = currentDispatchTeam.indexOf(card.id) >= 0; var image = card.image || card.backgroundImage; var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url(\"" + escapeHtml(image) + "\")" : ""); return "<button class=\"trial-team-card dispatch-team-card " + (selected ? "selected" : "") + "\" data-dispatch-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可執行委託的角色。</div>";
+      var startButton = byId("start-dispatch"); startButton.disabled = claimed || !currentDispatchTeam.length; startButton.textContent = claimed ? "本版本委託已完成" : "執行星港委託";
+      renderDispatchBattleResult(state);
+    }
+    function toggleDispatchTeam(cardId) {
+      var index = currentDispatchTeam.indexOf(cardId);
+      if (index >= 0) currentDispatchTeam.splice(index, 1);
+      else if (currentDispatchTeam.length >= 4) { showMessage("一次戰鬥最多派出 4 名角色。", true); return; }
+      else currentDispatchTeam.push(cardId);
+      var state = game.getState(); dispatchProgress(state).selectedTeam = currentDispatchTeam.slice(); updateGameFromState(state); saveLocalState(); renderDispatch();
+    }
+    function runDispatchMission() {
+      if (!game || !currentPlayerName) { showGate(); return; }
+      var mission = dispatchMissionById(currentDispatchMissionId); if (!mission) return;
+      if (remoteMode) {
+        apiRequest("/api/player/dispatch", { missionId: mission.id, team: currentDispatchTeam }).then(function (payload) { updateGameFromState(payload.state); renderDispatch(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星港委託完成：已獲得 " + rewardText(payload.reward) + "。" : "委託未完成，可以調整隊伍後再次嘗試。", !payload.battle.won); }).catch(function (error) { showMessage(error.message, true); });
+        return;
+      }
+      try {
+        var state = game.getState(); var progress = dispatchProgress(state);
+        if (progress.claimed[mission.id]) throw new Error("這份委託本版本已完成，請等待下次版本更新");
+        if (!currentDispatchTeam.length) throw new Error("至少派出 1 名角色才能執行委託");
+        if (currentDispatchTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
+        var battle = window.StarshipBattle.simulateBattle({ team: currentDispatchTeam, stats: effectiveBattleStats(state), stage: mission }); progress.selectedTeam = currentDispatchTeam.slice(); progress.lastMission = { missionId: mission.id, battle: battle };
+        if (battle.won) { progress.claimed[mission.id] = { completedAt: new Date().toISOString() }; Object.keys(mission.reward || {}).forEach(function (key) { if (Object.prototype.hasOwnProperty.call(state.resources, key)) state.resources[key] += Number(mission.reward[key] || 0); }); }
+        updateGameFromState(state); saveLocalState(); renderDispatch(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星港委託完成：已獲得 " + rewardText(mission.reward) + "。" : "委託未完成，可以調整隊伍後再次嘗試。", !battle.won);
       } catch (error) { showMessage(error.message, true); }
     }
     function rewardText(reward) {
@@ -552,6 +653,7 @@
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
     byId("open-characters").addEventListener("click", function () { showView("character-view"); });
     byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
+    byId("open-dispatch").addEventListener("click", function () { showView("dispatch-view"); });
     byId("continue-story").addEventListener("click", function () { showView("story-view"); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });
     byId("story-main-tab").addEventListener("click", function () { currentStoryTab = "main"; currentStoryChapterId = "main-1-0"; currentStorySceneId = ""; renderStory(); });
@@ -573,6 +675,9 @@
     byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
     byId("trial-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-character]"); if (button) toggleTrialTeam(button.getAttribute("data-trial-character")); });
     byId("start-trial-battle").addEventListener("click", runTrialBattle);
+    byId("dispatch-missions").addEventListener("click", function (event) { var button = event.target.closest("[data-dispatch-mission]"); if (button) { currentDispatchMissionId = button.getAttribute("data-dispatch-mission"); currentDispatchTeam = []; renderDispatch(); } });
+    byId("dispatch-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-dispatch-character]"); if (button) toggleDispatchTeam(button.getAttribute("data-dispatch-character")); });
+    byId("start-dispatch").addEventListener("click", runDispatchMission);
 
     setControlsEnabled(false);
     setHallVisible(false);

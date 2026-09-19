@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -17,6 +17,8 @@ const playerDatabasePath = path.join(dataDirectory, "players.json");
 const port = Number(process.env.PORT || 8080);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
+const currentUpdateVersion = "2.0-2.5";
+const updateReward = Object.freeze({ starSand: 3200 });
 const sessions = new Map();
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -192,9 +194,26 @@ function ensurePlayerMilestones(currentState) {
   if (clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) {
     state.recruitment.trial10ChoiceAvailable = true;
   }
-  if (state.trialProgress.version !== "1.0-1.5") {
-    state.trialProgress.version = "1.0-1.5";
+  state.updateRewards = state.updateRewards || { claimedVersions: {} };
+  state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
+  if (!state.updateRewards.claimedVersions[currentUpdateVersion]) {
+    state.resources.starSand += updateReward.starSand;
+    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, grantedAt: new Date().toISOString() };
+  }
+  if (state.trialProgress.version !== currentUpdateVersion) {
+    state.trialProgress.version = currentUpdateVersion;
     state.trialProgress.attempts = {};
+    state.trialProgress.clearedStages = [];
+    state.trialProgress.bestStage = 0;
+    state.trialProgress.lastBattle = null;
+    state.trialProgress.selectedTeam = [];
+  }
+  state.dispatchProgress = state.dispatchProgress || { version: currentUpdateVersion, selectedTeam: [], claimed: {}, lastMission: null };
+  if (state.dispatchProgress.version !== currentUpdateVersion) {
+    state.dispatchProgress.version = currentUpdateVersion;
+    state.dispatchProgress.selectedTeam = [];
+    state.dispatchProgress.claimed = {};
+    state.dispatchProgress.lastMission = null;
   }
   return new GachaGame({ banners, state }).getState();
 }
@@ -417,6 +436,34 @@ function runTrial(currentState, body) {
   return { state: new GachaGame({ banners, state }).getState(), battle, reward: battle.won ? { starSand: 100, tickets: 1, characterExp: Number(stage.reward && stage.reward.characterExp || 0), attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, tickets: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
 }
 
+function dispatchMissionById(missionId) {
+  const mission = dispatchMissions.find((item) => item.id === String(missionId || ""));
+  if (!mission) throw new Error("找不到星港委託");
+  return mission;
+}
+
+function runDispatch(currentState, body) {
+  const state = ensurePlayerMilestones(currentState);
+  const mission = dispatchMissionById(body.missionId);
+  const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
+  if (!team.length) throw new Error("至少派出 1 名角色才能執行委託");
+  if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
+  if (state.dispatchProgress.claimed[mission.id]) throw new Error("這份委託本版本已完成，請等待下次版本更新");
+  const effectiveStats = buildEffectiveStats(characterBattleStats, state);
+  const battle = simulateBattle({ team, stats: effectiveStats, stage: mission, rng: Math.random });
+  state.dispatchProgress.selectedTeam = team;
+  state.dispatchProgress.lastMission = { missionId: mission.id, battle };
+  const reward = {};
+  Object.keys(mission.reward || {}).forEach((key) => {
+    const amount = Number(mission.reward[key] || 0);
+    if (!Number.isFinite(amount) || amount < 0) return;
+    reward[key] = battle.won ? amount : 0;
+    if (battle.won && Object.prototype.hasOwnProperty.call(state.resources, key)) state.resources[key] += amount;
+  });
+  if (battle.won) state.dispatchProgress.claimed[mission.id] = { completedAt: new Date().toISOString() };
+  return { state: new GachaGame({ banners, state }).getState(), battle, reward, mission };
+}
+
 function claimCharacterChoice(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const rewardKey = String(body.rewardKey || "");
@@ -520,6 +567,16 @@ async function handleApi(request, response, requestUrl) {
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, battle: result.battle, reward: result.reward });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/dispatch") {
+      const player = playerFromSession(database, body.token);
+      const result = runDispatch(player.record.state, body);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, battle: result.battle, reward: result.reward, mission: result.mission });
       return;
     }
 

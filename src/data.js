@@ -21,12 +21,12 @@
       backgroundImage: backgroundImage || image || null,
       // 原始立繪保留給卡池縮圖；完整角色頁使用程式產生的 SVG 標籤版，
       // 讓角色名稱、星級、元素不依賴 AI 文字，也不會裁掉全身。
-      portraitImage: image ? "./assets/cards/complete/" + id + ".svg" : null
+      portraitImage: image ? (String(image).toLowerCase().endsWith(".svg") ? image : "./assets/cards/complete/" + id + ".svg") : null
     });
   }
 
-  // 只收錄文件與本次版本規劃中的角色；目前 live 卡池仍先開放 1.0–1.5，
-  // 2.0–3.5 角色先作為後續版本資料，不會誤加入現行卡池。
+  // 只收錄文件與本次版本規劃中的角色；2.0–2.5 會在本次大更新加入限定池，
+  // 3.0–4.5 先完整建檔，等版本公告後再開放。
   var cards = {
     celesia: card("celesia", "瑟蕾雅", "Celesia", 4, "星", "#9e92ff", "1.0", "1.0｜繪圖信使、協作劍士；界痕調查與北行動機", "./assets/cards/celesia.png"),
     reyn: card("reyn", "雷恩", "Reyn", 3, "燕", "#78a4c8", "1.0", "1.0｜獸靈之村巡林人", "./assets/cards/reyn.png"),
@@ -60,18 +60,37 @@
     lorne: card("lorne", "洛恩", "Lorne", 4, "烈", "#e37c52", "3.3", "3.3｜鍛路鎮鍛路師、熱管維護者", "./assets/cards/lorne.png"),
     cenya: card("cenya", "岑芽", "Cenya", 3, "淨", "#77d8d1", "3.2", "3.2｜白榆河水路修復隊學徒；偶發三星設計", "./assets/cards/cenya.png"),
     norell: card("norell", "諾嵐", "Norell", 4, "月", "#86b8e8", "3.4", "3.4｜北門風路測量員、臨時回覆台守望者", "./assets/cards/norell.png"),
-    aster: card("aster", "艾斯特", "Aster", 4, "烈", "#e88955", "3.5", "3.5｜終端檔案守門人、空白座看火者", "./assets/cards/aster.png")
+    aster: card("aster", "艾斯特", "Aster", 4, "烈", "#e88955", "3.5", "3.5｜終端檔案守門人、空白座看火者", "./assets/cards/aster.png"),
+
+    // 第四大版本角色：先建立完整圖鑑與戰鬥資料，卡池等後續版本公告。
+    aurelia: card("aurelia", "奧蕾雅", "Aurelia", 4, "星", "#f2c86d", "4.0", "4.0｜曙港天文台值班長、星潮觀測者", "./assets/cards/aurelia.svg"),
+    kairen: card("kairen", "凱嵐", "Kairen", 4, "烈", "#e98058", "4.1", "4.1｜碎星工坊維修師、熱源調度員", "./assets/cards/kairen.svg"),
+    sorae: card("sorae", "索萊", "Sorae", 4, "燕", "#70b7ff", "4.2", "4.2｜遠望塔信標師、長距離回覆校準者", "./assets/cards/sorae.svg"),
+    talia: card("talia", "塔莉亞", "Talia", 3, "淨", "#76d9c7", "4.2", "4.2｜遠望塔見習修復員；偶發三星設計", "./assets/cards/talia.svg"),
+    neve: card("neve", "涅芙", "Neve", 4, "幻", "#c18cff", "4.3", "4.3｜白夜航路記憶領航員、失效訊息整理者", "./assets/cards/neve.svg"),
+    kael: card("kael", "凱爾", "Kael", 4, "月", "#88aee8", "4.4", "4.4｜回覆海溝潛航隊長、深層訊號守門人", "./assets/cards/kael.svg"),
+    elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.svg")
   };
 
-  // 現行卡池只開放 1.0–1.5；保留文件原本的 3★／4★，不新增角色。
-  var activeCards = [
+  var legacyCards = [
     cards.celesia, cards.reyn, cards.lia, cards.isar, cards.rena, cards.eda,
     cards.veyra, cards.harlow, cards.elorna, cards.chodan, cards.magenta,
     cards.hina, cards.siyeon, cards.mave
   ];
+  var version2Cards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle];
+  var version4Cards = [cards.aurelia, cards.kairen, cards.sorae, cards.talia, cards.neve, cards.kael, cards.elyra];
+
+  // 本次大更新開放劇情與 2.0–2.5 角色；1.0–1.5 卡池仍保留，讓舊角色不會消失。
+  var activeCards = [
+    ...legacyCards, ...version2Cards
+  ];
+  var legacyFour = legacyCards.filter(function (item) { return item.rarity === 4; });
+  var legacyThree = legacyCards.filter(function (item) { return item.rarity === 3; });
   var activeFour = activeCards.filter(function (item) { return item.rarity === 4; });
   var activeThree = activeCards.filter(function (item) { return item.rarity === 3; });
-  var futureCards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle, cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster];
+  var futureCards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster, ...version4Cards];
+  var version2Four = version2Cards.filter(function (item) { return item.rarity === 4; });
+  var version2Three = version2Cards.filter(function (item) { return item.rarity === 3; });
   var version3Cards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster];
 
   // 星界試煉的自走棋數值；4★ 的基礎戰力整體高於 3★，但不是單一數值碾壓。
@@ -89,7 +108,7 @@
     chodan: { rarity: 4, role: "節奏", maxHp: 1060, attack: 145, defense: 105, speed: 115, range: 2, attackName: "月式鼓擊", skillName: "月式鼓點", skillPower: 1.25, skillEffect: "提升全隊速度" },
     magenta: { rarity: 4, role: "爆發", maxHp: 1120, attack: 185, defense: 95, speed: 118, range: 2, attackName: "低音震波", skillName: "旅行低音", skillPower: 1.4, skillEffect: "對相鄰敵人造成濺射傷害" },
     hina: { rarity: 4, role: "射手", maxHp: 1040, attack: 195, defense: 90, speed: 112, range: 3, attackName: "弦音箭", skillName: "弦音標記", skillPower: 1.35, skillEffect: "標記目標，下一次攻擊追加傷害" },
-    siyeon: { rarity: 4, role: "拾音", maxHp: 1000, attack: 125, defense: 110, speed: 108, range: 2, attackName: "回音脈衝", skillName: "回音採集", skillPower: 1.15, skillEffect: "回復一名受傷隊友" },
+    siyeon: { rarity: 4, role: "拾音", maxHp: 1080, attack: 145, defense: 120, speed: 110, range: 2, attackName: "回音脈衝", skillName: "回音採集", skillPower: 1.15, skillEffect: "回復一名受傷隊友" },
     mave: { rarity: 4, role: "仲裁", maxHp: 1120, attack: 165, defense: 130, speed: 102, range: 2, attackName: "索引裁切", skillName: "公共索引", skillPower: 1.3, skillEffect: "重新排列敵方目標並造成傷害" },
     risan: { rarity: 4, role: "支援", maxHp: 1100, attack: 175, defense: 115, speed: 102, range: 2, attackName: "潮圖切頁", skillName: "無地址索引", skillPower: 1.3, skillEffect: "讓隊伍下一輪攻擊更容易命中並整理敵方目標" },
     yaoze: { rarity: 4, role: "重裝", maxHp: 1280, attack: 150, defense: 145, speed: 76, range: 2, attackName: "燈塔訊號", skillName: "白帆守望", skillPower: 1.12, skillEffect: "為隊伍架起護盾並降低敵方速度" },
@@ -106,12 +125,19 @@
     ,cenya: { rarity: 3, role: "修復", maxHp: 820, attack: 88, defense: 92, speed: 108, range: 2, attackName: "水輪輕擊", skillName: "濾芯交班", skillPower: 1.12, skillEffect: "回復一名隊友並降低其受到的下一次傷害" }
     ,norell: { rarity: 4, role: "測量", maxHp: 1090, attack: 152, defense: 126, speed: 120, range: 3, attackName: "風標定向", skillName: "北門照明", skillPower: 1.26, skillEffect: "提升全隊速度並標記最脆弱的敵人" }
     ,aster: { rarity: 4, role: "守門", maxHp: 1420, attack: 176, defense: 156, speed: 88, range: 2, attackName: "空白座燼擊", skillName: "看火不佔座", skillPower: 1.38, skillEffect: "架起護盾並使敵方增益暫停一輪" }
+    ,aurelia: { rarity: 4, role: "指揮", maxHp: 1180, attack: 188, defense: 132, speed: 114, range: 3, attackName: "曙光定標", skillName: "天文台校準", skillPower: 1.38, skillEffect: "提升全隊命中與攻擊，並標記最脆弱的敵人" }
+    ,kairen: { rarity: 4, role: "鍛路", maxHp: 1460, attack: 182, defense: 166, speed: 82, range: 1, attackName: "碎星熱錘", skillName: "工坊分流", skillPower: 1.48, skillEffect: "重擊目標並為全隊架起短暫護盾" }
+    ,sorae: { rarity: 4, role: "射手", maxHp: 1100, attack: 210, defense: 104, speed: 128, range: 4, attackName: "遠望信標", skillName: "長距離回覆", skillPower: 1.42, skillEffect: "優先攻擊後排並讓下一次協同攻擊追加傷害" }
+    ,talia: { rarity: 3, role: "修復", maxHp: 900, attack: 98, defense: 98, speed: 112, range: 2, attackName: "折光扳手", skillName: "見習交班", skillPower: 1.15, skillEffect: "回復生命最低的隊友並降低其受到的下一次傷害" }
+    ,neve: { rarity: 4, role: "仲裁", maxHp: 1160, attack: 180, defense: 136, speed: 106, range: 2, attackName: "白夜折頁", skillName: "記憶回收", skillPower: 1.36, skillEffect: "清除敵方增益並將一名倒下隊友拉回低生命狀態" }
+    ,kael: { rarity: 4, role: "重裝", maxHp: 1680, attack: 165, defense: 205, speed: 68, range: 1, attackName: "深層鎮壓", skillName: "海溝守門", skillPower: 1.24, skillEffect: "嘲諷敵人並分攤下一輪隊伍傷害" }
+    ,elyra: { rarity: 4, role: "支援", maxHp: 1240, attack: 172, defense: 150, speed: 112, range: 2, attackName: "律式回覆", skillName: "第二條律", skillPower: 1.34, skillEffect: "讓隊伍獲得可撤回的減傷，並重置一名隊友技能冷卻" }
   };
 
-  var trialVersion = "1.0-1.5";
+  var trialVersion = "2.0-2.5";
   var trialMaxRewards = 10;
   var trialReward = Object.freeze({ starSand: 100, tickets: 1, characterExp: 120 });
-  // 星界試煉共有 20 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
+  // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
   var trialStages = [
     { id: 1, name: "回覆台外圍", region: "界痕入口", recommendedPower: 420, environment: "薄霧界痕", environmentEffect: "隊伍技能冷卻略快", modifiers: { teamSpeed: 1.06 }, enemyTrait: "回聲脆弱", enemyTraitEffect: "敵人受到協同傷害時更容易失衡", trialRule: "echo", enemies: [{ name: "界痕幼體", maxHp: 560, attack: 78, defense: 38, speed: 65, count: 2 }], reward: trialReward },
@@ -133,10 +159,27 @@
     { id: 17, name: "終端檔案門", region: "星界終端", recommendedPower: 5050, environment: "終端檔案門", environmentEffect: "敵方技能帶有清除增益效果", modifiers: { enemyAttack: 1.14, enemyDefense: 1.12 }, enemyTrait: "檔案覆寫", enemyTraitEffect: "敵方首領會清除隊伍一個正面效果", trialRule: "copy", enemies: [{ name: "覆寫檔案獸", maxHp: 5600, attack: 380, defense: 290, speed: 116, count: 2 }, { name: "終端索引核", maxHp: 7600, attack: 340, defense: 320, speed: 76, count: 1 }], reward: trialReward },
     { id: 18, name: "最後回覆台", region: "星界終端", recommendedPower: 5600, environment: "最後回覆台", environmentEffect: "治療與護盾效率取決於隊伍角色多樣性", modifiers: { healing: 0.86, enemyAttack: 1.16 }, enemyTrait: "最後回覆", enemyTraitEffect: "敵人生命越低，攻擊越高", trialRule: "execute", enemies: [{ name: "終末界痕體", maxHp: 6300, attack: 405, defense: 310, speed: 126, count: 2 }, { name: "最後回覆核", maxHp: 8300, attack: 365, defense: 340, speed: 84, count: 1 }], reward: trialReward },
     { id: 19, name: "星界邊緣線", region: "星界終端", recommendedPower: 6200, environment: "星界邊緣線", environmentEffect: "所有效果波動加劇，隊伍協同會直接影響勝負", modifiers: { teamAttack: 1.06, teamDefense: 0.96, enemyAttack: 1.18, enemyDefense: 1.16 }, enemyTrait: "邊緣崩解", enemyTraitEffect: "敵人會隨回合增加傷害，速戰與續航都重要", trialRule: "decay", enemies: [{ name: "邊緣崩解體", maxHp: 7000, attack: 430, defense: 330, speed: 138, count: 2 }, { name: "邊緣中樞", maxHp: 9200, attack: 390, defense: 365, speed: 90, count: 1 }], reward: trialReward },
-    { id: 20, name: "星界之律終局", region: "星界終端", recommendedPower: 6900, environment: "星界之律終局", environmentEffect: "終局首領會輪換護盾、增傷與壓制，必須完整運用隊伍配合", modifiers: { teamAttack: 1.05, teamDefense: 1.02, enemyAttack: 1.2, enemyDefense: 1.18 }, enemyTrait: "終局輪換", enemyTraitEffect: "首領每三回合輪換一種戰鬥姿態", trialRule: "finale", finalStage: true, enemies: [{ name: "終局護衛", maxHp: 7800, attack: 450, defense: 350, speed: 148, count: 2 }, { name: "星界之律王座", maxHp: 13000, attack: 470, defense: 390, speed: 92, count: 1 }], reward: trialReward }
+    { id: 20, name: "星界之律終局", region: "星界終端", recommendedPower: 6900, environment: "星界之律終局", environmentEffect: "終局首領會輪換護盾、增傷與壓制，必須完整運用隊伍配合", modifiers: { teamAttack: 1.05, teamDefense: 1.02, enemyAttack: 1.2, enemyDefense: 1.18 }, enemyTrait: "終局輪換", enemyTraitEffect: "首領每三回合輪換一種戰鬥姿態", trialRule: "finale", enemies: [{ name: "終局護衛", maxHp: 7800, attack: 450, defense: 350, speed: 148, count: 2 }, { name: "星界之律王座", maxHp: 13000, attack: 470, defense: 390, speed: 92, count: 1 }], reward: trialReward },
+    { id: 21, name: "潮汐書庫外環", region: "潮汐書庫", recommendedPower: 7350, environment: "潮汐書頁", environmentEffect: "每兩回合會交換敵我速度排序，先手不代表永遠先手", modifiers: { teamSpeed: 1.06, enemySpeed: 1.1, enemyAttack: 1.06 }, enemyTrait: "書頁倒流", enemyTraitEffect: "敵方會短暫複製上一個被擊倒單位的增益", trialRule: "time", enemies: [{ name: "倒流書獸", maxHp: 8200, attack: 455, defense: 360, speed: 132, count: 2 }, { name: "潮汐索引核", maxHp: 9800, attack: 420, defense: 390, speed: 88, count: 1 }], reward: trialReward },
+    { id: 22, name: "白帆岬燈路", region: "白帆岬", recommendedPower: 7850, environment: "白帆逆光", environmentEffect: "遠程角色命中提高，但敵方護衛會優先切入後排", modifiers: { teamAttack: 1.06, enemySpeed: 1.12, enemyDefense: 1.08 }, enemyTrait: "燈路切入", enemyTraitEffect: "敵人會繞過前排並標記後排最低生命角色", trialRule: "mark", enemies: [{ name: "白帆切入獸", maxHp: 8700, attack: 470, defense: 365, speed: 156, count: 2 }, { name: "岬角燈核", maxHp: 10400, attack: 430, defense: 410, speed: 96, count: 1 }], reward: trialReward },
+    { id: 23, name: "鏡潮島裂面", region: "鏡潮島", recommendedPower: 8400, environment: "折光裂面", environmentEffect: "正面增益會被折射一次，清除與重新施放需要輪轉", modifiers: { healing: 0.9, enemyAttack: 1.1, enemyDefense: 1.08 }, enemyTrait: "鏡像誤讀", enemyTraitEffect: "敵方會把第一個正面效果轉成自身護盾", trialRule: "copy", enemies: [{ name: "鏡像拾荒獸", maxHp: 9300, attack: 500, defense: 390, speed: 120, count: 2 }, { name: "折光主鏡", maxHp: 11800, attack: 450, defense: 430, speed: 82, count: 1 }], reward: trialReward },
+    { id: 24, name: "深潮測線", region: "深潮測線", recommendedPower: 9000, environment: "低壓深潮", environmentEffect: "治療與護盾效率降低，但控制成功後敵方會暴露弱點", modifiers: { healing: 0.78, teamDefense: 1.08, enemyAttack: 1.12 }, enemyTrait: "深潮壓迫", enemyTraitEffect: "敵方每次命中都會疊加潮蝕，支援與淨化不可缺少", trialRule: "corrosion", enemies: [{ name: "深潮寄生體", maxHp: 10200, attack: 525, defense: 405, speed: 126, count: 2 }, { name: "深潮閘核", maxHp: 12500, attack: 465, defense: 450, speed: 76, count: 1 }], reward: trialReward },
+    { id: 25, name: "風廊維護線", region: "風廊", recommendedPower: 9650, environment: "高空風廊", environmentEffect: "速度波動加劇，角色連續行動時傷害提高", modifiers: { teamSpeed: 1.12, enemySpeed: 1.14, teamDefense: 0.98 }, enemyTrait: "風廊追擊", enemyTraitEffect: "敵方會在連續兩次行動後獲得追擊", trialRule: "ambush", enemies: [{ name: "風廊追獵者", maxHp: 10900, attack: 560, defense: 420, speed: 168, count: 2 }, { name: "風廊信標獸", maxHp: 13200, attack: 490, defense: 455, speed: 102, count: 1 }], reward: trialReward },
+    { id: 26, name: "霧鏡議庭前廊", region: "霧鏡議庭", recommendedPower: 10350, environment: "霧鏡審理場", environmentEffect: "每三回合重新判定一個角色的目標，隊伍需要多功能定位", modifiers: { enemyAttack: 1.14, enemyDefense: 1.1, teamAttack: 1.04 }, enemyTrait: "審理標記", enemyTraitEffect: "被標記角色受到更多傷害，但也能對首領造成額外破防", trialRule: "multi", enemies: [{ name: "霧鏡執行獸", maxHp: 11600, attack: 585, defense: 445, speed: 142, count: 2 }, { name: "議庭判決核", maxHp: 14100, attack: 520, defense: 490, speed: 86, count: 1 }], reward: trialReward },
+    { id: 27, name: "潮眼修復井", region: "潮眼外圍", recommendedPower: 11100, environment: "潮眼脈動", environmentEffect: "敵方護盾會依生命比例重建，爆發與持續傷害都要安排", modifiers: { enemyDefense: 1.14, enemyAttack: 1.12, healing: 0.88 }, enemyTrait: "護盾回潮", enemyTraitEffect: "首領每四回合重建護盾，打斷技能可以延後回潮", trialRule: "shield", enemies: [{ name: "回潮鎧獸", maxHp: 12600, attack: 610, defense: 475, speed: 110, count: 2 }, { name: "潮眼修復核", maxHp: 15400, attack: 540, defense: 530, speed: 72, count: 1 }], reward: trialReward },
+    { id: 28, name: "第二條律試讀室", region: "星界終端二層", recommendedPower: 11900, environment: "試讀規則場", environmentEffect: "隊伍第一次倒下不會立刻出局，但會留下永久減益", modifiers: { teamAttack: 1.08, enemyAttack: 1.16, enemyDefense: 1.12 }, enemyTrait: "規則覆寫", enemyTraitEffect: "首領會在血量低於一半時改寫一條環境規則", trialRule: "copy", enemies: [{ name: "覆寫規則獸", maxHp: 13600, attack: 640, defense: 500, speed: 132, count: 2 }, { name: "試讀王座", maxHp: 16800, attack: 575, defense: 560, speed: 80, count: 1 }], reward: trialReward },
+    { id: 29, name: "新曙港邊界", region: "新曙港", recommendedPower: 12750, environment: "新曙潮線", environmentEffect: "所有角色技能效果提高，但敵方會隨回合增加攻擊", modifiers: { teamAttack: 1.1, teamSpeed: 1.04, enemyAttack: 1.18, enemyDefense: 1.14 }, enemyTrait: "曙潮增壓", enemyTraitEffect: "敵方每回合獲得增傷，必須在有限回合內完成突破", trialRule: "decay", enemies: [{ name: "曙潮崩解體", maxHp: 14800, attack: 670, defense: 530, speed: 150, count: 2 }, { name: "新曙邊界核", maxHp: 18200, attack: 600, defense: 590, speed: 92, count: 1 }], reward: trialReward },
+    { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 13700, environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.22, enemyDefense: 1.18 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態，錯誤的爆發時機會使全隊陷入反擊", trialRule: "finale", finalStage: true, enemies: [{ name: "第二律護衛", maxHp: 16400, attack: 700, defense: 575, speed: 174, count: 2 }, { name: "第二條律王座", maxHp: 22000, attack: 730, defense: 640, speed: 104, count: 1 }], reward: trialReward }
   ];
 
-  // 劇情入口先開放文件 1.0–1.5；每幕由前端與後端共用 id，完成獎勵才能安全地只領一次。
+  var dispatchVersion = "2.0-2.5";
+  var dispatchMissions = [
+    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 220, echoPowder: 4 } },
+    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 220, characterExp: 260, tickets: 1 } },
+    { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 300, starMarks: 1 } }
+  ];
+
+  // 劇情入口開放文件 1.0–2.5；每幕由前端與後端共用 id，完成獎勵才能安全地只領一次。
   var storyChapters = [
     {
       id: "main-1-0", type: "main", version: "1.0", title: "界痕初響", region: "獸靈之村",
@@ -260,7 +303,7 @@
     }
   ];
 
-  // 文件中的第三大版本先完成資料與文本；live 劇情仍維持 1.0–1.5，避免未公告版本提前進入玩家流程。
+  // 文件中的後續版本先完成資料與文本；live 劇情開放至 2.0–2.5，3.0 之後仍鎖定。
   var version3StoryChapters = [
     {
       id: "main-3-0", type: "main", version: "3.0", releaseOpen: false, title: "第九個回覆", region: "霽光廊",
@@ -384,6 +427,196 @@
     }
   ];
 
+  function buildVersionChapters(seeds, releaseOpen) {
+    return seeds.reduce(function (chapters, seed) {
+      chapters.push({
+        id: "main-" + seed.version,
+        type: "main",
+        version: seed.version,
+        releaseOpen: releaseOpen,
+        title: seed.mainTitle,
+        region: seed.region,
+        summary: seed.mainSummary,
+        characters: seed.mainCharacters,
+        scenes: seed.mainScenes
+      });
+      chapters.push({
+        id: "side-" + seed.version + "-" + seed.sideId,
+        type: "side",
+        version: seed.version,
+        releaseOpen: releaseOpen,
+        title: seed.sideTitle,
+        region: seed.region,
+        summary: seed.sideSummary,
+        characters: seed.sideCharacters,
+        scenes: seed.sideScenes
+      });
+      return chapters;
+    }, []);
+  }
+
+  var version2StoryChapters = buildVersionChapters([
+    {
+      version: "2.0", region: "潮汐書庫", mainTitle: "潮汐書庫的無地址", mainSummary: "瑟蕾雅一行抵達潮汐書庫，發現所有海圖都在指向一個沒有地址的回覆。",
+      mainCharacters: ["celesia", "risan", "yaoze", "mave"], mainScenes: [
+        { id: "library-arrival", title: "沒有地址的入館回覆", body: "潮汐書庫只在退潮時開門，璃珊把一張沒有地址的入館回覆交給瑟蕾雅。書庫不拒絕旅者，卻要求所有人先說明自己會帶走什麼、留下什麼，以及誰能要求刪除自己的記錄。" },
+        { id: "tide-map", title: "海圖會隨潮水改口", body: "曜澤帶隊伍走過白帆岬的舊燈路，展示一份每天都會改寫的海圖。瑟蕾雅原本想把它固定在公共檔案，璃珊提醒她：可供使用不等於可以永久定稿，地圖必須保留改口的時間。" },
+        { id: "no-address", title: "把空白留在索引上", body: "書庫深處的索引核要求隊伍填入一個完整地址，才能把海圖同步到所有回覆台。梅芙與璃珊共同拒絕這個欄位，改以期限與撤回點完成低負載連線；沒有地址的回覆第一次被正式保留下來。" }
+      ],
+      sideId: "library", sideTitle: "海圖邊角的回信", sideSummary: "補充璃珊與曜澤如何整理潮汐書庫的借閱規則。", sideCharacters: ["risan", "yaoze"], sideScenes: [
+        { id: "borrow", title: "借走一頁，不帶走一座海", body: "璃珊把借閱單分成可以複製、只能現場閱讀與本人可撤回三欄，曜澤則在每盞燈下標出潮汐時間。書庫因此不再把一張海圖當成永遠有效的命令。" },
+        { id: "lighthouse-letter", title: "燈塔寫給書庫的信", body: "曜澤收到一封沒有署名的燈塔信，只說今晚需要一盞不會把人引錯方向的燈。璃珊把信原樣收進空白欄，不替沉默補上發信人。" },
+        { id: "margin", title: "頁邊的退回點", body: "兩人替每份海圖加上頁邊退回點，任何借閱者都能在不解釋原因的情況下停止同步。這條小規則成為 2.0 第一個可以被居民自行改寫的安全門。" }
+      ]
+    },
+    {
+      version: "2.1", region: "鏡潮島", mainTitle: "鏡潮島的折光", mainSummary: "伊芙琳帶領隊伍穿過鏡潮島，查明一批被折光成兩份的回覆，並讓原句重新回到本人手中。",
+      mainCharacters: ["celesia", "evelyn", "risan", "noreia"], mainScenes: [
+        { id: "mirror-shore", title: "一座島，兩個方向", body: "鏡潮島的海岸同時映出兩個方向，伊芙琳說那不是幻覺，而是島把每一次選擇都保存成另一個可能。瑟蕾雅沿著較暗的反光前進，先尋找願意被聽見的人，而不是先尋找答案。" },
+        { id: "split-reply", title: "被折成兩半的回覆", body: "所有回覆片段都被拆成「可以」與「還沒決定」兩半，系統卻只保留前者。諾芮亞重新驗證時間戳，璃珊把另一半找回，隊伍終於看見島民從未同意過完整接入。" },
+        { id: "return-sentence", title: "把原句還給說話的人", body: "伊芙琳停止自動翻譯，請每位島民重新讀出自己的原句。鏡潮因此恢復單一方向，但不是因為所有人答案相同，而是因為每個人都能看見並收回自己的選擇。" }
+      ],
+      sideId: "mirror", sideTitle: "鏡面上的第二句話", sideSummary: "補充伊芙琳如何整理折光島的雙重記錄。", sideCharacters: ["evelyn", "noreia"], sideScenes: [
+        { id: "second-line", title: "第二句不代表同意", body: "伊芙琳在記錄表下方留下第二句話欄位，專門收納那些被第一句話遮住的猶豫。諾芮亞替每一列加上檢視日期，讓等待不再被當成錯誤。" },
+        { id: "mirror-test", title: "先照自己，再照別人", body: "鏡潮島的測試要求每位訪客先說明自己想從記錄中得到什麼。兩人發現，只有先承認自己的需求，才不會把對方的沉默誤認成方便。" },
+        { id: "folded-light", title: "折光可以被放下", body: "完成校準後，伊芙琳把折光片放回海岸，沒有帶回中央終端。它仍然能照亮路，卻不再替任何人決定該往哪裡走。" }
+      ]
+    },
+    {
+      version: "2.2", region: "深潮測線", mainTitle: "深潮測線", mainSummary: "澪歌深入海下測線，隊伍必須在低壓、低能見度與逐漸增加的潮蝕中完成交班。",
+      mainCharacters: ["celesia", "mirea", "orivelle", "lia"], mainScenes: [
+        { id: "deep-line", title: "下潛前的四個開關", body: "深潮測線的入口有四個手動開關，分別控制照明、聲音、回覆與退回。澪歌要求隊伍在下潛前把每個開關的責任交給不同的人，避免任何單一角色成為唯一出口。" },
+        { id: "pressure-signal", title: "低壓裡的訊號", body: "水壓讓所有訊號變慢，莉亞從殘留的微光判斷出一支醫療船正在等待。奧薇拉修復潮核，澪歌則把等待時間寫進回覆，讓海面的人知道下方仍在工作而不是失聯。" },
+        { id: "handover-depth", title: "深處也要能交班", body: "測線完成時，澪歌沒有把控制權帶回海面，而是把四個開關的交班規則留在深處。瑟蕾雅確認最後一段回覆後，所有人沿著可撤回的燈線上浮。" }
+      ],
+      sideId: "deep", sideTitle: "潮線引航手冊", sideSummary: "補充澪歌與奧薇拉如何整理深潮測線的支援規則。", sideCharacters: ["mirea", "orivelle"], sideScenes: [
+        { id: "rope", title: "先把退回繩固定", body: "澪歌的第一條規則不是怎麼下潛，而是先把退回繩固定在能被所有人摸到的位置。奧薇拉把繩結與潮核讀值放在同一張表上，任何人都能確認出口仍然存在。" },
+        { id: "repair-turn", title: "修復不是把問題藏起來", body: "潮核修好後仍保留一道微小裂痕，奧薇拉沒有把它塗掉，而是在手冊上標出下一次檢查的時間。澪歌說可見的裂痕比假裝完整更能保護下一班。" },
+        { id: "surface", title: "回到水面之前", body: "兩人把最後一個訊號交給海面後才上浮，確保接班者已經收到。深潮測線沒有留下英雄名單，只留下任何人都能依循的退回順序。" }
+      ]
+    },
+    {
+      version: "2.3", region: "風廊", mainTitle: "風廊之外", mainSummary: "菲芮維護一條會自己改道的風廊，瑟蕾雅一行學會把航路當成共同協議而非固定道路。",
+      mainCharacters: ["celesia", "ferye", "yaoze", "reyn"], mainScenes: [
+        { id: "wind-corridor", title: "風廊不是直線", body: "風廊每隔一夜就會把入口吹向不同位置，菲芮拒絕把它畫成固定直線。雷恩負責測量風向，曜澤負責照明，瑟蕾雅把每一個變動都標成期限而不是錯誤。" },
+        { id: "broken-beacon", title: "失效的信標", body: "一座舊信標把所有船只引向同一個暗流，菲芮拆下它的自動指向器，改成只有在當班者確認後才會亮起。這讓航路變慢，卻讓每一艘船重新擁有拒絕進入的權利。" },
+        { id: "wind-consent", title: "在風裡取得同意", body: "風廊居民共同決定下一個月的開放時段，隊伍只負責把選擇傳回書庫。2.3 的路沒有被固定下來，卻比任何固定地圖更可靠。" }
+      ],
+      sideId: "wind", sideTitle: "風向維護表", sideSummary: "補充菲芮、雷恩與曜澤輪流維護風廊信標的記錄。", sideCharacters: ["ferye", "reyn", "yaoze"], sideScenes: [
+        { id: "shift", title: "三人一班", body: "菲芮把維護表分成風向、燈色與退回三欄，雷恩提議每次只由一人宣布變更，曜澤則在旁邊補上所有人的確認。最後三人決定，沒有第二個人確認就不改燈。" },
+        { id: "false-calm", title: "假平靜", body: "某個午後風突然停止，所有人以為風廊已經安全。菲芮反而要求關閉入口，因為沒有風不代表沒有變化；等待一個週期後，暗流才從入口外側通過。" },
+        { id: "flag-return", title: "旗子回到原位", body: "維護結束後，三人把旗子放回可被下一班重新調整的位置。它不是地標，而是一段允許改口的提醒。" }
+      ]
+    },
+    {
+      version: "2.4", region: "霧鏡議庭", mainTitle: "霧鏡議庭", mainSummary: "諾芮亞進入霧鏡議庭，面對一套會替證詞排序的審理機制，並把等待重新寫進規則。",
+      mainCharacters: ["celesia", "noreia", "evelyn", "mave"], mainScenes: [
+        { id: "fog-court", title: "霧裡的第一份證詞", body: "霧鏡議庭只接受被排序過的證詞，最先說話的人總會被當成最重要的人。諾芮亞要求把所有原始錄音同時播放，讓隊伍先承認資料的順序本身也會造成偏差。" },
+        { id: "wait-rule", title: "等待也可以是判決", body: "梅芙發現議庭把尚未確認的證詞自動標成無效，伊芙琳協助把它們移到等待欄。瑟蕾雅沒有要求立刻通過，而是讓每個被影響的人先看到自己被如何描述。" },
+        { id: "open-record", title: "把判決交還給當事人", body: "霧散後，議庭保留三種結果：同意、拒絕與等待。諾芮亞將修改權交給原證詞的持有人，2.4 因而第一次讓檔案本身也承認自己可能錯。" }
+      ],
+      sideId: "court", sideTitle: "證詞的空白欄", sideSummary: "補充諾芮亞與梅芙如何讓審理記錄保留不確定性。", sideCharacters: ["noreia", "mave"], sideScenes: [
+        { id: "order", title: "順序不是重量", body: "梅芙把三份最早收到的證詞重新排到最後，並在旁邊標註這個改動。諾芮亞說明，時間先後可以幫助查證，卻不能決定誰比較值得被聽見。" },
+        { id: "missing", title: "缺一段也要標記", body: "一段錄音中間缺了十秒，議庭想用附近的句子補全。兩人保留十秒空白，並將補全版本另存為推測，讓後來的人能分辨原話與分析。" },
+        { id: "signature", title: "簽名之前先讀完", body: "當事人拿回自己的證詞後，先讀完每一個修改標記才簽名。這個流程比原本慢很多，卻讓霧鏡議庭的判決不再偷偷替人說完最後一句。" }
+      ]
+    },
+    {
+      version: "2.5", region: "潮眼外圍", mainTitle: "潮眼回覆", mainSummary: "奧薇拉修復潮眼外圍的核心，隊伍在 2.5 結尾建立一條能被下一個版本繼續修改的協議。",
+      mainCharacters: ["celesia", "orivelle", "mirea", "noreia", "risan"], mainScenes: [
+        { id: "tide-eye", title: "潮眼不是終點", body: "潮眼外圍的核心不斷吸收所有回覆，最後只剩一盞中央燈。奧薇拉判斷問題不在核心損壞，而在所有人都把自己的選擇交給同一個亮點。" },
+        { id: "four-currents", title: "四股可以分開的潮流", body: "澪歌把潮流分成物資、醫療、航路與拒絕四條支線，諾芮亞替每條支線加入期限與撤回點。璃珊將新協議送回書庫，讓其他地區可以選擇是否採用。" },
+        { id: "next-law", title: "把下一條律留給未來", body: "瑟蕾雅沒有替潮眼宣布永久規則，只留下四條可被修改的初稿。奧薇拉把最後一枚潮核交回居民保管，2.5 的結尾因此不是封印，而是為 3.0 留下一個能被拒絕的起點。" }
+      ],
+      sideId: "repair", sideTitle: "潮核修復日誌", sideSummary: "補充奧薇拉與澪歌在潮眼修復期間留下的工作紀錄。", sideCharacters: ["orivelle", "mirea"], sideScenes: [
+        { id: "pulse", title: "先聽潮核的脈動", body: "奧薇拉沒有立刻拆開潮核，而是讓每個班次先聽一輪脈動。澪歌把不同人的描述並排記錄，發現潮核的異常會隨觀察角度改變。" },
+        { id: "replace", title: "替換之前先取得同意", body: "一枚核心零件已經損壞，修復隊卻先詢問使用這條水路的人是否願意暫停。有人同意，有人拒絕，奧薇拉因此設計了兩套不會互相覆蓋的修復流程。" },
+        { id: "log-return", title: "把日誌交回潮眼", body: "修復完成後，日誌沒有被帶回中央檔案，而是留在潮眼旁的公共架上。任何人都能閱讀，也能在下一次潮汐後寫下不同答案。" }
+      ]
+    }
+  ], true);
+
+  var version4StoryChapters = buildVersionChapters([
+    {
+      version: "4.0", region: "新曙港", mainTitle: "新曙港的第一束光", mainSummary: "奧蕾雅在新曙港建立天文台，眾人必須決定第一束光要照亮誰，而不是照亮哪一條最短的路。",
+      mainCharacters: ["celesia", "aurelia", "orivelle", "jiera"], mainScenes: [
+        { id: "new-dawn", title: "第一束光從哪裡來", body: "新曙港每天都有一束提早抵達的光，天文台把它當成新的中央時間。奧蕾雅卻先請港民標出不希望被照亮的區域，讓觀測不會自動變成監視。" },
+        { id: "sky-shift", title: "星潮觀測者", body: "奧蕾雅把天空的變化分成公開、延遲與只供本人查閱三種資料。瑟蕾雅發現，真正困難的不是測量星潮，而是讓每個人知道資料何時可能影響自己。" },
+        { id: "dawn-agreement", title: "曙光協議", body: "新曙港同意以一個月為期限試行天文台協議，期滿後由居民重新決定。第一束光終於照到港口，卻沒有替任何人畫出不可回頭的道路。" }
+      ],
+      sideId: "dawn", sideTitle: "天文台輪班表", sideSummary: "補充奧蕾雅與奧薇拉如何安排新曙港的觀測與撤回。", sideCharacters: ["aurelia", "orivelle"], sideScenes: [
+        { id: "watch", title: "值班不是擁有天空", body: "奧蕾雅把天文台鑰匙分給六個班次，並在交班表留下空白。奧薇拉提醒她，輪班能分散責任，但只有可撤回的紀錄才能防止權力重新集中。" },
+        { id: "cloud", title: "雲層遮住的夜晚", body: "一晚雲層完全遮住天空，觀測者無法給出答案。兩人把未知原樣公布，港民反而因此學會自己判斷是否要等待。" },
+        { id: "first-shift", title: "第一班交給下一班", body: "新曙港的第一份完整觀測在交班時被重新檢查，所有修改都保留。天文台因此成為一座能被下一班改寫的工作室。" }
+      ]
+    },
+    {
+      version: "4.1", region: "碎星工坊", mainTitle: "碎星工坊的熱源", mainSummary: "凱嵐在碎星工坊修復過載熱源，隊伍重新面對「效率」與「能不能停下」之間的選擇。",
+      mainCharacters: ["celesia", "kairen", "lorne", "sumine"], mainScenes: [
+        { id: "forge-heat", title: "碎星不是燃料", body: "碎星工坊把天空落下的晶片當成永久燃料，熱源因此越來越難關閉。凱嵐先停掉最亮的爐，要求所有班次記錄停機後會受到誰的影響。" },
+        { id: "repair-route", title: "熱管的第二條路", body: "洛恩與凱嵐把熱管拆成兩條可交班路線，澄音則替每條路加入手動退回點。效率下降了，工坊卻第一次可以在不犧牲整座城的情況下停下來。" },
+        { id: "cooling-law", title: "冷卻也要寫進律", body: "工坊居民共同同意每月一次冷卻日，任何人都能在緊急時提前申請停爐。4.1 的火不再只代表前進，也代表知道何時必須讓熱度退回。" }
+      ],
+      sideId: "forge", sideTitle: "空爐旁的工具架", sideSummary: "補充凱嵐與洛恩如何整理不屬於任何人的維修工具。", sideCharacters: ["kairen", "lorne"], sideScenes: [
+        { id: "tool-rack", title: "工具不跟著主人走", body: "凱嵐把最常用的工具放回公共架，洛恩則在握柄上刻上用途而不是名字。下一個人拿到它時，不需要先取得前任的許可。" },
+        { id: "overload-mark", title: "把過載刻出來", body: "每一次過載都在工具架旁留下刻痕，工坊不再用漂亮的牆面遮住失敗。刻痕逐漸變多，卻也讓維修速度變快。" },
+        { id: "cool-tool", title: "冷卻後再交班", body: "最後一個班次把工具放回架前先等待金屬冷卻，所有人都因此多花一點時間，卻沒有再讓下一班接到會傷人的握柄。" }
+      ]
+    },
+    {
+      version: "4.2", region: "遠望塔", mainTitle: "遠望塔的長距離回覆", mainSummary: "索萊與見習修復員塔莉亞讓遠望塔重新連上外海，但不讓長距離訊號取代當地人的選擇。",
+      mainCharacters: ["celesia", "sorae", "talia", "yaoze"], mainScenes: [
+        { id: "far-beacon", title: "看得遠，不代表知道得多", body: "遠望塔能看見很遠的海岸，卻常把遠方的沉默誤判成安全。索萊把遠距離觀測分成提示與結論兩層，塔莉亞負責在下方確認每一段提示是否真的影響當地。" },
+        { id: "repair-rookie", title: "見習生的第一個退回點", body: "塔莉亞第一次獨立修復信標，發現它會把沒有回覆的船標成已通過。她沒有追求快速修好，而是先加上退回點，等船員本人確認後才重新點亮。" },
+        { id: "long-reply", title: "長距離也要能停", body: "曜澤把白帆岬的燈路接上遠望塔，但保留當地手動開關。遠距離的成功不是訊號覆蓋更多，而是任何一端都能叫停。" }
+      ],
+      sideId: "tower", sideTitle: "信標見習筆記", sideSummary: "補充索萊與塔莉亞如何把遠望塔的操作交給下一班。", sideCharacters: ["sorae", "talia"], sideScenes: [
+        { id: "lens", title: "鏡片先擦乾淨", body: "索萊要求見習生先處理最小的鏡片灰塵，因為遠距離的錯誤常從最小的遮蔽開始。塔莉亞把每次清理寫進交班表，沒有只記最後結果。" },
+        { id: "signal-check", title: "三次確認再發光", body: "遠望塔的新規則是發光前要有三個不同位置的確認。這讓啟動變慢，卻避免任何單一觀測者把整片海的狀態說死。" },
+        { id: "student-shift", title: "把塔交給見習生", body: "索萊在最後一班把主控權交給塔莉亞，只留下可撤回的操作權限。塔因此有了新的守望者，也沒有新的主人。" }
+      ]
+    },
+    {
+      version: "4.3", region: "白夜航路", mainTitle: "白夜航路的記憶", mainSummary: "涅芙整理白夜航路上失效的訊息，讓被刪除的記憶可以回來，但不被強迫重新公開。",
+      mainCharacters: ["celesia", "neve", "evelyn", "noreia"], mainScenes: [
+        { id: "white-night", title: "一直亮著的白夜", body: "白夜航路沒有真正的夜晚，失效訊息因此不會自然沉下去。涅芙把記憶分成願意回來、只願意被本人看見與希望永久刪除三類，先承認它們的差異。" },
+        { id: "memory-recovery", title: "回收不是復原", body: "伊芙琳協助把碎片重新排列，諾芮亞則確認哪些內容不能由旁人代簽。瑟蕾雅明白，回收資料只代表它回到選擇者身邊，不代表它必須回到公共檔案。" },
+        { id: "night-choice", title: "讓白夜也有休息時間", body: "航路居民設立每日一段不接收外部訊號的安靜時間，讓記憶有機會在不被追問的狀態下整理。白夜第一次有了可以暫停的時刻。" }
+      ],
+      sideId: "memory", sideTitle: "失效訊息清單", sideSummary: "補充涅芙如何整理不再需要公開的回覆。", sideCharacters: ["neve", "evelyn"], sideScenes: [
+        { id: "list", title: "清單不是墓碑", body: "涅芙把失效訊息清單設計成可以被本人刪改的活頁，而不是不可更動的墓碑。伊芙琳在每頁下方加上重新申請的方式。" },
+        { id: "private", title: "只給本人看的頁面", body: "一位航路工人選擇只保留私用頁面，隊伍沒有要求知道內容。能夠尊重看不見的部分，成為修復工作最難的一課。" },
+        { id: "close", title: "把檔案闔上", body: "白夜航路的第一份記憶檔案在本人同意後闔上，涅芙沒有留下摘要，只留下檔案曾經存在的時間。" }
+      ]
+    },
+    {
+      version: "4.4", region: "回覆海溝", mainTitle: "海溝守門人", mainSummary: "凱爾守住回覆海溝的深層入口，隊伍在沉重壓力下學會讓資源與決定分散保管。",
+      mainCharacters: ["celesia", "kael", "mirea", "orivelle"], mainScenes: [
+        { id: "trench-gate", title: "海溝的門不是王座", body: "回覆海溝入口只有一座門，所有補給都必須通過它。凱爾拒絕成為唯一守門人，先把門鎖拆成四把分散在不同班次手中。" },
+        { id: "deep-pressure", title: "壓力會讓人想快一點", body: "深層壓力讓隊伍不斷想加快決定，澪歌把每次加速造成的錯誤記錄在公共板上。奧薇拉維修受損的潮核，凱爾則把自己的判斷交給另一班覆核。" },
+        { id: "four-keys", title: "四把鑰匙都能叫停", body: "海溝重新開放時，四把鑰匙分別控制物資、航路、醫療與退回。任何一把都能暫停整體流程，守門人的力量因此不再集中在一個人身上。" }
+      ],
+      sideId: "trench", sideTitle: "四把鑰匙的交班", sideSummary: "補充凱爾與澪歌如何建立海溝入口的分散權限。", sideCharacters: ["kael", "mirea"], sideScenes: [
+        { id: "keys", title: "鑰匙先分開", body: "凱爾把四把鑰匙放在四個不同房間，第一次交班花了半天才完成。所有人都嫌麻煩，但沒有人能單獨開門的安全感很快取代了不便。" },
+        { id: "hold", title: "誰都可以按住流程", body: "一名新手發現補給數字不對，拿著自己的鑰匙要求暫停。凱爾沒有把她請出去，而是請所有班次一起重算。" },
+        { id: "deep-return", title: "海溝也要有回來的路", body: "交班表最後一欄永遠是退回，沒有人能把它刪掉。海溝因此不再只記錄誰成功下去，也記錄誰安全回來。" }
+      ]
+    },
+    {
+      version: "4.5", region: "第二條律終端", mainTitle: "第二條律", mainSummary: "伊萊拉整理 4.0–4.4 的協議，提出第二條律：任何連線都必須保留拒絕、撤回與重新協商的入口。",
+      mainCharacters: ["celesia", "elyra", "aurelia", "kael", "neve"], mainScenes: [
+        { id: "second-law", title: "第二條律的第一行", body: "伊萊拉沒有替新規則取一個漂亮的口號，她先列出三個不可省略的入口：拒絕、撤回與重新協商。瑟蕾雅把 1.0 以來的舊錯誤並排放在桌上，確認新律不能只寫成功的故事。" },
+        { id: "assemble", title: "把所有退回點接起來", body: "奧蕾雅帶來天文台的期限，凱爾帶來四把鑰匙，涅芙帶來只給本人看的檔案。眾人把每個版本的退回點接成一張不會自動封口的地圖。" },
+        { id: "open-end", title: "讓下一個人可以改寫", body: "第二條律通過的那一刻，終端沒有選出新的中心，只公布每一條協議的修改方式。伊萊拉把筆交給下一個願意承擔影響的人，星界之律的下一頁再次留白。" }
+      ],
+      sideId: "law", sideTitle: "可撤回協議手冊", sideSummary: "補充伊萊拉如何把各地規則整理成可被普通玩家理解的手冊。", sideCharacters: ["elyra", "aurelia", "neve"], sideScenes: [
+        { id: "manual", title: "手冊先寫怎麼拒絕", body: "伊萊拉把手冊第一頁改成拒絕方式，而不是加入流程。奧蕾雅說這樣會讓新使用者更慢開始，她回答：慢一點開始，才能知道自己是否真的要開始。" },
+        { id: "revise", title: "每一次修改都留痕", body: "涅芙把所有版本修改保留在手冊邊欄，任何人都能看見規則曾經傷害過誰、又由誰提出修正。沒有一個版本被假裝成永遠正確。" },
+        { id: "blank-page", title: "4.5 之後", body: "手冊最後一頁只寫著：下一次協商從這裡開始。瑟蕾雅把第一支筆放回公共架，第二條律完成了，卻沒有替未來寫下唯一答案。" }
+      ]
+    }
+  ], false);
+
   // 限定池的精選候選就是文件中的既有 4★；玩家選一隻後，其他 4★ 合計為 45%。
   var banners = [
     {
@@ -392,10 +625,10 @@
       type: "limited",
       poolKey: "limited",
       defaultFeaturedId: "celesia",
-      description: "可從 1.0–1.5 文件角色中選一隻限定 4★；選中者 55%，其餘 4★ 合計 45%。",
-      featured4Stars: activeFour,
-      standard4Stars: activeFour,
-      standard3Stars: activeThree
+      description: "1.0–1.5 舊版限定池；可從文件既有 4★ 中選一隻，選中者 55%，其餘 4★ 合計 45%。",
+      featured4Stars: legacyFour,
+      standard4Stars: legacyFour,
+      standard3Stars: legacyThree
     },
     {
       id: "rerun-1-0-to-2-0",
@@ -405,16 +638,27 @@
       active: false,
       defaultFeaturedId: "celesia",
       description: "復刻卡池尚未開放；未來仍會只使用文件既有角色，並承接限定池計數。",
-      featured4Stars: activeFour,
+      featured4Stars: legacyFour,
+      standard4Stars: legacyFour,
+      standard3Stars: legacyThree
+    },
+    {
+      id: "limited-2-0-to-2-5",
+      name: "限定｜2.0–2.5 潮眼回覆召集",
+      type: "limited",
+      poolKey: "limited",
+      defaultFeaturedId: "risan",
+      description: "2.0–2.5 新限定池；可從璃珊、曜澤、伊芙琳、澪歌、菲芮、諾芮亞、奧薇拉中選一隻，選中者 55%。",
+      featured4Stars: version2Four,
       standard4Stars: activeFour,
       standard3Stars: activeThree
     },
     {
       id: "standard-echo",
-      name: "常駐｜回音召集（1.0–1.5）",
+      name: "常駐｜回音召集（1.0–2.5）",
       type: "standard",
       poolKey: "standard",
-      description: "常駐池獨立計數；只收錄文件中 1.0–1.5 的 3★／4★，沒有精選保證。",
+      description: "常駐池獨立計數；收錄目前已開放的 1.0–2.5 角色，沒有精選保證。",
       featured4Stars: [],
       standard4Stars: activeFour,
       standard3Stars: activeThree
@@ -429,14 +673,22 @@
     activeFour: activeFour,
     activeThree: activeThree,
     banners: banners,
-    // 1.0–1.5 是 live 劇情；3.0–3.5 先完整建檔但保持鎖定，供後續版本開放。
-    storyChapters: storyChapters.concat(version3StoryChapters),
-    liveStoryChapters: storyChapters,
+    version2Cards: version2Cards,
+    version4Cards: version4Cards,
+    // 1.0–2.5 是 live 劇情；3.0–4.5 先完整建檔但保持鎖定，供後續版本開放。
+    storyChapters: storyChapters.concat(version2StoryChapters, version3StoryChapters, version4StoryChapters),
+    liveStoryChapters: storyChapters.concat(version2StoryChapters),
+    version2StoryChapters: version2StoryChapters,
     version3StoryChapters: version3StoryChapters,
+    version4StoryChapters: version4StoryChapters,
     characterBattleStats: characterBattleStats,
     trialStages: trialStages,
     trialVersion: trialVersion,
     trialMaxRewards: trialMaxRewards,
-    trialReward: trialReward
+    trialReward: trialReward,
+    dispatchVersion: dispatchVersion,
+    dispatchMissions: dispatchMissions,
+    updateVersion: "2.0-2.5",
+    updateReward: Object.freeze({ starSand: 3200 })
   };
 }));

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">遺構鎧獸</title><desc id="desc">銅金重裝鎧獸敵人圖鑑</desc>
+  <defs><linearGradient id="g" x2="0" y2="1"><stop stop-color="#f7cf79"/><stop offset="1" stop-color="#704539"/></linearGradient></defs>
+  <path d="M47 170c0-55 31-105 73-105s73 50 73 105c0 48-31 72-73 72s-73-24-73-72Z" fill="url(#g)" stroke="#ffe8a5" stroke-width="6"/>
+  <path d="M64 112h112M52 151h136M58 191h124M86 77l-9 142M120 67v160M154 77l9 142" fill="none" stroke="#9b623f" stroke-width="7" opacity=".85"/>
+  <path d="m67 77-34-26 12 64M173 77l34-26-12 64" fill="#805042" stroke="#e8b867" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="80" y="127" width="80" height="35" rx="15" fill="#362b48" stroke="#fff0bb" stroke-width="4"/><circle cx="103" cy="144" r="7" fill="#ffec9c"/><circle cx="137" cy="144" r="7" fill="#ffec9c"/>
+</svg>

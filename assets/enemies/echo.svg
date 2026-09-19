@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">噪音殘響</title><desc id="desc">粉紫色聲波敵人圖鑑</desc>
+  <defs><radialGradient id="g"><stop stop-color="#ffe2ff"/><stop offset=".35" stop-color="#e967c9"/><stop offset="1" stop-color="#4f246f"/></radialGradient></defs>
+  <circle cx="120" cy="137" r="75" fill="url(#g)" stroke="#ffb8ed" stroke-width="5"/><circle cx="120" cy="137" r="43" fill="none" stroke="#fff1ff" stroke-width="5" opacity=".75"/><circle cx="120" cy="137" r="13" fill="#fff8ff"/>
+  <path d="M42 84c-24 29-24 77 0 106M26 66c-36 42-36 100 0 142M198 84c24 29 24 77 0 106M214 66c36 42 36 100 0 142" fill="none" stroke="#cf9aff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M104 137h32M120 121v32" stroke="#5b287e" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">索引書獸</title><desc id="desc">藍色書頁檔案敵人圖鑑</desc>
+  <path d="M43 57c28-18 53-18 77 0 24-18 49-18 77 0v145c-28-18-53-18-77 0-24-18-49-18-77 0Z" fill="#34578f" stroke="#b4d9ff" stroke-width="5"/>
+  <path d="M120 58v144M61 91c20-10 39-8 59 4M61 121c20-10 39-8 59 4M61 151c20-10 39-8 59 4M179 91c-20-10-39-8-59 4M179 121c-20-10-39-8-59 4M179 151c-20-10-39-8-59 4" fill="none" stroke="#82c7ff" stroke-width="6" stroke-linecap="round"/>
+  <path d="m43 57-19-19M197 57l19-19M43 202l-20 22M197 202l20 22" stroke="#75b5ee" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="120" cy="58" r="12" fill="#ffeaa3"/><path d="M120 49v18M111 58h18" stroke="#614f91" stroke-width="3"/>
+</svg>

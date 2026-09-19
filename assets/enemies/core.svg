@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">潮核主核</title><desc id="desc">金紫色首領核心敵人圖鑑</desc>
+  <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#fff0a4"/><stop offset=".38" stop-color="#e28bff"/><stop offset="1" stop-color="#442375"/></linearGradient></defs>
+  <path d="m120 18 48 53 31 68-31 68-48 55-48-55-31-68 31-68Z" fill="url(#g)" stroke="#ffe9a6" stroke-width="6"/>
+  <path d="m120 57 22 80-22 87-22-87Z" fill="#4b2b79" opacity=".8"/><path d="M120 57v167M72 139h96" stroke="#fff1ae" stroke-width="4" opacity=".75"/>
+  <circle cx="120" cy="139" r="23" fill="#201542" stroke="#fff5bf" stroke-width="5"/><circle cx="120" cy="139" r="8" fill="#fff5bf"/>
+  <path d="M58 139H27M182 139h31M120 49V20M120 229v31" stroke="#f4c88b" stroke-width="7" stroke-linecap="round"/>
+</svg>

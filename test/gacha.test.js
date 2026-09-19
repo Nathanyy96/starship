@@ -3,13 +3,19 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version3Cards, characterBattleStats } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, updateReward } = require("../src/data.js");
 
-test("現行卡池只開放文件 1.0–1.5，2.0 以後先保留", () => {
-  assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), false);
-  assert.equal(activeCards.every((card) => Number(card.releaseVersion) <= 1.5), true);
-  assert.equal(futureCards.some((card) => card.releaseVersion === "2.0"), true);
+test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
+  assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
+  assert.equal(activeCards.every((card) => Number(card.releaseVersion) <= 2.5), true);
+  assert.equal(futureCards.some((card) => card.releaseVersion === "3.0"), true);
   assert.equal(banners[0].featured4Stars.every((card) => Number(card.releaseVersion) <= 1.5), true);
+  const updateBanner = banners.find((banner) => banner.id === "limited-2-0-to-2-5");
+  assert.ok(updateBanner);
+  assert.equal(updateBanner.active !== false, true);
+  assert.equal(updateBanner.featured4Stars.every((card) => Number(card.releaseVersion) >= 2 && Number(card.releaseVersion) <= 2.5), true);
+  assert.equal(version2Cards.length, 8);
+  assert.equal(updateReward.starSand, 3200);
 });
 
 test("後續角色都有完整立繪來源，但不會混入現行卡池", () => {
@@ -17,15 +23,25 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(futureCards.every((card) => card.portraitImage), true);
   assert.equal(activeCards.some((card) => card.id === "cenya"), false);
   assert.equal(version3Cards.some((card) => card.id === "cenya" && card.rarity === 3), true);
+  assert.equal(version4Cards.every((card) => card.portraitImage), true);
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
 });
 
-test("第三大版本 3.0–3.5 主線與支線都已建檔但保持鎖定", () => {
+test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保持鎖定", () => {
+  const liveStory = storyChapters.filter((chapter) => Number(chapter.version) <= 2.5);
   const futureStory = storyChapters.filter((chapter) => Number(chapter.version) >= 3);
-  assert.equal(futureStory.length, 12);
+  assert.equal(liveStory.length, 24);
+  assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length === 3 && chapter.scenes.every((scene) => scene.body)), true);
+  assert.equal(futureStory.length, 24);
   assert.equal(futureStory.every((chapter) => chapter.releaseOpen === false && chapter.scenes.length === 3), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-3-5"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "side-3-5-finale"), true);
+  assert.equal(futureStory.some((chapter) => chapter.id === "main-4.5"), true);
+});
+
+test("星港委託提供額外玩法與非抽卡獎勵", () => {
+  assert.equal(dispatchMissions.length, 3);
+  assert.equal(dispatchMissions.every((mission) => mission.enemies.length > 0 && mission.reward.starSand > 0), true);
 });
 
 function state(overrides) {

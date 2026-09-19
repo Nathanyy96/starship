@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">失序獸靈</title><desc id="desc">赭紅色獸靈敵人圖鑑</desc>
+  <defs><linearGradient id="g" x2="0" y2="1"><stop stop-color="#f1a078"/><stop offset="1" stop-color="#6d2f40"/></linearGradient></defs>
+  <path d="M47 160c-3-49 26-92 73-102 47 10 76 53 73 102-2 38-30 61-73 61s-71-23-73-61Z" fill="url(#g)" stroke="#ffc19b" stroke-width="5"/>
+  <path d="m67 83-34-35 12 62M173 83l34-35-12 62" fill="#874253" stroke="#f1a078" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="92" cy="143" rx="11" ry="15" fill="#fff2cf"/><ellipse cx="148" cy="143" rx="11" ry="15" fill="#fff2cf"/><circle cx="92" cy="145" r="5" fill="#4e1f36"/><circle cx="148" cy="145" r="5" fill="#4e1f36"/>
+  <path d="M92 183c17 13 39 13 56 0" fill="none" stroke="#ffd0b0" stroke-width="6" stroke-linecap="round"/><path d="M73 208 55 251M167 208l18 43" stroke="#8b4350" stroke-width="15" stroke-linecap="round"/>
+  <path d="M120 102v55M101 129h38" stroke="#ffe09d" stroke-width="4" opacity=".8"/>
+</svg>

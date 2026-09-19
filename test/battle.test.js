@@ -27,11 +27,11 @@ test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
   assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 765);
 });
 
-test("星界試煉擴充為 20 關並維持逐關升難", () => {
-  assert.equal(trialStages.length, 20);
-  assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 20 }, (_, index) => index + 1));
+test("星界試煉擴充為 30 關並維持逐關升難", () => {
+  assert.equal(trialStages.length, 30);
+  assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 30 }, (_, index) => index + 1));
   assert.ok(trialStages.every((stage, index) => index === 0 || stage.recommendedPower > trialStages[index - 1].recommendedPower));
-  assert.equal(trialStages[19].finalStage, true);
+  assert.equal(trialStages[29].finalStage, true);
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
 

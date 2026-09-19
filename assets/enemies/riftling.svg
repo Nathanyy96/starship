@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" role="img" aria-labelledby="title desc">
+  <title id="title">界痕幼體</title><desc id="desc">紫色界痕裂隙敵人圖鑑</desc>
+  <defs><radialGradient id="g" cx="50%" cy="36%"><stop stop-color="#d7c8ff"/><stop offset=".42" stop-color="#7664d7"/><stop offset="1" stop-color="#20194f"/></radialGradient></defs>
+  <path d="M120 21C81 35 52 67 55 111c2 33-23 48-13 77 10 28 43 44 78 40 35 4 68-12 78-40 10-29-15-44-13-77 3-44-26-76-65-90Z" fill="url(#g)" stroke="#bda9ff" stroke-width="5"/>
+  <path d="M72 104 32 77l20 48M168 104l40-27-20 48M81 190l-25 41 39-19M159 190l25 41-39-19" fill="#423482" stroke="#a58ef5" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="92" cy="125" rx="12" ry="17" fill="#f6f1ff"/><ellipse cx="148" cy="125" rx="12" ry="17" fill="#f6f1ff"/><circle cx="94" cy="128" r="5" fill="#30205b"/><circle cx="146" cy="128" r="5" fill="#30205b"/>
+  <path d="M91 160c17 14 41 14 58 0" fill="none" stroke="#f4baff" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="120" cy="75" r="10" fill="#ffe9a6" opacity=".9"/><path d="M120 45v60M90 75h60" stroke="#fff6d7" stroke-width="3" opacity=".75"/>
+</svg>

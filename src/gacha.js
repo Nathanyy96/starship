@@ -195,12 +195,21 @@
         completedScenes: {}
       },
       trialProgress: {
-        version: "1.0-1.5",
+        version: "2.0-2.5",
         selectedTeam: [],
         clearedStages: [],
         attempts: {},
         bestStage: 0,
         lastBattle: null
+      },
+      updateRewards: {
+        claimedVersions: {}
+      },
+      dispatchProgress: {
+        version: "2.0-2.5",
+        selectedTeam: [],
+        claimed: {},
+        lastMission: null
       },
       bannerExchanges: {},
       totalPulls: 0,
@@ -247,6 +256,11 @@
       state.trialProgress.attempts[id] = Number.isInteger(state.trialProgress.attempts[id]) && state.trialProgress.attempts[id] >= 0 ? state.trialProgress.attempts[id] : 0;
     });
     state.trialProgress.bestStage = Number.isInteger(state.trialProgress.bestStage) && state.trialProgress.bestStage >= 0 ? state.trialProgress.bestStage : 0;
+    state.updateRewards = Object.assign(initialState().updateRewards, isPlainObject(source.updateRewards) ? source.updateRewards : {});
+    state.updateRewards.claimedVersions = isPlainObject(state.updateRewards.claimedVersions) ? state.updateRewards.claimedVersions : {};
+    state.dispatchProgress = Object.assign(initialState().dispatchProgress, isPlainObject(source.dispatchProgress) ? source.dispatchProgress : {});
+    state.dispatchProgress.selectedTeam = Array.isArray(state.dispatchProgress.selectedTeam) ? state.dispatchProgress.selectedTeam.slice(0, 4) : [];
+    state.dispatchProgress.claimed = isPlainObject(state.dispatchProgress.claimed) ? state.dispatchProgress.claimed : {};
     state.bannerExchanges = isPlainObject(source.bannerExchanges) ? source.bannerExchanges : {};
     state.totalPulls = Number.isInteger(source.totalPulls) && source.totalPulls >= 0 ? source.totalPulls : 0;
     state.history = Array.isArray(source.history) ? source.history.slice(-50) : [];
@@ -266,11 +280,11 @@
       state.pity[banner.poolKey].pullsSince4Star = Number.isInteger(saved.pullsSince4Star) ? saved.pullsSince4Star : 0;
       state.pity[banner.poolKey].guaranteedFeatured = saved.guaranteedFeatured === true;
       assert(state.pity[banner.poolKey].pullsSince4Star >= 0 && state.pity[banner.poolKey].pullsSince4Star < DEFAULT_RULES.hardPity, "保底計數超出範圍：" + banner.poolKey);
-      if (banner.poolKey === "limited" && !state.selectedFeatured[banner.poolKey]) {
-        var selected = source.selectedFeatured && (source.selectedFeatured[banner.poolKey] || source.selectedFeatured[banner.id]);
+      if (banner.poolKey === "limited") {
+        var selected = source.selectedFeatured && (source.selectedFeatured[banner.id] || source.selectedFeatured[banner.poolKey]);
         selected = selected || banner.defaultFeaturedId;
         if (banner.featured4Stars.some(function (card) { return card.id === selected; })) {
-          state.selectedFeatured[banner.poolKey] = selected;
+          state.selectedFeatured[banner.id] = selected;
         }
       }
     });
@@ -432,7 +446,7 @@
     if (banner.poolKey !== "limited") {
       return null;
     }
-    var selectedId = this.state.selectedFeatured[banner.poolKey] || banner.defaultFeaturedId;
+    var selectedId = this.state.selectedFeatured[banner.id] || this.state.selectedFeatured[banner.poolKey] || banner.defaultFeaturedId;
     return banner.featured4Stars.find(function (card) { return card.id === selectedId; }) || banner.featured4Stars[0];
   };
 
@@ -442,7 +456,7 @@
     assert(banner.poolKey === "limited", "常駐回音召集沒有可選精選角色");
     var selected = banner.featured4Stars.find(function (card) { return card.id === options.cardId; });
     assert(selected, "這隻角色不在目前卡池的可選限定 4★ 清單中");
-    this.state.selectedFeatured[banner.poolKey] = selected.id;
+    this.state.selectedFeatured[banner.id] = selected.id;
     return { bannerId: banner.id, card: clone(selected), state: this.getState() };
   };
 

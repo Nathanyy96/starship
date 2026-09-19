@@ -53,7 +53,7 @@
           <p class="eyebrow">STAR-LAW / HOME TERMINAL</p>
           <h2>星界之律大廳</h2>
           <p>在回覆台之間整理線索，推進文件中的旅程，召集角色並培養已取得的夥伴。</p>
-          <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span></div>
+          <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span><span id="lobby-update-label">大更新獎勵 +3,200 星砂</span></div>
         </div>
         <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
       </div>
@@ -63,14 +63,15 @@
         <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
         <button id="open-characters" class="lobby-menu-card character-menu" type="button"><span class="menu-index">03</span><span class="menu-icon">◇</span><strong>角色培養</strong><small>查看已獲得角色與培養進度</small><span class="menu-arrow">→</span></button>
         <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
+        <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
       </div>
-      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–1.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
+      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
     </section>
 
     <section id="story-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">1.0–1.5</span></div>
-      <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0–1.5</button><button id="story-side-tab" class="small-button" type="button">支線 1.0–1.5</button></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">1.0–2.5</span></div>
+      <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0–2.5</button><button id="story-side-tab" class="small-button" type="button">支線 1.0–2.5</button></div>
       <div class="story-layout"><nav id="story-chapters" class="story-chapters" aria-label="劇情章節"></nav><article id="story-reader" class="story-reader"></article></div>
     </section>
 
@@ -85,11 +86,12 @@
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
       <div class="trial-layout">
         <aside class="trial-stage-rail">
-          <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>20 關逐關解鎖 · 最多 4 名角色</strong><small>每關有獨立環境與敵方特性；戰鬥依速度、技能冷卻與隊伍協同自動進行。</small></div>
+          <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>30 關逐關解鎖 · 最多 4 名角色</strong><small>本次大更新已重置挑戰與獎勵；每關有獨立環境與敵方特性，戰鬥依速度、技能冷卻與隊伍協同自動進行。</small></div>
           <div id="trial-stages" class="trial-stages"></div>
         </aside>
         <section class="trial-arena">
           <div id="trial-stage-details" class="trial-stage-details"></div>
+          <div id="trial-enemy-intel" class="trial-enemy-intel"></div>
           <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>出戰編隊</h3></div><span id="trial-team-count">0 / 4</span></div>
           <div id="trial-team-list" class="trial-team-list"></div>
           <button id="start-trial-battle" class="primary-action trial-start-button" type="button">開始自走棋戰鬥</button>
@@ -98,8 +100,26 @@
       </div>
     </section>
 
+    <section id="dispatch-view" class="game-view panel" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>2.0–2.5 限時任務</span></div>
+      <div class="dispatch-layout">
+        <aside class="dispatch-mission-rail">
+          <div class="trial-rule"><span class="eyebrow">NEW GAMEPLAY</span><strong>每份委託每版本完成一次</strong><small>觀察敵人特性、組成適合的隊伍，完成後取得星砂與養成資源；下次大更新會重置。</small></div>
+          <nav id="dispatch-missions" class="dispatch-missions" aria-label="星港委託清單"></nav>
+        </aside>
+        <section class="dispatch-arena">
+          <div id="dispatch-mission-details" class="trial-stage-details"></div>
+          <div id="dispatch-enemy-intel" class="trial-enemy-intel"></div>
+          <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>派遣隊伍</h3></div><span id="dispatch-team-count">0 / 4</span></div>
+          <div id="dispatch-team-list" class="trial-team-list"></div>
+          <button id="start-dispatch" class="primary-action trial-start-button" type="button">執行星港委託</button>
+          <div id="dispatch-result" class="trial-battle-result"></div>
+        </section>
+      </div>
+    </section>
+
     <div id="gacha-hall" class="gacha-hall" hidden>
-    <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–1.5 角色池</span></div>
+    <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–2.5 角色池</span></div>
     <section class="resource-bar" aria-label="資源">
       <div class="resource"><span class="resource-icon sand">✦</span><span><small>星砂</small><strong id="star-sand">0</strong></span></div>
       <div class="resource"><span class="resource-icon ticket">↩</span><span><small>共鳴券</small><strong id="tickets">0</strong></span></div>
@@ -117,7 +137,7 @@
           <select id="banner-select" aria-label="選擇卡池"></select>
         </div>
         <p id="banner-description" class="banner-description"></p>
-        <div class="banner-subline" aria-label="卡池標籤"><span>1.0—1.5 角色回音</span><span>50 抽硬保底</span><span>前 20 抽無 4★</span></div>
+        <div class="banner-subline" aria-label="卡池標籤"><span>1.0—2.5 角色回音</span><span>50 抽硬保底</span><span>前 20 抽無 4★</span></div>
         <div class="featured-heading"><span>從文件角色選一隻限定 4★</span><select id="featured-select" aria-label="選擇限定 4 星角色"></select></div>
         <div id="featured-card" class="featured-card"></div>
 
@@ -144,7 +164,7 @@
           <div><span>第 1–20 抽</span><strong>0%</strong><small>不會提早出現 4★</small></div>
           <div><span>選中限定 4★</span><strong>55%</strong><small>每次 4★ 判定時選中者的機率</small></div>
           <div><span>其他 4★ 合計</span><strong>45%</strong><small>同一池其餘文件角色合計</small></div>
-          <div><span>三星角色</span><strong>20%</strong><small>非 4★ 結果中的角色機率；1.0–1.5 三星共用</small></div>
+          <div><span>三星角色</span><strong>20%</strong><small>非 4★ 結果中的角色機率；依目前卡池列出的三星共用</small></div>
           <div><span>一般回響</span><strong>80%</strong><small>非 4★ 結果的其餘部分，轉為回響粉</small></div>
           <div><span>第 21 抽</span><strong>10%</strong><small>前 20 抽不出 4★，從這一抽開始提升</small></div>
           <div><span>之後每抽</span><strong>+4%</strong><small>按單格逐抽計算</small></div>
@@ -170,7 +190,7 @@
     </section>
 
     <footer>
-      <span>現行實作：50 抽硬保底／前 20 抽無 4★／21 抽起每抽 +4%</span>
+      <span>現行實作：50 抽硬保底／前 20 抽無 4★／21 抽起每抽 +4%／劇情 1.0–2.5</span>
       <span>卡面固定顯示角色名稱、星級與元素；立繪完整比例不裁切</span>
     </footer>
     </div>
