@@ -681,8 +681,9 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .pet-art-svg .pet-body, .pet-art-svg .pet-head, .pet-art-svg .pet-ear, .pet-art-svg .pet-tail, .pet-art-svg .pet-wing, .pet-art-svg .pet-root { fill: var(--pet-art-base); stroke: rgba(246, 250, 255, .65); stroke-width: 2; stroke-linejoin: round; }
 .pet-art-svg .pet-head { fill: color-mix(in srgb, var(--pet-art-base) 78%, #fff); }
 .pet-art-svg .pet-belly { fill: rgba(250, 252, 255, .56); stroke: rgba(246, 250, 255, .38); stroke-width: 2; }
-.pet-art-svg .pet-eye, .pet-art-svg .pet-nose { fill: #111936; stroke: #eef5ff; stroke-width: 1.5; }
-.pet-art-svg .pet-face { fill: none; stroke: #1a2447; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pet-art-svg .pet-eye, .pet-art-svg .pet-nose { fill: #111936; stroke: #f8fbff; stroke-width: 2; }
+.pet-art-svg .pet-eye-highlight { fill: #fff; stroke: none; }
+.pet-art-svg .pet-face { fill: none; stroke: #141d40; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
 .pet-art-svg .pet-beak, .pet-art-svg .pet-crest, .pet-art-svg .pet-crystal { fill: var(--pet-art-outfit); stroke: rgba(246, 250, 255, .65); stroke-width: 2; stroke-linejoin: round; }
 .pet-art-svg .pet-outfit-mark { fill: var(--pet-art-outfit); opacity: .9; stroke: rgba(246, 250, 255, .55); stroke-width: 2; }
 .pet-art-svg .pet-bubble, .pet-art-svg .pet-art-spark { fill: var(--pet-art-effect); opacity: .82; }
