@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="霜狼敵人圖像">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#355a87"/><stop offset="1" stop-color="#0b1534"/></radialGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9f7ff"/><stop offset=".48" stop-color="#7ca8d3"/><stop offset="1" stop-color="#4b5f9a"/></linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="url(#bg)"/>
+  <circle cx="31" cy="31" r="3" fill="#b9f7ff"/><circle cx="128" cy="24" r="2" fill="#fff2bb"/><path d="M19 129h122" stroke="#76e9ed" stroke-opacity=".28"/>
+  <path d="M39 116 30 64l20 14 18-34 11 23 26-15 15 29 11-5-13 39c-7 15-24 23-43 23-17 0-29-8-36-22Z" fill="url(#fur)" stroke="#b8eaff" stroke-width="2"/>
+  <path d="m48 76-7-31 25 20M106 67l20-25-2 37" fill="#638fc6" stroke="#b8eaff" stroke-width="2"/>
+  <path d="M60 101c9-9 28-12 43-4 6 3 10 9 11 18-16 8-38 8-54-2Z" fill="#18284d" opacity=".9"/>
+  <path d="M66 96 56 89M95 94l12-8" stroke="#e8ffff" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="68" cy="89" r="3.5" fill="#ffe28e"/><circle cx="94" cy="89" r="3.5" fill="#ffe28e"/>
+  <path d="M77 107h9" stroke="#9eeefa" stroke-width="2" stroke-linecap="round"/>
+  <path d="m34 128 12-6M126 123l9 7" stroke="#89e8ef" stroke-width="3" stroke-linecap="round"/>
+</svg>

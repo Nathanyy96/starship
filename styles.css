@@ -466,6 +466,10 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .trial-rule-callout { display: grid; grid-template-columns: auto 1fr; gap: 4px 9px; margin-top: 13px; padding: 10px 12px; border-left: 2px solid rgba(169,155,255,.72); color: #9faed0; background: rgba(169,155,255,.06); font-size: .66rem; line-height: 1.5; }
 .trial-rule-callout strong { color: #d9d2ff; font-size: .65rem; }
 .trial-rule-callout span { min-width: 0; }
+.trial-mythic-note { display: grid; grid-column: 1 / -1; gap: 3px; margin-top: 5px; padding-top: 7px; border-top: 1px solid rgba(246,199,111,.13); }
+.trial-mythic-note strong { color: #ffe2a0; font-size: .62rem; }
+.trial-mythic-note span { color: #b5c1d8; }
+.trial-mythic-rail-label { color: #ffe2a0 !important; }
 
 /* Every auth-protected section must stay invisible until player-app.js opens it. */
 [hidden] { display: none !important; }
@@ -485,6 +489,10 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .story-scene-reader > p { white-space: pre-line; }
 .story-reader-kicker { align-items: center; flex-wrap: wrap; }
 .story-source-badge { padding: 4px 7px; border: 1px solid rgba(112,233,223,.28); border-radius: 999px; color: #a4eee6; background: rgba(112,233,223,.07); font-size: .56rem; letter-spacing: .08em; }
+.story-mythic-badge, .trial-mythic-badge { padding: 4px 7px; border: 1px solid rgba(246,199,111,.36); border-radius: 999px; color: #ffe2a0; background: rgba(246,199,111,.08); font-size: .56rem; letter-spacing: .06em; }
+.story-mythic-note { display: grid; gap: 3px; margin: 13px 0 3px; padding: 10px 12px; border-left: 2px solid rgba(246,199,111,.72); color: #bfcbe4; background: rgba(246,199,111,.06); font-size: .68rem; line-height: 1.55; }
+.story-mythic-note strong { color: #ffe2a0; font-size: .65rem; }
+.story-mythic-note span { color: #aebbd5; }
 .story-reader-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 4px; }
 .story-reader-meta span { padding: 7px 9px; border: 1px solid rgba(187,213,255,.14); border-radius: 9px; color: #91a2c0; background: rgba(255,255,255,.035); font-size: .63rem; }
 .story-reader-meta b { margin-left: 3px; color: #e8f2ff; }
@@ -512,6 +520,7 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .enemy-intel-art span { position: absolute; right: 6px; bottom: 6px; padding: 3px 5px; border: 1px solid rgba(255,255,255,.3); border-radius: 5px; color: #fff1c0; background: rgba(5,8,20,.7); font: .62rem ui-monospace, Consolas, monospace; }
 .enemy-intel-copy { display: flex; min-width: 0; flex-direction: column; justify-content: center; gap: 3px; padding: 8px 9px; }
 .enemy-intel-copy > strong { overflow: hidden; color: #f2f6ff; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+.enemy-mythic-badge { width: max-content; padding: 2px 5px; border: 1px solid rgba(246,199,111,.32); border-radius: 5px; color: #ffe2a0; background: rgba(246,199,111,.08); font-size: .53rem; }
 .enemy-intel-copy > small, .enemy-intel-copy > em { color: #8294b5; font-size: .59rem; font-style: normal; }
 .enemy-intel-copy > div { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
 .enemy-intel-copy > div span { color: #8899b8; font-size: .58rem; }.enemy-intel-copy b { color: #eaf2ff; }

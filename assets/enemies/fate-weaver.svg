@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="命線織獸敵人圖像">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="78%"><stop stop-color="#553e79"/><stop offset="1" stop-color="#10152f"/></radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffce8d"/><stop offset=".5" stop-color="#dd8bff"/><stop offset="1" stop-color="#6be8de"/></linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="url(#bg)"/>
+  <circle cx="80" cy="76" r="50" fill="none" stroke="#dba7ff" stroke-opacity=".45" stroke-width="2" stroke-dasharray="4 7"/>
+  <path d="M30 43c29 34 68 8 101 45 8 9 12 18 15 29M20 106c33-34 65-3 112-48M37 23c18 47 55 48 85 111" fill="none" stroke="url(#line)" stroke-width="3"/>
+  <path d="M80 31c-19 19-29 36-29 55 0 28 17 46 29 46s29-18 29-46c0-19-10-36-29-55Z" fill="#1c2144" stroke="#efb4ff" stroke-width="3"/>
+  <path d="m80 51 13 22-13 30-13-30Z" fill="#f4ccff" opacity=".9"/><circle cx="74" cy="77" r="3" fill="#6be8de"/><circle cx="86" cy="77" r="3" fill="#6be8de"/>
+  <path d="M67 113h26" stroke="#ffd28b" stroke-width="3" stroke-linecap="round"/>
+</svg>

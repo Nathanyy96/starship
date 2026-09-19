@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="霜火巨像敵人圖像">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="80%"><stop stop-color="#713e4c"/><stop offset="1" stop-color="#17152e"/></radialGradient>
+    <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe398"/><stop offset=".36" stop-color="#e88961"/><stop offset=".7" stop-color="#8a5a9e"/><stop offset="1" stop-color="#4a3d78"/></linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="url(#bg)"/>
+  <path d="M80 142c-25 0-43-15-43-40l8-50 18 15 17-28 17 28 18-15 8 50c0 25-18 40-43 40Z" fill="url(#armor)" stroke="#ffd897" stroke-width="3"/>
+  <path d="M54 48 38 28l28 13M106 48l16-20-28 13" fill="#9a628f" stroke="#ffb975" stroke-width="3"/>
+  <path d="M47 83h66M56 101h48" stroke="#ffda89" stroke-opacity=".6" stroke-width="3"/>
+  <circle cx="66" cy="73" r="5" fill="#fff0a5"/><circle cx="94" cy="73" r="5" fill="#fff0a5"/>
+  <path d="M68 113c8 6 16 6 24 0" fill="none" stroke="#301e45" stroke-width="4" stroke-linecap="round"/>
+  <path d="m31 126 15 9M129 126l-15 9" stroke="#ff9e73" stroke-width="5" stroke-linecap="round"/>
+</svg>

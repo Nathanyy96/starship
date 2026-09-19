@@ -446,6 +446,37 @@
       var sceneList = reader.querySelector(".story-scene-list");
       if (plot && sceneList) reader.insertBefore(plot, sceneList);
     }
+    function decorateStoryMythic(chapter) {
+      if (!chapter || !chapter.mythicTheme) return;
+      var reader = byId("story-reader");
+      var kicker = reader && reader.querySelector(".story-reader-kicker");
+      if (kicker && !kicker.querySelector(".story-mythic-badge")) {
+        var badge = document.createElement("span");
+        badge.className = "story-mythic-badge";
+        badge.textContent = "北境神話篇｜" + chapter.mythicTheme;
+        kicker.appendChild(badge);
+      }
+      var summary = reader && reader.querySelector(".story-summary");
+      if (summary && chapter.mythicNote && !reader.querySelector(".story-mythic-note")) {
+        var note = document.createElement("div");
+        note.className = "story-mythic-note";
+        note.innerHTML = "<strong>神話意象｜" + escapeHtml(chapter.mythicMotif || chapter.mythicTheme) + "</strong><span>" + escapeHtml(chapter.mythicNote) + "</span>";
+        summary.insertAdjacentElement("afterend", note);
+      }
+    }
+    function decorateStoryRoadmap() {
+      var container = byId("story-chapters");
+      if (!container) return;
+      var locked = lockedStoryChapterList();
+      var cards = container.querySelectorAll(".story-roadmap-card");
+      locked.forEach(function (chapter, index) {
+        if (!chapter.mythicTheme || !cards[index]) return;
+        var small = cards[index].querySelector("small");
+        if (small) small.textContent += " · 北境神話篇｜" + chapter.mythicTheme;
+      });
+      var heading = container.querySelector(".story-roadmap-heading");
+      if (heading && locked.some(function (chapter) { return chapter.mythicTheme; })) heading.textContent = "後續版本檔案｜4.0 起：北境神話篇";
+    }
     function renderStory() {
       if (!game) return;
       var state = game.getState(); var chapters = storyChapterList(); var current = storyChapterById(currentStoryChapterId);
@@ -459,8 +490,10 @@
       var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕 · " + number(storyLength(chapter)) + " 字</small></span></button>"; }).join("");
       var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
+      decorateStoryRoadmap();
       byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–4.5 已建檔" : "支線 1.0–2.5｜3.0–4.5 已建檔";
       renderStoryReader(state, current);
+      decorateStoryMythic(current);
       moveStoryPlotToTop();
     }
     function renderCharacters() {
@@ -582,6 +615,14 @@
     function effectiveBattleStats(state) { return window.StarshipBattle && window.StarshipBattle.buildEffectiveStats ? window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, state) : data.characterBattleStats; }
     function trialPower(team, state) { return window.StarshipBattle ? window.StarshipBattle.teamPower(team, effectiveBattleStats(state)) : 0; }
     function enemyArtFor(enemy) {
+      var mythicArt = {
+        "frost-wolf": "./assets/enemies/frost-wolf.svg",
+        "world-root": "./assets/enemies/world-root.svg",
+        "fate-weaver": "./assets/enemies/fate-weaver.svg",
+        "rainbow-warden": "./assets/enemies/rainbow-warden.svg",
+        "fire-giant": "./assets/enemies/fire-giant.svg"
+      };
+      if (enemy && mythicArt[enemy.mythicClass]) return mythicArt[enemy.mythicClass];
       var text = String(enemy && enemy.name || "");
       if (/王座|終局|核心|主核|中樞|燈核|判決核|索引核|修復核|邊界核/.test(text)) return "./assets/enemies/core.svg";
       if (/獵犬|獵影|風路|風廊|斥候/.test(text)) return "./assets/enemies/hound.svg";
@@ -595,8 +636,35 @@
     function renderEnemyIntel(stage) {
       return (stage.enemies || []).map(function (enemy) {
         var hp = Number(enemy.maxHp || 0); var threat = Math.round((Number(enemy.attack || 0) * 1.2) + Number(enemy.defense || 0));
-        return "<article class=\"enemy-intel-card\"><div class=\"enemy-intel-art\"><img src=\"" + escapeHtml(enemyArtFor(enemy)) + "\" alt=\"" + escapeHtml(enemy.name + " 敵人圖鑑") + "\"><span>×" + number(enemy.count || 1) + "</span></div><div class=\"enemy-intel-copy\"><strong>" + escapeHtml(enemy.name) + "</strong><small>敵方單位 · 速度 " + number(enemy.speed || 0) + "</small><div><span>HP <b>" + number(hp) + "</b></span><span>攻 <b>" + number(enemy.attack || 0) + "</b></span><span>防 <b>" + number(enemy.defense || 0) + "</b></span></div><em>威脅值 " + number(threat) + " · 會依關卡特性行動</em></div></article>";
+        var mythicBadge = enemy.mythicClass ? "<span class=\"enemy-mythic-badge\">北境神話篇</span>" : "";
+        return "<article class=\"enemy-intel-card\"><div class=\"enemy-intel-art\"><img src=\"" + escapeHtml(enemyArtFor(enemy)) + "\" alt=\"" + escapeHtml(enemy.name + " 敵人圖鑑") + "\"><span>×" + number(enemy.count || 1) + "</span></div><div class=\"enemy-intel-copy\"><strong>" + escapeHtml(enemy.name) + "</strong>" + mythicBadge + "<small>敵方單位 · 速度 " + number(enemy.speed || 0) + "</small><div><span>HP <b>" + number(hp) + "</b></span><span>攻 <b>" + number(enemy.attack || 0) + "</b></span><span>防 <b>" + number(enemy.defense || 0) + "</b></span></div><em>威脅值 " + number(threat) + " · 會依關卡特性行動</em></div></article>";
       }).join("");
+    }
+    function decorateTrialMythic(stage) {
+      if (!stage || !stage.mythicTheme) return;
+      var details = byId("trial-stage-details");
+      var kicker = details && details.querySelector(".trial-stage-kicker");
+      if (kicker && !kicker.querySelector(".trial-mythic-badge")) {
+        var badge = document.createElement("span");
+        badge.className = "trial-mythic-badge";
+        badge.textContent = "北境神話篇｜" + stage.mythicTheme;
+        kicker.appendChild(badge);
+      }
+      var callout = details && details.querySelector(".trial-rule-callout");
+      if (callout && stage.mythicNote && !callout.querySelector(".trial-mythic-note")) {
+        var note = document.createElement("div");
+        note.className = "trial-mythic-note";
+        note.innerHTML = "<strong>神話敵群</strong><span>" + escapeHtml(stage.mythicNote) + "</span>";
+        callout.appendChild(note);
+      }
+      var stageButton = byId("trial-stages").querySelector('[data-trial-stage="' + stage.id + '"]');
+      if (stageButton && !stageButton.querySelector(".trial-mythic-rail-label")) {
+        var small = stageButton.querySelector("small");
+        if (small) {
+          small.textContent += " · 北境神話篇";
+          small.classList.add("trial-mythic-rail-label");
+        }
+      }
     }
     function renderTrialBattleResult(state) {
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
@@ -619,6 +687,7 @@
       }).join("");
       var enemyText = current.enemies.map(function (enemy) { return enemy.name + " ×" + enemy.count; }).join("、");
       byId("trial-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>TRIAL " + String(current.id).padStart(2, "0") + "</span><span>" + escapeHtml(current.region) + "</span>" + (current.finalStage ? "<span>FINAL</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>敵方編成：" + escapeHtml(enemyText) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般試煉") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>推薦戰力 <b>" + number(current.recommendedPower) + "</b></span><span>本版本獎勵 <b>" + number(Number(current.reward && current.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂 + " + number(trialCharacterExp) + " 經驗</b></span><span>可領次數 <b>" + attempts + " / " + maxRewards + "</b></span></div>";
+      decorateTrialMythic(current);
       if (byId("trial-enemy-intel")) byId("trial-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>先看敵人的攻防與速度，再安排隊伍協同</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);

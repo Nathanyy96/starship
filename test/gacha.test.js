@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, talentRules, talentDefinitions } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -52,6 +52,14 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
   assert.equal(futureStory.some((chapter) => chapter.id === "main-3-5"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "side-3-5-finale"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-4.5"), true);
+});
+
+test("4.0 起接入原創北境神話篇，且不改動 3.0–3.5 的主題", () => {
+  assert.equal(northernMythArc.startingVersion, "4.0");
+  assert.equal(Object.keys(northernMythArc.versions).length, 6);
+  assert.equal(version4Cards.length > 0, true);
+  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 4 && chapter.mythicArc === northernMythArc.id).length, 12);
+  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 3 && Number(chapter.version) < 4).some((chapter) => chapter.mythicArc), false);
 });
 
 test("星港委託提供額外玩法與非抽卡獎勵", () => {

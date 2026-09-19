@@ -37,6 +37,14 @@ test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
 
+test("試煉 21–30 使用北境神話篇原創敵群與獨立敵人圖像標記", () => {
+  const mythicStages = trialStages.filter((stage) => stage.id >= 21);
+  assert.equal(mythicStages.length, 10);
+  assert.ok(mythicStages.every((stage) => stage.mythicArc === "northern-myth-arc" && stage.mythicTheme));
+  assert.ok(mythicStages.every((stage) => stage.enemies.every((enemy) => enemy.mythicClass)));
+  assert.ok(mythicStages.some((stage) => stage.enemies.some((enemy) => enemy.name === "世界根鎧獸")));
+});
+
 test("四星培養成長幅度高於三星，重複角色留下個人命座晶核", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
   const four = buildEffectiveStats(characterBattleStats, { characterProgress: { celesia: { level: 20, constellation: 2 } } }).celesia;

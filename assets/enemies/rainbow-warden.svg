@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="虹徑守望敵人圖像">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="80%"><stop stop-color="#2f5374"/><stop offset="1" stop-color="#101631"/></radialGradient>
+    <linearGradient id="arc" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#ff9ecf"/><stop offset=".33" stop-color="#ffe18c"/><stop offset=".66" stop-color="#7debdc"/><stop offset="1" stop-color="#9f9cff"/></linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="url(#bg)"/>
+  <path d="M21 108a59 59 0 0 1 118 0" fill="none" stroke="url(#arc)" stroke-width="13" opacity=".8"/>
+  <path d="M31 111a49 49 0 0 1 98 0" fill="none" stroke="#dffaff" stroke-opacity=".32" stroke-width="2"/>
+  <path d="m80 27 13 25 28 4-20 20 5 29-26-14-26 14 5-29-20-20 28-4Z" fill="#15294d" stroke="#f7d991" stroke-width="3"/>
+  <circle cx="72" cy="69" r="3" fill="#70e9df"/><circle cx="88" cy="69" r="3" fill="#70e9df"/>
+  <path d="M71 82h18" stroke="#fff1b2" stroke-width="3" stroke-linecap="round"/>
+  <path d="M35 126h90" stroke="#8fe9eb" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+</svg>
