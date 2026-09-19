@@ -281,6 +281,8 @@
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
   // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
   var voyageVersion = "2.0-2.5";
+  var maveLuminousSkin = { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", themeLabel: "ARCHIVE OUTFIT", previewTitle: "流光檔案", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" };
+  var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第一個夏日造型測試；保留梅芙的臉部特徵，改變服裝、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var voyageConfig = {
     version: voyageVersion,
     title: "星海迷航",
@@ -329,7 +331,9 @@
       hidden: { starSand: 280, characterExp: 700, petTokens: 1 },
       special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-luminous-archive" }
     },
-    seasonSkin: { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" }
+    // seasonSkin 保留給舊版航程與相容性；seasonSkins 讓角色培養頁可同時預覽多個造型。
+    seasonSkin: maveLuminousSkin,
+    seasonSkins: [maveLuminousSkin, maveSummerSkin]
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。

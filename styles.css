@@ -758,6 +758,8 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .pet-rate-star { padding: 0 2px; color: #64799e; border: 0; background: transparent; cursor: pointer; }
 .pet-rate-star.on, .pet-rate-star:hover { color: #f6c76f; }
 .pet-rate-actions em { color: #8ff4e7; font-size: .56rem; font-style: normal; }
+.character-skin-list { display: grid; gap: 12px; margin-top: 16px; }
+.character-skin-list .character-skin-panel { margin-top: 0; }
 .character-skin-panel { display: grid; grid-template-columns: minmax(180px, .72fr) minmax(0, 1.28fr); gap: 16px; margin-top: 16px; padding: 12px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--skin-accent, #d06cff) 48%, transparent); border-radius: 16px; background: radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--skin-accent, #d06cff) 22%, transparent), transparent 38%), linear-gradient(135deg, rgba(38, 24, 73, .72), rgba(12, 19, 47, .82)); }
 .character-skin-preview { position: relative; min-height: 215px; overflow: hidden; border-radius: 12px; background: #090f29; }
 .character-skin-preview::after { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(6, 8, 28, .82)); content: ""; pointer-events: none; }
