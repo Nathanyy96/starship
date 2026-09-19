@@ -409,6 +409,11 @@
       var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
       var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
       if (byId("lobby-update-label")) byId("lobby-update-label").textContent = updateClaimed ? "大更新獎勵 +3,200 星砂（已領取）" : "大更新獎勵 +3,200 星砂";
+      var tutorialDone = tutorialProgress(state).rewardClaimed === true;
+      var tutorialQuick = byId("open-tutorial");
+      if (tutorialQuick) tutorialQuick.classList.toggle("completed", tutorialDone);
+      if (byId("tutorial-quick-status")) byId("tutorial-quick-status").textContent = tutorialDone ? "已完成 · 可重看規則" : "完成教學可領獎";
+      if (byId("tutorial-quick-badge")) byId("tutorial-quick-badge").textContent = tutorialDone ? "DONE" : "GUIDE";
       byId("lobby-continue-title").textContent = (chapter.versionLabel || chapter.version) + "｜" + chapter.title;
       byId("lobby-continue-copy").textContent = chapter.summary;
       renderMilestoneRewards();
@@ -491,7 +496,7 @@
       var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
       decorateStoryRoadmap();
-      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–4.5 已建檔" : "支線 1.0–2.5｜3.0–4.5 已建檔";
+      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–5.5 已建檔" : "支線 1.0–2.5｜3.0–5.5 已建檔";
       renderStoryReader(state, current);
       decorateStoryMythic(current);
       moveStoryPlotToTop();

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=northern-myth-arc-4-0">
+  <link rel="stylesheet" href="./styles.css?v=northern-myth-arc-5-5">
 </head>
 <body>
   <main class="page-shell">
@@ -57,6 +57,10 @@
         </div>
         <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
       </div>
+      <div class="lobby-quick-actions" aria-label="快速入口">
+        <button id="open-announcements" class="lobby-quick-card announcement-quick" type="button"><span class="quick-icon" aria-hidden="true">📣</span><span class="quick-copy"><strong>公告</strong><small id="announcement-quick-status">更新內容與獎勵</small></span><span class="quick-badge">NEW</span></button>
+        <button id="open-tutorial" class="lobby-quick-card tutorial-quick" type="button"><span class="quick-icon" aria-hidden="true">?</span><span class="quick-copy"><strong>新手教學</strong><small id="tutorial-quick-status">完成教學可領獎</small></span><span class="quick-badge" id="tutorial-quick-badge">GUIDE</span></button>
+      </div>
       <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>文件資料同步中</span></div>
       <div class="lobby-menu-grid">
         <button id="open-story" class="lobby-menu-card story-menu" type="button"><span class="menu-index">01</span><span class="menu-icon">◈</span><strong>劇情</strong><small>閱讀界痕調查與各版本角色線</small><span class="menu-arrow">→</span></button>
@@ -67,8 +71,6 @@
         <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
         <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
         <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
-        <button id="open-tutorial" class="lobby-menu-card tutorial-menu" type="button"><span class="menu-index">09</span><span class="menu-icon">?</span><strong>新手教學</strong><small>快速了解劇情、抽卡、培養與試煉規則</small><span class="menu-arrow">→</span></button>
-        <button id="open-announcements" class="lobby-menu-card announcement-menu" type="button"><span class="menu-index">10</span><span class="menu-icon">!</span><strong>公告</strong><small>查看本次更新內容、獎勵與系統優化</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
@@ -259,10 +261,10 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=northern-myth-arc-4-0"></script>
-  <script src="./src/story-source.js?v=northern-myth-arc-4-0"></script>
-  <script src="./src/data.js?v=northern-myth-arc-4-0"></script>
-  <script src="./src/battle.js?v=northern-myth-arc-4-0"></script>
-  <script src="./src/player-app.js?v=northern-myth-arc-4-0"></script>
+  <script src="./src/gacha.js?v=northern-myth-arc-5-5"></script>
+  <script src="./src/story-source.js?v=northern-myth-arc-5-5"></script>
+  <script src="./src/data.js?v=northern-myth-arc-5-5"></script>
+  <script src="./src/battle.js?v=northern-myth-arc-5-5"></script>
+  <script src="./src/player-app.js?v=northern-myth-arc-5-5"></script>
 </body>
 </html>

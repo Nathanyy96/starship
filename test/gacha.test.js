@@ -33,7 +33,7 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
 });
 
-test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保持鎖定", () => {
+test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {
   const liveStory = storyChapters.filter((chapter) => Number(chapter.version) <= 2.5);
   const futureStory = storyChapters.filter((chapter) => Number(chapter.version) >= 3);
   assert.equal(liveStory.length, 18);
@@ -47,18 +47,20 @@ test("1.0–2.5 劇情完整開放，3.0–4.5 主線與支線都已建檔但保
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").scenes.length, 3);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("見證人的空白"), false);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("角色圖鑑｜第三大版本"), false);
-  assert.equal(futureStory.length, 24);
+  assert.equal(futureStory.length, 36);
   assert.equal(futureStory.every((chapter) => chapter.releaseOpen === false && chapter.scenes.length === 3), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-3-5"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "side-3-5-finale"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-4.5"), true);
+  assert.equal(futureStory.some((chapter) => chapter.id === "main-5.5"), true);
+  assert.equal(futureStory.filter((chapter) => Number(chapter.version) >= 5).every((chapter) => chapter.mythicArc === "northern-myth-arc"), true);
 });
 
 test("4.0 起接入原創北境神話篇，且不改動 3.0–3.5 的主題", () => {
   assert.equal(northernMythArc.startingVersion, "4.0");
-  assert.equal(Object.keys(northernMythArc.versions).length, 6);
+  assert.equal(Object.keys(northernMythArc.versions).length, 12);
   assert.equal(version4Cards.length > 0, true);
-  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 4 && chapter.mythicArc === northernMythArc.id).length, 12);
+  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 4 && chapter.mythicArc === northernMythArc.id).length, 24);
   assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 3 && Number(chapter.version) < 4).some((chapter) => chapter.mythicArc), false);
 });
 

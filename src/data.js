@@ -34,7 +34,7 @@
   }
 
   // 只收錄文件與本次版本規劃中的角色；2.0–2.5 會在本次大更新加入限定池，
-  // 3.0–4.5 先完整建檔，等版本公告後再開放。
+  // 3.0–5.5 先完整建檔，等版本公告後再開放。
   var cards = {
     celesia: card("celesia", "瑟蕾雅", "Celesia", 4, "星", "#9e92ff", "1.0", "1.0｜繪圖信使、協作劍士；界痕調查與北行動機", "./assets/cards/celesia.png"),
     reyn: card("reyn", "雷恩", "Reyn", 3, "燕", "#78a4c8", "1.0", "1.0｜獸靈之村巡林人", "./assets/cards/reyn.png"),
@@ -848,6 +848,87 @@
     }
   ], false);
 
+  var version5StoryChapters = buildVersionChapters([
+    {
+      version: "5.0", region: "北境根冠", mainTitle: "根冠上的第十盞燈", mainSummary: "第二條律向北傳遞後，瑟蕾雅一行抵達北境根冠，發現九重界域之外還有一個未被點亮的回覆位置。",
+      mainCharacters: ["celesia", "aurelia", "jiera", "elyra"], mainScenes: [
+        { id: "tenth-lamp", title: "第十盞燈不急著點亮", body: "北境根冠懸在新曙港以北的雲層上方，九條根脈分別通往已知界域，最外側卻留著一個沒有名字的燈座。奧蕾雅想先測量它，霽羅提醒眾人：空位也可能是有人選擇不被看見。" },
+        { id: "root-keepers", title: "守根者不持有根系", body: "根冠的守根者每隔一季交換位置，從不把根系圖帶離觀測室。瑟蕾雅看到他們用風向、霜痕與居民回覆共同判讀界域，理解這裡的神話不是一位神祇的命令，而是人們對共同記憶的稱呼。" },
+        { id: "return-the-roots", title: "把根系交回各界", body: "伊萊拉提議把完整根系圖送進中央終端，守根者卻要求分成九份、由各地自行保管。隊伍最後留下可撤回的交會點，沒有替第十個空位填上答案，北境篇因此從一個被尊重的空白開始。" }
+      ],
+      sideId: "root-register", sideTitle: "北境的根名冊", sideSummary: "補充守根者如何記錄季節、回覆與每一個未被命名的空位。", sideCharacters: ["aurelia", "jiera", "norell"], sideScenes: [
+        { id: "season-list", title: "季節不是固定標籤", body: "諾嵐發現根名冊每一季都會改變顏色，守根者說那不是刪除舊資料，而是提醒下一班重新確認風路是否仍然安全。" },
+        { id: "unnamed-seat", title: "為空位保留名字", body: "霽羅替空位寫下「尚未命名」而不是「未知」，讓後來的人知道這裡有人做過保留的決定。奧蕾雅把這個欄位加入觀測規則，任何人都能提出更名或撤回。" },
+        { id: "register-handover", title: "名冊交給下一班", body: "交班時，守根者不交出一套答案，只交出最近一次被修改的頁面與一盞可以熄滅的燈。北境根冠的第一份支線檔案因此沒有主人，只有下一次確認的時間。" }
+      ]
+    },
+    {
+      version: "5.1", region: "霜火鍛環", mainTitle: "霜火雙核", mainSummary: "根冠下方的霜火鍛環同時失去冷卻與加熱的節奏，凱嵐必須讓兩股力量輪值，而不是選出其中一股成為唯一核心。",
+      mainCharacters: ["celesia", "kairen", "lorne", "sumine"], mainScenes: [
+        { id: "cold-furnace", title: "先熄掉最亮的爐", body: "霜火鍛環的兩座主爐彼此爭奪界痕燃料，最亮的火反而讓整座鍛環無法降溫。凱嵐先熄掉那座最容易被稱為奇蹟的爐，讓每個班次看見停下來會影響誰。" },
+        { id: "two-cores", title: "兩個核心不必互相征服", body: "洛恩把霜核與火核拆成兩條可交班的熱管，澄音則在中間加入手動退回段。兩股力量仍然互相拉扯，卻不再需要把其中一股封成敵人，鍛環第一次能同時容納冷卻與前進。" },
+        { id: "shared-forge", title: "輪值比王座更可靠", body: "鍛環居民投票決定每月的霜火輪值，並把過載時的停爐權分給四個班次。瑟蕾雅看見火光照亮的不是一個王座，而是一張可以被下一個人改寫的工作表。" }
+      ],
+      sideId: "forge-long-night", sideTitle: "長夜裡的工具架", sideSummary: "補充霜火鍛環如何把工具、冷卻記錄與停爐權交給不同班次。", sideCharacters: ["kairen", "lorne", "aster"], sideScenes: [
+        { id: "cold-tools", title: "工具要先冷下來", body: "艾斯特把會殘留熱量的工具分成兩架，並在交班表上留下冷卻完成的時間。沒有人能因為趕路就跳過等待，工具因此不再把上一班的急迫帶給下一班。" },
+        { id: "forge-scratch", title: "刻痕不是恥辱", body: "洛恩把每一次過載刻在公共工具架旁，凱嵐沒有要求把刻痕磨平。看得見的失敗讓新手更早找到安全的停爐點，也讓工坊不必靠傳說維持秩序。" },
+        { id: "night-shift", title: "長夜班的最後一盞燈", body: "長夜班結束時，艾斯特把最後一盞火調到能照見退出路線的亮度。霜火鍛環沒有宣布勝利，只讓下一班知道哪裡仍然需要小心。" }
+      ]
+    },
+    {
+      version: "5.2", region: "虹徑外環", mainTitle: "虹橋以外的回覆", mainSummary: "遠望塔找到一條通往北境外環的彩色界橋，索萊與塔莉亞必須確認橋的兩端都能拒絕通行，才能讓它真正安全。",
+      mainCharacters: ["celesia", "sorae", "talia", "yaoze"], mainScenes: [
+        { id: "rainbow-signal", title: "七色訊號不是邀請函", body: "虹徑在雲層上展開七道不同色澤的光，遠望塔的舊規則把它判定成來自北境的邀請。索萊將訊號拆成提示與請求兩層，塔莉亞則逐一尋找每個顏色背後是否真的有人同意連線。" },
+        { id: "bridge-ends", title: "橋的兩端都能關閉", body: "曜澤在橋南設下手動燈標，北境居民則在橋北保留另一組開關。當一艘船未經確認就要通過時，兩端同時熄燈，讓跨界通道第一次用拒絕證明自己可靠。" },
+        { id: "walk-back", title: "走過去，也要走得回來", body: "瑟蕾雅帶隊通過虹徑外環，沿途把每個分岔點標成可以回頭的位置。通路沒有把兩地變成同一個地方，反而讓兩地都更清楚自己願意交換什麼、保留什麼。" }
+      ],
+      sideId: "bridge-watch", sideTitle: "橋上不設王座", sideSummary: "補充信標師與橋北居民如何輪流確認跨界通路。", sideCharacters: ["sorae", "talia", "ferye"], sideScenes: [
+        { id: "bridge-shift", title: "輪班看橋，不是擁有橋", body: "菲芮把橋面風向、兩端回覆與退回燈分成三欄，提醒見習者：守望只代表當班負責，不代表可以替下一班保證一切安全。" },
+        { id: "color-choice", title: "每種顏色都能暫停", body: "塔莉亞發現其中一道虹光會把等待誤認成同意，於是替它加上獨立的暫停訊號。橋面變慢了，但沒有任何顏色再被迫代表肯定。" },
+        { id: "return-lantern", title: "把燈帶回原位", body: "完成測試後，索萊把臨時信標交回橋北，而不是帶回遠望塔。下一次通行要由下一班重新確認，虹徑因此沒有固定的主人。" }
+      ]
+    },
+    {
+      version: "5.3", region: "命線織庭", mainTitle: "命線織庭的空白梭", mainSummary: "白夜航路的命線在織庭交會，涅芙與梅芙發現最危險的不是看見未來，而是有人替所有人挑出唯一一條未來。",
+      mainCharacters: ["celesia", "neve", "mave", "noreia"], mainScenes: [
+        { id: "three-threads", title: "三條線都是真的", body: "命線織庭同時保存已發生、正在發生與尚未決定的三種線。梅芙原本想替檔案排序，涅芙卻要求每條線都保留原主人的語氣，因為可能性不能只剩下最容易讀懂的那一條。" },
+        { id: "cut-thread", title: "剪線不等於改命", body: "一條命線纏住公共回覆台，議庭要求直接剪斷。諾芮亞先找到受影響的人，發現那條線其實是求助訊號；隊伍改用低負載分流，沒有把麻煩的未來假裝成不存在。" },
+        { id: "shuttle-return", title: "把梭交回說話的人", body: "織庭最後只留下空白梭，讓每位線的持有人決定是否繼續編織。瑟蕾雅把第二條律的修改權放回公共架，命運因此不再是一張完成的圖，而是一項可以拒絕的工作。" }
+      ],
+      sideId: "weaver-school", sideTitle: "織線學徒的三次練習", sideSummary: "補充織庭學徒如何學會分辨記錄、推測與替人做決定。", sideCharacters: ["neve", "noreia", "mave"], sideScenes: [
+        { id: "first-knot", title: "第一個結先問誰留下", body: "涅芙教學徒打第一個結時，沒有教她固定形狀，而是先問這段線由誰保留。學徒發現只要缺少這個答案，再漂亮的圖也可能變成擅自公開。" },
+        { id: "second-line", title: "第二條線是推測", body: "諾芮亞在織庭標出一條由觀測者推測出的線，並讓它永遠使用不同顏色。梅芙說明，推測可以幫助準備，但不能冒充本人已經做出的選擇。" },
+        { id: "empty-shuttle", title: "空白梭留給下一班", body: "學徒完成練習後想把空白梭帶回宿舍，三人請她把它放回公共架。下一個人也許會織出完全不同的路，空白才有真正的用途。" }
+      ]
+    },
+    {
+      version: "5.4", region: "深海根門", mainTitle: "深海的回聲守門人", mainSummary: "回覆海溝下方出現新的根門，凱爾聽見像巨蛇翻身的低鳴，卻選擇把開門與封門拆成四組可以彼此否決的權限。",
+      mainCharacters: ["celesia", "kael", "mirea", "orivelle"], mainScenes: [
+        { id: "root-gate", title: "根門不是王座", body: "深海根門吸收海溝所有訊號，門上的紋路像一條沉睡的長蛇環繞入口。凱爾拒絕把自己稱為唯一守門人，先把物資、醫療、航路與退回分成四把不同的鑰匙。" },
+        { id: "undersea-voice", title: "低鳴不一定是命令", body: "澪歌在深處聽見低鳴，海面的人卻把它解讀成必須立刻下潛的命令。奧薇拉修復潮核，瑟蕾雅則把低鳴標成需要確認的訊號，讓未知可以等待而不被強迫翻譯。" },
+        { id: "four-keys-return", title: "四把鑰匙一起叫停", body: "根門短暫開啟時，四個班次同時發現海底路線正在改變，於是共同叫停。門沒有被征服，也沒有被永久封死；它保留一條等下一次確認的回來路。" }
+      ],
+      sideId: "deep-key", sideTitle: "第四把鑰匙的交班", sideSummary: "補充凱爾、澪歌與奧薇拉如何讓退回權不被最勇敢的人帶走。", sideCharacters: ["kael", "mirea", "orivelle"], sideScenes: [
+        { id: "key-four", title: "最後一把不是最重要", body: "凱爾原本把退回鑰匙放在自己身上，澪歌提醒他這會讓所有人把停止責任交給同一個人。第四把鑰匙最後由每班輪流保管，沒有誰能永久擁有它。" },
+        { id: "pressure-record", title: "把壓力寫進交班表", body: "奧薇拉把海底壓力與每次開門時間並排記錄，發現最危險的時刻不一定最深，而是大家急著證明自己能繼續的時候。" },
+        { id: "safe-surface", title: "安全回到水面", body: "深海隊伍最後沿著退回燈線上浮，沒有帶走根門的答案，只帶回四把鑰匙都能叫停的規則。這條規則成為下一版重建前最重要的遺物。" }
+      ]
+    },
+    {
+      version: "5.5", region: "新曙終端", mainTitle: "長冬後的九界新曙", mainSummary: "北境長冬讓舊根系暫時沉寂，伊萊拉與瑟蕾雅必須在所有人等待答案時，決定是否讓新的中心再次誕生。",
+      mainCharacters: ["celesia", "elyra", "aster", "aurelia", "jiera"], mainScenes: [
+        { id: "long-winter", title: "長冬不是末日的另一個名字", body: "九重界域的界痕同時降至最低，所有回覆台都等待新曙終端宣布下一步。艾斯特把舊檔案的失敗與成功一起點亮，提醒眾人：長冬只是系統停止替大家加速的時段，不是誰有權替世界宣告終結。" },
+        { id: "no-new-center", title: "不讓新中心先說話", body: "奧蕾雅提出建立一座新的中央觀測塔，伊萊拉卻要求先讓九地各自寫出能接受、不能接受與仍需等待的條件。瑟蕾雅把這些條件接成可撤回的協議，沒有讓任何一地成為唯一發言者。" },
+        { id: "new-dawn-law", title: "把新曙交給下一個人", body: "長冬結束時，新曙終端沒有選出新的主人，只把根系、命線、霜火、虹徑與深海鑰匙的修改方式公開。伊萊拉把筆交給下一個願意承擔影響的人，5.5 的終幕因此不是神話完結，而是所有人都能重新開始的清晨。" }
+      ],
+      sideId: "dawn-archive", sideTitle: "把神話寫回人手", sideSummary: "補充北境居民如何把代代流傳的神話改寫成普通人能使用的規則。", sideCharacters: ["elyra", "neve", "aster"], sideScenes: [
+        { id: "old-names", title: "舊名字可以留下", body: "涅芙整理北境居民使用的舊名字，沒有把它們刪成統一格式。每個名字旁邊都附上它在何時保護過人、又在何時可能造成誤解的記錄。" },
+        { id: "public-pen", title: "公共架上的筆", body: "艾斯特把所有版本的修改筆放在同一座公共架上，任何人都能取用，也能把不同意的理由寫在旁邊。神話不再只由守根者解釋，而是回到每個受影響的人手中。" },
+        { id: "after-dawn", title: "5.5 之後", body: "新曙的第一頁沒有寫下下一個敵人或唯一的英雄，只寫著每條規則的拒絕方式、撤回方式與重新協商時間。北境神話篇暫告一段落，星界之律仍為下一個選擇保持開放。" }
+      ]
+    }
+  ], false);
+
   // 4.0 起接入原創的「北境神話篇」：借用世界樹、命線、霜火、彩虹橋與終末重建等意象，
   // 不直接套用北歐神名或重述既有神話，讓它成為《星界之律》世界中的新傳承。
   var northernMythArc = {
@@ -868,12 +949,18 @@
       "4.2": { label: "虹徑回覆", motif: "彩虹界橋／遠距離訊號", note: "遠望塔找到跨界回覆橋，但橋的兩端都保留關閉權。" },
       "4.3": { label: "白夜命線", motif: "白夜／可撤回的命線", note: "每條被看見的可能都必須保留本人收回與改寫的入口。" },
       "4.4": { label: "深淵守門", motif: "深海巨蛇意象／四把鑰匙", note: "海溝深處的壓力提醒眾人，守門權不能集中在一個人身上。" },
-      "4.5": { label: "長冬後的新律", motif: "終末與重建／第二條律", note: "長冬不是結局，真正的終幕是讓下一個人能重新協商規則。" }
+      "4.5": { label: "長冬後的新律", motif: "終末與重建／第二條律", note: "長冬不是結局，真正的終幕是讓下一個人能重新協商規則。" },
+      "5.0": { label: "根冠與第十盞燈", motif: "九重根域／未命名的空位", note: "根系之外仍有一個沒有被替人命名的回覆位置。" },
+      "5.1": { label: "霜火雙核", motif: "霜火輪值／不設王座的鍛環", note: "冷卻與前進都能存在，停爐權也必須被共同保管。" },
+      "5.2": { label: "虹徑之外", motif: "彩虹界橋／雙端拒絕", note: "真正安全的跨界通路，兩端都必須能關閉。" },
+      "5.3": { label: "命線織庭", motif: "三條可能／空白梭", note: "看見可能不等於替任何人選定未來。" },
+      "5.4": { label: "深海根門", motif: "長蛇低鳴／四把鑰匙", note: "未知的低鳴需要確認，不能自動變成命令。" },
+      "5.5": { label: "長冬後的新曙", motif: "終末重建／九界共議", note: "神話沒有替世界封口，新曙把修改權交還每一個受影響的人。" }
     }
   };
   Object.keys(northernMythArc.versions).forEach(function (version) {
     var theme = northernMythArc.versions[version];
-    version4StoryChapters.filter(function (chapter) { return String(chapter.version) === version; }).forEach(function (chapter) {
+    version4StoryChapters.concat(version5StoryChapters).filter(function (chapter) { return String(chapter.version) === version; }).forEach(function (chapter) {
       chapter.mythicArc = northernMythArc.id;
       chapter.mythicTheme = theme.label;
       chapter.mythicMotif = theme.motif;
@@ -981,7 +1068,7 @@
   }
 
   var liveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
-  var allStoryChapters = liveStoryChapters.concat(version3StoryChapters, version4StoryChapters);
+  var allStoryChapters = liveStoryChapters.concat(version3StoryChapters, version4StoryChapters, version5StoryChapters);
 
   return {
     cards: cards,
@@ -993,12 +1080,13 @@
     banners: banners,
     version2Cards: version2Cards,
     version4Cards: version4Cards,
-    // 1.0–2.5 是 live 劇情；3.0–4.5 先完整建檔但保持鎖定，供後續版本開放。
+    // 1.0–2.5 是 live 劇情；3.0–5.5 先完整建檔但保持鎖定，供後續版本開放。
     storyChapters: allStoryChapters,
     liveStoryChapters: liveStoryChapters,
     version2StoryChapters: version2StoryChapters,
     version3StoryChapters: version3StoryChapters,
     version4StoryChapters: version4StoryChapters,
+    version5StoryChapters: version5StoryChapters,
     northernMythArc: northernMythArc,
     storySource: storySource,
     characterBattleStats: characterBattleStats,
