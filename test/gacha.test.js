@@ -44,13 +44,19 @@ test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
 test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {
   const liveStory = storyChapters.filter((chapter) => Number(chapter.version) <= 2.5);
   const futureStory = storyChapters.filter((chapter) => Number(chapter.version) >= 3);
-  assert.equal(liveStory.length, 18);
+  assert.equal(liveStory.length, 25);
   assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body)), true);
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => String(scene.body).trim().length >= 20)), true);
-  assert.equal(liveStory.every((chapter) => Number(chapter.fullBody && chapter.fullBody.length) > 800), true);
+  assert.equal(liveStory.filter((chapter) => chapter.fullBody).every((chapter) => Number(chapter.fullBody.length) > 800), true);
   assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").sourceStatus, "document-tab-missing");
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => typeof scene.id === "string" && scene.id.length > 0)), true);
-  assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").scenes.at(-1).id, "name-arrival");
+  const firstChapter = liveStory.find((chapter) => chapter.id === "main-1-0");
+  assert.equal(firstChapter.scenes[3].title, "第四幕｜有人守著的背後");
+  assert.equal(firstChapter.scenes[4].title, "北門以後");
+  const mirrorChapter = liveStory.find((chapter) => chapter.id === "main-2.1");
+  assert.equal(mirrorChapter.scenes.length, 4);
+  assert.equal(mirrorChapter.scenes.at(-1).id, "mirror-choice");
+  assert.equal(mirrorChapter.scenes.reduce((total, scene) => total + scene.body.length, 0) > 1000, true);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.4").fullBody.includes("附錄｜"), false);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").scenes.length, 3);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("見證人的空白"), false);
@@ -62,6 +68,9 @@ test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保
   assert.equal(futureStory.some((chapter) => chapter.id === "main-4.5"), true);
   assert.equal(futureStory.some((chapter) => chapter.id === "main-5.5"), true);
   assert.equal(futureStory.filter((chapter) => Number(chapter.version) >= 5).every((chapter) => chapter.mythicArc === "northern-myth-arc"), true);
+  assert.equal(storyChapters.every((chapter) => chapter.narrativeGuide), true);
+  assert.equal(futureStory.filter((chapter) => chapter.type === "main").every((chapter) => chapter.scenes.every((scene) => scene.body.length >= 100)), true);
+  assert.equal(futureStory.filter((chapter) => chapter.type === "main").every((chapter) => chapter.characters.includes("celesia")), true);
 });
 
 test("4.0 起接入原創北境神話篇，且不改動 3.0–3.5 的主題", () => {

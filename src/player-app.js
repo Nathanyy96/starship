@@ -430,8 +430,13 @@
       }).join("") + "</div>";
     }
     function storyLength(chapter) {
-      if (chapter.fullBody) return String(chapter.fullBody).replace(/\s/g, "").length;
+      if (chapter.fullBody && chapter.sourceStatus !== "document-tab-missing") return String(chapter.fullBody).replace(/\s/g, "").length;
       return chapter.scenes.reduce(function (sum, scene) { return sum + String(scene.body || "").replace(/\s/g, "").length; }, 0);
+    }
+    function storyGuideMarkup(chapter) {
+      var guide = chapter && chapter.narrativeGuide;
+      if (!guide) return "";
+      return "<section class=\"story-narrative-guide\"><div><span class=\"eyebrow\">CELESIA STORY THREAD</span><strong>" + escapeHtml(guide.focus || "") + "</strong></div><div><span>本章懸念</span><p>" + escapeHtml(guide.hook || "") + "</p></div><div><span>本章收束</span><p>" + escapeHtml(guide.payoff || "") + "</p></div></section>";
     }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
@@ -444,7 +449,7 @@
       var characterCount = chapter.characters.filter(function (id) { return Boolean(data.cards[id]); }).length;
       var length = storyLength(chapter);
       var sourceLabel = chapter.sourceStatus === "document-tab-missing" ? "補充正文" : "文件正文";
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p><div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4>" + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂・+650 角色經驗</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>每幕首次完成可獲得 100 星砂與 650 角色經驗；正文可向下捲動閱讀</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已整理成長篇閱讀格式，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4>" + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂・+650 角色經驗</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>每幕首次完成可獲得 100 星砂與 650 角色經驗；正文可向下捲動閱讀</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已整理成長篇閱讀格式，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
     }
     function moveStoryPlotToTop() {
       var reader = byId("story-reader");
@@ -558,11 +563,15 @@
       }
       byId("character-animation-title").textContent = card.name + "｜角色動畫";
       byId("character-animation-subtitle").textContent = card.romanizedName + " · " + card.releaseVersion + " 版本動態立繪";
-      byId("character-animation-caption").textContent = "1.0–1.5 角色動態立繪 · 約 " + (animation.durationSeconds || 5) + " 秒";
+      byId("character-animation-caption").textContent = "1.0–1.5 角色動態立繪 · 約 " + (animation.durationSeconds || 5) + " 秒 · 循環播放";
       byId("character-animation-empty").hidden = true;
       video.setAttribute("aria-label", card.name + "角色動畫");
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
       if (card.image) video.setAttribute("poster", card.image);
       video.src = animation.src;
+      video.load();
       if (typeof dialog.showModal === "function") dialog.showModal();
       else dialog.setAttribute("open", "");
       var playback = video.play();
