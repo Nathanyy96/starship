@@ -207,11 +207,12 @@
         state.dispatchProgress.lastMission = null;
       }
       var voyageVersion = data.voyageVersion || updateVersion;
-      state.voyageProgress = state.voyageProgress || { version: voyageVersion, status: "idle", routeId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
+      state.voyageProgress = state.voyageProgress || { version: voyageVersion, status: "idle", routeId: null, selectedRouteId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
       if (state.voyageProgress.version !== voyageVersion) {
         state.voyageProgress.version = voyageVersion;
         state.voyageProgress.status = "idle";
         state.voyageProgress.routeId = null;
+        state.voyageProgress.selectedRouteId = null;
         state.voyageProgress.route = [];
         state.voyageProgress.nodeIndex = 0;
         state.voyageProgress.selectedTeam = [];
@@ -249,6 +250,8 @@
       if (Array.isArray(dispatch.selectedTeam)) currentDispatchTeam = dispatch.selectedTeam.slice(0, 4);
       var voyage = state.voyageProgress || {};
       if (Array.isArray(voyage.selectedTeam)) currentVoyageTeam = voyage.selectedTeam.slice(0, 4);
+      if (voyage.status === "active" && voyage.routeId) currentVoyageRouteId = voyage.routeId;
+      else if (voyage.selectedRouteId) currentVoyageRouteId = voyage.selectedRouteId;
       var pets = state.petProgress || {};
       if (pets.selectedPetId) currentPetId = pets.selectedPetId;
       if (pets.selectedOutfitId) currentPetOutfitId = pets.selectedOutfitId;
@@ -969,7 +972,8 @@
       } catch (error) { showMessage(error.message, true); }
     }
     function voyageProgress(state) {
-      state.voyageProgress = state.voyageProgress || { version: data.voyageVersion || "2.0-2.5", status: "idle", routeId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
+      state.voyageProgress = state.voyageProgress || { version: data.voyageVersion || "2.0-2.5", status: "idle", routeId: null, selectedRouteId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
+      state.voyageProgress.selectedRouteId = typeof state.voyageProgress.selectedRouteId === "string" ? state.voyageProgress.selectedRouteId : state.voyageProgress.routeId || null;
       state.voyageProgress.selectedTeam = Array.isArray(state.voyageProgress.selectedTeam) ? state.voyageProgress.selectedTeam : [];
       state.voyageProgress.route = Array.isArray(state.voyageProgress.route) ? state.voyageProgress.route : [];
       state.voyageProgress.flags = state.voyageProgress.flags || {};
@@ -1050,10 +1054,12 @@
       byId("voyage-description").textContent = config.description || "在主線之外探索一段獨立航程。";
       byId("voyage-skin-name").textContent = skin.name || "本期特殊裝扮";
       byId("voyage-skin-copy").textContent = skin.description || "特殊結局獎勵。";
-      var activeRoute = progress.routeId ? voyageRouteById(progress.routeId) : null;
-      currentVoyageRouteId = activeRoute ? activeRoute.id : currentVoyageRouteId;
+      var activeRoute = progress.status === "active" && progress.routeId ? voyageRouteById(progress.routeId) : null;
+      if (activeRoute) currentVoyageRouteId = activeRoute.id;
+      else if (progress.selectedRouteId && voyageRouteById(progress.selectedRouteId)) currentVoyageRouteId = progress.selectedRouteId;
+      else if (!voyageRouteById(currentVoyageRouteId) && routes.length) currentVoyageRouteId = routes[0].id;
       byId("voyage-view-status").textContent = progress.status === "active" ? (activeRoute ? activeRoute.name : "航程進行中") : progress.status === "complete" ? "航程完成 · 可再次探索" : progress.status === "failed" ? "航程中止 · 可重新開航" : "本期航程尚未開始";
-      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\" aria-pressed=\"" + (selected ? "true" : "false") + "\"><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small><em>" + (selected ? "✓ 已選擇這條航線" : "點擊查看並選擇") + "</em></button>"; }).join("");
+      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); var locked = Boolean(activeRoute); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\" aria-pressed=\"" + (selected ? "true" : "false") + "\"" + (locked ? " disabled\"" : "") + "><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small><em>" + (locked ? "航程進行中，暫不能更換" : selected ? "✓ 已選擇這條航線" : "點擊查看並選擇") + "</em></button>"; }).join("");
       var startButton = byId("start-voyage"); startButton.disabled = progress.status === "active"; startButton.textContent = progress.status === "active" ? "航程進行中" : progress.status === "failed" ? "重新開航（建立新路線）" : "開始航程（未選則隨機）";
       if (progress.status === "idle" || progress.status === "failed" || progress.status === "complete") {
         byId("voyage-node-list").innerHTML = "<div class=\"voyage-empty-state\"><span class=\"eyebrow\">CHOOSE A ROUTE</span><strong>先選一條航線，出發後事件會在途中出現</strong><p>每個結局獎勵每期只領一次；完成後可以再跑其他航線，找出不同條件。</p></div>";
@@ -1411,7 +1417,26 @@
      byId("dispatch-missions").addEventListener("click", function (event) { var button = event.target.closest("[data-dispatch-mission]"); if (button) { currentDispatchMissionId = button.getAttribute("data-dispatch-mission"); currentDispatchTeam = []; renderDispatch(); } });
     byId("dispatch-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-dispatch-character]"); if (button) toggleDispatchTeam(button.getAttribute("data-dispatch-character")); });
     byId("start-dispatch").addEventListener("click", runDispatchMission);
-    byId("voyage-route-list").addEventListener("click", function (event) { var button = event.target.closest("[data-voyage-route]"); if (button) { currentVoyageRouteId = button.getAttribute("data-voyage-route"); renderVoyage(); } });
+    byId("voyage-route-list").addEventListener("click", function (event) {
+      var button = event.target.closest("[data-voyage-route]");
+      if (!button || button.disabled) return;
+      var routeId = button.getAttribute("data-voyage-route");
+      var state = game.getState();
+      if (voyageProgress(state).status === "active") { showMessage("目前航程進行中，完成或重新開航後才能更換航線。", true); return; }
+      currentVoyageRouteId = routeId;
+      voyageProgress(state).selectedRouteId = routeId;
+      if (remoteMode) {
+        apiRequest("/api/player/voyage", { action: "select-route", routeId: routeId }).then(function (payload) {
+          currentVoyageRouteId = payload.selectedRouteId || routeId;
+          updateGameFromState(payload.state);
+          renderVoyage();
+        }).catch(function (error) { showMessage(error.message, true); });
+      } else {
+        updateGameFromState(state);
+        saveLocalState();
+        renderVoyage();
+      }
+    });
     byId("start-voyage").addEventListener("click", function () { runVoyageAction(""); });
     byId("voyage-node-actions").addEventListener("click", function (event) { var choice = event.target.closest("[data-voyage-choice]"); if (choice && !choice.disabled) { runVoyageAction(choice.getAttribute("data-voyage-choice")); return; } var advance = event.target.closest("[data-voyage-advance]"); if (advance) runVoyageAction(""); });
     byId("voyage-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-voyage-character]"); if (button) toggleVoyageTeam(button.getAttribute("data-voyage-character")); });

@@ -360,11 +360,12 @@ function ensurePlayerMilestones(currentState) {
     state.dispatchProgress.claimed = {};
     state.dispatchProgress.lastMission = null;
   }
-  state.voyageProgress = state.voyageProgress || { version: voyageVersion, status: "idle", routeId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
+  state.voyageProgress = state.voyageProgress || { version: voyageVersion, status: "idle", routeId: null, selectedRouteId: null, route: [], nodeIndex: 0, selectedTeam: [], fragments: 0, buffs: [], flags: {}, claimedRewards: {}, lastBattle: null, lastEnding: null };
   if (state.voyageProgress.version !== voyageVersion) {
     state.voyageProgress.version = voyageVersion;
     state.voyageProgress.status = "idle";
     state.voyageProgress.routeId = null;
+    state.voyageProgress.selectedRouteId = null;
     state.voyageProgress.route = [];
     state.voyageProgress.nodeIndex = 0;
     state.voyageProgress.selectedTeam = [];
@@ -724,10 +725,18 @@ function runVoyage(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const game = createGame(state);
   const action = String(body.action || "");
+  if (action === "select-route") {
+    if (state.voyageProgress.status === "active") throw new Error("目前航程進行中，完成或重新開航後才能更換航線");
+    const routeId = String(body.routeId || "");
+    const route = (voyageConfig.routes || []).find((item) => item.id === routeId);
+    if (!route) throw new Error("找不到這條星海迷航航線");
+    state.voyageProgress.selectedRouteId = route.id;
+    return { state: createGame(state).getState(), selectedRouteId: route.id, voyageVersion };
+  }
   if (action === "start") {
     const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
     if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
-    return game.startVoyage({ routeId: body.routeId, team });
+    return game.startVoyage({ routeId: body.routeId || state.voyageProgress.selectedRouteId, team });
   }
   if (action !== "resolve") throw new Error("找不到星海迷航操作");
   const progress = state.voyageProgress;

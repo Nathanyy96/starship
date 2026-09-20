@@ -237,6 +237,7 @@
         version: "2.0-2.5",
         status: "idle",
         routeId: null,
+        selectedRouteId: null,
         route: [],
         nodeIndex: 0,
         selectedTeam: [],
@@ -353,6 +354,7 @@
     state.voyageProgress.version = typeof state.voyageProgress.version === "string" && state.voyageProgress.version ? state.voyageProgress.version : "2.0-2.5";
     state.voyageProgress.status = ["idle", "active", "complete", "failed"].indexOf(state.voyageProgress.status) >= 0 ? state.voyageProgress.status : "idle";
     state.voyageProgress.routeId = typeof state.voyageProgress.routeId === "string" ? state.voyageProgress.routeId : null;
+    state.voyageProgress.selectedRouteId = typeof state.voyageProgress.selectedRouteId === "string" ? state.voyageProgress.selectedRouteId : state.voyageProgress.routeId;
     state.voyageProgress.route = Array.isArray(state.voyageProgress.route) ? state.voyageProgress.route.map(String) : [];
     state.voyageProgress.nodeIndex = Number.isInteger(state.voyageProgress.nodeIndex) && state.voyageProgress.nodeIndex >= 0 ? state.voyageProgress.nodeIndex : 0;
     state.voyageProgress.selectedTeam = Array.isArray(state.voyageProgress.selectedTeam) ? state.voyageProgress.selectedTeam.slice(0, 4) : [];
@@ -881,12 +883,14 @@
     assert(routes.length > 0, "星海迷航尚未設定航線");
     var progress = this.state.voyageProgress;
     assert(progress.status !== "active", "目前已有進行中的星海迷航航程");
-    var route = options.routeId ? routes.find(function (item) { return item && item.id === options.routeId; }) : null;
+    var requestedRouteId = options.routeId || progress.selectedRouteId;
+    var route = requestedRouteId ? routes.find(function (item) { return item && item.id === requestedRouteId; }) : null;
     if (!route) route = pick(routes, this.rng);
     assert(Array.isArray(route.nodeIds) && route.nodeIds.length > 0, "星海迷航航線沒有節點");
     progress.version = String(this.voyageConfig.version || progress.version || "2.0-2.5");
     progress.status = "active";
     progress.routeId = route.id;
+    progress.selectedRouteId = route.id;
     progress.route = route.nodeIds.slice();
     progress.nodeIndex = 0;
     progress.selectedTeam = Array.isArray(options.team) ? options.team.slice(0, 4) : [];

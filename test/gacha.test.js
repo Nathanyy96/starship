@@ -157,8 +157,20 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   });
   const start = gacha.startVoyage({ routeId: "route-echo", team: ["celesia", "reyn"] });
   assert.equal(start.node.id, "voyage-start");
+  assert.equal(start.state.voyageProgress.routeId, "route-echo");
+  assert.equal(start.state.voyageProgress.selectedRouteId, "route-echo");
   const next = gacha.advanceVoyage({ nodeId: "voyage-start", team: ["celesia", "reyn"] });
   assert.equal(next.nextNode.id, "voyage-combat-1");
+  const completed = game({
+    voyageConfig,
+    state: state({
+      collection: { celesia: 1, reyn: 1 },
+      voyageProgress: { status: "complete", routeId: "route-echo", selectedRouteId: "route-hidden" }
+    })
+  });
+  const restarted = completed.startVoyage({ team: ["celesia", "reyn"] });
+  assert.equal(restarted.state.voyageProgress.routeId, "route-hidden");
+  assert.equal(restarted.state.voyageProgress.selectedRouteId, "route-hidden");
   const pet = gacha.petAction({ action: "feed", petId: "star-fox" });
   assert.equal(pet.state.resources.characterExp, 100000);
   assert.equal(pet.state.petProgress.resources.petFood, 5);

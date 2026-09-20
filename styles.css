@@ -665,6 +665,8 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .voyage-route-list { display: grid; gap: 8px; margin: 14px 0; }
 .voyage-route-card { display: grid; gap: 5px; width: 100%; padding: 12px 14px; text-align: left; color: #dce7ff; border: 1px solid rgba(125, 157, 218, .24); border-radius: 14px; background: rgba(12, 25, 55, .75); cursor: pointer; transition: .2s ease; }
 .voyage-route-card:hover, .voyage-route-card.selected { border-color: rgba(119, 228, 222, .7); background: linear-gradient(110deg, rgba(45, 91, 126, .68), rgba(42, 39, 91, .8)); transform: translateY(-1px); }
+.voyage-route-card:disabled { cursor: not-allowed; opacity: .68; }
+.voyage-route-card:disabled:hover { border-color: rgba(125, 157, 218, .24); background: rgba(12, 25, 55, .75); transform: none; }
 .voyage-route-card span { font-weight: 700; font-size: .8rem; }
 .voyage-route-card small { color: #8ea4c9; font-size: .64rem; line-height: 1.45; }
 .voyage-route-card em { color: #77e4de; font-size: .59rem; font-style: normal; }
