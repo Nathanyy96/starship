@@ -77,7 +77,16 @@
     talia: card("talia", "塔莉亞", "Talia", 3, "淨", "#76d9c7", "4.2", "4.2｜遠望塔見習修復員；偶發三星設計", "./assets/cards/talia.svg"),
     neve: card("neve", "涅芙", "Neve", 4, "幻", "#c18cff", "4.3", "4.3｜白夜航路記憶領航員、失效訊息整理者", "./assets/cards/neve.svg"),
     kael: card("kael", "凱爾", "Kael", 4, "月", "#88aee8", "4.4", "4.4｜回覆海溝潛航隊長、深層訊號守門人", "./assets/cards/kael.svg"),
-    elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.svg")
+    elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.svg"),
+
+    // 第五大版本角色：保留完整角色規劃與戰鬥資料，但維持鎖定，不進現行卡池。
+    vestra: card("vestra", "維斯妲", "Vestra", 4, "星", "#e4b86b", "5.0", "5.0｜北境根冠守根者、未命名燈座保管人", "./assets/cards/vestra.svg"),
+    brann: card("brann", "布蘭", "Brann", 4, "烈", "#e87954", "5.1", "5.1｜霜火鍛環熱源調度員、輪值工程師", "./assets/cards/brann.svg"),
+    eirin: card("eirin", "伊芮恩", "Eirin", 4, "燕", "#70b7ff", "5.2", "5.2｜虹徑外環信標師、雙端通路測量者", "./assets/cards/eirin.svg"),
+    sava: card("sava", "薩芙", "Sava", 4, "幻", "#bd8ce8", "5.3", "5.3｜命線織庭編譯師、空白梭保管者", "./assets/cards/sava.svg"),
+    niela: card("niela", "妮拉", "Niela", 3, "淨", "#75d7cc", "5.3", "5.3｜織線學徒、公共梭房見習修復員；偶發三星設計", "./assets/cards/niela.svg"),
+    hervan: card("hervan", "赫爾凡", "Hervan", 4, "月", "#87aee7", "5.4", "5.4｜深海根門潛航隊長、四把鑰匙輪值者", "./assets/cards/hervan.svg"),
+    daria: card("daria", "達莉雅", "Daria", 4, "淨", "#64d7c7", "5.5", "5.5｜新曙終端交班見證人、九界協議記錄者", "./assets/cards/daria.svg")
   };
 
   var legacyCards = [
@@ -87,6 +96,7 @@
   ];
   var version2Cards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle];
   var version4Cards = [cards.aurelia, cards.kairen, cards.sorae, cards.talia, cards.neve, cards.kael, cards.elyra];
+  var version5Cards = [cards.vestra, cards.brann, cards.eirin, cards.sava, cards.niela, cards.hervan, cards.daria];
 
   // 本次大更新開放劇情與 2.0–2.5 角色；1.0–1.5 卡池仍保留，讓舊角色不會消失。
   var activeCards = [
@@ -96,7 +106,7 @@
   var legacyThree = legacyCards.filter(function (item) { return item.rarity === 3; });
   var activeFour = activeCards.filter(function (item) { return item.rarity === 4; });
   var activeThree = activeCards.filter(function (item) { return item.rarity === 3; });
-  var futureCards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster, ...version4Cards];
+  var futureCards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster, ...version4Cards, ...version5Cards];
   var version2Four = version2Cards.filter(function (item) { return item.rarity === 4; });
   var version2Three = version2Cards.filter(function (item) { return item.rarity === 3; });
   var version3Cards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster];
@@ -152,6 +162,13 @@
     ,neve: { rarity: 4, role: "仲裁", maxHp: 1160, attack: 180, defense: 136, speed: 106, range: 2, attackName: "白夜折頁", skillName: "記憶回收", skillPower: 1.36, skillEffect: "清除敵方增益並將一名倒下隊友拉回低生命狀態" }
     ,kael: { rarity: 4, role: "重裝", maxHp: 1680, attack: 165, defense: 205, speed: 68, range: 1, attackName: "深層鎮壓", skillName: "海溝守門", skillPower: 1.24, skillEffect: "嘲諷敵人並分攤下一輪隊伍傷害" }
     ,elyra: { rarity: 4, role: "支援", maxHp: 1240, attack: 172, defense: 150, speed: 112, range: 2, attackName: "律式回覆", skillName: "第二條律", skillPower: 1.34, skillEffect: "讓隊伍獲得可撤回的減傷，並重置一名隊友技能冷卻" }
+    ,vestra: { rarity: 4, role: "守門", maxHp: 1510, attack: 178, defense: 178, speed: 94, range: 2, attackName: "根冠定標", skillName: "空位守望", skillPower: 1.32, skillEffect: "架起護盾並讓隊伍下一輪可撤回一次傷害" }
+    ,brann: { rarity: 4, role: "鍛路", maxHp: 1550, attack: 198, defense: 170, speed: 84, range: 1, attackName: "霜火輪錘", skillName: "雙核輪值", skillPower: 1.46, skillEffect: "重擊目標並降低敵方攻擊，為隊伍留下短暫護盾" }
+    ,eirin: { rarity: 4, role: "測量", maxHp: 1320, attack: 220, defense: 142, speed: 132, range: 4, attackName: "虹徑定向", skillName: "雙端信標", skillPower: 1.34, skillEffect: "標記最脆弱敵人並提升全隊速度，下一輪可安全退回" }
+    ,sava: { rarity: 4, role: "編譯", maxHp: 1390, attack: 224, defense: 158, speed: 118, range: 2, attackName: "命線編譯", skillName: "空白梭", skillPower: 1.38, skillEffect: "清除敵方增益並把一次敵方強化改成等待" }
+    ,niela: { rarity: 3, role: "修復", maxHp: 900, attack: 96, defense: 98, speed: 110, range: 2, attackName: "織線輕補", skillName: "學徒交班", skillPower: 1.14, skillEffect: "回復生命最低的隊友並降低其下一次受到的傷害" }
+    ,hervan: { rarity: 4, role: "重裝", maxHp: 1680, attack: 175, defense: 205, speed: 80, range: 1, attackName: "深門鎮潮", skillName: "四鑰分攤", skillPower: 1.3, skillEffect: "嘲諷敵人並把下一輪隊伍傷害分攤給自己" }
+    ,daria: { rarity: 4, role: "指揮", maxHp: 1430, attack: 230, defense: 170, speed: 120, range: 3, attackName: "新曙落筆", skillName: "交班見證", skillPower: 1.4, skillEffect: "提升全隊攻擊與防禦，並重置一名隊友技能冷卻" }
   };
 
   // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調。
@@ -1661,6 +1678,7 @@
     banners: banners,
     version2Cards: version2Cards,
     version4Cards: version4Cards,
+    version5Cards: version5Cards,
     // 1.0–2.5 是 live 劇情；3.0–5.5 先完整建檔但保持鎖定，供後續版本開放。
     storyChapters: allStoryChapters,
     liveStoryChapters: liveStoryChapters,

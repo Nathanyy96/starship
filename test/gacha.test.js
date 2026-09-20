@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -31,6 +31,16 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(version3Cards.some((card) => card.id === "cenya" && card.rarity === 3), true);
   assert.equal(version4Cards.every((card) => card.portraitImage), true);
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
+});
+
+test("角色規劃完整建檔至 5.5，但玩家入口仍只開放 1.0–2.5", () => {
+  assert.equal(version5Cards.length, 7);
+  assert.equal(version5Cards.filter((card) => card.rarity === 4).length >= 1, true);
+  assert.equal(version5Cards.some((card) => card.rarity === 3), true);
+  assert.equal(version5Cards.every((card) => Number(card.releaseVersion) >= 5 && Number(card.releaseVersion) <= 5.5), true);
+  assert.equal(version5Cards.every((card) => card.portraitImage && characterBattleStats[card.id]), true);
+  assert.equal(futureCards.some((card) => card.id === "daria" && card.releaseVersion === "5.5"), true);
+  assert.equal(activeCards.every((card) => Number(card.releaseVersion) <= 2.5), true);
 });
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {

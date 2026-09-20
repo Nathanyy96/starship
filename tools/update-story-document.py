@@ -1,16 +1,48 @@
 from pathlib import Path
+import json
+import os
 import re
 import shutil
+import subprocess
 
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_BREAK
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.shared import Inches, Pt
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "星界之律遊戲設定總覽.docx"
 OUTPUT = ROOT / "星界之律遊戲設定總覽-劇情修訂版.docx"
+
+
+def load_future_story():
+    """Read the 3.0–5.5 story directly from the game's data source.
+
+    Keeping the document generator connected to src/data.js prevents the design
+    document from drifting away from the text that the game will display when
+    these future chapters are opened.
+    """
+    bundled_node = Path(r"C:\Users\natha\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe")
+    node = Path(os.environ.get("STARSHIP_NODE", "")) if os.environ.get("STARSHIP_NODE") else bundled_node
+    if not node.exists():
+        node = Path("node")
+    export_script = (
+        "import('./src/data.js').then(({default:d}) => "
+        "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), story:d.storyChapters, "
+        "v3:d.version3StoryChapters, v4:d.version4StoryChapters, v5:d.version5StoryChapters})))"
+    )
+    result = subprocess.run(
+        [str(node), "--input-type=module", "-e", export_script],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return json.loads(result.stdout)
 
 
 def replace_in_paragraph(paragraph, replacements):
@@ -60,6 +92,10 @@ def add_story_table(document):
     table = document.add_table(rows=1, cols=4)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.style = "Table Grid"
+    header_properties = table.rows[0]._tr.get_or_add_trPr()
+    header_repeat = OxmlElement("w:tblHeader")
+    header_repeat.set(qn("w:val"), "true")
+    header_properties.append(header_repeat)
     headers = ["版本", "主線", "支線", "本版本的中心轉折"]
     for cell, text in zip(table.rows[0].cells, headers):
         cell.text = text
@@ -69,6 +105,106 @@ def add_story_table(document):
         for cell, text in zip(cells, [version, main, side, twist]):
             cell.text = text
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(8.5)
+    return table
+
+
+def add_future_story_body(document, story):
+    """Append the complete 3.0–5.5 main and side-story scenes."""
+    document.add_heading("五、3.0–5.5 後續版本完整正文", level=2)
+    intro = document.add_paragraph()
+    intro.add_run("閱讀定位：").bold = True
+    intro.add_run(
+        "3.0–3.5 延續瑟蕾雅建立的拒絕、撤回與分散治理主題；4.0–5.5 再以北歐神話意象"
+        "重新理解根系、命線、霜火、虹橋、深海守門與長冬，但不直接套用既有神名或神話劇本。"
+        "每一版都讓瑟蕾雅面對一個看似只能由她決定的中心，再把拒絕、撤回與交班的權利交還給受影響的人。"
+        "以下正文與 src/data.js 的未開放版本資料同步。"
+    )
+
+    for version_group, label in (
+        (story.get("v3", []), "3.0–3.5"),
+        (story.get("v4", []), "4.0–4.5"),
+        (story.get("v5", []), "5.0–5.5"),
+    ):
+        document.add_heading(f"{label} 版本正文", level=3)
+        for chapter in version_group:
+            version = chapter.get("version", "")
+            title = chapter.get("title", "未命名章節")
+            document.add_heading(f"{version} {title}", level=4)
+            summary = document.add_paragraph()
+            summary.add_run("章節摘要：").bold = True
+            summary.add_run(chapter.get("summary", ""))
+            for index, scene in enumerate(chapter.get("scenes", []), start=1):
+                document.add_heading(f"{index}. {scene.get('title', '未命名幕次')}", level=5)
+                document.add_paragraph(scene.get("body", ""))
+
+
+def add_character_scope(document, story):
+    """Show the complete 1.0–5.5 character plan and its live/locked boundary."""
+    document.add_heading("角色規劃與開放狀態", level=2)
+    document.add_paragraph(
+        "角色資料與劇情資料同樣完整建檔至 5.5。玩家目前只會在 1.0–2.5 取得與培養角色；"
+        "3.0–5.5 的角色已保存名稱、星級、元素、定位與立繪來源，但不會進入現行卡池或玩家角色列表，"
+        "直到對應版本正式公告開放。"
+    )
+    cards = sorted(story.get("cards", []), key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", "")))
+    table = document.add_table(rows=1, cols=5)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    header_properties = table.rows[0]._tr.get_or_add_trPr()
+    header_repeat = OxmlElement("w:tblHeader")
+    header_repeat.set(qn("w:val"), "true")
+    header_properties.append(header_repeat)
+    headers = ["版本", "角色", "星級", "元素", "狀態"]
+    for cell, text in zip(table.rows[0].cells, headers):
+        cell.text = text
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for card in cards:
+        cells = table.add_row().cells
+        version = str(card.get("releaseVersion", ""))
+        status = "玩家開放" if float(version) <= 2.5 else "已建檔／鎖定"
+        values = [version, card.get("name", ""), "★" * int(card.get("rarity", 0)), card.get("element", ""), status]
+        for cell, text in zip(cells, values):
+            cell.text = str(text)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(8.5)
+    return table
+
+
+def add_story_index(document, story):
+    """Add an authoritative 1.0–5.5 main/side index from the game data."""
+    document.add_heading("劇情版本索引（以遊戲資料為準）", level=2)
+    document.add_paragraph(
+        "本表直接取自 src/data.js 的 storyChapters，保留 1.0–5.5 的主線與支線名稱。"
+        "玩家入口目前只開放 1.0–2.5；3.0–5.5 已完成建檔但維持鎖定。"
+    )
+    table = document.add_table(rows=1, cols=4)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    header_properties = table.rows[0]._tr.get_or_add_trPr()
+    header_repeat = OxmlElement("w:tblHeader")
+    header_repeat.set(qn("w:val"), "true")
+    header_properties.append(header_repeat)
+    headers = ["版本", "類型", "章節", "狀態"]
+    for cell, text in zip(table.rows[0].cells, headers):
+        cell.text = text
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for chapter in story:
+        cells = table.add_row().cells
+        version = str(chapter.get("version", ""))
+        chapter_type = "主線" if chapter.get("type") == "main" else "支線"
+        status = "玩家開放" if float(version) <= 2.5 and chapter.get("releaseOpen") is not False else "已建檔／鎖定"
+        for cell, text in zip(cells, [version, chapter_type, chapter.get("title", ""), status]):
+            cell.text = str(text)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
     for row in table.rows:
         for cell in row.cells:
             for paragraph in cell.paragraphs:
@@ -107,7 +243,12 @@ def append_story_revision(document):
     document.add_heading("四、3.0–5.5 版本校訂表", level=2)
     add_story_table(document)
 
-    document.add_heading("五、完成前檢查清單", level=2)
+    story = load_future_story()
+    add_story_index(document, story.get("story", []))
+    add_character_scope(document, story)
+    add_future_story_body(document, story)
+
+    document.add_heading("六、完成前檢查清單", level=2)
     add_bullet(document, "每一章有可讀的標題、摘要、至少三幕正文、開場問題、中段代價與結尾轉折。")
     add_bullet(document, "每個主線章節的角色標籤與導讀都能找到瑟蕾雅；支線至少說明它如何受她的選擇影響，且不取代支線角色自己的決定。")
     add_bullet(document, "劇情頁同時顯示當幕閱讀區、本章完整正文、幕次導覽與首次完成獎勵；長文可向下捲動，不再只顯示劇情標題。")
