@@ -30,6 +30,7 @@
     var currentPetOutfitId = "default";
     var currentPetEffectId = "starlit";
     var petShowcases = [];
+    var starLawTestPanelOpen = false;
     var currentCharacterId = "";
     var currentCharacterSkinId = "";
     var game = null;
@@ -97,7 +98,7 @@
       byId(viewId).hidden = false;
       if (viewId === "game-lobby") { renderLobby(); }
       if (viewId === "tutorial-view") { renderTutorial(); }
-      if (viewId === "announcement-view") { renderAnnouncements(); }
+      if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -369,6 +370,43 @@
       if (!byId("announcement-list")) return;
       var list = data.announcements || [];
       byId("announcement-list").innerHTML = list.length ? list.map(function (item, index) { return "<article class=\"announcement-card " + (index === 0 ? "featured" : "") + "\"><div class=\"announcement-card-head\"><span class=\"announcement-badge\">" + escapeHtml(item.badge) + "</span><span>" + escapeHtml(item.date) + "</span></div><h3>" + escapeHtml(item.title) + "</h3><p>" + escapeHtml(item.copy) + "</p><div class=\"announcement-highlights\">" + (item.highlights || []).map(function (highlight) { return "<span>✓ " + escapeHtml(highlight) + "</span>"; }).join("") + "</div><div class=\"announcement-reward\"><span>獎勵／重點</span><strong>" + escapeHtml(item.reward) + "</strong></div></article>"; }).join("") : "<div class=\"empty\">目前沒有公告。</div>";
+      renderStarLawTestPanel();
+    }
+    function renderStarLawTestPanel() {
+      var status = byId("star-law-test-status");
+      var button = byId("claim-star-law-test-reward");
+      if (!status || !button || !game) return;
+      var state = game.getState();
+      var claimed = Boolean(state.testRewards && state.testRewards.starLawSupplyClaimed);
+      button.disabled = claimed;
+      status.textContent = claimed ? "本帳號已領取測試補給；資源已保存。" : "測試補給尚未領取。";
+    }
+    function setStarLawTestPanelVisible(visible) {
+      var panel = byId("star-law-test-panel");
+      if (!panel) return;
+      starLawTestPanelOpen = Boolean(visible);
+      panel.hidden = !starLawTestPanelOpen;
+      renderStarLawTestPanel();
+      if (starLawTestPanelOpen) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function claimStarLawTestReward() {
+      if (!game || !currentPlayerName) { showGate(); return; }
+      var reward = { starSand: 100000, characterExp: 1000000 };
+      if (remoteMode) {
+        apiRequest("/api/player/star-law-test-reward", {}).then(function (payload) {
+          updateGameFromState(payload.state);
+          renderStarLawTestPanel(); render(); renderLobby();
+          showMessage(payload.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入帳號：" + rewardText(payload.reward || reward) + "。", false);
+        }).catch(function (error) { showMessage(error.message, true); });
+        return;
+      }
+      try {
+        var result = game.claimStarLawTestReward({ reward: reward });
+        updateGameFromState(result.state);
+        saveLocalState();
+        renderStarLawTestPanel(); render(); renderLobby();
+        showMessage(result.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入本機帳號：" + rewardText(result.reward) + "。", false);
+      } catch (error) { showMessage(error.message, true); }
     }
     function completeTutorial() {
       if (!game || !currentPlayerName) { showGate(); return; }
@@ -1311,6 +1349,8 @@
     byId("open-pets").addEventListener("click", function () { showView("pet-view"); });
     byId("open-tutorial").addEventListener("click", function () { showView("tutorial-view"); });
     byId("open-announcements").addEventListener("click", function () { showView("announcement-view"); });
+    byId("open-star-law-test").addEventListener("click", function () { setStarLawTestPanelVisible(!starLawTestPanelOpen); });
+    byId("claim-star-law-test-reward").addEventListener("click", claimStarLawTestReward);
     byId("continue-story").addEventListener("click", function () { showView("story-view"); });
     byId("tutorial-reward").addEventListener("click", function (event) { if (event.target.closest("#complete-tutorial")) completeTutorial(); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });

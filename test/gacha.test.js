@@ -191,6 +191,22 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(Object.prototype.hasOwnProperty.call(second.state.resources, "tickets"), false);
 });
 
+test("星律隱藏測試補給會寫入帳號且只可領取一次", () => {
+  const gacha = game();
+  const before = gacha.getState().resources;
+  const first = gacha.claimStarLawTestReward();
+  assert.equal(first.alreadyClaimed, false);
+  assert.equal(first.reward.starSand, 100000);
+  assert.equal(first.reward.characterExp, 1000000);
+  assert.equal(first.state.resources.starSand, before.starSand + 100000);
+  assert.equal(first.state.resources.characterExp, before.characterExp + 1000000);
+  assert.equal(first.state.testRewards.starLawSupplyClaimed, true);
+  const second = gacha.claimStarLawTestReward();
+  assert.equal(second.alreadyClaimed, true);
+  assert.equal(second.state.resources.starSand, first.state.resources.starSand);
+  assert.equal(second.state.resources.characterExp, first.state.resources.characterExp);
+});
+
 test("版本遷移保留角色、等級、命座晶核與已完成劇情", () => {
   const migrated = game({
     state: state({

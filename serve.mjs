@@ -20,6 +20,7 @@ const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 const currentUpdateVersion = "2.0-2.5";
 const updateReward = Object.freeze({ starSand: 3200 });
+const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 1000000 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
 function createGame(state) {
@@ -503,6 +504,18 @@ function assertAdmin(body) {
   }
 }
 
+function testRewardsEnabled() {
+  const flag = String(process.env.STARSHIP_TEST_REWARDS || "").trim().toLowerCase();
+  return process.env.NODE_ENV !== "production" || flag === "1" || flag === "true" || flag === "yes";
+}
+
+function claimStarLawTestReward(currentState) {
+  if (!testRewardsEnabled()) {
+    throw new Error("星律測試補給目前已關閉；測試時請暫時設定 STARSHIP_TEST_REWARDS=true");
+  }
+  return createGame(currentState).claimStarLawTestReward({ reward: starLawTestReward });
+}
+
 function integerOrCurrent(value, current) {
   if (value === undefined) return current;
   if (!Number.isInteger(value) || value < 0) throw new Error("資源與保底數值必須是非負整數");
@@ -901,6 +914,16 @@ async function handleApi(request, response, requestUrl) {
     if (requestUrl.pathname === "/api/player/tutorial-complete") {
       const player = playerFromSession(database, body.token);
       const result = completeTutorial(player.record.state);
+      player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: result.alreadyClaimed, reward: result.reward });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/star-law-test-reward") {
+      const player = playerFromSession(database, body.token);
+      const result = claimStarLawTestReward(player.record.state);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);

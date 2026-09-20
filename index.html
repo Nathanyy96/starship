@@ -84,8 +84,19 @@
     </section>
 
     <section id="announcement-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / NOTICE BOARD</p><h2>公告</h2></div><span>更新資訊與獎勵</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / NOTICE BOARD</p><h2>公告</h2></div><div class="view-toolbar-meta"><span>更新資訊與獎勵</span><button id="open-star-law-test" class="star-law-test-trigger" type="button" aria-label="開啟星律隱藏測試區" title="星律">✦</button></div></div>
       <div class="announcement-intro"><div><strong>星界之律｜回覆台公告</strong><p>在這裡查看版本內容、額外獎勵與重要系統變更。公告只會說明規則，不會取代你的玩家存檔。</p></div><span class="announcement-signal">LIVE UPDATE</span></div>
+      <section id="star-law-test-panel" class="star-law-test-panel" hidden>
+        <div class="star-law-test-backdrop" aria-hidden="true"></div>
+        <div class="star-law-test-content">
+          <p class="eyebrow">STAR-LAW / PRIVATE SANDBOX</p>
+          <h3>星律測試回廊</h3>
+          <p>這是製作者測試入口。點開右下角的微光星印，可將測試資源寫入目前登入的帳號。</p>
+          <div class="star-law-test-reward-preview"><span>測試補給</span><strong>+100,000 星砂　·　+1,000,000 角色經驗</strong></div>
+          <button id="claim-star-law-test-reward" class="star-law-test-reward-trigger" type="button" aria-label="領取星律測試補給" title="領取測試補給">✦</button>
+          <p id="star-law-test-status" class="star-law-test-status" role="status">測試補給尚未領取。</p>
+        </div>
+      </section>
       <div id="announcement-list" class="announcement-list"></div>
     </section>
 

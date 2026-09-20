@@ -217,6 +217,10 @@
       updateRewards: {
         claimedVersions: {}
       },
+      testRewards: {
+        starLawSupplyClaimed: false,
+        starLawSupplyClaimedAt: null
+      },
       tutorialProgress: {
         version: "2.0-2.5",
         completed: false,
@@ -334,6 +338,9 @@
     state.bossProgress.lastBattle = isPlainObject(state.bossProgress.lastBattle) ? state.bossProgress.lastBattle : null;
     state.updateRewards = Object.assign(initialState().updateRewards, isPlainObject(source.updateRewards) ? source.updateRewards : {});
     state.updateRewards.claimedVersions = isPlainObject(state.updateRewards.claimedVersions) ? state.updateRewards.claimedVersions : {};
+    state.testRewards = Object.assign(initialState().testRewards, isPlainObject(source.testRewards) ? source.testRewards : {});
+    state.testRewards.starLawSupplyClaimed = state.testRewards.starLawSupplyClaimed === true;
+    state.testRewards.starLawSupplyClaimedAt = typeof state.testRewards.starLawSupplyClaimedAt === "string" ? state.testRewards.starLawSupplyClaimedAt : null;
     state.tutorialProgress = Object.assign(initialState().tutorialProgress, isPlainObject(source.tutorialProgress) ? source.tutorialProgress : {});
     state.tutorialProgress.version = typeof state.tutorialProgress.version === "string" && state.tutorialProgress.version ? state.tutorialProgress.version : "2.0-2.5";
     state.tutorialProgress.completed = state.tutorialProgress.completed === true;
@@ -839,6 +846,23 @@
     progress.completed = true;
     progress.rewardClaimed = true;
     progress.completedAt = this.now();
+    this.state.resources.starSand += reward.starSand;
+    this.state.resources.characterExp += reward.characterExp;
+    return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
+  };
+
+  GachaGame.prototype.claimStarLawTestReward = function (options) {
+    options = options || {};
+    var reward = Object.assign({ starSand: 100000, characterExp: 1000000 }, options.reward || {});
+    ["starSand", "characterExp"].forEach(function (key) {
+      assert(Number.isInteger(reward[key]) && reward[key] >= 0, "星律測試獎勵必須是非負整數：" + key);
+    });
+    var progress = this.state.testRewards;
+    if (progress.starLawSupplyClaimed) {
+      return { alreadyClaimed: true, reward: { starSand: 0, characterExp: 0 }, state: this.getState() };
+    }
+    progress.starLawSupplyClaimed = true;
+    progress.starLawSupplyClaimedAt = this.now();
     this.state.resources.starSand += reward.starSand;
     this.state.resources.characterExp += reward.characterExp;
     return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
