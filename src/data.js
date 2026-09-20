@@ -227,6 +227,15 @@
     { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 12800, recommendedPowerNote: "建議隊伍戰力約 12,800；低於此值仍可能靠治療、重裝與破防協同通關，但失誤容忍度會明顯降低。", environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.08, enemyDefense: 1.12 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態，錯誤的爆發時機會使全隊陷入反擊；傷害經過下修，血量仍保留終局耐久。", trialRule: "finale", finalStage: true, enemies: [{ name: "末冬護衛", mythicClass: "rainbow-warden", maxHp: 12500, attack: 520, defense: 500, speed: 164, count: 2 }, { name: "新律王座", mythicClass: "fire-giant", maxHp: 18000, attack: 560, defense: 585, speed: 100, count: 1 }], reward: trialReward }
   ];
 
+  // 星海迷航是休閒探索玩法，不應直接借用第 18／30 關的高難度試煉終幕。
+  // 這三個專用戰鬥只保留敵人特性與閱讀回饋，推薦戰力和傷害控制在一般玩家能
+  // 用 1.0–2.5 已取得角色穩定嘗試的範圍；高難度挑戰仍留在 trialStages。
+  var voyageBattleStages = [
+    { id: "voyage-combat-1", name: "碎光狹道", region: "星海迷航", recommendedPower: 1200, environment: "碎光航道", environmentEffect: "速度較快的角色容易先手，適合熟悉自走棋戰鬥", modifiers: { teamSpeed: 1.04, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "碎光擾動", enemyTraitEffect: "敵人數量較多但單體傷害較低，先處理高速單位即可", trialRule: "echo", enemies: [{ name: "碎光漂獸", maxHp: 1050, attack: 112, defense: 72, speed: 84, count: 2 }, { name: "碎光航標核", maxHp: 1500, attack: 118, defense: 90, speed: 58, count: 1 }], reward: {} },
+    { id: "voyage-combat-2", name: "折光風暴", region: "星海迷航", recommendedPower: 3500, environment: "折光風暴帶", environmentEffect: "敵方增益會短暫反射，安排技能順序即可拆解", modifiers: { teamAttack: 1.03, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "折光回聲", enemyTraitEffect: "首領第一次施放技能後獲得短暫護盾，破盾後會回到一般狀態", trialRule: "copy", enemies: [{ name: "折光拾荒獸", maxHp: 2850, attack: 188, defense: 132, speed: 105, count: 2 }, { name: "折光風暴核", maxHp: 4600, attack: 222, defense: 168, speed: 74, count: 1 }], reward: {} },
+    { id: "voyage-final", name: "星海終端守門者", region: "未命名終端", recommendedPower: 5400, recommendedPowerNote: "星海迷航終幕建議隊伍戰力約 5,400；低於此值仍可透過治療、護盾與協同通關。", environment: "星海終端", environmentEffect: "守門者會輪換護盾與壓制，但不使用星界試煉終局的高傷害規則", modifiers: { teamAttack: 1.05, teamDefense: 1.03, enemyAttack: 0.86, enemyDefense: 0.92 }, enemyTrait: "終端守門", enemyTraitEffect: "護衛倒下後首領會短暫暴露弱點，先擊破護衛能降低終幕壓力", trialRule: "shield", finalStage: true, enemies: [{ name: "星海護航體", maxHp: 4200, attack: 250, defense: 178, speed: 118, count: 2 }, { name: "星海終端守門者", maxHp: 7200, attack: 302, defense: 228, speed: 82, count: 1 }], reward: {} }
+  ];
+
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
   // 六種素材來源分成 Lv.1–3 三個獎勵檔位，讓玩家可以透過戰鬥穩定準備突破材料，
   // 同時保留隊伍搭配與重複挑戰的空間。每個檔位安排兩個 Boss，避免刪除既有角色的素材來源。
@@ -308,7 +317,7 @@
     ],
     nodes: [
       { id: "voyage-start", type: "start", name: "漂流起點", region: "星海外環", description: "航船脫離回覆台的固定座標，接下來的路線會由星海自行排列。" },
-      { id: "voyage-combat-1", type: "combat", name: "碎光狹道", region: "碎光帶", description: "小型敵群封住狹道，先確認隊伍的前後排與技能循環。", stageId: 6, fragmentReward: 1 },
+      { id: "voyage-combat-1", type: "combat", name: "碎光狹道", region: "碎光帶", description: "小型敵群封住狹道，先確認隊伍的前後排與技能循環。", stageId: "voyage-combat-1", fragmentReward: 1 },
       { id: "voyage-harmonics", type: "event", name: "三重回音室", region: "回音室", description: "三道不同頻率的回聲同時抵達，選擇要聆聽、調和或暫時靜音。", choices: [
         { id: "listen", label: "聽取殘響", description: "收集一道額外線索。", incrementFlag: "echoes", fragmentDelta: 1 },
         { id: "tune", label: "調和兩種頻率", description: "三星與四星共同工作時，可以開啟協鳴條件。", requiresMixedTeam: true, flag: "harmonized", buff: "harmony" },
@@ -336,8 +345,8 @@
         { id: "open", label: "開啟檔案門", description: "需要先取得檔案標記，成功後可觸發隱藏結局。", requiresFlag: "archive", flag: "secretGate", buff: "archive-key" },
         { id: "wait", label: "在門前等待", description: "不打開門，但留下回聲線索。", incrementFlag: "echoes" }
       ] },
-      { id: "voyage-combat-2", type: "combat", name: "折光風暴", region: "折光風暴帶", description: "敵人會複製隊伍剛使用的增益，必須安排技能順序。", stageId: 18, fragmentReward: 2, buff: "storm-proof" },
-      { id: "voyage-final", type: "boss", final: true, name: "星海終端守門者", region: "未命名終端", description: "守門者不屬於任何版本的主線，只有完整的隊伍協同能讓它暫停回擊。", stageId: 30, fragmentReward: 3 }
+      { id: "voyage-combat-2", type: "combat", name: "折光風暴", region: "折光風暴帶", description: "敵人會複製隊伍剛使用的增益，必須安排技能順序。", stageId: "voyage-combat-2", fragmentReward: 2, buff: "storm-proof" },
+      { id: "voyage-final", type: "boss", final: true, name: "星海終端守門者", region: "未命名終端", description: "守門者不屬於任何版本的主線，只有完整的隊伍協同能讓它暫停回擊。", stageId: "voyage-final", fragmentReward: 3 }
     ],
     endingRewards: {
       normal: { starSand: 160, characterExp: 500 },
@@ -352,13 +361,13 @@
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
   var petVersion = "2.1-companion-workshop";
   var petDefinitions = [
-    { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
-    { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
-    { id: "wind-bird", name: "風鈴雀", temperament: "敏捷", icon: "◇", accent: "#86b8ff", maxLevel: 30, description: "會把風向變成旋律，喜歡停在航路標記的最高處。" },
-    { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" },
-    { id: "aurora-fawn", name: "極光幼鹿", temperament: "溫柔", icon: "♢", accent: "#8ee6c7", maxLevel: 30, description: "鹿角會收集夜空的微光，靠近時會讓工坊的星塵變得柔和。" },
-    { id: "rune-drake", name: "符文幼龍", temperament: "頑皮", icon: "✧", accent: "#ff9a94", maxLevel: 30, description: "喜歡把古老符文當作玩具，偶爾會用一聲噴嚏點亮整面牆。" },
-    { id: "cloud-whale", name: "雲潮鯨", temperament: "悠閒", icon: "≈", accent: "#79c9ff", maxLevel: 30, description: "在雲海裡慢慢游動，會把玩家的好心情變成一圈圈潮光。" }
+    { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", image: "./assets/pets/star-fox.png", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
+    { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", image: "./assets/pets/tide-otter.png", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
+    { id: "wind-bird", name: "風鈴雀", temperament: "敏捷", icon: "◇", accent: "#86b8ff", image: "./assets/pets/wind-bird.png", maxLevel: 30, description: "會把風向變成旋律，喜歡停在航路標記的最高處。" },
+    { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", image: "./assets/pets/mirror-sprout.png", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" },
+    { id: "aurora-fawn", name: "極光幼鹿", temperament: "溫柔", icon: "♢", accent: "#8ee6c7", image: "./assets/pets/aurora-fawn.png", maxLevel: 30, description: "鹿角會收集夜空的微光，靠近時會讓工坊的星塵變得柔和。" },
+    { id: "rune-drake", name: "符文幼龍", temperament: "頑皮", icon: "✧", accent: "#ff9a94", image: "./assets/pets/rune-drake.png", maxLevel: 30, description: "喜歡把古老符文當作玩具，偶爾會用一聲噴嚏點亮整面牆。" },
+    { id: "cloud-whale", name: "雲潮鯨", temperament: "悠閒", icon: "≈", accent: "#79c9ff", image: "./assets/pets/cloud-whale.png", maxLevel: 30, description: "在雲海裡慢慢游動，會把玩家的好心情變成一圈圈潮光。" }
   ];
   var petOutfits = [
     { id: "default", name: "原野本色", description: "保留寵物的自然外觀。", accent: "#9e92ff" },
@@ -1670,6 +1679,7 @@
     dispatchMissions: dispatchMissions,
     voyageVersion: voyageVersion,
     voyageConfig: voyageConfig,
+    voyageBattleStages: voyageBattleStages,
     petVersion: petVersion,
      petDefinitions: petDefinitions,
      petOutfits: petOutfits,

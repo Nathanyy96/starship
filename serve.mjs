@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -601,6 +601,12 @@ function trialStageById(stageId) {
   return stage;
 }
 
+function voyageStageByNode(node) {
+  const dedicated = (voyageBattleStages || []).find((item) => item.id === String(node && node.stageId || node && node.id || ""));
+  if (dedicated) return dedicated;
+  return node && node.stageId ? trialStageById(node.stageId) : null;
+}
+
 function runTrial(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const stage = trialStageById(body.stageId);
@@ -719,7 +725,7 @@ function runVoyage(currentState, body) {
   if (node.type === "combat" || node.type === "boss") {
     if (!team.length) throw new Error("至少派出 1 名角色才能進行星海迷航戰鬥");
     if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
-    const stage = trialStageById(node.stageId);
+    const stage = voyageStageByNode(node);
     battle = simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, state), stage, rng: Math.random });
   }
   const result = game.advanceVoyage({ nodeId: node.id, choice: body.choice, team, battle });
@@ -757,7 +763,7 @@ function publicPetShowcase(key, record) {
   return {
     playerKey: key,
     playerName: record.name,
-    pet: { id: definition.id, name: definition.name, temperament: definition.temperament, icon: definition.icon, accent: definition.accent, level: pet.level, bond: pet.bond, mood: pet.mood },
+    pet: { id: definition.id, name: definition.name, temperament: definition.temperament, icon: definition.icon, accent: definition.accent, image: definition.image, level: pet.level, bond: pet.bond, mood: pet.mood },
     outfit: { id: outfit.id, name: outfit.name, description: outfit.description, accent: outfit.accent },
     effect: { id: effect.id, name: effect.name, description: effect.description, icon: effect.icon, color: effect.color },
     ratingCount: Number(showcase.ratingCount || 0),

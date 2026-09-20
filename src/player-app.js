@@ -720,9 +720,9 @@
     }
     function battleSceneMarkup(battle, state, stage, mode) {
       if (!battle) return "";
-      var team = Array.isArray(battle.team) ? battle.team : []; var enemies = Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
+      var timedOut = battle.status === "timeout" || battle.timedOut === true; var resultClass = battle.won ? "battle-clear" : timedOut ? "battle-timeout" : "battle-failed"; var team = Array.isArray(battle.team) ? battle.team : []; var enemies = Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗|上限|超時/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
       var title = stage && stage.name ? stage.name : battle.stageName || "自走棋戰鬥"; var environment = battle.environment || stage && stage.environment || "一般戰鬥"; var rule = battle.enemyTrait || stage && stage.enemyTrait || "一般特性";
-      return "<section class=\"battle-scene " + (battle.won ? "battle-clear" : "battle-failed") + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / LIVE RESULT</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit) { return battleUnitMarkup(unit, state, false); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit) { return battleUnitMarkup(unit, state, true); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
+      return "<section class=\"battle-scene " + resultClass + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit) { return battleUnitMarkup(unit, state, false); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit) { return battleUnitMarkup(unit, state, true); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
     }
     function decorateTrialMythic(stage) {
       if (!stage || !stage.mythicTheme) return;
@@ -753,12 +753,12 @@
     function renderTrialBattleResult(state) {
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
       if (!battle || Number(battle.stageId) !== Number(currentTrialStageId)) { container.innerHTML = "<div class=\"trial-result-empty\">完成一場自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
-      var stage = trialStageById(battle.stageId) || {}; var rewardExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
-      var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : "本次未通關，不會扣除挑戰次數";
+      var stage = trialStageById(battle.stageId) || {}; var rewardExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0); var timedOut = battle.status === "timeout" || battle.timedOut === true;
+      var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數" : "本次未通關，不會扣除挑戰次數";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
       var environment = battle.environment ? "環境「" + battle.environment + "」" : "";
       var powerNote = battle.recommendedPower ? "推薦 " + number(battle.recommendedPower) + "｜目前 " + number(battle.teamPower || 0) + "（" + Math.round(Number(battle.powerRatio || 0) * 100) + "%）" + (!battle.won && Number(battle.teamPower || 0) < Number(battle.recommendedPower) ? "｜低於推薦戰力，建議先提升角色或調整隊伍" : "") : "隊伍戰力 " + number(battle.teamPower || 0);
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜" + escapeHtml(powerNote) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "TRIAL") + "<details><summary>查看完整自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : timedOut ? "戰鬥超時" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜" + escapeHtml(powerNote) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "TRIAL") + "<details><summary>查看完整自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderTrial() {
       if (!game) return;
@@ -798,7 +798,7 @@
       var trialStarSand = Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0);
       var trialCharacterExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
       if (remoteMode) {
-        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam }).then(function (payload) { updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !payload.battle.won); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
@@ -809,7 +809,7 @@
         if (currentTrialTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
         var battle = window.StarshipBattle.simulateBattle({ team: currentTrialTeam, stats: effectiveBattleStats(state), stage: stage }); progress.selectedTeam = currentTrialTeam.slice(); progress.lastBattle = battle;
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true; }
-        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !battle.won);
+        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，可以調整編隊後再次挑戰。", battle.status === "defeat");
       } catch (error) { showMessage(error.message, true); }
     }
     function bossProgress(state) {
@@ -824,10 +824,10 @@
     function renderBossBattleResult(state) {
       var container = byId("boss-battle-result"); var battle = bossProgress(state).lastBattle;
       if (!container || !battle || battle.stageId !== currentBossStageId) { if (container) container.innerHTML = "<div class=\"trial-result-empty\">完成一場 Boss 自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
-      var stage = bossStageById(battle.stageId) || {}; var reward = stage.reward || {};
-      var rewardCopy = battle.won ? "本次獎勵：+" + number(reward.amount || 0) + " " + escapeHtml(reward.materialName || "突破材料") + "、+" + number(reward.universalAmount || 1) + " 星界通用突破印記、+" + number(reward.characterExp || 0) + " 角色經驗" : "本次未通關，不會取得突破材料";
+      var stage = bossStageById(battle.stageId) || {}; var reward = stage.reward || {}; var timedOut = battle.status === "timeout" || battle.timedOut === true;
+      var rewardCopy = battle.won ? "本次獎勵：+" + number(reward.amount || 0) + " " + escapeHtml(reward.materialName || "突破材料") + "、+" + number(reward.universalAmount || 1) + " 星界通用突破印記、+" + number(reward.characterExp || 0) + " 角色經驗" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會取得突破材料" : "本次未通關，不會取得突破材料";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">BOSS REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "Boss 挑戰成功" : "Boss 挑戰失敗") + " · " + escapeHtml(stage.name || "Boss") + " · " + battle.rounds + " 回合</strong><small>" + rewardCopy + "｜隊伍協同 " + escapeHtml(synergy) + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "BOSS") + "<details><summary>查看完整 Boss 自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">BOSS REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "Boss 挑戰成功" : timedOut ? "Boss 戰鬥超時" : "Boss 挑戰失敗") + " · " + escapeHtml(stage.name || "Boss") + " · " + battle.rounds + " 回合</strong><small>" + rewardCopy + "｜隊伍協同 " + escapeHtml(synergy) + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "BOSS") + "<details><summary>查看完整 Boss 自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderBoss() {
       if (!game || !byId("boss-stages")) return;
@@ -863,7 +863,7 @@
       var boss = bossStageById(currentBossStageId); if (!boss) return;
       var maxRewards = data.bossMaxRewards || 10;
       if (remoteMode) {
-        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam }).then(function (payload) { updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : timedOut ? "Boss 戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
@@ -886,8 +886,8 @@
       var container = byId("dispatch-result"); if (!container) return;
       var progress = dispatchProgress(state); var result = progress.lastMission;
       if (!result || result.missionId !== currentDispatchMissionId || !result.battle) { container.innerHTML = "<div class=\"trial-result-empty\">完成一份星港委託後，戰報與獎勵會顯示在這裡。</div>"; return; }
-      var battle = result.battle; var mission = dispatchMissionById(result.missionId) || {}; var reward = battle.won ? rewardText(mission.reward || {}) : "未通關不會領取獎勵";
-      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">DISPATCH REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "委託完成" : "委託未完成") + " · " + escapeHtml(mission.name || "星港委託") + "</strong><small>" + escapeHtml(battle.won ? "獲得：" + reward : reward) + "｜隊伍協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, mission, "DISPATCH") + "<details><summary>查看完整委託戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      var battle = result.battle; var mission = dispatchMissionById(result.missionId) || {}; var timedOut = battle.status === "timeout" || battle.timedOut === true; var reward = battle.won ? rewardText(mission.reward || {}) : timedOut ? "戰鬥超過演算上限，未判定完成，不會領取獎勵" : "未通關不會領取獎勵";
+      container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">DISPATCH REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "委託完成" : timedOut ? "委託戰鬥超時" : "委託未完成") + " · " + escapeHtml(mission.name || "星港委託") + "</strong><small>" + escapeHtml(battle.won ? "獲得：" + reward : reward) + "｜隊伍協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, mission, "DISPATCH") + "<details><summary>查看完整委託戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderDispatch() {
       if (!game || !byId("dispatch-missions")) return;
@@ -917,7 +917,7 @@
       if (!game || !currentPlayerName) { showGate(); return; }
       var mission = dispatchMissionById(currentDispatchMissionId); if (!mission) return;
       if (remoteMode) {
-        apiRequest("/api/player/dispatch", { missionId: mission.id, team: currentDispatchTeam }).then(function (payload) { updateGameFromState(payload.state); renderDispatch(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星港委託完成：已獲得 " + rewardText(payload.reward) + "。" : "委託未完成，可以調整隊伍後再次嘗試。", !payload.battle.won); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/dispatch", { missionId: mission.id, team: currentDispatchTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderDispatch(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星港委託完成：已獲得 " + rewardText(payload.reward) + "。" : timedOut ? "委託戰鬥超過演算上限，未判定完成，不會扣除獎勵。" : "委託未完成，可以調整隊伍後再次嘗試。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
@@ -939,7 +939,11 @@
       return state.voyageProgress;
     }
     function voyageRouteById(id) { return (data.voyageConfig && data.voyageConfig.routes || []).find(function (route) { return route.id === id; }); }
-    function voyageBattleStage(node) { return node && node.stageId ? trialStageById(node.stageId) : null; }
+    function voyageBattleStage(node) {
+      if (!node) return null;
+      var dedicated = (data.voyageBattleStages || []).find(function (stage) { return String(stage.id) === String(node.stageId || node.id); });
+      return dedicated || (node.stageId ? trialStageById(node.stageId) : null);
+    }
     function voyageNodeTypeLabel(node) {
       if (!node) return "節點";
       if (node.final || node.type === "boss") return "終端戰";
@@ -991,7 +995,7 @@
       var progress = voyageProgress(state); var battle = progress.lastBattle; var ending = progress.lastEnding;
       if (!battle && !ending) { container.innerHTML = "<div class=\"trial-result-empty\">完成一個航程節點後，戰報與結局獎勵會顯示在這裡。</div>"; return; }
       var parts = [];
-      if (battle) { var voyageStage = trialStageById(battle.stageId) || {}; var voyagePowerNote = battle.recommendedPower ? "推薦 " + number(battle.recommendedPower) + "｜目前 " + number(battle.teamPower || 0) + "（" + Math.round(Number(battle.powerRatio || 0) * 100) + "%）" : "隊伍戰力 " + number(battle.teamPower || 0); parts.push("<div class=\"trial-result-header " + (battle.won ? "won" : "lost") + "\"><div><span class=\"eyebrow\">VOYAGE REPORT / " + (battle.won ? "CLEAR" : "RETRY") + "</span><strong>" + (battle.won ? "航道突破成功" : "航道暫時封鎖") + " · " + number(battle.rounds || 0) + " 回合</strong><small>" + voyagePowerNote + "｜協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%" + (!battle.won && battle.recommendedPower && Number(battle.teamPower || 0) < Number(battle.recommendedPower) ? "｜低於推薦戰力，建議先提升角色或調整隊伍" : "") + "</small></div><span class=\"battle-power\">" + (battle.won ? "繼續前進" : "可重新開航") + "</span></div>"); parts.push(battleSceneMarkup(battle, state, voyageStage, "VOYAGE")); }
+       if (battle) { var voyageStage = (data.voyageBattleStages || []).find(function (stage) { return String(stage.id) === String(battle.stageId); }) || trialStageById(battle.stageId) || {}; var timedOut = battle.status === "timeout" || battle.timedOut === true; var voyagePowerNote = battle.recommendedPower ? "推薦 " + number(battle.recommendedPower) + "｜目前 " + number(battle.teamPower || 0) + "（" + Math.round(Number(battle.powerRatio || 0) * 100) + "%）" : "隊伍戰力 " + number(battle.teamPower || 0); parts.push("<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">VOYAGE REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "航道突破成功" : timedOut ? "航道戰鬥超時" : "航道暫時封鎖") + " · " + number(battle.rounds || 0) + " 回合</strong><small>" + (timedOut ? "本次戰鬥達到演算上限，未判定突破；可以重新開航。" : voyagePowerNote) + "｜協同 " + Math.round(Number(battle.synergy || 0) * 100) + "%" + (!battle.won && !timedOut && battle.recommendedPower && Number(battle.teamPower || 0) < Number(battle.recommendedPower) ? "｜低於推薦戰力，建議先提升角色或調整隊伍" : "") + "</small></div><span class=\"battle-power\">" + (battle.won ? "繼續前進" : "可重新開航") + "</span></div>"); parts.push(battleSceneMarkup(battle, state, voyageStage, "VOYAGE")); }
       if (ending) {
         var endingLabel = ending.id === "special" ? "協鳴特殊結局" : ending.id === "hidden" ? "隱藏結局" : "一般結局";
         parts.push("<div class=\"voyage-ending-card\"><span class=\"eyebrow\">ENDING UNLOCKED</span><h3>" + endingLabel + "</h3><p>" + (ending.alreadyClaimed ? "這個結局的本期獎勵已領取過，仍可再次探索路線。" : "已將本期結局獎勵寫入你的帳號。") + "</p><strong>" + escapeHtml(rewardText(ending.reward || {})) + "</strong></div>");
@@ -1062,10 +1066,10 @@
           battle = window.StarshipBattle.simulateBattle({ team: currentVoyageTeam, stats: effectiveBattleStats(state), stage: stage });
         }
         if (remoteMode) {
-          apiRequest("/api/player/voyage", { action: "resolve", nodeId: node.id, choice: choice || undefined, team: currentVoyageTeam }).then(function (payload) { updateGameFromState(payload.state); renderVoyage(); renderLobby(); renderCharacters(); showMessage(payload.ending ? "航程完成：" + (payload.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(payload.ending.reward)) : payload.battle && payload.battle.won ? "節點突破成功，繼續向下一段航道前進。" : payload.battle ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(payload.battle && !payload.battle.won)); }).catch(function (error) { showMessage(error.message, true); });
+          apiRequest("/api/player/voyage", { action: "resolve", nodeId: node.id, choice: choice || undefined, team: currentVoyageTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderVoyage(); renderLobby(); renderCharacters(); showMessage(payload.ending ? "航程完成：" + (payload.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(payload.ending.reward)) : payload.battle && payload.battle.won ? "節點突破成功，繼續向下一段航道前進。" : timedOut ? "節點戰鬥超過演算上限，未判定突破；可以重新開航。" : payload.battle ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(payload.battle && !payload.battle.won && !timedOut)); }).catch(function (error) { showMessage(error.message, true); });
           return;
         }
-        var result = game.advanceVoyage({ nodeId: node.id, choice: choice, team: currentVoyageTeam, battle: battle }); updateGameFromState(result.state); saveLocalState(); renderVoyage(); renderLobby(); renderCharacters(); showMessage(result.ending ? "航程完成：" + (result.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(result.ending.reward)) : battle && !battle.won ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(battle && !battle.won));
+        var result = game.advanceVoyage({ nodeId: node.id, choice: choice, team: currentVoyageTeam, battle: battle }); updateGameFromState(result.state); saveLocalState(); renderVoyage(); renderLobby(); renderCharacters(); showMessage(result.ending ? "航程完成：" + (result.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(result.ending.reward)) : battle && battle.status === "timeout" ? "節點戰鬥超過演算上限，未判定突破；可以重新開航。" : battle && !battle.won ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(battle && !battle.won && battle.status !== "timeout"));
       } catch (error) { showMessage(error.message, true); }
     }
     function petProgressState(state) {
@@ -1087,6 +1091,10 @@
       definition = definition || {};
       outfit = outfit || {};
       effect = effect || {};
+      if (definition.image) {
+        var imageClass = "pet-art-image" + (compact ? " compact" : "");
+        return "<img class=\"" + imageClass + "\" src=\"" + escapeHtml(definition.image) + "\" alt=\"" + escapeHtml(definition.name || "星伴") + "的完整立繪\" loading=\"lazy\" draggable=\"false\">";
+      }
       var id = String(definition.id || "");
       var art = {
         "star-fox": '<path class="pet-tail" d="M63 128C24 111 22 67 55 59c27-6 39 18 23 37-8 9-19 12-31 10 21 12 32 20 36 34Z"/><path class="pet-ear" d="M82 76 75 39c-1-7 6-10 11-5l25 27Z"/><path class="pet-ear" d="M137 62 159 35c5-6 12-2 11 5l-7 38Z"/><ellipse class="pet-body" cx="111" cy="117" rx="52" ry="40"/><circle class="pet-head" cx="113" cy="86" r="38"/><path class="pet-belly" d="M83 120c10 28 57 31 74 0-4 34-19 44-38 44s-33-11-36-44Z"/><circle class="pet-eye" cx="99" cy="87" r="7"/><circle class="pet-eye" cx="128" cy="87" r="7"/><circle class="pet-eye-highlight" cx="97" cy="85" r="2"/><circle class="pet-eye-highlight" cx="126" cy="85" r="2"/><path class="pet-face" d="M107 101q6 7 12 0M113 96v6"/><path class="pet-outfit-mark" d="M74 119q37 18 76 0l-5 16q-34 20-66 0Z"/>',

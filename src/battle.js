@@ -281,7 +281,10 @@
     var logs = ["第 " + stage.id + " 關：「" + stage.name + "」自走棋戰鬥開始。", "環境：「" + (stage.environment || "一般試煉") + "」｜" + (stage.environmentEffect || "沒有額外環境效果。"), "敵方特性：「" + (stage.enemyTrait || "一般") + "」｜" + (stage.enemyTraitEffect || "沒有額外特性。"), "隊伍協同 " + Math.round(synergy * 100) + "%，本局變動 " + Math.round(luck * 100) + "%。"];
     applyStageOpening(stage, team, enemies, logs);
     var round = 0;
-    var maxRounds = 50;
+    // 50 回合對有護盾、治療或多階段首領的隊伍過於短，會把尚未結束的戰鬥誤報成失敗。
+    // 保留演算保護上限避免真正的永迴圈，但把上限提高並回傳獨立的 timeout 狀態。
+    var configuredMaxRounds = Number(options.maxRounds || stage.maxRounds || 120);
+    var maxRounds = Number.isFinite(configuredMaxRounds) && configuredMaxRounds >= 60 ? Math.floor(configuredMaxRounds) : 120;
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
       round += 1;
       team.concat(enemies).forEach(function (unit) { if (unit.hp > 0) tickUnit(unit); });
@@ -314,9 +317,18 @@
       });
     }
     var won = alive(enemies).length === 0 && alive(team).length > 0;
-    logs.push(won ? "試煉通關，隊伍在第 " + round + " 回合完成回覆。" : "試煉失敗，請調整隊伍或培養角色後再挑戰。" );
+    var timedOut = !won && alive(team).length > 0 && alive(enemies).length > 0 && round >= maxRounds;
+    var status = won ? "won" : timedOut ? "timeout" : "defeat";
+    logs.push(won
+      ? "試煉通關，隊伍在第 " + round + " 回合完成回覆。"
+      : timedOut
+        ? "戰鬥達到演算保護上限 " + maxRounds + " 回合，尚未判定通關；本次不會扣除挑戰次數。"
+        : "試煉失敗，請調整隊伍或培養角色後再挑戰。" );
     return {
       won: won,
+      status: status,
+      timedOut: timedOut,
+      roundLimit: maxRounds,
       stageId: stage.id,
       stageName: stage.name,
       environment: stage.environment || "一般試煉",

@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -128,6 +128,8 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.seasonSkins[2].characterId, "harlow");
   assert.equal(voyageConfig.seasonSkins[2].rarity, 4);
   assert.equal(petDefinitions.length, 7);
+  assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && pet.image.endsWith(".png")), true);
+  assert.equal(voyageBattleStages.length, 3);
   assert.ok(petDefinitions.some((pet) => pet.id === "rune-drake" && pet.description.length > 20));
   assert.ok(petOutfits.length >= 8 && petEffects.length >= 8);
   assert.equal(petChallenges.length, 3);

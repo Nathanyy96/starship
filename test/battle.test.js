@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { simulateBattle, teamPower } = require("../src/battle.js");
-const { characterBattleStats, trialStages, trialReward, trialMaxRewards } = require("../src/data.js");
+const { characterBattleStats, trialStages, trialReward, trialMaxRewards, voyageBattleStages, voyageConfig } = require("../src/data.js");
 
 test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () => {
   const battle = simulateBattle({
@@ -51,6 +51,30 @@ test("星海迷航終幕提供可讀的推薦戰力並降低不必要的爆發�
   });
   assert.equal(battle.recommendedPower, 12800);
   assert.equal(battle.powerRatio, 0.13);
+});
+
+test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終幕", () => {
+  const finalNode = voyageConfig.nodes.find((node) => node.id === "voyage-final");
+  const voyageFinal = voyageBattleStages.find((stage) => stage.id === finalNode.stageId);
+  assert.ok(voyageFinal);
+  assert.equal(voyageFinal.recommendedPower, 5400);
+  assert.ok(voyageFinal.recommendedPower < trialStages[29].recommendedPower);
+  assert.equal(voyageFinal.modifiers.enemyAttack, 0.86);
+  assert.equal(voyageFinal.finalStage, true);
+});
+
+test("戰鬥達到演算上限時回傳 timeout，不誤判成失敗或通關", () => {
+  const battle = simulateBattle({
+    team: ["test-unit"],
+    stats: { "test-unit": { maxHp: 1000, attack: 1, defense: 999, speed: 1, role: "tank", skillName: "測試", skillPower: 1 } },
+    stage: { id: "timeout-test", name: "超時測試", maxRounds: 60, modifiers: { teamAttack: 0.01, enemyAttack: 0.01 }, enemies: [{ name: "護盾核", maxHp: 999999, attack: 1, defense: 99999, speed: 1, count: 1 }] },
+    rng: () => 0.5
+  });
+  assert.equal(battle.won, false);
+  assert.equal(battle.status, "timeout");
+  assert.equal(battle.timedOut, true);
+  assert.equal(battle.rounds, 60);
+  assert.match(battle.logs.at(-1), /演算保護上限/);
 });
 
 test("試煉 21–30 使用北境神話篇原創敵群與獨立敵人圖像標記", () => {
