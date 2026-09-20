@@ -38,6 +38,18 @@ const mime = {
   ".mp4": "video/mp4"
 };
 
+function parseByteRange(rangeHeader, fileSize) {
+  if (!rangeHeader) return null;
+  const match = /^bytes=(\d*)-(\d*)$/.exec(String(rangeHeader).trim());
+  if (!match || (!match[1] && !match[2]) || fileSize <= 0) return false;
+
+  let start = match[1] ? Number(match[1]) : Math.max(0, fileSize - Number(match[2]));
+  let end = match[2] ? Number(match[2]) : fileSize - 1;
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || end < start || start >= fileSize) return false;
+  end = Math.min(end, fileSize - 1);
+  return { start, end };
+}
+
 fs.mkdirSync(dataDirectory, { recursive: true });
 
 const usePostgres = Boolean(process.env.DATABASE_URL);
@@ -1052,7 +1064,7 @@ const server = http.createServer((request, response) => {
     return;
   }
 
-  fs.readFile(filePath, (error, content) => {
+  fs.stat(filePath, (error, fileStats) => {
     if (error) {
       response.writeHead(error.code === "ENOENT" ? 404 : 500, { "Content-Type": "text/plain; charset=utf-8" });
       response.end(error.code === "ENOENT" ? "Not found" : "Server error");
@@ -1060,8 +1072,38 @@ const server = http.createServer((request, response) => {
     }
     const extension = path.extname(filePath).toLowerCase();
     const cacheControl = [".html", ".css", ".js"].includes(extension) ? "no-cache, must-revalidate" : "public, max-age=31536000, immutable";
-    response.writeHead(200, { "Content-Type": mime[extension] || "application/octet-stream", "Cache-Control": cacheControl });
-    response.end(content);
+    const headers = {
+      "Content-Type": mime[extension] || "application/octet-stream",
+      "Cache-Control": cacheControl,
+      "Content-Length": fileStats.size
+    };
+    const rangeHeader = extension === ".mp4" ? request.headers.range : null;
+    const byteRange = parseByteRange(rangeHeader, fileStats.size);
+    if (rangeHeader && !byteRange) {
+      response.writeHead(416, {
+        "Content-Type": headers["Content-Type"],
+        "Cache-Control": headers["Cache-Control"],
+        "Content-Length": 0,
+        "Content-Range": `bytes */${fileStats.size}`
+      });
+      response.end();
+      return;
+    }
+    headers["Accept-Ranges"] = "bytes";
+    if (byteRange) {
+      headers["Content-Range"] = `bytes ${byteRange.start}-${byteRange.end}/${fileStats.size}`;
+      headers["Content-Length"] = byteRange.end - byteRange.start + 1;
+    }
+    response.writeHead(byteRange ? 206 : 200, headers);
+    if (request.method === "HEAD") {
+      response.end();
+      return;
+    }
+    const streamOptions = byteRange ? { start: byteRange.start, end: byteRange.end } : undefined;
+    fs.createReadStream(filePath, streamOptions).on("error", () => {
+      if (!response.headersSent) response.writeHead(500);
+      response.destroy();
+    }).pipe(response);
   });
 });
 
