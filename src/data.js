@@ -379,7 +379,7 @@
   var petVersion = "2.1-companion-workshop";
   var petDefinitions = [
     { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", image: "./assets/pets/star-fox.png", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
-    { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", image: "./assets/pets/tide-otter.png", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
+    { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", image: "./assets/pets/tide-otter-v2.png", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
     { id: "wind-bird", name: "風鈴雀", temperament: "敏捷", icon: "◇", accent: "#86b8ff", image: "./assets/pets/wind-bird.png", maxLevel: 30, description: "會把風向變成旋律，喜歡停在航路標記的最高處。" },
     { id: "mirror-sprout", name: "霧鏡芽", temperament: "安靜", icon: "◈", accent: "#b897e8", image: "./assets/pets/mirror-sprout.png", maxLevel: 30, description: "在霧鏡裡映出不同表情，偶爾會替玩家找到遺失的小物。" },
     { id: "aurora-fawn", name: "極光幼鹿", temperament: "溫柔", icon: "♢", accent: "#8ee6c7", image: "./assets/pets/aurora-fawn.png", maxLevel: 30, description: "鹿角會收集夜空的微光，靠近時會讓工坊的星塵變得柔和。" },

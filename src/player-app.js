@@ -1125,13 +1125,29 @@
     function petChallengeById(id) { return (data.petChallenges || []).find(function (item) { return item.id === id; }); }
     function petResourceLabel(id) { return ({ petFood: "飼料", petToys: "玩具", petTokens: "星伴代幣", showcaseToken: "展示徽章" })[id] || id; }
     function petActionMessage(text, isError) { var target = byId("pet-action-message"); if (target) { target.textContent = text; target.className = isError ? "message error" : "message"; } }
+    var PET_ART_VERSION = "pet-art-20260920";
+    var PET_ARTWORK = {
+      "star-fox": "./assets/pets/star-fox.png",
+      "tide-otter": "./assets/pets/tide-otter-v2.png",
+      "wind-bird": "./assets/pets/wind-bird.png",
+      "mirror-sprout": "./assets/pets/mirror-sprout.png",
+      "aurora-fawn": "./assets/pets/aurora-fawn.png",
+      "rune-drake": "./assets/pets/rune-drake.png",
+      "cloud-whale": "./assets/pets/cloud-whale.png"
+    };
+    function petImageUrl(definition) {
+      var path = definition && (definition.image || PET_ARTWORK[definition.id]);
+      if (!path) return "";
+      return path + (path.indexOf("?") >= 0 ? "&" : "?") + "v=" + PET_ART_VERSION;
+    }
     function petArtMarkup(definition, outfit, effect, compact) {
       definition = definition || {};
       outfit = outfit || {};
       effect = effect || {};
-      if (definition.image) {
+      var imagePath = petImageUrl(definition);
+      if (imagePath) {
         var imageClass = "pet-art-image" + (compact ? " compact" : "");
-        return "<img class=\"" + imageClass + "\" src=\"" + escapeHtml(definition.image) + "\" alt=\"" + escapeHtml(definition.name || "星伴") + "的完整立繪\" loading=\"lazy\" draggable=\"false\">";
+        return "<img class=\"" + imageClass + "\" src=\"" + escapeHtml(imagePath) + "\" alt=\"" + escapeHtml(definition.name || "星伴") + "的完整立繪\" loading=\"lazy\" draggable=\"false\">";
       }
       var id = String(definition.id || "");
       var art = {
