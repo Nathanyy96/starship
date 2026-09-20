@@ -1125,7 +1125,7 @@
     function petChallengeById(id) { return (data.petChallenges || []).find(function (item) { return item.id === id; }); }
     function petResourceLabel(id) { return ({ petFood: "飼料", petToys: "玩具", petTokens: "星伴代幣", showcaseToken: "展示徽章" })[id] || id; }
     function petActionMessage(text, isError) { var target = byId("pet-action-message"); if (target) { target.textContent = text; target.className = isError ? "message error" : "message"; } }
-    var PET_ART_VERSION = "pet-art-20260920";
+    var PET_ART_VERSION = "pet-customization-20260920";
     var PET_ARTWORK = {
       "star-fox": "./assets/pets/star-fox.png",
       "tide-otter": "./assets/pets/tide-otter-v2.png",
@@ -1140,6 +1140,15 @@
       if (!path) return "";
       return path + (path.indexOf("?") >= 0 ? "&" : "?") + "v=" + PET_ART_VERSION;
     }
+    function petDecorationMarkup(outfit, effect, compact) {
+      var outfitId = String(outfit.id || "default");
+      var effectId = String(effect.id || "starlit");
+      var particleClass = compact ? " compact" : "";
+      var particles = ["p1", "p2", "p3", "p4", "p5", "p6"].map(function (position) {
+        return "<i class=\"pet-effect-particle " + position + particleClass + "\">" + escapeHtml(effect.icon || "✦") + "</i>";
+      }).join("");
+      return "<span class=\"pet-outfit-layer outfit-" + escapeHtml(outfitId) + "\" aria-hidden=\"true\"></span><span class=\"pet-effect-layer effect-" + escapeHtml(effectId) + "\" aria-hidden=\"true\">" + particles + "</span>";
+    }
     function petArtMarkup(definition, outfit, effect, compact) {
       definition = definition || {};
       outfit = outfit || {};
@@ -1147,7 +1156,8 @@
       var imagePath = petImageUrl(definition);
       if (imagePath) {
         var imageClass = "pet-art-image" + (compact ? " compact" : "");
-        return "<img class=\"" + imageClass + "\" src=\"" + escapeHtml(imagePath) + "\" alt=\"" + escapeHtml(definition.name || "星伴") + "的完整立繪\" loading=\"lazy\" draggable=\"false\">";
+        var compositeClass = "pet-art-composite" + (compact ? " compact" : "");
+        return "<span class=\"" + compositeClass + "\" data-outfit=\"" + escapeHtml(outfit.id || "default") + "\" data-effect=\"" + escapeHtml(effect.id || "starlit") + "\">" + petDecorationMarkup(outfit, effect, compact) + "<img class=\"" + imageClass + "\" src=\"" + escapeHtml(imagePath) + "\" alt=\"" + escapeHtml(definition.name || "星伴") + "的完整立繪\" loading=\"lazy\" draggable=\"false\"></span>";
       }
       var id = String(definition.id || "");
       var art = {
@@ -1207,8 +1217,8 @@
       var challengeMarkup = "<section class=\"pet-challenge-panel\"><div class=\"pet-panel-heading\"><div><p class=\"eyebrow\">COMPANION ACTIVITIES</p><h3>星伴挑戰</h3></div><span>" + Number(daily.challengeCount || 0) + " / 3 今日挑戰</span></div><p class=\"pet-challenge-copy\">每天可完成三種不同的小任務，消耗的是寵物專用資源；完成後會給大量寵物經驗與回饋，不會動用星砂或角色資源。</p><div class=\"pet-challenge-grid\">" + (data.petChallenges || []).map(function (challenge) { var challengeReward = challenge.reward || {}; return "<button class=\"pet-challenge-button\" data-pet-action=\"challenge\" data-pet-id=\"" + escapeHtml(selected.id) + "\" data-pet-challenge=\"" + escapeHtml(challenge.id) + "\" type=\"button\"><strong>" + escapeHtml(challenge.name) + "</strong><small>" + escapeHtml(challenge.description) + "</small><em>消耗 " + Number(challenge.costAmount || 1) + " " + escapeHtml(petResourceLabel(challenge.cost)) + " · +" + Number(challengeReward.petExp || 0) + " 寵物經驗</em></button>"; }).join("") + "</div></section>";
       byId("pet-selected-card").innerHTML = petCardMarkup(selected, pet, true) + "<div class=\"pet-action-row\"><button class=\"primary-action\" data-pet-action=\"feed\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">餵食　1 飼料</button><button class=\"secondary-action\" data-pet-action=\"play\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">玩耍　1 玩具</button><button class=\"secondary-action\" data-pet-action=\"groom\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">" + (daily.groomed ? "今日已梳理" : "梳理　每日一次") + "</button><button class=\"secondary-action\" data-pet-action=\"explore\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">外出探索（本期 " + Number(progress.exploreCount || 0) + " / 3）</button></div><div class=\"pet-training-row\"><span>訓練方向</span><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"care\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">照護　1 代幣</button><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"play\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">玩耍　1 代幣</button><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"focus\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">專注　1 代幣</button></div>" + challengeMarkup;
       byId("pet-public-toggle").checked = progress.showcase.isPublic === true;
-      byId("pet-outfit-list").innerHTML = "<div class=\"pet-option-heading\">裝扮</div>" + (data.petOutfits || []).map(function (outfit) { return "<button class=\"pet-option-button " + (currentPetOutfitId === outfit.id ? "active" : "") + "\" data-pet-outfit=\"" + escapeHtml(outfit.id) + "\" type=\"button\"><span style=\"--option-accent:" + escapeHtml(outfit.accent || "#9e92ff") + "\"></span><strong>" + escapeHtml(outfit.name) + "</strong><small>" + escapeHtml(outfit.description) + "</small></button>"; }).join("");
-      byId("pet-effect-list").innerHTML = "<div class=\"pet-option-heading\">出場特效</div>" + (data.petEffects || []).map(function (effect) { return "<button class=\"pet-option-button " + (currentPetEffectId === effect.id ? "active" : "") + "\" data-pet-effect=\"" + escapeHtml(effect.id) + "\" type=\"button\"><span style=\"--option-accent:" + escapeHtml(effect.color || "#f4c66b") + "\">" + escapeHtml(effect.icon || "✦") + "</span><strong>" + escapeHtml(effect.name) + "</strong><small>" + escapeHtml(effect.description) + "</small></button>"; }).join("");
+      byId("pet-outfit-list").innerHTML = "<div class=\"pet-option-heading\">裝扮｜會加入可見的獨立配件圖層</div>" + (data.petOutfits || []).map(function (outfit) { return "<button class=\"pet-option-button " + (currentPetOutfitId === outfit.id ? "active" : "") + "\" data-pet-outfit=\"" + escapeHtml(outfit.id) + "\" type=\"button\"><span class=\"pet-option-swatch\" style=\"--option-accent:" + escapeHtml(outfit.accent || "#9e92ff") + "\">" + escapeHtml(outfit.icon || "✦") + "</span><strong>" + escapeHtml(outfit.name) + "</strong><small>" + escapeHtml(outfit.description) + "</small></button>"; }).join("");
+      byId("pet-effect-list").innerHTML = "<div class=\"pet-option-heading\">出場特效｜只增加展示層，不改變寵物立繪畫質</div>" + (data.petEffects || []).map(function (effect) { return "<button class=\"pet-option-button " + (currentPetEffectId === effect.id ? "active" : "") + "\" data-pet-effect=\"" + escapeHtml(effect.id) + "\" type=\"button\"><span class=\"pet-option-swatch\" style=\"--option-accent:" + escapeHtml(effect.color || "#f4c66b") + "\">" + escapeHtml(effect.icon || "✦") + "</span><strong>" + escapeHtml(effect.name) + "</strong><small>" + escapeHtml(effect.description) + "</small></button>"; }).join("");
       byId("pet-catalog-count").textContent = Object.keys(progress.pets).filter(function (id) { return progress.pets[id] && progress.pets[id].owned; }).length + " / " + definitions.length;
       byId("pet-catalog-list").innerHTML = definitions.map(function (definition) { var saved = progress.pets[definition.id]; var owned = saved && saved.owned; return "<button class=\"pet-catalog-card " + (owned ? "owned" : "locked") + (definition.id === selected.id ? " selected" : "") + "\" data-pet-select=\"" + escapeHtml(definition.id) + "\" type=\"button\"><span class=\"pet-catalog-icon\" style=\"--pet-accent:" + escapeHtml(definition.accent || "#9e92ff") + "\">" + escapeHtml(definition.icon) + "</span><span><strong>" + escapeHtml(definition.name) + "</strong><small>" + escapeHtml(definition.temperament) + (owned ? " · Lv." + saved.level : " · 尚未領養") + "</small></span><em>" + (owned ? "選擇" : "領養 3 代幣") + "</em></button>"; }).join("");
       renderPetShowcases();

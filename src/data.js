@@ -387,24 +387,24 @@
     { id: "cloud-whale", name: "雲潮鯨", temperament: "悠閒", icon: "≈", accent: "#79c9ff", image: "./assets/pets/cloud-whale.png", maxLevel: 30, description: "在雲海裡慢慢游動，會把玩家的好心情變成一圈圈潮光。" }
   ];
   var petOutfits = [
-    { id: "default", name: "原野本色", description: "保留寵物的自然外觀。", accent: "#9e92ff" },
-    { id: "moon-scarf", name: "月紗圍巾", description: "一條會在移動時留下月光的圍巾。", accent: "#91b9e8" },
-    { id: "tide-cape", name: "潮泡披肩", description: "由不會破裂的潮泡織成。", accent: "#71d8dc" },
-    { id: "archive-crown", name: "檔案小冠", description: "星海迷航特殊結局可使用的紀念裝扮。", accent: "#d06cff" },
-    { id: "aurora-hood", name: "極光兜帽", description: "把極光縫進帽沿，走動時會留下淡淡的綠藍光。", accent: "#7de4cf" },
-    { id: "star-goggles", name: "星鏡護目", description: "能把遠方星塵放大成一整片閃爍的星河。", accent: "#a58dff" },
-    { id: "sail-pack", name: "浮帆背包", description: "收起來像小背包，展開後能讓寵物輕輕滑過氣流。", accent: "#f3c56d" },
-    { id: "rune-horns", name: "符文角飾", description: "以柔光符文打造的角飾，適合喜歡惡作劇的星伴。", accent: "#ff9a94" }
+    { id: "default", name: "原野本色", icon: "✦", description: "保留寵物的自然外觀，只保留柔和底部光暈。", accent: "#9e92ff" },
+    { id: "moon-scarf", name: "月紗圍巾", icon: "☾", description: "在身體下方顯示月光絲帶與流蘇，不會遮住臉部。", accent: "#91b9e8" },
+    { id: "tide-cape", name: "潮泡披肩", icon: "◌", description: "以半透明水幕環繞腳邊，與潮泡獸的水流呼應。", accent: "#71d8dc" },
+    { id: "archive-crown", name: "檔案小冠", icon: "♔", description: "在頭頂浮出小型檔案冠飾，適合公開展示與特殊結局紀念。", accent: "#d06cff" },
+    { id: "aurora-hood", name: "極光兜帽", icon: "⌁", description: "在立繪上方形成柔和極光弧線，保留寵物原本的表情。", accent: "#7de4cf" },
+    { id: "star-goggles", name: "星鏡護目", icon: "⊙", description: "在展示框側邊加入可旋轉的星鏡徽記，不壓住眼睛與臉部細節。", accent: "#a58dff" },
+    { id: "sail-pack", name: "浮帆背包", icon: "⛵", description: "在身側展開一面小浮帆，呈現輕旅行的出場姿態。", accent: "#f3c56d" },
+    { id: "rune-horns", name: "符文角飾", icon: "ᛉ", description: "在上方加入兩道柔光符文角印，適合頑皮型星伴。", accent: "#ff9a94" }
   ];
   var petEffects = [
-    { id: "starlit", name: "星屑環", description: "出場時散落小型星屑。", icon: "✦", color: "#f4c66b" },
-    { id: "aurora", name: "極光帶", description: "移動時留下淡淡的極光尾跡。", icon: "〰", color: "#71d8dc" },
-    { id: "bubbles", name: "泡泡訊號", description: "互動時冒出三枚透明泡泡。", icon: "○", color: "#86b8ff" },
-    { id: "paper-stars", name: "紙星回覆", description: "評分展示時飄出紙製星星。", icon: "✧", color: "#d06cff" },
-    { id: "fireflies", name: "螢光微星", description: "互動時會有小螢光繞著寵物排成星座。", icon: "✺", color: "#f0d47a" },
-    { id: "runes", name: "符文浮印", description: "每次完成訓練都會留下短暫的符文印記。", icon: "◇", color: "#d19cff" },
-    { id: "snowfall", name: "霜晶細雪", description: "展示時降下不會融化的細小霜晶。", icon: "❄", color: "#a7dcff" },
-    { id: "tide-prism", name: "潮光棱彩", description: "把泡泡折射成彩色潮光，適合公開展示。", icon: "◌", color: "#6fe6e0" }
+    { id: "starlit", name: "星屑環", description: "展示框周圍會緩慢旋轉金色星屑，寵物移動時亮度提高。", icon: "✦", color: "#f4c66b" },
+    { id: "aurora", name: "極光帶", description: "在寵物背後流動青綠與紫色極光，不會蓋住立繪。", icon: "〰", color: "#71d8dc" },
+    { id: "bubbles", name: "泡泡訊號", description: "從寵物周圍浮起不同大小的透明泡泡，展示時持續上升。", icon: "○", color: "#86b8ff" },
+    { id: "paper-stars", name: "紙星回覆", description: "飄出帶有檔案折線的紙星，讓公開展示更有回覆感。", icon: "✧", color: "#d06cff" },
+    { id: "fireflies", name: "螢光微星", description: "六點微光會連成一個小星座，並以不規則節奏閃爍。", icon: "✺", color: "#f0d47a" },
+    { id: "runes", name: "符文浮印", description: "展示框外圍短暫浮出北境符文圈，完成訓練時會脈衝一次。", icon: "◇", color: "#d19cff" },
+    { id: "snowfall", name: "霜晶細雪", description: "細小霜晶從上方落下，在寵物腳邊化成淡藍光點。", icon: "❄", color: "#a7dcff" },
+    { id: "tide-prism", name: "潮光棱彩", description: "把周圍光點折射成青、紫、金三色棱彩，適合水系星伴。", icon: "◌", color: "#6fe6e0" }
   ];
   var petChallenges = [
     { id: "starlight-run", name: "星光追逐", description: "在工坊軌道追上三顆逃跑的星屑。", cost: "petToys", costAmount: 1, reward: { petExp: 90, bond: 2, mood: 4, petFood: 2 } },
