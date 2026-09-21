@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { banners, activeCards, futureCards, futureCharacterReleasePlan, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -41,6 +41,18 @@ test("角色規劃完整建檔至 5.5，但玩家入口仍只開放 1.0–2.5", 
   assert.equal(version5Cards.every((card) => card.portraitImage && characterBattleStats[card.id]), true);
   assert.equal(futureCards.some((card) => card.id === "daria" && card.releaseVersion === "5.5"), true);
   assert.equal(activeCards.every((card) => Number(card.releaseVersion) <= 2.5), true);
+});
+
+test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留在故事中", () => {
+  assert.equal(futureCharacterReleasePlan.length, 3);
+  assert.equal(futureCharacterReleasePlan.every((plan) => plan.fourStarIds.length >= 2 && plan.fourStarIds.length <= 3), true);
+  assert.deepEqual(futureCharacterReleasePlan.map((plan) => plan.fourStarIds.length), [3, 3, 3]);
+  assert.equal(futureCharacterReleasePlan.every((plan) => plan.focus.length >= 30), true);
+  const plannedIds = futureCharacterReleasePlan.flatMap((plan) => plan.fourStarIds.concat(plan.threeStarIds, plan.storyOnlyIds));
+  assert.equal(new Set(plannedIds).size, futureCards.length);
+  assert.equal(futureCards.every((card) => card.storyRelationship.length >= 20), true);
+  assert.equal(futureCards.filter((card) => card.plannedGachaVersion === null).length, 9);
+  assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {

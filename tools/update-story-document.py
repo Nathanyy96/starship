@@ -32,7 +32,8 @@ def load_future_story():
     export_script = (
         "import('./src/data.js').then(({default:d}) => "
         "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), story:d.storyChapters, "
-        "v3:d.version3StoryChapters, v4:d.version4StoryChapters, v5:d.version5StoryChapters})))"
+        "v3:d.version3StoryChapters, v4:d.version4StoryChapters, v5:d.version5StoryChapters, "
+        "releasePlan:d.futureCharacterReleasePlan})))"
     )
     result = subprocess.run(
         [str(node), "--input-type=module", "-e", export_script],
@@ -119,10 +120,12 @@ def add_future_story_body(document, story):
     intro = document.add_paragraph()
     intro.add_run("閱讀定位：").bold = True
     intro.add_run(
-        "3.0–3.5 延續瑟蕾雅建立的拒絕、撤回與分散治理主題；4.0–5.5 再以北歐神話意象"
+        "1.0–2.5 的瑟蕾雅、獸靈之村與既有世界設定是正史根基；3.0 起重新整理節奏，"
+        "讓新角色先以故事夥伴身分慢慢建立關係，再在合適的大版本進入卡池。3.0–3.5 延續瑟蕾雅建立的拒絕、撤回與分散治理主題；4.0–5.5 再以北歐神話意象"
         "重新理解根系、命線、霜火、虹橋、深海守門與長冬，但不直接套用既有神名或神話劇本。"
         "每一版都讓瑟蕾雅面對一個看似只能由她決定的中心，再把拒絕、撤回與交班的權利交還給受影響的人。"
-        "以下正文與 src/data.js 的未開放版本資料同步。"
+        "每個大版本維持五個小版本，但只安排 2–3 名新四星；其他已完成角色保留於主線與支線，"
+        "讓瑟蕾雅與每個人的信任、衝突和情感都能有回收。以下正文與 src/data.js 的未開放版本資料同步。"
     )
 
     for version_group, label in (
@@ -148,29 +151,70 @@ def add_character_scope(document, story):
     document.add_heading("角色規劃與開放狀態", level=2)
     document.add_paragraph(
         "角色資料與劇情資料同樣完整建檔至 5.5。玩家目前只會在 1.0–2.5 取得與培養角色；"
-        "3.0–5.5 的角色已保存名稱、星級、元素、定位與立繪來源，但不會進入現行卡池或玩家角色列表，"
-        "直到對應版本正式公告開放。"
+        "3.0–5.5 的角色已保存名稱、星級、元素、定位、故事關係與獨立立繪來源。故事初登場版本"
+        "不等於卡池版本：每個大版本只安排 2–3 名新四星，其餘角色先以劇情夥伴身分保留，直到"
+        "有足夠篇幅完成她們與瑟蕾雅的關係，再於後續版本正式開放。"
     )
     cards = sorted(story.get("cards", []), key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", "")))
-    table = document.add_table(rows=1, cols=5)
+    table = document.add_table(rows=1, cols=6)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     header_properties = table.rows[0]._tr.get_or_add_trPr()
     header_repeat = OxmlElement("w:tblHeader")
     header_repeat.set(qn("w:val"), "true")
     header_properties.append(header_repeat)
-    headers = ["版本", "角色", "星級", "元素", "狀態"]
+    headers = ["故事初登場", "預計卡池", "角色", "星級", "元素", "狀態"]
     for cell, text in zip(table.rows[0].cells, headers):
         cell.text = text
         cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
     for card in cards:
         cells = table.add_row().cells
         version = str(card.get("releaseVersion", ""))
-        status = "玩家開放" if float(version) <= 2.5 else "已建檔／鎖定"
-        values = [version, card.get("name", ""), "★" * int(card.get("rarity", 0)), card.get("element", ""), status]
+        status = "玩家開放" if float(version) <= 2.5 else ("故事保留／待後續安排" if card.get("plannedGachaVersion") is None else "已建檔／鎖定")
+        planned = card.get("plannedGachaVersion") or "後續再議"
+        values = [version, planned, card.get("name", ""), "★" * int(card.get("rarity", 0)), card.get("element", ""), status]
         for cell, text in zip(cells, values):
             cell.text = str(text)
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(8.5)
+    return table
+
+
+def add_character_release_plan(document, story):
+    """Document the slower release cadence separately from story debut order."""
+    document.add_heading("大版本角色發佈節奏", level=2)
+    document.add_paragraph(
+        "每個大版本維持五個小版本，但不再要求每個小版本都推出新四星。"
+        "以下是目前的 3.0–5.5 規劃：新四星控制在每個大版本 2–3 名，"
+        "已設計但尚未進卡池的角色仍會在主線、合併支線或角色故事中登場，"
+        "等關係與個人弧線成熟後再安排，不把他們當成一次性報到角色。"
+    )
+    table = document.add_table(rows=1, cols=5)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers = ["大版本", "新四星（預計卡池）", "三星", "故事保留角色", "敘事重點"]
+    for cell, text in zip(table.rows[0].cells, headers):
+        cell.text = text
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for plan in story.get("releasePlan", []) or []:
+        cards = {card.get("id"): card for card in story.get("cards", [])}
+        def names(ids):
+            return "、".join(cards.get(card_id, {}).get("name", card_id) for card_id in ids) or "無"
+        cells = table.add_row().cells
+        values = [
+            plan.get("majorVersion", ""),
+            names(plan.get("fourStarIds", [])),
+            names(plan.get("threeStarIds", [])),
+            names(plan.get("storyOnlyIds", [])),
+            plan.get("focus", "")
+        ]
+        for cell, text in zip(cells, values):
+            cell.text = str(text)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
     for row in table.rows:
         for cell in row.cells:
             for paragraph in cell.paragraphs:
@@ -246,6 +290,7 @@ def append_story_revision(document):
     story = load_future_story()
     add_story_index(document, story.get("story", []))
     add_character_scope(document, story)
+    add_character_release_plan(document, story)
     add_future_story_body(document, story)
 
     document.add_heading("六、完成前檢查清單", level=2)
@@ -253,7 +298,7 @@ def append_story_revision(document):
     add_bullet(document, "每個主線章節的角色標籤與導讀都能找到瑟蕾雅；支線至少說明它如何受她的選擇影響，且不取代支線角色自己的決定。")
     add_bullet(document, "劇情頁同時顯示當幕閱讀區、本章完整正文、幕次導覽與首次完成獎勵；長文可向下捲動，不再只顯示劇情標題。")
     add_bullet(document, "每次版本更新只更新劇情開放與版本玩法，不清除角色、等級、命座、突破、資源或已完成劇情；文件、src/data.js、測試必須一起核對。")
-    add_bullet(document, "本次審核結果：現行 1.0–2.5 章節可讀、幕名與正文已對齊，支線已按 2–3 個小版本合併為六篇完整篇章；3.0–5.5 內容已改為完整的主線／合併支線版本稿並維持鎖定，待未來資產與版本公告確認後開放。")
+    add_bullet(document, "本次審核結果：現行 1.0–2.5 章節可讀、幕名與正文已對齊，支線已按 2–3 個小版本合併為六篇完整篇章；3.0–5.5 內容已改為完整的主線／合併支線版本稿，並把角色發佈改為每大版本 2–3 名新四星，維持鎖定直到未來資產與版本公告確認後開放。")
 
 
 def main():

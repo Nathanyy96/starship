@@ -15,7 +15,35 @@
   }
   if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
 
+  // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
+  // 這份規劃刻意把「故事初登場」和「預計可抽版本」分開，避免為了卡池節奏
+  // 讓每個小版本都硬塞一名新四星，導致角色關係只剩下快速報到。
+  var futureCharacterPlan = {
+    jiera: { plannedGachaVersion: "3.0", storyRelationship: "瑟蕾雅在 3.0 第一次把測線決定權交給霽羅；她不是導師，而是提醒瑟蕾雅也可以退回隊伍裡的人。" },
+    rotea: { plannedGachaVersion: "3.2", storyRelationship: "蘿堤亞與瑟蕾雅從格式爭論走到信任；她敢刪掉瑟蕾雅的預設聲紋，兩人建立不替彼此代答的默契。" },
+    sumine: { plannedGachaVersion: null, storyRelationship: "澄音用輪班、照護與慢修復承接 3.2 的代價；她讓瑟蕾雅看見修復不是英雄獨白，後續會以水路守護者身分回到隊伍。" },
+    cenya: { plannedGachaVersion: "3.2", storyRelationship: "岑芽是瑟蕾雅第一次正式帶著做學徒工作的年輕夥伴；她的笨拙問題讓瑟蕾雅學會說明，而不是只示範答案。" },
+    lorne: { plannedGachaVersion: "3.5", storyRelationship: "洛恩與瑟蕾雅在 3.3–3.5 共同拆解集中供能；他把『我能做到』改問成『誰能按停』，是火路上的互相尊重。" },
+    norell: { plannedGachaVersion: null, storyRelationship: "諾嵐不追隨瑟蕾雅的方向，而是把每條路的退回點畫給她；兩人從測量合作變成能互相喊停的信任。" },
+    aster: { plannedGachaVersion: null, storyRelationship: "艾斯特以門衛身分拒絕瑟蕾雅直接進入終端；他們在沉默與看火中建立不靠崇拜維持的夥伴關係。" },
+    aurelia: { plannedGachaVersion: "4.0", storyRelationship: "奧蕾雅與瑟蕾雅從天文台的觀測爭論開始；她把光的解釋權拆開，讓瑟蕾雅第一次被當成共同研究者而非預言。" },
+    kairen: { plannedGachaVersion: "4.2", storyRelationship: "凱嵐不接受瑟蕾雅替工坊承擔全部責任；兩人以輪值和停爐權互相試探，最後成為能把脆弱交出去的搭檔。" },
+    sorae: { plannedGachaVersion: null, storyRelationship: "索萊與瑟蕾雅共享遠距離回覆的孤獨；他們不急著把熟悉聲音當邀請，關係建立在一起等待。" },
+    talia: { plannedGachaVersion: "4.2", storyRelationship: "塔莉亞是瑟蕾雅身邊不怕問笨問題的見習者；瑟蕾雅在她身上補回與獸靈之村學徒們失去的平常相處。" },
+    neve: { plannedGachaVersion: null, storyRelationship: "涅芙不替瑟蕾雅修復記憶，只把選擇權與缺頁放回她手中；兩人形成安靜但深的互信。" },
+    kael: { plannedGachaVersion: null, storyRelationship: "凱爾與瑟蕾雅對『勇敢是否等於下潛』有根本分歧；他是第一個把她從母親線前拉回水面的人。" },
+    elyra: { plannedGachaVersion: "4.5", storyRelationship: "伊萊拉與瑟蕾雅共同寫第二條律；她們不是師徒，而是兩個都願意修改自己的共同起草人。" },
+    vestra: { plannedGachaVersion: "5.0", storyRelationship: "維斯妲在根冠教瑟蕾雅尊重空位；她不急著回答母親線索，卻陪她承受沒有答案的季節。" },
+    brann: { plannedGachaVersion: null, storyRelationship: "布蘭把霜火工作拆成可交班的步驟，和瑟蕾雅在急於救人的衝動中互相拉住，讓信任變成具體流程。" },
+    eirin: { plannedGachaVersion: "5.2", storyRelationship: "伊芮恩與瑟蕾雅在虹橋兩端守望；她把跨界相遇從浪漫邀請改成雙方都能說不的約定。" },
+    sava: { plannedGachaVersion: null, storyRelationship: "薩芙理解瑟蕾雅害怕三種未來同時是真的；她不替她剪線，只陪她把選擇還給每條線的主人。" },
+    niela: { plannedGachaVersion: "5.3", storyRelationship: "妮拉是織庭裡最早敢質疑瑟蕾雅的人；她的學習讓瑟蕾雅知道被依賴也不能取代別人思考。" },
+    hervan: { plannedGachaVersion: null, storyRelationship: "赫爾凡在深海把第四把鑰匙交給瑟蕾雅又收回；兩人以安全與回返建立比英雄式犧牲更長久的情誼。" },
+    daria: { plannedGachaVersion: "5.5", storyRelationship: "達莉雅在 5.5 陪瑟蕾雅把終端寫成可交班的見證；她讓瑟蕾雅把母親的私人回信與公共世界分開。" }
+  };
+
   function card(id, name, romanizedName, rarity, element, accent, releaseVersion, note, image, backgroundImage) {
+    var futurePlan = futureCharacterPlan[id] || {};
     return Object.freeze({
       id: id,
       name: name,
@@ -24,6 +52,9 @@
       element: element,
       accent: accent,
       releaseVersion: releaseVersion,
+      storyDebutVersion: releaseVersion,
+      plannedGachaVersion: Object.prototype.hasOwnProperty.call(futurePlan, "plannedGachaVersion") ? futurePlan.plannedGachaVersion : releaseVersion,
+      storyRelationship: futurePlan.storyRelationship || "",
       note: note || "",
       image: image || null,
       backgroundImage: backgroundImage || image || null,
@@ -61,7 +92,7 @@
     noreia: card("noreia", "諾芮亞", "Noreia", 4, "星", "#9e92ff", "2.4", "2.4｜霧鏡議庭見證記錄員", "./assets/cards/noreia.png"),
     orivelle: card("orivelle", "奧薇拉", "Orivelle", 4, "淨", "#57d9c0", "2.5", "2.5｜潮眼外圍潮核修復師", "./assets/cards/orivelle.png"),
 
-    // 文件「角色圖鑑｜第三大版本」：每個版本至少一名 4★。
+    // 3.0–3.5：先完整建立角色與劇情關係，實際卡池只安排少量新四星。
     jiera: card("jiera", "霽羅", "Jiera", 4, "星", "#86c8d7", "3.0", "3.0｜古道碑記修復師、口述地圖記錄員", "./assets/cards/jiera.png"),
     rotea: card("rotea", "蘿堤亞", "Rotea", 4, "幻", "#b995e8", "3.1", "3.1｜內陸回覆台編譯師、格式修復者", "./assets/cards/rotea.png"),
     sumine: card("sumine", "澄音", "Sumine", 4, "淨", "#74d8d0", "3.2", "3.2｜白榆河水路修復隊輪班工", "./assets/cards/sumine.png"),
@@ -70,7 +101,7 @@
     norell: card("norell", "諾嵐", "Norell", 4, "月", "#86b8e8", "3.4", "3.4｜北門風路測量員、臨時回覆台守望者", "./assets/cards/norell.png"),
     aster: card("aster", "艾斯特", "Aster", 4, "烈", "#e88955", "3.5", "3.5｜終端檔案守門人、空白座看火者", "./assets/cards/aster.png"),
 
-    // 第四大版本角色：先建立完整圖鑑與戰鬥資料，卡池等後續版本公告。
+    // 第四大版本角色：先建立完整圖鑑與戰鬥資料；部分角色先作為劇情夥伴，避免每個小版本都換一批人。
     aurelia: card("aurelia", "奧蕾雅", "Aurelia", 4, "星", "#f2c86d", "4.0", "4.0｜曙港天文台值班長、星潮觀測者", "./assets/cards/aurelia.png"),
     kairen: card("kairen", "凱嵐", "Kairen", 4, "烈", "#e98058", "4.1", "4.1｜碎星工坊維修師、熱源調度員", "./assets/cards/kairen.png"),
     sorae: card("sorae", "索萊", "Sorae", 4, "燕", "#70b7ff", "4.2", "4.2｜遠望塔信標師、長距離回覆校準者", "./assets/cards/sorae.png"),
@@ -79,7 +110,7 @@
     kael: card("kael", "凱爾", "Kael", 4, "月", "#88aee8", "4.4", "4.4｜回覆海溝潛航隊長、深層訊號守門人", "./assets/cards/kael.png"),
     elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.png"),
 
-    // 第五大版本角色：保留完整角色規劃與戰鬥資料，但維持鎖定，不進現行卡池。
+    // 第五大版本角色：保留完整角色規劃與戰鬥資料，但維持鎖定；只挑少數角色作為 5.x 新卡池核心。
     vestra: card("vestra", "維斯妲", "Vestra", 4, "星", "#e4b86b", "5.0", "5.0｜北境根冠守根者、未命名燈座保管人", "./assets/cards/vestra.png"),
     brann: card("brann", "布蘭", "Brann", 4, "烈", "#e87954", "5.1", "5.1｜霜火鍛環熱源調度員、輪值工程師", "./assets/cards/brann.png"),
     eirin: card("eirin", "伊芮恩", "Eirin", 4, "燕", "#70b7ff", "5.2", "5.2｜虹徑外環信標師、雙端通路測量者", "./assets/cards/eirin.png"),
@@ -110,6 +141,32 @@
   var version2Four = version2Cards.filter(function (item) { return item.rarity === 4; });
   var version2Three = version2Cards.filter(function (item) { return item.rarity === 3; });
   var version3Cards = [cards.jiera, cards.rotea, cards.sumine, cards.cenya, cards.lorne, cards.norell, cards.aster];
+
+  // 每個大版本維持五個小版本，但新四星集中在 2–3 名；其餘已設計角色
+  // 仍保留在故事、立繪與戰鬥資料中，等劇情需要時再安排可抽版本。
+  var futureCharacterReleasePlan = Object.freeze([
+    Object.freeze({
+      majorVersion: "3.0–3.5",
+      fourStarIds: ["jiera", "rotea", "lorne"],
+      threeStarIds: ["cenya"],
+      storyOnlyIds: ["sumine", "norell", "aster"],
+      focus: "從獸靈之村的共同生活延伸到不讓任何人永遠成為唯一中心；霽羅、蘿堤亞與洛恩各自代表測線、聲音與火路的不同選擇。"
+    }),
+    Object.freeze({
+      majorVersion: "4.0–4.5",
+      fourStarIds: ["aurelia", "kairen", "elyra"],
+      threeStarIds: ["talia"],
+      storyOnlyIds: ["sorae", "neve", "kael"],
+      focus: "北境神話意象從傳說變成生活規則；奧蕾雅、凱嵐與伊萊拉分別把光、火與律法寫成可共同修改的制度。"
+    }),
+    Object.freeze({
+      majorVersion: "5.0–5.5",
+      fourStarIds: ["vestra", "eirin", "daria"],
+      threeStarIds: ["niela"],
+      storyOnlyIds: ["brann", "sava", "hervan"],
+      focus: "瑟蕾雅面對母親與世界中心的最後選擇；維斯妲、伊芮恩與達莉雅讓空位、通路和交班成為她真正能留下的答案。"
+    })
+  ]);
 
   // 角色培養頁的動態立繪；素材檔名沿用角色 id，之後新增影片時只要補進這份清單。
   var characterAnimationDirectory = "./video/astralyn-1.0-1.5/";
@@ -1791,6 +1848,8 @@
     cards: cards,
     activeCards: activeCards,
     futureCards: futureCards,
+    futureCharacterPlan: futureCharacterPlan,
+    futureCharacterReleasePlan: futureCharacterReleasePlan,
     version3Cards: version3Cards,
     activeFour: activeFour,
     activeThree: activeThree,
