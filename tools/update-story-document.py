@@ -223,6 +223,45 @@ def add_character_release_plan(document, story):
     return table
 
 
+def add_character_relationships(document, story):
+    """Keep the emotional purpose of every future character explicit."""
+    document.add_heading("瑟蕾雅與後續角色關係索引", level=2)
+    document.add_paragraph(
+        "角色可以先在主線或合併支線中出現，再等關係成熟後進入卡池。"
+        "本表不是角色簡介，而是每個角色在瑟蕾雅旅程中的情感功能："
+        "她們如何互相質疑、照顧、拉回現實，或讓瑟蕾雅學會把選擇交還給別人。"
+    )
+    cards = sorted(
+        [card for card in story.get("cards", []) if float(card.get("releaseVersion", 0)) >= 3],
+        key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", ""))
+    )
+    table = document.add_table(rows=1, cols=3)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers = ["角色", "故事初登場／預計卡池", "與瑟蕾雅的關係與情感作用"]
+    for cell, text in zip(table.rows[0].cells, headers):
+        cell.text = text
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for card in cards:
+        cells = table.add_row().cells
+        debut = str(card.get("releaseVersion", ""))
+        planned = card.get("plannedGachaVersion") or "後續再議"
+        values = [
+            card.get("name", ""),
+            f"故事 {debut}／卡池 {planned}／{'★' * int(card.get('rarity', 0))}",
+            card.get("storyRelationship", "") or "待補充"
+        ]
+        for cell, text in zip(cells, values):
+            cell.text = str(text)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(8.5)
+    return table
+
+
 def add_story_index(document, story):
     """Add an authoritative 1.0–5.5 main/side index from the game data."""
     document.add_heading("劇情版本索引（以遊戲資料為準）", level=2)
@@ -291,6 +330,7 @@ def append_story_revision(document):
     add_story_index(document, story.get("story", []))
     add_character_scope(document, story)
     add_character_release_plan(document, story)
+    add_character_relationships(document, story)
     add_future_story_body(document, story)
 
     document.add_heading("六、完成前檢查清單", level=2)

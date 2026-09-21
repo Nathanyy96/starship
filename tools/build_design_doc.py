@@ -222,6 +222,21 @@ def add_character_portrait_catalog(doc, portrait_dir):
     doc.add_paragraph().paragraph_format.space_after = Pt(1)
 
 
+def add_future_character_relationships(doc):
+    cards = [card for card in load_character_catalog() if float(card.get("releaseVersion", 0)) >= 3]
+    add_heading(doc, "後續角色與瑟蕾雅的關係索引", 2)
+    add_text(doc, "故事初登場和預計卡池刻意分開。這份索引記錄每位角色在瑟蕾雅旅程中的情感功能，供主線、合併支線與角色故事共同使用；未進卡池的角色仍然是完整的故事角色。", size=10, after=6)
+    rows = []
+    for card in cards:
+        planned = card.get("plannedGachaVersion") or "後續再議"
+        rows.append([
+            card.get("name", ""),
+            f"故事 {card.get('releaseVersion', '')}／卡池 {planned}",
+            card.get("storyRelationship", "") or "待補充"
+        ])
+    add_table(doc, ["角色", "登場／卡池", "關係與情感作用"], rows, widths=[1.0, 1.25, 4.35])
+
+
 def main():
     doc = Document()
     section = doc.sections[0]
@@ -470,6 +485,8 @@ def main():
         ["4.0–4.5", "奧蕾雅 4★、凱嵐 4★、伊萊拉 4★；塔莉亞 3★", "新曙港 → 第二條律；把北境神話意象寫成可共同修改的規則", "3 名新四星／保留索萊、涅芙、凱爾於故事"],
         ["5.0–5.5", "維斯妲 4★、伊芮恩 4★、達莉雅 4★；妮拉 3★", "根冠 → 長冬後的新曙；瑟蕾雅拒絕成為唯一中心並完成交班", "3 名新四星／保留布蘭、薩芙、赫爾凡於故事"],
     ], widths=[.7, 2.25, 2.55, 1.1])
+
+    add_future_character_relationships(doc)
 
     add_heading(doc, "開放前檢查", 2)
     add_bullets(doc, [
