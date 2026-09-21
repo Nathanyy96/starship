@@ -1146,6 +1146,16 @@
     return Object.assign({}, sourceChapter, { scenes: scenes });
   }
 
+  function documentChapterTitle(sourceLabel, fallback) {
+    var label = String(sourceLabel || "").trim();
+    var parts = label.split("｜");
+    if (parts.length >= 3) {
+      var title = parts.slice(2).join("｜").trim();
+      if (title) return title;
+    }
+    return fallback;
+  }
+
   var storyContinuityGuides = {
     "main-1-0": { focus: "瑟蕾雅第一次穿過界痕，從求生與查案開始，發現黑晶巨獸其實是在尋找回家的路。", hook: "她在第十三扇窗聽見母親留下的四小節旋律，卻只取得一片漆與一個未完成地址。", payoff: "瑟蕾雅學會把隊友放進地圖，不再把自己畫成唯一的退路。" },
     "main-1-1": { focus: "瑟蕾雅沿著回音追查母親的線索，也第一次看見不同的人可以對同一條路給出不同答案。", hook: "移動舞台的聲音把她帶往北境，但回音的收件人始終沒有承諾會回來。", payoff: "她把『想去』和『現在就要出發』分開，為後續尋找彼岸留下空間。" },
@@ -1606,6 +1616,9 @@
         };
       }
       var result = guide ? Object.assign({}, chapter, { narrativeGuide: guide }) : chapter;
+      if (result.type === "main" && Number(result.version) >= 1 && Array.isArray(result.characters) && result.characters.indexOf("celesia") < 0) {
+        result = Object.assign({}, result, { characters: result.characters.concat("celesia") });
+      }
       if (result.type === "side" && Number(result.version) >= 3 && Array.isArray(result.characters) && result.characters.indexOf("celesia") < 0) {
         result = Object.assign({}, result, { characters: result.characters.concat("celesia") });
       }
@@ -1632,6 +1645,7 @@
       var sourceChapter = imported[chapter.id] ? normalizeImportedSource(imported[chapter.id]) : null;
       var livePolish = liveStoryPolish[chapter.id] || null;
       return sourceChapter ? Object.assign({}, chapter, sourceChapter, livePolish || {}, {
+        title: documentChapterTitle(sourceChapter.sourceLabel, (livePolish && livePolish.title) || chapter.title),
         sourceDocumentId: storySource.documentId,
         sourceStatus: sourceChapter.sourceStatus || "document"
       }) : Object.assign({}, chapter, livePolish || {});
@@ -1664,8 +1678,113 @@
     return applyContinuityGuides(merged);
   }
 
-  var liveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
-  var allStoryChapters = applyContinuityGuides(liveStoryChapters.concat(version3StoryChapters, version4StoryChapters, version5StoryChapters));
+  var sideStoryGroupSpecs = [
+    { id: "side-1-0-village", range: "1.0–1.1", title: "第十三把椅子與今天不排練", region: "白鐘城・霧橋鎮", members: ["side-1-0-village", "side-1-1-qwer"] },
+    { id: "side-1-2-water", range: "1.2–1.3", title: "獵人歸林與雨停以前", region: "獸靈之村・洛汀港", members: ["side-1-2-water", "side-1-3-harbor"] },
+    { id: "side-1-4-bell", range: "1.4–1.5", title: "給昨天的妳與下一次敲門", region: "彼岸鐘庭・公共檔案庫", members: ["side-1-4-bell", "side-1-5-files"] },
+    { id: "side-2.0-library", range: "2.0–2.1", title: "藍燈不滅與未寄出的回聲", region: "潮汐書庫・鏡潮島", members: ["side-2.0-library", "side-2.1-mirror"] },
+    { id: "side-2.2-deep", range: "2.2–2.3", title: "空船的乘客與風箏不替人回信", region: "深潮測線・雲脊站", members: ["side-2.2-deep", "side-2.3-wind"] },
+    { id: "side-2.4-witness", range: "2.4–2.5", title: "見證人的空白", region: "霧鏡議庭・潮眼外圍", members: ["side-2.4-court", "side-2.5-repair", "side-2.4-witness"] },
+    { id: "side-3-0-wind", range: "3.0–3.2", title: "藍旗、黑木匣與白榆河", region: "白石驛站・內陸回覆台・白榆河", members: ["side-3-0-wind", "side-3-1-format", "side-3-2-river"] },
+    { id: "side-3-3-forge", range: "3.3–3.5", title: "空白握柄與終端的第一頁", region: "鍛路鎮・北門高地・星界終端", members: ["side-3-3-forge", "side-3-4-north", "side-3-5-finale"] },
+    { id: "side-4.0-dawn", range: "4.0–4.2", title: "曙港的輪班與遠望塔", region: "新曙港・碎星工坊・遠望塔", members: ["side-4.0-dawn", "side-4.1-forge", "side-4.2-tower"] },
+    { id: "side-4.3-memory", range: "4.3–4.5", title: "失效訊息與可撤回的門", region: "白夜航路・海溝入口・協議庭", members: ["side-4.3-memory", "side-4.4-trench", "side-4.5-law"] },
+    { id: "side-5.0-root-register", range: "5.0–5.2", title: "根名冊、霜火與虹橋", region: "北境根冠・霜火鍛環・虹橋", members: ["side-5.0-root-register", "side-5.1-forge-long-night", "side-5.2-bridge-watch"] },
+    { id: "side-5.3-weaver-school", range: "5.3–5.5", title: "空白梭與長冬後的信", region: "命線織庭・深海根門・北境新曙", members: ["side-5.3-weaver-school", "side-5.4-deep-key", "side-5.5-dawn-archive"] }
+  ];
+
+  function combineSideScenes(spec, members, canonical) {
+    var hasDocumentBody = canonical && canonical.sourceLabel && canonical.sourceLabel.indexOf(spec.range + "｜支線｜") === 0;
+    if (hasDocumentBody) return canonical.scenes;
+    var actNames = ["第一幕", "第二幕", "終幕"];
+    return [0, 1, 2].map(function (index) {
+      var available = members.map(function (member) { return member.scenes[index]; }).filter(Boolean);
+      var firstTitle = available[0] && available[0].title ? String(available[0].title).replace(/^(?:序幕|終幕|終節|第[一二三四五六七八九十]+幕|第[一二三四五六七八九十]+節)｜/u, "") : "回聲與選擇";
+      var body = available.map(function (scene, sceneIndex) {
+        var member = members[sceneIndex];
+        return "【" + member.version + "｜" + member.title + "】\n" + scene.body;
+      }).join("\n\n");
+      return { id: spec.id + "-act-" + (index + 1), title: actNames[index] + "｜" + firstTitle, body: body };
+    });
+  }
+
+  function groupSideStoryChapters(chapters) {
+    var byId = {};
+    chapters.forEach(function (chapter) { byId[chapter.id] = chapter; });
+    var consumed = {};
+    var aliases = {};
+    var grouped = [];
+    sideStoryGroupSpecs.forEach(function (spec) {
+      var members = spec.members.map(function (id) { return byId[id]; }).filter(Boolean);
+      var canonical = byId[spec.id] || members[0];
+      if (!canonical) return;
+      var scenes = combineSideScenes(spec, members, canonical);
+      var characters = [];
+      members.forEach(function (member) {
+        (member.characters || []).forEach(function (characterId) {
+          if (characters.indexOf(characterId) < 0) characters.push(characterId);
+        });
+      });
+      var title = documentChapterTitle(canonical.sourceLabel, spec.title);
+      var group = Object.assign({}, canonical, {
+        id: spec.id,
+        type: "side",
+        version: spec.range.split("–")[0],
+        versionLabel: spec.range,
+        title: title,
+        region: spec.region,
+        summary: canonical.summary || "補足主線之外的角色選擇與地方回聲，故事不改變主線結局。",
+        characters: characters,
+        scenes: scenes,
+        fullBody: canonical.fullBody || scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
+        releaseOpen: Number(spec.range.split("–")[0]) <= 2.5,
+        legacyIds: spec.members.filter(function (id) { return id !== spec.id; })
+      });
+      grouped.push(group);
+      spec.members.forEach(function (legacyId) {
+        consumed[legacyId] = true;
+        aliases[legacyId] = spec.id;
+        var member = byId[legacyId];
+        if (!member) return;
+        var memberIndex = spec.members.indexOf(legacyId);
+        var sceneOffset = (canonical && canonical.sourceLabel && canonical.sourceLabel.indexOf(spec.range + "｜支線｜") === 0 && memberIndex < 2) ? memberIndex * 3 : 0;
+        (member.scenes || []).forEach(function (scene, sceneIndex) {
+          var targetScene = group.scenes[sceneOffset + sceneIndex] || group.scenes[Math.min(sceneIndex, group.scenes.length - 1)];
+          if (!targetScene) return;
+          aliases[legacyId + ":" + scene.id] = spec.id + ":" + targetScene.id;
+        });
+      });
+    });
+    chapters.forEach(function (chapter) {
+      if (chapter.type === "side") {
+        if (consumed[chapter.id]) return;
+        return;
+      }
+      grouped.push(chapter);
+    });
+    grouped.sort(function (a, b) {
+      var av = Number(a.version); var bv = Number(b.version);
+      if (av !== bv) return av - bv;
+      if (a.type !== b.type) return a.type === "main" ? -1 : 1;
+      return String(a.id).localeCompare(String(b.id));
+    });
+    return { chapters: applyContinuityGuides(grouped), aliases: aliases };
+  }
+
+  var rawLiveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
+  var rawAllStoryChapters = rawLiveStoryChapters.concat(version3StoryChapters, version4StoryChapters, version5StoryChapters);
+  var groupedStory = groupSideStoryChapters(rawAllStoryChapters);
+  var allStoryChapters = groupedStory.chapters.map(function (chapter) {
+    if (String(chapter.fullBody || "").trim()) return chapter;
+    return Object.assign({}, chapter, {
+      fullBody: chapter.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n")
+    });
+  });
+  var liveStoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) <= 2.5; });
+  var storyChapterAliases = groupedStory.aliases;
+  var groupedVersion3StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 3 && Number(chapter.version) < 4; });
+  var groupedVersion4StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 4 && Number(chapter.version) < 5; });
+  var groupedVersion5StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 5; });
 
   return {
     cards: cards,
@@ -1683,9 +1802,10 @@
     storyChapters: allStoryChapters,
     liveStoryChapters: liveStoryChapters,
     version2StoryChapters: version2StoryChapters,
-    version3StoryChapters: version3StoryChapters,
-    version4StoryChapters: version4StoryChapters,
-    version5StoryChapters: version5StoryChapters,
+    version3StoryChapters: groupedVersion3StoryChapters,
+    version4StoryChapters: groupedVersion4StoryChapters,
+    version5StoryChapters: groupedVersion5StoryChapters,
+    storyChapterAliases: storyChapterAliases,
     northernMythArc: northernMythArc,
     storySource: storySource,
     characterBattleStats: characterBattleStats,

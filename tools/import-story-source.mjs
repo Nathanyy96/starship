@@ -16,12 +16,12 @@ const storyDefinitions = [
   { id: "side-1-4-bell", type: "side", version: "1.4", versionLabel: "1.4–1.5", label: "1.4–1.5｜支線｜給昨天的妳與下一次敲門", min: 144000, end: "00｜設定與製作總頁", legacySceneIds: ["tools", "night", "mark"] },
   { id: "main-2.0", type: "main", version: "2.0", versionLabel: "2.0", label: "2.0｜主線｜潮汐之外仍有人", min: 175000, end: "2.0–2.1｜支線｜藍燈不滅與未寄出的回聲", legacySceneIds: ["library-arrival", "tide-map", "no-address"] },
   { id: "side-2.0-library", type: "side", version: "2.0", versionLabel: "2.0–2.1", label: "2.0–2.1｜支線｜藍燈不滅與未寄出的回聲", min: 182000, end: "2.1｜主線｜鏡中的名字", legacySceneIds: ["borrow", "lighthouse-letter", "margin"] },
-  { id: "main-2.1", type: "main", version: "2.1", versionLabel: "2.1", label: "2.1｜主線｜鏡中的名字", min: 184000, end: "2.2｜主線｜斷線之下仍有潮聲", legacySceneIds: ["mirror-shore", "split-reply", "return-sentence"], missingInDocument: true },
+  { id: "main-2.1", type: "main", version: "2.1", versionLabel: "2.1", label: "2.1｜主線｜鏡中的名字", min: 184000, end: "2.2｜主線｜斷線之下仍有潮聲", legacySceneIds: ["mirror-shore", "split-reply", "return-sentence"] },
   { id: "main-2.2", type: "main", version: "2.2", versionLabel: "2.2", label: "2.2｜主線｜斷線之下仍有潮聲", min: 187800, end: "2.2–2.3｜支線｜空船的乘客與風箏不替人回信", legacySceneIds: ["deep-line", "pressure-signal", "handover-depth"] },
   { id: "side-2.2-deep", type: "side", version: "2.2", versionLabel: "2.2–2.3", label: "2.2–2.3｜支線｜空船的乘客與風箏不替人回信", min: 191000, end: "2.3｜主線｜雲脊之上的地址", legacySceneIds: ["rope", "repair-turn", "surface"] },
   { id: "main-2.3", type: "main", version: "2.3", versionLabel: "2.3", label: "2.3｜主線｜雲脊之上的地址", min: 193000, end: "2.4｜主線｜霧鏡議庭", legacySceneIds: ["wind-columns", "cloud-address", "highland-return"] },
   { id: "main-2.4", type: "main", version: "2.4", versionLabel: "2.4", label: "2.4｜主線｜霧鏡議庭", min: 196400, end: "2.4–2.5｜支線｜見證人的空白", legacySceneIds: ["court-map", "witness-page", "public-record"] },
-  { id: "side-2.4-witness", type: "side", version: "2.4", versionLabel: "2.4–2.5", label: "2.4–2.5｜支線｜見證人的空白", min: 198700, end: "2.5｜主線｜潮眼之後", legacySceneIds: ["half-sentence", "repair-mark", "empty-card"] },
+  { id: "side-2.4-witness", type: "side", version: "2.4", versionLabel: "2.4–2.5", label: "2.4–2.5｜支線｜見證人的空白", min: 198700, end: "角色圖鑑｜第三大版本", legacySceneIds: ["half-sentence", "repair-mark", "empty-card"] },
   // 文件在 2.5 主線後仍保留了一份 2.4–2.5 支線與第三大版本圖鑑的備份，
   // 這裡要在支線標題處截斷，不能一路讀到 3.0，否則主線閱讀器會混入別章內容。
   { id: "main-2.5", type: "main", version: "2.5", versionLabel: "2.5", label: "2.5｜主線｜潮眼之後", min: 200000, end: "2.4–2.5｜支線｜見證人的空白", legacySceneIds: ["tide-eye", "eight-keys", "after-tide"] }
@@ -48,9 +48,21 @@ const fallback21Scenes = [
 ];
 
 function findAfter(text, marker, minimum) {
-  const position = text.indexOf(marker, minimum);
-  if (position < 0) throw new Error(`找不到文件分頁：${marker}`);
-  return position;
+  const start = Math.max(0, Math.min(Number(minimum) || 0, text.length));
+  const position = text.indexOf(marker, start);
+  if (position >= 0) return position;
+  // 文件新增合併支線與長篇正文後，固定字元位置可能向前移；
+  // 若預估位置已超過正文，退回尋找預估位置以前最後一次出現的分頁標題。
+  let fallback = -1;
+  let cursor = 0;
+  while (cursor < start) {
+    const next = text.indexOf(marker, cursor);
+    if (next < 0 || next >= start) break;
+    fallback = next;
+    cursor = next + marker.length;
+  }
+  if (fallback >= 0) return fallback;
+  throw new Error(`找不到文件分頁：${marker}`);
 }
 
 function cleanBody(value, label) {
@@ -122,7 +134,7 @@ for (const definition of storyDefinitions) {
 const serialized = JSON.stringify({
   documentId,
   importedAt: new Date().toISOString(),
-  sourceNote: "由 Google 文件公開匯出內容整理；2.1 分頁在來源中只有標題並混入 2.2 正文，因此以承接劇情補齊遊戲閱讀內容。",
+  sourceNote: "由 Google 文件公開匯出內容整理；1.0–2.5 的可讀正文與幕次已完成同步，2.1 已使用文件中的完整正文。",
   chapters
 }, null, 2);
 

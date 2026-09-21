@@ -33,6 +33,8 @@
     var starLawTestPanelOpen = false;
     var currentCharacterId = "";
     var currentCharacterSkinId = "";
+    var characterSearchTerm = "";
+    var characterListFilter = "all";
     var game = null;
 
     function byId(id) { return document.getElementById(id); }
@@ -341,13 +343,28 @@
     function storyProgress(state) {
       state.storyProgress = state.storyProgress || { currentChapter: "main-1-0", completedScenes: {} };
       state.storyProgress.completedScenes = state.storyProgress.completedScenes || {};
+      var aliases = data.storyChapterAliases || {};
+      var completed = state.storyProgress.completedScenes;
+      Object.keys(completed).forEach(function (key) {
+        var separator = key.indexOf(":");
+        if (separator < 0) return;
+        var oldChapterId = key.slice(0, separator);
+        var oldSceneId = key.slice(separator + 1);
+        var migratedKey = aliases[oldChapterId + ":" + oldSceneId] || ((aliases[oldChapterId] && oldSceneId) ? aliases[oldChapterId] + ":" + oldSceneId : null);
+        if (migratedKey && migratedKey !== key && !completed[migratedKey]) completed[migratedKey] = completed[key];
+        if (migratedKey && migratedKey !== key) delete completed[key];
+      });
+      if (aliases[state.storyProgress.currentChapter]) state.storyProgress.currentChapter = aliases[state.storyProgress.currentChapter];
       return state.storyProgress;
     }
-    function storyChapterById(id) { return data.storyChapters.find(function (chapter) { return chapter.id === id; }); }
+    function storyChapterById(id) {
+      var canonicalId = (data.storyChapterAliases && data.storyChapterAliases[id]) || id;
+      return data.storyChapters.find(function (chapter) { return chapter.id === canonicalId; }) || data.storyChapters.find(function (chapter) { return chapter.id === id; });
+    }
     function storySceneById(chapter, id) { return chapter && chapter.scenes.find(function (scene) { return scene.id === id; }); }
     function sceneKey(chapterId, sceneId) { return chapterId + ":" + sceneId; }
-    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.releaseOpen !== false && Number(chapter.version) <= 2.5; }); }
-    function lockedStoryChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.releaseOpen === false; }); }
+    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen !== false && Number(chapter.version) <= 2.5; }); }
+    function lockedStoryChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen === false; }); }
     function sceneClaimed(state, chapterId, sceneId) { return Boolean(storyProgress(state).completedScenes[sceneKey(chapterId, sceneId)]); }
     function developmentCost(card, level) {
       var rules = api.DEFAULT_RULES.development;
@@ -470,6 +487,25 @@
         return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>";
       }).join("") + "</div>";
     }
+    function chineseActNumber(value) {
+      var numerals = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十"];
+      return numerals[value] || String(value);
+    }
+    function storySceneDisplayTitle(chapter, scene, index) {
+      var raw = String(scene && scene.title || "").trim();
+      var total = chapter && Array.isArray(chapter.scenes) ? chapter.scenes.length : 0;
+      var isSide = chapter && chapter.type === "side";
+      // 支線統一成連續幕次；原本的「序幕／第一節／終節」只保留標題正文，避免同一章出現兩組序幕。
+      if (isSide) {
+        var bodyTitle = raw.replace(/^(?:序幕|終幕|終節|第[一二三四五六七八九十百]+[幕節])\s*[｜|]?\s*/, "").trim();
+        var label = index === total - 1 ? "終幕" : "第" + chineseActNumber(index + 1) + "幕";
+        return label + (bodyTitle ? "｜" + bodyTitle : "");
+      }
+      // 主線保留已寫好的「序幕／第X幕／終幕」，只為缺少幕次的文件段落補上連續編號。
+      if (/^(?:序幕|終幕|第[一二三四五六七八九十百]+幕)\s*(?:｜|$)/.test(raw)) return raw;
+      var mainLabel = index === total - 1 ? "終幕" : "第" + chineseActNumber(index + 1) + "幕";
+      return mainLabel + (raw ? "｜" + raw : "");
+    }
     function storyLength(chapter) {
       if (chapter.fullBody && chapter.sourceStatus !== "document-tab-missing") return String(chapter.fullBody).replace(/\s/g, "").length;
       return chapter.scenes.reduce(function (sum, scene) { return sum + String(scene.body || "").replace(/\s/g, "").length; }, 0);
@@ -483,14 +519,16 @@
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
       currentStorySceneId = scene.id;
       var claimed = sceneClaimed(state, chapter.id, scene.id);
-      var sceneButtons = chapter.scenes.map(function (item) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(item.title) + "</span><small>" + (sceneClaimed(state, chapter.id, item.id) ? "已領取本幕獎勵" : "完成後 +100 星砂・+650 經驗") + "</small></button>"; }).join("");
+      var sceneIndex = Math.max(0, chapter.scenes.findIndex(function (item) { return item.id === scene.id; }));
+      var sceneTitle = storySceneDisplayTitle(chapter, scene, sceneIndex);
+      var sceneButtons = chapter.scenes.map(function (item, index) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</span><small>" + (sceneClaimed(state, chapter.id, item.id) ? "已領取本幕獎勵" : "完成後 +100 星砂・+650 經驗") + "</small></button>"; }).join("");
       var fullChapter = chapter.scenes.map(function (item, index) {
-        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(item.title) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body") + "</article>";
+        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body") + "</article>";
       }).join("");
       var characterCount = chapter.characters.filter(function (id) { return Boolean(data.cards[id]); }).length;
       var length = storyLength(chapter);
       var sourceLabel = chapter.sourceStatus === "document-tab-missing" ? "補充正文" : "文件正文";
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(scene.title) + "</h4>" + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂・+650 角色經驗</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>每幕首次完成可獲得 100 星砂與 650 角色經驗；正文可向下捲動閱讀</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已整理成長篇閱讀格式，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂・+650 角色經驗</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>本章完整劇情</span><small>已整理成長篇閱讀格式，所有幕次內容都會顯示</small></div><div>" + fullChapter + "</div></section>";
     }
     function moveStoryPlotToTop() {
       var reader = byId("story-reader");
@@ -557,15 +595,22 @@
       var personalCoreTotal = data.activeCards.reduce(function (sum, card) { var progress = state.characterProgress[card.id] || {}; return sum + (Number(progress.constellationCore) || 0); }, 0);
       if (byId("character-core")) byId("character-core").textContent = number(personalCoreTotal);
       byId("character-star-marks").textContent = number(state.resources.starMarks);
-      byId("character-list").innerHTML = data.activeCards.map(function (card) {
+      var searchTerm = characterSearchTerm.trim().toLocaleLowerCase();
+      var visibleCards = data.activeCards.filter(function (card) {
+        var copies = state.collection[card.id] || 0;
+        var matchesFilter = characterListFilter === "all" || (characterListFilter === "owned" && copies > 0) || (characterListFilter === "rarity4" && card.rarity === 4) || (characterListFilter === "rarity3" && card.rarity === 3);
+        var searchable = [card.name, card.romanizedName, card.element, card.releaseVersion, card.id].join(" ").toLocaleLowerCase();
+        return matchesFilter && (!searchTerm || searchable.indexOf(searchTerm) >= 0);
+      });
+      byId("character-list-count").textContent = "顯示 " + visibleCards.length + " / " + data.activeCards.length + " 名";
+      byId("character-list").innerHTML = visibleCards.length ? visibleCards.map(function (card) {
         var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (card.image ? ";--card-image:url(\"" + escapeHtml(card.image) + "\")" : "");
         var growthAction;
         if (!copies) growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\" disabled>尚未取得</button>";
         else if (needBreakthrough) growthAction = "<button class=\"secondary-action growth-button breakthrough-growth-button\" data-breakthrough-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (availableBreakthrough < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>";
         else growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (atMax || state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">" + (atMax ? "已達 90 等" : "升級　" + cost.characterExp + " 經驗") + "</button>";
-        var animationAction = animation ? "<button class=\"secondary-action growth-button growth-animation-button\" data-character-animation=\"" + escapeHtml(card.id) + "\" type=\"button\">▶ 角色動畫</button>" : "<span class=\"growth-animation-unavailable\" title=\"目前尚未收錄角色動畫\">動畫未收錄</span>";
-        return "<article class=\"character-growth-card " + (copies ? "owned" : "locked") + " rarity-" + card.rarity + "\" data-open-character=\"" + escapeHtml(card.id) + "\" tabindex=\"0\"><div class=\"character-growth-art\" style=\"" + style + "\"><span>" + escapeHtml(card.element) + "</span><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + "</small></div><div class=\"character-growth-body\"><div><span class=\"rarity-label\">" + "★".repeat(card.rarity) + "</span><h3>" + escapeHtml(card.name) + "</h3><p>" + escapeHtml(card.note) + "</p></div><div class=\"growth-stats\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + "/6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"growth-actions\">" + growthAction + animationAction + "</div></div></article>";
-      }).join("");
+        return "<article class=\"character-growth-card compact-character-card " + (copies ? "owned" : "locked") + " rarity-" + card.rarity + "\" data-open-character=\"" + escapeHtml(card.id) + "\" tabindex=\"0\" aria-label=\"查看" + escapeHtml(card.name) + "培養資料\"><div class=\"character-growth-art\" style=\"" + style + "\"><span>" + escapeHtml(card.element) + "</span><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + "</small></div><div class=\"character-growth-body\"><div class=\"compact-character-heading\"><span class=\"rarity-label\">" + "★".repeat(card.rarity) + "</span><span class=\"compact-element\">" + escapeHtml(card.element) + "元素</span></div><h3>" + escapeHtml(card.name) + "</h3><div class=\"growth-stats\"><span>戰力 <b>" + number(power) + "</b></span><span>Lv.<b>" + progress.level + "/90</b></span><span>命座 <b>" + (progress.constellation || 0) + "/6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"growth-actions\">" + growthAction + "</div></div></article>";
+      }).join("") : "<div class=\"character-list-empty\">找不到符合條件的角色，請調整搜尋或篩選。</div>";
       if (currentCharacterId) { renderCharacterDetail(currentCharacterId); }
     }
     function characterStatsFor(cardId, progress) {
@@ -1397,6 +1442,8 @@
       var card = event.target.closest("[data-open-character]"); if (card) openCharacterDetail(card.getAttribute("data-open-character"));
     });
     byId("character-list").addEventListener("keydown", function (event) { if (event.target.closest("button, a, input, select, textarea")) return; if (event.key === "Enter" || event.key === " ") { var card = event.target.closest("[data-open-character]"); if (card) { event.preventDefault(); openCharacterDetail(card.getAttribute("data-open-character")); } } });
+    byId("character-search").addEventListener("input", function () { characterSearchTerm = this.value; renderCharacters(); });
+    byId("character-filter").addEventListener("change", function () { characterListFilter = this.value; renderCharacters(); });
     byId("character-detail").addEventListener("click", function (event) {
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
