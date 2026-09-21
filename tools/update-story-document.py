@@ -33,7 +33,7 @@ def load_future_story():
         "import('./src/data.js').then(({default:d}) => "
         "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), story:d.storyChapters, "
         "v3:d.version3StoryChapters, v4:d.version4StoryChapters, v5:d.version5StoryChapters, "
-        "releasePlan:d.futureCharacterReleasePlan})))"
+        "releasePlan:d.futureCharacterReleasePlan, futureRevision:d.futureStoryRevision})))"
     )
     result = subprocess.run(
         [str(node), "--input-type=module", "-e", export_script],
@@ -71,12 +71,12 @@ def add_bullet(document, text):
 
 def add_story_table(document):
     rows = [
-        ("3.0", "第九個回覆", "藍旗與空白格", "母親筆跡的拒絕信；第九節點保留成空位，瑟蕾雅第一次讓自己退到隊伍之外。"),
-        ("3.1", "回覆台的第三種顏色", "黑木匣的三個欄位", "系統把瑟蕾雅的聲音自動補成同意；她刪除自己的預設聲紋，保住等待權。"),
-        ("3.2", "河床上沒有中心", "白榆河的輪班表", "星痕被複製到中央蓄水塔；瑟蕾雅熄掉中央主訊號，發現黑晶正在模仿她。"),
-        ("3.3", "空白座的火", "鍛路師的空白握柄", "有人用她的筆跡發集中供能命令；她把火源與停止權拆給鎮民，看到母親的手勢。"),
-        ("3.4", "北門沒有終點", "風路守望表", "地圖刪掉瑟蕾雅的名字；她不強行補回，改用可回頭測線追查誰在控制她的路。"),
-        ("3.5", "最後一個不回覆", "把第一頁留白", "終端要求她成為唯一中心；她留下可拒絕、可撤回、可重談的第一條星界之律。"),
+        ("3.0", "回聲之門", "村口的三面旗", "瑟蕾雅回到獸靈之村，第一次把母親的拒絕放在自己的思念之前，留下由村民共同保管的空位。"),
+        ("3.1", "誰替她寫回覆", "黑木匣裡的未完成句", "回覆台模仿瑟蕾雅的聲音；她刪除預設聲紋，讓『我不知道』也能被完整保留。"),
+        ("3.2", "白榆河的黑星", "白榆河的輪班表", "她熄掉中央主訊號，讓澄音與岑芽接手四段水路，並在河床發現指向鍛路鎮的黑星。"),
+        ("3.3", "火把不是王冠", "空白握柄與兩小時後", "洛恩與她把火源、停爐權和撤退路線交給鎮民，救急不再等於坐上唯一的座位。"),
+        ("3.4", "北門的母親", "風路守望表", "艾妲的信留下『不要把我帶走』；瑟蕾雅不把拒絕變成追趕任務，改用可回頭測線前進。"),
+        ("3.5", "門外先寫信", "把第一頁留給活著的人", "她知道門是為自己開的，仍先寫信、先詢問，留下可拒絕、可撤回、可重談的第一條星界之律。"),
         ("4.0", "新曙港的第一束光", "天文台輪班表", "根系圖以她的第一筆為中心；她讓第一束光照亮退回點，而不是最短航路。"),
         ("4.1", "碎星工坊的熱源", "空爐旁的工具架", "霜核保存她與母親的身世片段；她讓霜火輪值，不讓能力再次集中在自己身上。"),
         ("4.2", "遠望塔的長距離回覆", "信標見習筆記", "虹橋以母親的聲音呼喚她；兩端都保留關閉權，熟悉的聲音不再直接等於邀請。"),
@@ -120,8 +120,8 @@ def add_future_story_body(document, story):
     intro = document.add_paragraph()
     intro.add_run("閱讀定位：").bold = True
     intro.add_run(
-        "1.0–2.5 的瑟蕾雅、獸靈之村與既有世界設定是正史根基；3.0 起重新整理節奏，"
-        "讓新角色先以故事夥伴身分慢慢建立關係，再在合適的大版本進入卡池。3.0–3.5 延續瑟蕾雅建立的拒絕、撤回與分散治理主題；4.0–5.5 再以北歐神話意象"
+        "1.0–2.5 的瑟蕾雅、獸靈之村與既有世界設定是正史根基；3.0–3.5 使用『回聲之門』重製版，"
+        "讓新角色先以故事夥伴身分慢慢建立關係，再在合適的大版本進入卡池。新版先處理瑟蕾雅回到村子、面對母親拒絕與走向北門的個人弧線；4.0–5.5 再以北歐神話意象"
         "重新理解根系、命線、霜火、虹橋、深海守門與長冬，但不直接套用既有神名或神話劇本。"
         "每一版都讓瑟蕾雅面對一個看似只能由她決定的中心，再把拒絕、撤回與交班的權利交還給受影響的人。"
         "每個大版本維持五個小版本，但只安排 2–3 名新四星；其他已完成角色保留於主線與支線，"
@@ -262,6 +262,49 @@ def add_character_relationships(document, story):
     return table
 
 
+def add_future_story_revision(document, story):
+    """Document the active 3.0–3.5 rewrite without deleting the 1.0–2.5 canon."""
+    revision = story.get("futureRevision") or {}
+    if not revision:
+        return
+    document.add_heading("3.0–3.5 劇情重製版：回聲之門", level=2)
+    document.add_paragraph(
+        "這是目前鎖定版本採用的新版橋接稿。1.0–2.5 的瑟蕾雅、獸靈之村、雷恩、莉亞、伊薩爾、"
+        "艾妲與潮眼事件維持原始正史；3.0–3.5 改以回到最初的家、面對母親的拒絕、再走向北門為主軸。"
+        "原先的未開放正文不刪除，僅作為可回溯素材；遊戲與本文件以本重製版的摘要、導讀與幕次為準。"
+    )
+    premise = document.add_paragraph()
+    premise.add_run("重製核心：").bold = True
+    premise.add_run(revision.get("premise", ""))
+    for rule in revision.get("designRules", []) or []:
+        add_bullet(document, rule)
+
+    chapters = revision.get("chapters", {}) or {}
+    table = document.add_table(rows=1, cols=4)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers = ["章節", "新版標題", "新版摘要", "幕次"]
+    for cell, text in zip(table.rows[0].cells, headers):
+        cell.text = text
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    for chapter_id, chapter in chapters.items():
+        cells = table.add_row().cells
+        values = [
+            chapter_id,
+            chapter.get("title", ""),
+            chapter.get("summary", ""),
+            "、".join(scene.get("title", "") for scene in chapter.get("scenes", [])),
+        ]
+        for cell, text in zip(cells, values):
+            cell.text = str(text)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(8.5)
+
+
 def add_story_index(document, story):
     """Add an authoritative 1.0–5.5 main/side index from the game data."""
     document.add_heading("劇情版本索引（以遊戲資料為準）", level=2)
@@ -330,6 +373,7 @@ def append_story_revision(document):
     add_story_index(document, story.get("story", []))
     add_character_scope(document, story)
     add_character_release_plan(document, story)
+    add_future_story_revision(document, story)
     add_character_relationships(document, story)
     add_future_story_body(document, story)
 

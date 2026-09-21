@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, futureCharacterReleasePlan, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -53,6 +53,19 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCards.every((card) => card.storyRelationship.length >= 20), true);
   assert.equal(futureCards.filter((card) => card.plannedGachaVersion === null).length, 9);
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
+});
+
+test("3.0–3.5 採用保留獸靈之村設定的新版主線", () => {
+  assert.equal(futureStoryRevision.id, "future-story-revision-v2");
+  assert.match(futureStoryRevision.preservedCanon, /瑟蕾雅/);
+  assert.match(futureStoryRevision.preservedCanon, /獸靈之村/);
+  assert.equal(futureStoryRevision.chapters["main-3-0"].title, "回聲之門");
+  assert.equal(futureStoryRevision.chapters["main-3-5"].title, "門外先寫信");
+  const revised = storyChapters.filter((chapter) => chapter.storyRevisionId === futureStoryRevision.id);
+  assert.equal(Object.keys(futureStoryRevision.chapters).length, 12);
+  assert.equal(revised.length, 8);
+  assert.equal(revised.every((chapter) => chapter.scenes.length === 3 && chapter.scenes.every((scene) => scene.body.length >= 80)), true);
+  assert.match(storyChapters.find((chapter) => chapter.id === "main-3-5").summary, /先寫信/);
 });
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {

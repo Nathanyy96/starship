@@ -15,6 +15,13 @@
   }
   if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
 
+  // 1.0–2.5 保留原始正史；3.0–3.5 使用重製版橋接到北境神話篇。
+  var futureStoryRevision = null;
+  if (typeof require === "function") {
+    try { futureStoryRevision = require("./future-story-revision.js"); } catch (error) { futureStoryRevision = null; }
+  }
+  if (!futureStoryRevision && typeof globalThis !== "undefined") futureStoryRevision = globalThis.StarshipFutureStoryRevision || null;
+
   // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
   // 這份規劃刻意把「故事初登場」和「預計可抽版本」分開，避免為了卡池節奏
   // 讓每個小版本都硬塞一名新四星，導致角色關係只剩下快速報到。
@@ -1692,7 +1699,20 @@
     });
   }
 
-  version3StoryChapters = applyFutureStoryPolish(version3StoryChapters);
+  function applyFutureStoryRevision(chapters) {
+    var patches = futureStoryRevision && futureStoryRevision.chapters ? futureStoryRevision.chapters : {};
+    return chapters.map(function (chapter) {
+      var patch = patches[chapter.id];
+      if (!patch) return chapter;
+      return Object.assign({}, chapter, patch, {
+        storyRevisionId: futureStoryRevision.id,
+        storyRevisionTitle: futureStoryRevision.title,
+        narrativeGuide: patch.narrativeGuide || chapter.narrativeGuide
+      });
+    });
+  }
+
+  version3StoryChapters = applyFutureStoryRevision(applyFutureStoryPolish(version3StoryChapters));
   version4StoryChapters = applyFutureStoryPolish(version4StoryChapters);
   version5StoryChapters = applyFutureStoryPolish(version5StoryChapters);
 
@@ -1850,6 +1870,7 @@
     futureCards: futureCards,
     futureCharacterPlan: futureCharacterPlan,
     futureCharacterReleasePlan: futureCharacterReleasePlan,
+    futureStoryRevision: futureStoryRevision,
     version3Cards: version3Cards,
     activeFour: activeFour,
     activeThree: activeThree,
