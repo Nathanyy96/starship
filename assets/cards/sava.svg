@@ -1,4 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 720" role="img" aria-label="薩芙">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2d194a"/><stop offset=".55" stop-color="#a578d2"/><stop offset="1" stop-color="#0f1738"/></linearGradient><linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efc8ff"/><stop offset="1" stop-color="#563d91"/></linearGradient></defs>
-  <rect width="480" height="720" fill="url(#bg)"/><path d="M48 175 Q125 85 198 175 T348 175 T494 175" fill="none" stroke="#f5d8ff" stroke-width="3" opacity=".8"/><path d="M0 544 Q120 430 236 524 T480 467 V720 H0Z" fill="#151332" opacity=".82"/><path d="M203 254 Q229 201 286 217 Q335 235 326 312 L302 410 176 405 165 313Z" fill="#e5bfd1"/><path d="M159 308 Q164 188 279 179 Q353 183 348 264 L313 280 277 223 209 254 200 343Z" fill="#f1d8ff"/><path d="M181 403 L305 403 365 660 112 660Z" fill="url(#coat)" stroke="#f5d8ff" stroke-width="4"/><path d="M190 444 L73 554 103 582 242 490Z" fill="#dcb7ff"/><path d="M303 414 L398 520 362 547 281 458Z" fill="#8155b1"/><path d="M374 92 L401 119 374 146 347 119Z" fill="none" stroke="#ffe0ff" stroke-width="5"/><text x="29" y="689" fill="#f6e1ff" font-family="sans-serif" font-size="25" font-weight="700">SAVA</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="薩芙 ★★★★ 幻">
+  <rect width="1024" height="1536" fill="#080d22"/>
+  <image href="sava.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".8"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05091a" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#bd8ce8" stop-opacity=".64"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(38 38)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">薩芙</text>
+    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
+    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">幻</text>
+    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Sava</text>
+  </g>
 </svg>

@@ -1,4 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 720" role="img" aria-label="達莉雅">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#183d43"/><stop offset=".55" stop-color="#e5b968"/><stop offset="1" stop-color="#11183a"/></linearGradient><linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5e7b0"/><stop offset="1" stop-color="#4f8291"/></linearGradient></defs>
-  <rect width="480" height="720" fill="url(#bg)"/><path d="M0 536 Q104 420 225 523 T480 459 V720 H0Z" fill="#101933" opacity=".83"/><circle cx="362" cy="156" r="120" fill="none" stroke="#fff0af" stroke-width="5" opacity=".68"/><path d="M204 254 Q229 203 286 218 Q333 235 326 312 L302 410 176 405 165 313Z" fill="#e6c0b8"/><path d="M160 309 Q164 185 278 180 Q353 181 350 263 L313 280 278 224 211 254 201 343Z" fill="#d8f2e9"/><path d="M182 403 L305 403 366 660 112 660Z" fill="url(#coat)" stroke="#fff0b1" stroke-width="4"/><path d="M188 442 L68 547 102 581 242 494Z" fill="#f8f0c8"/><path d="M304 414 L399 516 365 546 282 458Z" fill="#6aa4a6"/><path d="M355 100 L383 128 355 156 327 128Z" fill="#fff2b0"/><text x="29" y="689" fill="#fff1bd" font-family="sans-serif" font-size="25" font-weight="700">DARIA</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="達莉雅 ★★★★ 淨">
+  <rect width="1024" height="1536" fill="#080d22"/>
+  <image href="daria.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".8"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05091a" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#64d7c7" stop-opacity=".64"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(38 38)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">達莉雅</text>
+    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
+    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">淨</text>
+    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Daria</text>
+  </g>
 </svg>

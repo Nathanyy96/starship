@@ -71,22 +71,22 @@
     aster: card("aster", "艾斯特", "Aster", 4, "烈", "#e88955", "3.5", "3.5｜終端檔案守門人、空白座看火者", "./assets/cards/aster.png"),
 
     // 第四大版本角色：先建立完整圖鑑與戰鬥資料，卡池等後續版本公告。
-    aurelia: card("aurelia", "奧蕾雅", "Aurelia", 4, "星", "#f2c86d", "4.0", "4.0｜曙港天文台值班長、星潮觀測者", "./assets/cards/aurelia.svg"),
-    kairen: card("kairen", "凱嵐", "Kairen", 4, "烈", "#e98058", "4.1", "4.1｜碎星工坊維修師、熱源調度員", "./assets/cards/kairen.svg"),
-    sorae: card("sorae", "索萊", "Sorae", 4, "燕", "#70b7ff", "4.2", "4.2｜遠望塔信標師、長距離回覆校準者", "./assets/cards/sorae.svg"),
-    talia: card("talia", "塔莉亞", "Talia", 3, "淨", "#76d9c7", "4.2", "4.2｜遠望塔見習修復員；偶發三星設計", "./assets/cards/talia.svg"),
-    neve: card("neve", "涅芙", "Neve", 4, "幻", "#c18cff", "4.3", "4.3｜白夜航路記憶領航員、失效訊息整理者", "./assets/cards/neve.svg"),
-    kael: card("kael", "凱爾", "Kael", 4, "月", "#88aee8", "4.4", "4.4｜回覆海溝潛航隊長、深層訊號守門人", "./assets/cards/kael.svg"),
-    elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.svg"),
+    aurelia: card("aurelia", "奧蕾雅", "Aurelia", 4, "星", "#f2c86d", "4.0", "4.0｜曙港天文台值班長、星潮觀測者", "./assets/cards/aurelia.png"),
+    kairen: card("kairen", "凱嵐", "Kairen", 4, "烈", "#e98058", "4.1", "4.1｜碎星工坊維修師、熱源調度員", "./assets/cards/kairen.png"),
+    sorae: card("sorae", "索萊", "Sorae", 4, "燕", "#70b7ff", "4.2", "4.2｜遠望塔信標師、長距離回覆校準者", "./assets/cards/sorae.png"),
+    talia: card("talia", "塔莉亞", "Talia", 3, "淨", "#76d9c7", "4.2", "4.2｜遠望塔見習修復員；偶發三星設計", "./assets/cards/talia.png"),
+    neve: card("neve", "涅芙", "Neve", 4, "幻", "#c18cff", "4.3", "4.3｜白夜航路記憶領航員、失效訊息整理者", "./assets/cards/neve.png"),
+    kael: card("kael", "凱爾", "Kael", 4, "月", "#88aee8", "4.4", "4.4｜回覆海溝潛航隊長、深層訊號守門人", "./assets/cards/kael.png"),
+    elyra: card("elyra", "伊萊拉", "Elyra", 4, "淨", "#65d7c7", "4.5", "4.5｜第二條律的起草人、可撤回協議保管者", "./assets/cards/elyra.png"),
 
     // 第五大版本角色：保留完整角色規劃與戰鬥資料，但維持鎖定，不進現行卡池。
-    vestra: card("vestra", "維斯妲", "Vestra", 4, "星", "#e4b86b", "5.0", "5.0｜北境根冠守根者、未命名燈座保管人", "./assets/cards/vestra.svg"),
-    brann: card("brann", "布蘭", "Brann", 4, "烈", "#e87954", "5.1", "5.1｜霜火鍛環熱源調度員、輪值工程師", "./assets/cards/brann.svg"),
-    eirin: card("eirin", "伊芮恩", "Eirin", 4, "燕", "#70b7ff", "5.2", "5.2｜虹徑外環信標師、雙端通路測量者", "./assets/cards/eirin.svg"),
-    sava: card("sava", "薩芙", "Sava", 4, "幻", "#bd8ce8", "5.3", "5.3｜命線織庭編譯師、空白梭保管者", "./assets/cards/sava.svg"),
-    niela: card("niela", "妮拉", "Niela", 3, "淨", "#75d7cc", "5.3", "5.3｜織線學徒、公共梭房見習修復員；偶發三星設計", "./assets/cards/niela.svg"),
-    hervan: card("hervan", "赫爾凡", "Hervan", 4, "月", "#87aee7", "5.4", "5.4｜深海根門潛航隊長、四把鑰匙輪值者", "./assets/cards/hervan.svg"),
-    daria: card("daria", "達莉雅", "Daria", 4, "淨", "#64d7c7", "5.5", "5.5｜新曙終端交班見證人、九界協議記錄者", "./assets/cards/daria.svg")
+    vestra: card("vestra", "維斯妲", "Vestra", 4, "星", "#e4b86b", "5.0", "5.0｜北境根冠守根者、未命名燈座保管人", "./assets/cards/vestra.png"),
+    brann: card("brann", "布蘭", "Brann", 4, "烈", "#e87954", "5.1", "5.1｜霜火鍛環熱源調度員、輪值工程師", "./assets/cards/brann.png"),
+    eirin: card("eirin", "伊芮恩", "Eirin", 4, "燕", "#70b7ff", "5.2", "5.2｜虹徑外環信標師、雙端通路測量者", "./assets/cards/eirin.png"),
+    sava: card("sava", "薩芙", "Sava", 4, "幻", "#bd8ce8", "5.3", "5.3｜命線織庭編譯師、空白梭保管者", "./assets/cards/sava.png"),
+    niela: card("niela", "妮拉", "Niela", 3, "淨", "#75d7cc", "5.3", "5.3｜織線學徒、公共梭房見習修復員；偶發三星設計", "./assets/cards/niela.png"),
+    hervan: card("hervan", "赫爾凡", "Hervan", 4, "月", "#87aee7", "5.4", "5.4｜深海根門潛航隊長、四把鑰匙輪值者", "./assets/cards/hervan.png"),
+    daria: card("daria", "達莉雅", "Daria", 4, "淨", "#64d7c7", "5.5", "5.5｜新曙終端交班見證人、九界協議記錄者", "./assets/cards/daria.png")
   };
 
   var legacyCards = [

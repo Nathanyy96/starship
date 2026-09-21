@@ -1,3 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 720" role="img" aria-label="索萊">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102c5a"/><stop offset=".48" stop-color="#65a9ec"/><stop offset="1" stop-color="#191b48"/></linearGradient><linearGradient id="dress" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9f2ff"/><stop offset="1" stop-color="#426bb1"/></linearGradient></defs>
-  <rect width="480" height="720" fill="url(#bg)"/><path d="M0 520 Q150 395 286 510 T480 460 V720 H0Z" fill="#101c4a" opacity=".85"/><path d="M62 156 L418 74" stroke="#d4f4ff" stroke-width="3" opacity=".75"/><circle cx="94" cy="154" r="10" fill="#fff3b2"/><circle cx="368" cy="95" r="7" fill="#fff3b2"/><path d="M207 244 Q238 202 291 221 Q331 242 326 307 L298 412 178 405 169 313Z" fill="#d7a68e"/><path d="M167 314 Q151 212 262 179 Q354 153 360 247 L324 268 283 216 211 259 207 350Z" fill="#d9ecff"/><path d="M180 409 L305 409 377 656 101 656Z" fill="url(#dress)" stroke="#e8fbff" stroke-width="4"/><path d="M193 430 L75 350 63 379 188 505Z" fill="#d6f2ff" opacity=".9"/><path d="M307 420 L395 301 420 321 339 497Z" fill="#426ab1"/><circle cx="401" cy="312" r="22" fill="#fff2b4"/><text x="27" y="687" fill="#e3f6ff" font-family="sans-serif" font-size="25" font-weight="700">SORAE</text></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="索萊 ★★★★ 燕">
+  <rect width="1024" height="1536" fill="#080d22"/>
+  <image href="sorae.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".8"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05091a" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#70b7ff" stop-opacity=".64"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(38 38)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">索萊</text>
+    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
+    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">燕</text>
+    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Sorae</text>
+  </g>
+</svg>

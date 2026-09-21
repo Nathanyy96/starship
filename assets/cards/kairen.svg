@@ -1,3 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 720" role="img" aria-label="凱嵐">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#451d2b"/><stop offset=".55" stop-color="#dc704b"/><stop offset="1" stop-color="#121b3b"/></linearGradient><linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffbf71"/><stop offset="1" stop-color="#692845"/></linearGradient></defs>
-  <rect width="480" height="720" fill="url(#bg)"/><path d="M0 520 L120 430 210 520 310 385 480 510 V720 H0Z" fill="#18172f"/><circle cx="380" cy="172" r="115" fill="#ffb15e" opacity=".22"/><path d="M204 256 Q232 204 285 219 Q334 236 324 313 L301 412 177 405 167 315Z" fill="#c98d7d"/><path d="M162 300 Q163 185 277 180 Q359 180 351 263 L315 281 279 225 213 252 203 331Z" fill="#57344b"/><path d="M186 405 L305 405 363 658 116 658Z" fill="url(#coat)" stroke="#ffd07e" stroke-width="4"/><path d="M177 458 L84 562 111 585 230 509Z" fill="#ffad58"/><path d="M86 551 L64 614 88 630 119 570Z" fill="#ffe0a0"/><path d="M302 414 L389 512 359 535 283 460Z" fill="#3a2144"/><text x="29" y="687" fill="#ffd38b" font-family="sans-serif" font-size="25" font-weight="700">KAIREN</text></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="凱嵐 ★★★★ 烈">
+  <rect width="1024" height="1536" fill="#080d22"/>
+  <image href="kairen.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".8"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05091a" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#e98058" stop-opacity=".64"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(38 38)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">凱嵐</text>
+    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
+    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">烈</text>
+    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Kairen</text>
+  </g>
+</svg>

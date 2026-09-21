@@ -1,3 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 720" role="img" aria-label="伊萊拉">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123f4c"/><stop offset=".5" stop-color="#61d4c5"/><stop offset="1" stop-color="#141b46"/></linearGradient><linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ecfff2"/><stop offset="1" stop-color="#3f8793"/></linearGradient></defs>
-  <rect width="480" height="720" fill="url(#bg)"/><path d="M0 510 Q145 420 277 520 T480 470 V720 H0Z" fill="#102f42" opacity=".88"/><path d="M202 246 Q235 203 286 219 Q328 239 324 306 L298 408 177 402 168 313Z" fill="#c18d87"/><path d="M164 315 Q160 209 260 183 Q344 168 354 249 L314 269 276 216 207 260 202 339Z" fill="#e7fff5"/><path d="M180 407 L305 407 366 655 108 655Z" fill="url(#dress)" stroke="#dcfff2" stroke-width="4"/><path d="M193 430 L73 360 60 389 183 510Z" fill="#c1f4e1"/><path d="M305 423 L402 330 424 354 334 500Z" fill="#43828d"/><path d="M370 172 L422 224 370 276 318 224Z" fill="none" stroke="#f3fff2" stroke-width="6" opacity=".75"/><text x="27" y="687" fill="#e0fff2" font-family="sans-serif" font-size="25" font-weight="700">ELYRA</text></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="伊萊拉 ★★★★ 淨">
+  <rect width="1024" height="1536" fill="#080d22"/>
+  <image href="elyra.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".8"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05091a" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#65d7c7" stop-opacity=".64"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(38 38)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">伊萊拉</text>
+    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
+    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">淨</text>
+    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Elyra</text>
+  </g>
+</svg>
