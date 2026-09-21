@@ -854,7 +854,12 @@ function claimCharacterChoice(currentState, body) {
 async function handleApi(request, response, requestUrl) {
   if (requestUrl.pathname === "/api/health" && request.method === "GET") {
     await ensurePostgresSchema();
-    sendJson(response, 200, { ok: true, service: "starship-gacha", persistence: usePostgres ? "postgres" : "file" });
+    sendJson(response, 200, {
+      ok: true,
+      service: "starship-gacha",
+      persistence: usePostgres ? "postgres" : "file",
+      testRewardsEnabled: testRewardsEnabled()
+    });
     return;
   }
   if (request.method === "OPTIONS") {

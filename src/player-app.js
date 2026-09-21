@@ -31,6 +31,7 @@
     var currentPetEffectId = "starlit";
     var petShowcases = [];
     var starLawTestPanelOpen = false;
+    var testRewardsServerEnabled = null;
     var currentCharacterId = "";
     var currentCharacterSkinId = "";
     var characterSearchTerm = "";
@@ -398,8 +399,13 @@
       if (!status || !button || !game) return;
       var state = game.getState();
       var claimed = Boolean(state.testRewards && state.testRewards.starLawSupplyClaimed);
-      button.disabled = claimed;
-      status.textContent = claimed ? "本帳號已領取測試補給；資源已保存。" : "測試補給尚未領取。";
+      var disabledByServer = remoteMode && testRewardsServerEnabled === false;
+      button.disabled = claimed || disabledByServer;
+      status.textContent = claimed
+        ? "本帳號已領取測試補給；資源已保存。"
+        : disabledByServer
+          ? "目前是正式模式，測試補給尚未開啟；請在測試服設定 STARSHIP_TEST_REWARDS=true。"
+          : "測試補給尚未領取。";
     }
     function setStarLawTestPanelVisible(visible) {
       var panel = byId("star-law-test-panel");
@@ -411,13 +417,14 @@
     }
     function claimStarLawTestReward() {
       if (!game || !currentPlayerName) { showGate(); return; }
+      var status = byId("star-law-test-status");
       var reward = { starSand: 100000, characterExp: 1000000 };
       if (remoteMode) {
         apiRequest("/api/player/star-law-test-reward", {}).then(function (payload) {
           updateGameFromState(payload.state);
           renderStarLawTestPanel(); render(); renderLobby();
           showMessage(payload.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入帳號：" + rewardText(payload.reward || reward) + "。", false);
-        }).catch(function (error) { showMessage(error.message, true); });
+        }).catch(function (error) { status.textContent = error.message; showMessage(error.message, true); });
         return;
       }
       try {
@@ -426,7 +433,7 @@
         saveLocalState();
         renderStarLawTestPanel(); render(); renderLobby();
         showMessage(result.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入本機帳號：" + rewardText(result.reward) + "。", false);
-      } catch (error) { showMessage(error.message, true); }
+      } catch (error) { status.textContent = error.message; showMessage(error.message, true); }
     }
     function completeTutorial() {
       if (!game || !currentPlayerName) { showGate(); return; }
@@ -1387,11 +1394,13 @@
     }
     function probeBackend() {
       if (!serverCandidate) { showGateMessage("目前使用瀏覽器本機存檔；不需要另外啟動伺服器。", false); return; }
-      window.fetch("/api/health", { cache: "no-store" }).then(function (response) { if (!response.ok) { throw new Error("no backend"); } return response.json(); }).then(function () {
+      window.fetch("/api/health", { cache: "no-store" }).then(function (response) { if (!response.ok) { throw new Error("no backend"); } return response.json(); }).then(function (payload) {
         remoteMode = true;
+        testRewardsServerEnabled = payload && payload.testRewardsEnabled === true;
         showGateMessage("已連接線上存檔服務。", false);
       }).catch(function () {
         remoteMode = false;
+        testRewardsServerEnabled = null;
         showGateMessage("這個網頁未連接外部伺服器，將使用瀏覽器本機存檔；不需要另外啟動 Codex 伺服器。", false);
       });
     }

@@ -17,6 +17,9 @@ services:
           property: connectionString
       - key: STARSHIP_DATA_DIR
         value: ./data
+      # 測試服才填 true；正式公開服請保持 false 或不要設定。
+      - key: STARSHIP_TEST_REWARDS
+        sync: false
 
 databases:
   - name: starship-db
