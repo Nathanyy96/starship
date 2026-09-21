@@ -219,7 +219,9 @@
       },
       testRewards: {
         starLawSupplyClaimed: false,
-        starLawSupplyClaimedAt: null
+        starLawSupplyClaimedAt: null,
+        starLawSupplyVersion: 0,
+        testRosterGranted: false
       },
       tutorialProgress: {
         version: "2.0-2.5",
@@ -342,6 +344,8 @@
     state.testRewards = Object.assign(initialState().testRewards, isPlainObject(source.testRewards) ? source.testRewards : {});
     state.testRewards.starLawSupplyClaimed = state.testRewards.starLawSupplyClaimed === true;
     state.testRewards.starLawSupplyClaimedAt = typeof state.testRewards.starLawSupplyClaimedAt === "string" ? state.testRewards.starLawSupplyClaimedAt : null;
+    state.testRewards.starLawSupplyVersion = Number.isInteger(state.testRewards.starLawSupplyVersion) && state.testRewards.starLawSupplyVersion >= 0 ? state.testRewards.starLawSupplyVersion : 0;
+    state.testRewards.testRosterGranted = state.testRewards.testRosterGranted === true;
     state.tutorialProgress = Object.assign(initialState().tutorialProgress, isPlainObject(source.tutorialProgress) ? source.tutorialProgress : {});
     state.tutorialProgress.version = typeof state.tutorialProgress.version === "string" && state.tutorialProgress.version ? state.tutorialProgress.version : "2.0-2.5";
     state.tutorialProgress.completed = state.tutorialProgress.completed === true;
@@ -855,19 +859,41 @@
 
   GachaGame.prototype.claimStarLawTestReward = function (options) {
     options = options || {};
-    var reward = Object.assign({ starSand: 100000, characterExp: 1000000 }, options.reward || {});
+    var targetVersion = 2;
+    var reward = Object.assign({ starSand: 100000, characterExp: 3000000 }, options.reward || {});
     ["starSand", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(reward[key]) && reward[key] >= 0, "星律測試獎勵必須是非負整數：" + key);
     });
     var progress = this.state.testRewards;
-    if (progress.starLawSupplyClaimed) {
+    var previousVersion = Number(progress.starLawSupplyVersion) || 0;
+    if (progress.starLawSupplyClaimed && previousVersion >= targetVersion && progress.testRosterGranted) {
       return { alreadyClaimed: true, reward: { starSand: 0, characterExp: 0 }, state: this.getState() };
+    }
+    var upgrade = progress.starLawSupplyClaimed === true;
+    if (upgrade) {
+      // 舊測試帳號已領過 100,000 星砂與 1,000,000 經驗；升級測試補給時只補差額。
+      reward = { starSand: Math.max(0, reward.starSand - 100000), characterExp: Math.max(0, reward.characterExp - 1000000) };
     }
     progress.starLawSupplyClaimed = true;
     progress.starLawSupplyClaimedAt = this.now();
+    progress.starLawSupplyVersion = targetVersion;
+    progress.testRosterGranted = true;
     this.state.resources.starSand += reward.starSand;
     this.state.resources.characterExp += reward.characterExp;
-    return { alreadyClaimed: false, reward: clone(reward), state: this.getState() };
+    // 測試服需要能直接比較目前開放的全部角色，不必靠隨機抽卡湊齊名冊。
+    Object.keys(this.cardById).forEach(function (cardId) {
+      this.state.collection[cardId] = Math.max(1, Number(this.state.collection[cardId]) || 0);
+      if (!this.state.characterProgress[cardId]) {
+        this.state.characterProgress[cardId] = { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false };
+      }
+    }, this);
+    Object.keys(this.breakthroughRequirements).forEach(function (cardId) {
+      var requirement = this.breakthroughRequirements[cardId];
+      if (!requirement || !requirement.materialId) return;
+      this.state.breakthroughMaterials[requirement.materialId] = Math.max(100, Number(this.state.breakthroughMaterials[requirement.materialId]) || 0);
+    }, this);
+    this.state.breakthroughMaterials["universal-core"] = Math.max(100, Number(this.state.breakthroughMaterials["universal-core"]) || 0);
+    return { alreadyClaimed: false, upgraded: upgrade, reward: clone(reward), state: this.getState() };
   };
 
   GachaGame.prototype.getVoyageNode = function (nodeId) {

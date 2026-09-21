@@ -418,12 +418,12 @@
     function claimStarLawTestReward() {
       if (!game || !currentPlayerName) { showGate(); return; }
       var status = byId("star-law-test-status");
-      var reward = { starSand: 100000, characterExp: 1000000 };
+      var reward = { starSand: 100000, characterExp: 3000000 };
       if (remoteMode) {
         apiRequest("/api/player/star-law-test-reward", {}).then(function (payload) {
           updateGameFromState(payload.state);
           renderStarLawTestPanel(); render(); renderLobby();
-          showMessage(payload.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入帳號：" + rewardText(payload.reward || reward) + "。", false);
+          showMessage(payload.alreadyClaimed ? "星律測試補給已經領取過。" : (payload.upgraded ? "星律測試補給已升級，差額與測試名冊已寫入帳號：" : "星律測試補給已寫入帳號：") + rewardText(payload.reward || reward) + "。", false);
         }).catch(function (error) { status.textContent = error.message; showMessage(error.message, true); });
         return;
       }
@@ -432,7 +432,7 @@
         updateGameFromState(result.state);
         saveLocalState();
         renderStarLawTestPanel(); render(); renderLobby();
-        showMessage(result.alreadyClaimed ? "星律測試補給已經領取過。" : "星律測試補給已寫入本機帳號：" + rewardText(result.reward) + "。", false);
+        showMessage(result.alreadyClaimed ? "星律測試補給已經領取過。" : (result.upgraded ? "星律測試補給已升級，差額與測試名冊已寫入本機帳號：" : "星律測試補給已寫入本機帳號：") + rewardText(result.reward) + "。", false);
       } catch (error) { status.textContent = error.message; showMessage(error.message, true); }
     }
     function completeTutorial() {
@@ -621,10 +621,9 @@
       if (currentCharacterId) { renderCharacterDetail(currentCharacterId); }
     }
     function characterStatsFor(cardId, progress) {
-      var base = data.characterBattleStats[cardId];
-      if (!base) return null;
-      var level = Math.max(1, Number(progress.level) || 1); var constellation = Math.max(0, Number(progress.constellation) || 0); var isFourStar = base.rarity === 4; var growth = base.growthRates || {}; var mainGrowth = Number(growth.main) || (isFourStar ? 0.04 : 0.03); var defenseGrowth = Number(growth.defense) || (isFourStar ? 0.03 : 0.022); var speedGrowth = Number(growth.speed) || (isFourStar ? 0.012 : 0.009); var multiplier = 1 + (level - 1) * mainGrowth + constellation * (isFourStar ? 0.05 : 0.03);
-      return { maxHp: Math.round(base.maxHp * multiplier), attack: Math.round(base.attack * multiplier), defense: Math.round(base.defense * (1 + (level - 1) * defenseGrowth + constellation * (isFourStar ? 0.045 : 0.027))), speed: Math.round(base.speed * (1 + (level - 1) * speedGrowth + constellation * (isFourStar ? 0.016 : 0.01))), role: base.role, attackName: base.attackName, skillName: base.skillName, skillEffect: base.skillEffect };
+      var progressState = { characterProgress: {} };
+      progressState.characterProgress[cardId] = progress || {};
+      return window.StarshipBattle && window.StarshipBattle.buildEffectiveStats ? window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, progressState)[cardId] || null : data.characterBattleStats[cardId] || null;
     }
     function characterPower(cardId, state) {
       var stats = effectiveBattleStats(state);
@@ -700,7 +699,7 @@
       var breakthroughAction = needBreakthrough && requirement ? "<button class=\"secondary-action breakthrough-detail-action\" data-detail-breakthrough=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (materialAmount + universalAmount < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>" : "";
       var animationAction = animation ? "<button class=\"secondary-action character-animation-button\" data-character-animation=\"" + escapeHtml(card.id) + "\" type=\"button\">▶ 角色動畫</button>" : "<span class=\"character-animation-unavailable\"><strong>角色動畫</strong><small>目前尚未收錄</small></span>";
       var breakthroughNote = requirement ? (progress.breakthrough ? "已完成 80 等突破，可繼續升到 90 等" : "建議 Boss｜" + escapeHtml((bossStageById(requirement.bossId) || {}).name || "未設定") + "　指定材料｜" + escapeHtml(requirement.materialName) + " " + materialAmount + "/" + requirement.cost + "　通用印記｜" + universalAmount + "（可替代）") : "突破材料設定尚未載入";
-      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + portraitLabel + "</div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div><div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + developAction + breakthroughAction + animationAction + "</div><p class=\"detail-resource-hint\">4★每級提升幅度與經驗成本較高；3★較容易培養。重複抽到角色時命座會立即自動增加，不需要在這裡再次按提升；角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
+      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + portraitLabel + "</div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div><div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + developAction + breakthroughAction + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星每命的追趕成長較高，滿命滿等約接近一般四星 55 等，四星滿命也會明顯提升技能與面板。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
       detail.scrollIntoView({ behavior: "smooth", block: "center" });
     }

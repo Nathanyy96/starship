@@ -1,3 +1,8 @@
+import json
+import os
+import subprocess
+from pathlib import Path
+
 from docx import Document
 from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
@@ -5,6 +10,10 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_NODE = Path(r"C:\Users\natha\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe")
 
 
 OUT = r"C:\starship\gacha-system\星界之律遊戲設定總覽.docx"
@@ -157,6 +166,60 @@ def add_page_break(doc):
     doc.add_page_break()
 
 
+def load_character_catalog():
+    node = Path(os.environ.get("STARSHIP_NODE", str(DEFAULT_NODE)))
+    if not node.exists():
+        node = Path("node")
+    script = "const d=require('./src/data.js'); process.stdout.write(JSON.stringify(Object.values(d.cards)));"
+    result = subprocess.run([str(node), "-e", script], cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8")
+    return sorted(json.loads(result.stdout), key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", "")))
+
+
+def add_character_portrait_catalog(doc, portrait_dir):
+    cards = load_character_catalog()
+    add_page_break(doc)
+    add_heading(doc, "角色完整立繪圖鑑", 1)
+    add_text(doc, "以下圖鑑與 src/data.js 的 cards 同步，收錄 1.0–5.5 全部角色。每張圖都使用完整立繪，並在圖下固定標示角色名稱、星級、元素、版本與目前開放狀態；後續版本角色雖已建檔，仍會以鎖定狀態保留。", size=10.5, after=8)
+    table = doc.add_table(rows=0, cols=3)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
+    for index, card in enumerate(cards):
+        if index % 3 == 0:
+            cells = table.add_row().cells
+            for cell in cells:
+                cell.width = Inches(2.2)
+                cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+                set_cell_shading(cell, "F4F7FB")
+                set_cell_borders(cell)
+                set_cell_margins(cell, top=120, start=100, bottom=120, end=100)
+        cell = table.rows[-1].cells[index % 3]
+        cell.text = ""
+        image_path = Path(portrait_dir) / (str(card.get("id")) + ".png")
+        paragraph = cell.paragraphs[0]
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if image_path.exists():
+            # Keep the final row together with its captions when Word paginates
+            # the gallery.  The smaller width still leaves the portrait large
+            # enough to read while avoiding an orphaned caption on a new page.
+            paragraph.add_run().add_picture(str(image_path), width=Inches(1.62))
+        else:
+            fallback = paragraph.add_run("立繪待補")
+            set_run_font(fallback, size=9, color="8A3D3D", bold=True)
+        paragraph.paragraph_format.space_after = Pt(3)
+        caption = cell.add_paragraph()
+        caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        name = caption.add_run(str(card.get("name", "")))
+        set_run_font(name, size=10, color="000000", bold=True)
+        meta = cell.add_paragraph()
+        meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        version = str(card.get("releaseVersion", ""))
+        status = "玩家開放" if float(version) <= 2.5 else "建檔鎖定"
+        meta_run = meta.add_run("★" * int(card.get("rarity", 0)) + "  " + str(card.get("element", "")) + "元素  ·  " + version + "  ·  " + status)
+        set_run_font(meta_run, size=8.2, color="3B5C82")
+        meta.paragraph_format.space_after = Pt(2)
+    doc.add_paragraph().paragraph_format.space_after = Pt(1)
+
+
 def main():
     doc = Document()
     section = doc.sections[0]
@@ -294,6 +357,7 @@ def main():
     add_table(doc, ["項目", "三星角色", "四星角色"], [
         ["基礎數值", "整體較低，靠治療、速度或特定功能補位", "生命、攻擊、防禦與整體戰力基準較高"],
         ["升級倍率", "每級 3% 主要屬性、2.2% 防禦、0.9% 速度", "標準每級 4%／3%／1.2%；低基礎戰力 4★進入平衡帶後為 5%／3.6%／1.4%"],
+        ["命座倍率", "每命主要屬性 +40%、防禦 +13%、速度 +2.2%、技能倍率 +2%；滿命滿等約接近一般 4★55 等", "每命主要屬性 +12%、防禦 +8%、速度 +2.5%、技能倍率 +1.8%；滿命在高階戰鬥有明顯回饋"],
         ["升級成本", "起始 45 角色經驗，每級增加 18", "起始 70 角色經驗，每級增加 32"],
         ["協同價值", "便宜、快速或提供治療與特殊定位", "輸出、重裝、支援與控制組合較完整"],
     ], widths=[1.35, 2.7, 2.55])
@@ -310,6 +374,11 @@ def main():
         "重複角色已在抽卡結算時自動增加命座；培養頁不再放置重複的手動提升按鈕，個人晶核保留作為存檔相容與後續系統資源。",
         "抽卡不再產生全域共鳴晶核；命座只由重複角色自動增加，該角色專用晶核僅作為個人命座資源與舊存檔相容資料保留。",
     ])
+
+    portrait_dir = os.environ.get("STARSHIP_DOCX_PORTRAIT_DIR")
+    if not portrait_dir:
+        raise RuntimeError("建立設定文件前必須指定 STARSHIP_DOCX_PORTRAIT_DIR，避免輸出沒有角色立繪的文件")
+    add_character_portrait_catalog(doc, portrait_dir)
 
     add_page_break(doc)
     add_heading(doc, "星界試煉", 1)
@@ -328,6 +397,8 @@ def main():
         "重裝或守衛承受傷害，治療與修復角色維持隊伍，支援與指揮角色提高整體效率。",
         "測量、仲裁與編譯等角色可降低敵方防禦或清除增益；射手、斥候與爆發角色負責集中擊破。",
         "環境與敵方特性會改變答案，例如治療降低、敵方護盾、噪音延遲技能或高速獵襲。",
+        "後期第 21–30 關已重新校準敵方攻擊曲線與首領機制：不再只靠高生命拖長戰鬥，也不把傷害拉到只能靠滿命隊伍硬扛；第 30 關以 12,800 推薦戰力、620／690 基礎攻擊的護衛與王座作為終局基準。",
+        "戰鬥演算保護上限為 120 回合；超過上限只會回傳 timeout，不會誤判為通關或直接扣除成功獎勵次數。",
     ])
 
     add_page_break(doc)

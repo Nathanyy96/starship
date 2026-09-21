@@ -74,6 +74,18 @@
     }, 0);
   }
 
+  // 命座是角色抽到重複後的主要成長回饋。三星的基礎面板與四星差距較大，
+  // 因此三星採用較明顯但仍有上限的追趕倍率；四星則提升每命的存在感，
+  // 讓滿命四星在高難度試煉有價值，但不會靠命座把推薦戰力直接打穿。
+  var CONSTELLATION_GROWTH = Object.freeze({
+    threeStar: Object.freeze({ main: 0.4, defense: 0.13, speed: 0.022, skill: 0.02 }),
+    fourStar: Object.freeze({ main: 0.12, defense: 0.08, speed: 0.025, skill: 0.018 })
+  });
+
+  function constellationGrowthFor(rarity) {
+    return Number(rarity) === 4 ? CONSTELLATION_GROWTH.fourStar : CONSTELLATION_GROWTH.threeStar;
+  }
+
   function buildEffectiveStats(baseStats, state) {
     var progressMap = state && state.characterProgress ? state.characterProgress : {};
     var result = {};
@@ -81,7 +93,7 @@
       var base = clone(baseStats[id]);
       var progress = progressMap[id] || {};
       var level = Math.max(1, Number(progress.level) || 1);
-      var constellation = Math.max(0, Number(progress.constellation) || 0);
+      var constellation = clamp(Math.max(0, Number(progress.constellation) || 0), 0, 6);
       var isFourStar = base.rarity === 4;
       // 低基礎戰力的四星使用資料層標記的平衡成長帶，讓功能型角色在 70–90 等
       // 不會因初始面板較低而被永久拉開；這是角色定位平衡，不使用性別判定。
@@ -89,11 +101,15 @@
       var mainGrowth = Number(growth.main) || (isFourStar ? 0.04 : 0.03);
       var defenseGrowth = Number(growth.defense) || (isFourStar ? 0.03 : 0.022);
       var speedGrowth = Number(growth.speed) || (isFourStar ? 0.012 : 0.009);
-      var multiplier = 1 + (level - 1) * mainGrowth + constellation * (isFourStar ? 0.05 : 0.03);
+      var constellationGrowth = constellationGrowthFor(base.rarity);
+      var multiplier = 1 + (level - 1) * mainGrowth + constellation * constellationGrowth.main;
       base.maxHp = Math.round(base.maxHp * multiplier);
       base.attack = Math.round(base.attack * multiplier);
-      base.defense = Math.round(base.defense * (1 + (level - 1) * defenseGrowth + constellation * (isFourStar ? 0.045 : 0.027)));
-      base.speed = Math.round(base.speed * (1 + (level - 1) * speedGrowth + constellation * (isFourStar ? 0.016 : 0.01)));
+      base.defense = Math.round(base.defense * (1 + (level - 1) * defenseGrowth + constellation * constellationGrowth.defense));
+      base.speed = Math.round(base.speed * (1 + (level - 1) * speedGrowth + constellation * constellationGrowth.speed));
+      if (Number.isFinite(Number(base.skillPower))) {
+        base.skillPower = Number((Number(base.skillPower) * (1 + constellation * constellationGrowth.skill)).toFixed(4));
+      }
       base.level = level;
       base.constellation = constellation;
       result[id] = base;
@@ -346,5 +362,11 @@
     };
   }
 
-  return { simulateBattle: simulateBattle, teamPower: teamPower, buildEffectiveStats: buildEffectiveStats, synergyScore: synergyScore };
+  return {
+    simulateBattle: simulateBattle,
+    teamPower: teamPower,
+    buildEffectiveStats: buildEffectiveStats,
+    synergyScore: synergyScore,
+    constellationGrowth: CONSTELLATION_GROWTH
+  };
 }));

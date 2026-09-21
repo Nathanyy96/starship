@@ -20,7 +20,7 @@ const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 const currentUpdateVersion = "2.0-2.5";
 const updateReward = Object.freeze({ starSand: 3200 });
-const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 1000000 });
+const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
 function createGame(state) {

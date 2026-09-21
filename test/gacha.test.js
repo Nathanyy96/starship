@@ -209,10 +209,13 @@ test("星律隱藏測試補給會寫入帳號且只可領取一次", () => {
   const first = gacha.claimStarLawTestReward();
   assert.equal(first.alreadyClaimed, false);
   assert.equal(first.reward.starSand, 100000);
-  assert.equal(first.reward.characterExp, 1000000);
+  assert.equal(first.reward.characterExp, 3000000);
   assert.equal(first.state.resources.starSand, before.starSand + 100000);
-  assert.equal(first.state.resources.characterExp, before.characterExp + 1000000);
+  assert.equal(first.state.resources.characterExp, before.characterExp + 3000000);
   assert.equal(first.state.testRewards.starLawSupplyClaimed, true);
+  assert.equal(first.state.testRewards.testRosterGranted, true);
+  assert.ok(first.state.collection.celesia >= 1);
+  assert.ok(first.state.breakthroughMaterials["universal-core"] >= 100);
   const second = gacha.claimStarLawTestReward();
   assert.equal(second.alreadyClaimed, true);
   assert.equal(second.state.resources.starSand, first.state.resources.starSand);

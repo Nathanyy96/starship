@@ -37,12 +37,13 @@ test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
 
-test("星海迷航終幕提供可讀的推薦戰力並降低不必要的爆發傷害", () => {
+test("星海迷航終幕提供可讀的推薦戰力並維持可承受的壓力", () => {
   const finalStage = trialStages.find((stage) => stage.id === 30);
   assert.equal(finalStage.recommendedPower, 12800);
   assert.match(finalStage.recommendedPowerNote, /12,800/);
-  assert.equal(finalStage.modifiers.enemyAttack, 1.08);
-  assert.ok(finalStage.enemies.every((enemy) => enemy.attack <= 560));
+  assert.equal(finalStage.modifiers.enemyAttack, 1.14);
+  assert.ok(finalStage.enemies.every((enemy) => enemy.attack <= 690));
+  assert.ok(finalStage.enemies.some((enemy) => enemy.attack >= 620));
   const battle = simulateBattle({
     team: ["celesia", "harlow", "lia", "reyn"],
     stats: characterBattleStats,
@@ -87,11 +88,16 @@ test("試煉 21–30 使用北境神話篇原創敵群與獨立敵人圖像標�
 
 test("四星培養成長幅度高於三星，重複角色留下個人命座晶核", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
+  const fourAtZero = buildEffectiveStats(characterBattleStats, { characterProgress: { celesia: { level: 20, constellation: 0 } } }).celesia;
+  const threeAtZero = buildEffectiveStats(characterBattleStats, { characterProgress: { reyn: { level: 20, constellation: 0 } } }).reyn;
   const four = buildEffectiveStats(characterBattleStats, { characterProgress: { celesia: { level: 20, constellation: 2 } } }).celesia;
   const three = buildEffectiveStats(characterBattleStats, { characterProgress: { reyn: { level: 20, constellation: 2 } } }).reyn;
   const fourBase = characterBattleStats.celesia;
   const threeBase = characterBattleStats.reyn;
-  assert.ok(four.attack / fourBase.attack > three.attack / threeBase.attack);
+  // 四星仍保有較高的基礎升級帶；三星的命座追趕倍率則另外驗證，不能混成同一條比較。
+  assert.ok(fourAtZero.attack / fourBase.attack > threeAtZero.attack / threeBase.attack);
+  assert.ok(four.attack > fourAtZero.attack);
+  assert.ok(three.attack > threeAtZero.attack);
   const fourPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], characterBattleStats));
   const threePowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 3).map((id) => teamPower([id], characterBattleStats));
   assert.ok(Math.min(...fourPowers) > Math.max(...threePowers));
@@ -105,4 +111,26 @@ test("四星低基礎功能型角色在 70–90 等使用平衡成長帶", () =>
   assert.ok(Math.min(...fourStarPowers) / Math.max(...fourStarPowers) > 0.8);
   assert.equal(characterBattleStats.mave.growthBand, "parity");
   assert.equal(characterBattleStats.mave.growthRates.main, 0.05);
+});
+
+test("命座成長讓三星滿命滿等接近四星 55 等，四星滿命也有明顯回饋", () => {
+  const { buildEffectiveStats, constellationGrowth } = require("../src/battle.js");
+  const ids = Object.keys(characterBattleStats);
+  const threeIds = ids.filter((id) => characterBattleStats[id].rarity === 3);
+  const fourIds = ids.filter((id) => characterBattleStats[id].rarity === 4);
+  const statsFor = (level, constellation, selectedIds) => buildEffectiveStats(characterBattleStats, {
+    characterProgress: Object.fromEntries(selectedIds.map((id) => [id, { level, constellation }]))
+  });
+  const powerList = (stats, selectedIds) => selectedIds.map((id) => teamPower([id], stats)).sort((a, b) => a - b);
+  const fourAt55 = powerList(statsFor(55, 0, fourIds), fourIds);
+  const threeAt90C6 = powerList(statsFor(90, 6, threeIds), threeIds);
+  const fourAt90C0 = powerList(statsFor(90, 0, fourIds), fourIds);
+  const fourAt90C6 = powerList(statsFor(90, 6, fourIds), fourIds);
+  const median = (values) => values[Math.floor(values.length / 2)];
+  assert.equal(constellationGrowth.threeStar.main, 0.4);
+  assert.equal(constellationGrowth.fourStar.main, 0.12);
+  assert.ok(median(threeAt90C6) >= median(fourAt55) * 0.8);
+  assert.ok(Math.max(...threeAt90C6) >= median(fourAt55) * 0.95);
+  assert.ok(Math.max(...threeAt90C6) < Math.min(...fourAt90C6));
+  assert.ok(median(fourAt90C6) >= median(fourAt90C0) * 1.1);
 });
