@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storyWorldMap, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -130,6 +130,18 @@ test("4.0 起接入原創北境神話篇，且不改動 3.0–3.5 的主題", ()
   assert.equal(version4Cards.length > 0, true);
   assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 4 && chapter.mythicArc === northernMythArc.id).length, 16);
   assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 3 && Number(chapter.version) < 4).some((chapter) => chapter.mythicArc), false);
+});
+
+test("世界地圖覆蓋所有章節，且從獸靈之村到新曙終端保持連通", () => {
+  assert.equal(storyWorldMap.id, "story-world-map-v1");
+  assert.equal(storyWorldMap.regions.length, 5);
+  assert.equal(storyWorldMap.locations.length >= 30, true);
+  assert.equal(Object.keys(storyWorldMap.chapterLocations).length, storyChapters.length);
+  assert.equal(storyChapters.every((chapter) => storyWorldMap.chapterLocations[chapter.id].length > 0), true);
+  assert.equal(storyChapters.every((chapter) => storyWorldMap.regionAliases[chapter.region]), true);
+  assert.equal(storyWorldMap.routes.every((route) => storyWorldMap.locations.some((location) => location.id === route.from) && storyWorldMap.locations.some((location) => location.id === route.to)), true);
+  assert.equal(storyWorldMap.chapterLocations["main-1-0"].includes("beast-village"), true);
+  assert.equal(storyWorldMap.chapterLocations["main-5.5"].includes("new-dawn-terminal"), true);
 });
 
 test("星港委託提供額外玩法與非抽卡獎勵", () => {

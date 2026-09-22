@@ -25,7 +25,7 @@ def load_game_data() -> dict:
         "import('./src/data.js').then(({default:d}) => "
         "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), "
         "activeCards:d.activeCards, futureCards:d.futureCards, "
-        "story:d.storyChapters, replan:d.storyReplan}))).catch((error) => { console.error(error); process.exit(1); })"
+        "story:d.storyChapters, replan:d.storyReplan, map:d.storyWorldMap}))).catch((error) => { console.error(error); process.exit(1); })"
     )
     result = subprocess.run(
         [str(node), "--input-type=module", "-e", export_script],
@@ -64,6 +64,7 @@ def main() -> None:
     replanned_stories = [chapter for chapter in stories if chapter.get("storyRevisionId") == replan_id and float(chapter["version"]) >= 1.1]
     future_cards = [card for card in cards if float(card["releaseVersion"]) >= 3]
     live_cards = [card for card in cards if float(card["releaseVersion"]) <= 2.5]
+    world_map = data.get("map") or {}
 
     missing_titles = [
         chapter["title"]
@@ -90,6 +91,8 @@ def main() -> None:
         if body not in text
     ]
     missing_card_names = [card["name"] for card in cards if card["name"] not in text]
+    missing_map_regions = [region["name"] for region in world_map.get("regions", []) if region.get("name") not in text]
+    missing_map_locations = [location["name"] for location in world_map.get("locations", []) if location.get("name") not in text]
     version_counts = {}
     major_version_counts = {}
     for chapter in stories:
@@ -119,6 +122,11 @@ def main() -> None:
         "document_missing_main_titles": missing_titles,
         "document_missing_side_titles": missing_side_titles,
         "document_missing_card_names": missing_card_names,
+        "world_map_id": world_map.get("id"),
+        "world_map_locations": len(world_map.get("locations", [])),
+        "world_map_routes": len(world_map.get("routes", [])),
+        "document_missing_map_regions": missing_map_regions,
+        "document_missing_map_locations": missing_map_locations,
         "document_missing_future_scene_bodies": missing_future_scenes,
         "document_missing_replanned_scene_bodies": missing_replanned_scenes,
     }
@@ -127,6 +135,8 @@ def main() -> None:
         "document_missing_main_titles",
         "document_missing_side_titles",
         "document_missing_card_names",
+        "document_missing_map_regions",
+        "document_missing_map_locations",
         "document_missing_future_scene_bodies",
         "document_missing_replanned_scene_bodies",
     }

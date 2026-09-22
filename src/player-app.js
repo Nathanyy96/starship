@@ -18,6 +18,8 @@
     var currentStoryChapterId = "main-1-0";
     var currentStorySceneId = "";
     var currentStoryTab = "main";
+    var currentStoryMapFilter = "all";
+    var currentStoryMapLocationId = "";
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
     var currentBossStageId = "boss-star-warden";
@@ -523,6 +525,97 @@
       if (!guide) return "";
       return "<section class=\"story-narrative-guide\"><div><span class=\"eyebrow\">CELESIA STORY THREAD</span><strong>" + escapeHtml(guide.focus || "") + "</strong></div><div><span>本章懸念</span><p>" + escapeHtml(guide.hook || "") + "</p></div><div><span>本章收束</span><p>" + escapeHtml(guide.payoff || "") + "</p></div></section>";
     }
+    function storyMapLocationById(id) {
+      var map = data.storyWorldMap;
+      return map && (map.locations || []).find(function (location) { return location.id === id; });
+    }
+    function storyMapChapterLocationIds(chapter) {
+      var map = data.storyWorldMap;
+      return map && chapter && map.chapterLocations && map.chapterLocations[chapter.id] ? map.chapterLocations[chapter.id] : [];
+    }
+    function storyMapVersionStart(value) {
+      var match = String(value || "").match(/\d+(?:\.\d+)?/);
+      return match ? Number(match[0]) : 99;
+    }
+    function storyMapFilterMatches(location) {
+      if (currentStoryMapFilter === "all") return true;
+      var start = storyMapVersionStart(location.versionRange);
+      if (currentStoryMapFilter === "live") return start <= 2.5;
+      if (currentStoryMapFilter === "3") return start >= 3 && start < 4;
+      if (currentStoryMapFilter === "4") return start >= 4 && start < 5;
+      if (currentStoryMapFilter === "5") return start >= 5;
+      return true;
+    }
+    function storyMapLocationIsOpen(location) { return storyMapVersionStart(location && location.versionRange) <= 2.5; }
+    function storyMapRegionById(id) {
+      var map = data.storyWorldMap;
+      return map && (map.regions || []).find(function (region) { return region.id === id; });
+    }
+    function storyMapChapterMarkup(location) {
+      var map = data.storyWorldMap;
+      var chapterIds = [];
+      (map && map.chapterLocations ? Object.keys(map.chapterLocations) : []).forEach(function (chapterId) {
+        if ((map.chapterLocations[chapterId] || []).indexOf(location.id) >= 0) chapterIds.push(chapterId);
+      });
+      chapterIds.sort(function (a, b) {
+        var left = storyChapterById(a); var right = storyChapterById(b);
+        return Number(left && left.version || 0) - Number(right && right.version || 0) || (left && left.type === "main" ? -1 : 1);
+      });
+      return chapterIds.slice(0, 6).map(function (chapterId) {
+        var chapter = storyChapterById(chapterId); if (!chapter) return "";
+        var open = chapter.releaseOpen !== false;
+        return "<button class=\"story-map-chapter-link" + (open ? "" : " locked") + "\" data-map-chapter=\"" + escapeHtml(chapter.id) + "\" type=\"button\"" + (open ? "" : " disabled") + "><span>" + escapeHtml(storyVersionLabel(chapter)) + "｜" + escapeHtml(chapter.type === "main" ? "主線" : "支線") + "</span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + (open ? "開放閱讀" : "已建檔，後續版本開放") + "</small></button>";
+      }).join("");
+    }
+    function storyMapRegionLabelMarkup(region) {
+      var positions = {
+        "origin-forest": [120, 170],
+        "tide-west": [700, 170],
+        "inland-forge": [490, 720],
+        "northern-myth": [820, 48],
+        "root-deep": [120, 48]
+      };
+      var position = positions[region.id] || [20, 20];
+      return "<text class=\"story-map-region-label\" x=\"" + position[0] + "\" y=\"" + position[1] + "\"><tspan>" + escapeHtml(region.name) + "</tspan><tspan x=\"" + position[0] + "\" dy=\"16\">" + escapeHtml(region.terrain) + "</tspan></text>";
+    }
+    function storyMapRoutePath(route) {
+      var from = storyMapLocationById(route.from); var to = storyMapLocationById(route.to);
+      if (!from || !to) return "";
+      var midX = Math.round((from.x + to.x) / 2); var midY = Math.round((from.y + to.y) / 2);
+      return "M" + from.x + " " + from.y + " C" + midX + " " + from.y + ", " + to.x + " " + midY + ", " + to.x + " " + to.y;
+    }
+    function renderStoryWorldMap(chapter) {
+      var container = byId("story-world-map"); var map = data.storyWorldMap;
+      if (!container || !map) return;
+      var chapterLocations = storyMapChapterLocationIds(chapter);
+      if (!currentStoryMapLocationId || !storyMapLocationById(currentStoryMapLocationId) || (chapterLocations.length && chapterLocations.indexOf(currentStoryMapLocationId) < 0) || (!chapterLocations.length && currentStoryMapLocationId)) currentStoryMapLocationId = chapterLocations[0] || (map.locations[0] && map.locations[0].id);
+      var selected = storyMapLocationById(currentStoryMapLocationId) || map.locations[0];
+      var visibleIds = {};
+      map.locations.filter(storyMapFilterMatches).forEach(function (location) { visibleIds[location.id] = true; });
+      var terrain = (map.terrainShapes || []).map(function (shape) {
+        var region = storyMapRegionById(shape.regionId) || {};
+        return "<polygon class=\"story-map-terrain\" points=\"" + escapeHtml(shape.points) + "\" style=\"--region-color:" + escapeHtml(region.color || "#78a9ff") + "\"></polygon>";
+      }).join("");
+      var routes = (map.routes || []).map(function (route) {
+        var visible = visibleIds[route.from] && visibleIds[route.to];
+        return "<path class=\"story-map-route" + (visible ? "" : " muted") + "\" d=\"" + escapeHtml(storyMapRoutePath(route)) + "\"><title>" + escapeHtml(route.label + "｜" + route.direction) + "</title></path>";
+      }).join("");
+      var labels = (map.regions || []).map(storyMapRegionLabelMarkup).join("");
+      var nodes = map.locations.map(function (location) {
+        var visible = visibleIds[location.id];
+        var open = storyMapLocationIsOpen(location);
+        var active = selected && selected.id === location.id;
+        var inChapter = chapterLocations.indexOf(location.id) >= 0;
+        return "<g class=\"story-map-location" + (visible ? "" : " filtered") + (open ? " open" : " locked") + (active ? " selected" : "") + (inChapter ? " chapter-current" : "") + "\" data-map-location=\"" + escapeHtml(location.id) + "\" tabindex=\"0\" role=\"button\" aria-label=\"" + escapeHtml(location.name + "，" + (open ? "已開放" : "後續版本")) + "\"><circle cx=\"" + location.x + "\" cy=\"" + location.y + "\" r=\"" + (active ? 13 : 9) + "\"></circle><circle class=\"story-map-location-core\" cx=\"" + location.x + "\" cy=\"" + location.y + "\" r=\"3\"></circle><text x=\"" + (location.x + 14) + "\" y=\"" + (location.y + 4) + "\">" + escapeHtml(location.name) + "</text></g>";
+      }).join("");
+      var selectedRegion = storyMapRegionById(selected && selected.regionId) || {};
+      var selectedChapters = storyMapChapterMarkup(selected || map.locations[0]);
+      var filters = [["all", "全圖"], ["live", "1.0–2.5 已開放"], ["3", "3.0–3.5"], ["4", "4.0–4.5"], ["5", "5.0–5.5"]].map(function (item) {
+        return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
+      }).join("");
+      var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
+      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">地理整合 v1 · 1.0–5.5</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-dot locked\"></i>後續版本</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>方位</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 起點在西南側的獸靈之村；沿西部潮線向東北可到潮眼，再由霽光廊轉入內陸。3.5 星界終端之後，航線轉向北境，最後由根冠向西南回到新曙終端。</p>";
+    }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
       currentStorySceneId = scene.id;
@@ -582,6 +675,7 @@
       if (!chapters.length) {
         byId("story-chapters").innerHTML = "<div class=\"empty\">劇情資料尚未載入，請重新整理頁面；玩家存檔不會因此被清除。</div>";
         byId("story-reader").innerHTML = "<div class=\"empty\">目前沒有可顯示的已開放劇情。若重新整理後仍看不到，請聯絡管理員檢查部署版本。</div>";
+        if (byId("story-world-map")) byId("story-world-map").innerHTML = "";
         return;
       }
       if (!current || current.type !== currentStoryTab || current.releaseOpen === false) { current = chapters[0]; currentStoryChapterId = current.id; currentStorySceneId = current.scenes[0].id; }
@@ -591,6 +685,7 @@
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
       decorateStoryRoadmap();
       byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–5.5 已建檔" : "支線 1.0–2.5｜3.0–5.5 已建檔";
+      renderStoryWorldMap(current);
       renderStoryReader(state, current);
       decorateStoryMythic(current);
       moveStoryPlotToTop();
@@ -1444,6 +1539,19 @@
     byId("story-side-tab").addEventListener("click", function () { currentStoryTab = "side"; currentStoryChapterId = "side-1-0-village"; currentStorySceneId = ""; renderStory(); });
     byId("story-chapters").addEventListener("click", function (event) { var button = event.target.closest("[data-story-id]"); if (button) updateStorySelection(button.getAttribute("data-story-id")); });
     byId("story-reader").addEventListener("click", function (event) { var sceneButton = event.target.closest("[data-scene-id]"); if (sceneButton) { currentStorySceneId = sceneButton.getAttribute("data-scene-id"); renderStory(); return; } var completeButton = event.target.closest("[data-complete-scene]"); if (completeButton) completeStoryScene(currentStoryChapterId, completeButton.getAttribute("data-complete-scene")); });
+    byId("story-world-map").addEventListener("click", function (event) {
+      var filter = event.target.closest("[data-map-filter]");
+      if (filter) { currentStoryMapFilter = filter.getAttribute("data-map-filter") || "all"; renderStoryWorldMap(storyChapterById(currentStoryChapterId)); return; }
+      var location = event.target.closest("[data-map-location]");
+      if (location) { currentStoryMapLocationId = location.getAttribute("data-map-location"); renderStoryWorldMap(storyChapterById(currentStoryChapterId)); return; }
+      var chapterButton = event.target.closest("[data-map-chapter]");
+      if (chapterButton && !chapterButton.disabled) { var chapter = storyChapterById(chapterButton.getAttribute("data-map-chapter")); if (chapter) { currentStoryTab = chapter.type; updateStorySelection(chapter.id); } }
+    });
+    byId("story-world-map").addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      var location = event.target.closest("[data-map-location]");
+      if (location) { event.preventDefault(); currentStoryMapLocationId = location.getAttribute("data-map-location"); renderStoryWorldMap(storyChapterById(currentStoryChapterId)); }
+    });
      byId("character-list").addEventListener("click", function (event) {
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { event.stopPropagation(); openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        var developButton = event.target.closest("[data-develop-character]"); if (developButton) { event.stopPropagation(); developCharacter(developButton.getAttribute("data-develop-character")); return; }

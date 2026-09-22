@@ -28,6 +28,12 @@
   }
   if (!storyReplan && typeof globalThis !== "undefined") storyReplan = globalThis.StarshipStoryReplan || null;
 
+  var storyWorldMap = null;
+  if (typeof require === "function") {
+    try { storyWorldMap = require("./story-world-map.js"); } catch (error) { storyWorldMap = null; }
+  }
+  if (!storyWorldMap && typeof globalThis !== "undefined") storyWorldMap = globalThis.StarshipStoryWorldMap || null;
+
   // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
   // 這份規劃刻意把「故事初登場」和「預計可抽版本」分開，避免為了卡池節奏
   // 讓每個小版本都硬塞一名新四星，導致角色關係只剩下快速報到。
@@ -1917,6 +1923,7 @@
     futureCharacterReleasePlan: futureCharacterReleasePlan,
     futureStoryRevision: futureStoryRevision,
     storyReplan: storyReplan,
+    storyWorldMap: storyWorldMap,
     version3Cards: version3Cards,
     activeFour: activeFour,
     activeThree: activeThree,

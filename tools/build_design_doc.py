@@ -222,6 +222,71 @@ def add_character_portrait_catalog(doc, portrait_dir):
     doc.add_paragraph().paragraph_format.space_after = Pt(1)
 
 
+def load_world_map_catalog():
+    node = Path(os.environ.get("STARSHIP_NODE", str(DEFAULT_NODE)))
+    if not node.exists():
+        node = Path("node")
+    script = "const d=require('./src/data.js'); process.stdout.write(JSON.stringify({map:d.storyWorldMap,story:d.storyChapters}));"
+    result = subprocess.run([str(node), "-e", script], cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8")
+    return json.loads(result.stdout)
+
+
+def add_world_map_section(doc):
+    catalog = load_world_map_catalog()
+    world_map = catalog["map"]
+    chapters = {chapter.get("id"): chapter for chapter in catalog["story"]}
+    locations = {location.get("id"): location for location in world_map.get("locations", [])}
+    chapter_by_location = {}
+    for chapter_id, location_ids in world_map.get("chapterLocations", {}).items():
+        for location_id in location_ids:
+            chapter_by_location.setdefault(location_id, []).append(chapter_id)
+
+    add_page_break(doc)
+    add_heading(doc, "世界地圖與地區整合", 1)
+    add_text(
+        doc,
+        "本版將故事中的複合地區名稱統一整理到一張星界地圖。遊戲劇情頁使用同一份 src/story-world-map.js 資料，"
+        "顯示地形、方位、故事航線、版本開放狀態與章節關聯；正文仍保留各章節原本的敘事地區名稱。"
+        "地圖固定從獸靈之村出發，經西部潮線、內陸回覆圈與北境神話圈，最後抵達根系深境的新曙終端。",
+        size=10.5,
+        after=8,
+    )
+    add_table(
+        doc,
+        ["地區", "主要地形", "版本範圍", "故事功能"],
+        [
+            [region.get("name", ""), region.get("terrain", ""), region.get("versionRange", ""), region.get("description", "")]
+            for region in world_map.get("regions", [])
+        ],
+        widths=[1.25, 1.8, 1.05, 2.5],
+    )
+    add_heading(doc, "地圖節點、方位與章節關聯", 2)
+    add_text(doc, "座標使用遊戲 SVG 地圖的 1200×760 視圖框；玩家可在劇情頁篩選 1.0–2.5、3.0–3.5、4.0–4.5 或 5.0–5.5。", size=9.5, after=5)
+    location_rows = []
+    for location in world_map.get("locations", []):
+        chapter_titles = []
+        for chapter_id in chapter_by_location.get(location.get("id"), [])[:4]:
+            chapter = chapters.get(chapter_id)
+            if chapter:
+                chapter_titles.append(str(chapter.get("version", "")) + "｜" + str(chapter.get("title", "")))
+        location_rows.append([
+            location.get("name", ""),
+            (world_map.get("regions") or [{}])[next((index for index, region in enumerate(world_map.get("regions", [])) if region.get("id") == location.get("regionId")), 0)].get("name", ""),
+            location.get("terrain", ""),
+            location.get("versionRange", ""),
+            "、".join(chapter_titles) or "航線節點",
+        ])
+    add_table(doc, ["地點", "地區", "地形", "版本", "代表章節"], location_rows, widths=[1.15, 1.25, 1.35, .8, 2.05])
+    add_heading(doc, "故事航線與連貫性檢查", 2)
+    add_bullets(doc, [
+        "1.0 的獸靈之村是固定起點；1.1–2.5 沿霧橋、洛汀港、潮汐書庫、鏡潮島、雲脊與潮眼向西部展開。",
+        "2.5 結束後由潮眼回返霽光廊，3.0–3.5 經白榆河、鍛路鎮與北門高地抵達星界終端。",
+        "3.5 的第一頁接上 4.0 北境根圖；4.0–4.5 經新曙港、遠望塔、白夜航路與第二條律終端。",
+        "5.0–5.5 從北境根冠經霜火、虹徑、命線織庭與深海根門抵達新曙終端，完成瑟蕾雅的交班選擇。",
+        "tools/story-coherence-audit.py 會檢查每個章節都有地圖節點、地區別名有覆蓋、所有航線連通，並驗證五個版本轉折的文字銜接。",
+    ])
+
+
 def add_future_character_relationships(doc):
     cards = [card for card in load_character_catalog() if float(card.get("releaseVersion", 0)) >= 3]
     add_heading(doc, "後續角色與瑟蕾雅的關係索引", 2)
@@ -367,6 +432,8 @@ def main():
         "新帳號自動取得瑟蕾雅。完成 1.0 主線任意一幕後，可在大廳自選雷恩或莉亞。",
         "通關星界試煉第 10 關後，再開啟一次雷恩或莉亞自選，第二份獎勵優先顯示尚未取得的角色。",
     ])
+
+    add_world_map_section(doc)
 
     add_page_break(doc)
     add_heading(doc, "角色培養", 1)

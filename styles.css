@@ -538,6 +538,68 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .enemy-intel-heading strong { display: block; margin-top: 4px; color: #f2f5ff; font-size: .9rem; }
 .enemy-intel-heading small { color: #8f9fbd; font-size: .64rem; }
 .enemy-intel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 9px; }
+
+.story-world-map-panel { margin: 18px 0 20px; padding: 18px; border: 1px solid rgba(112,233,223,.22); border-radius: 20px; background: radial-gradient(circle at 7% 12%, rgba(112,233,223,.1), transparent 28%), linear-gradient(145deg, rgba(13,29,61,.92), rgba(7,15,34,.88)); }
+.story-map-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.story-map-heading h3 { margin: 6px 0 5px; color: #f5f8ff; font-size: 1.18rem; }
+.story-map-heading p { max-width: 760px; margin: 0; color: #aabbd8; font-size: .72rem; line-height: 1.7; }
+.story-map-version { padding: 7px 9px; border: 1px solid rgba(246,199,111,.3); border-radius: 999px; color: #ffe2a0; background: rgba(246,199,111,.06); font: .6rem ui-monospace, Consolas, monospace; white-space: nowrap; }
+.story-map-filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 15px 0 12px; }
+.story-map-filter { padding: 7px 10px; border: 1px solid rgba(187,213,255,.18); border-radius: 999px; color: #9eafd0; background: rgba(255,255,255,.035); font-size: .64rem; }
+.story-map-filter:hover, .story-map-filter.active { border-color: rgba(112,233,223,.58); color: #e5ffff; background: rgba(112,233,223,.11); }
+.story-map-layout { display: grid; grid-template-columns: minmax(0, 1.62fr) minmax(220px, .58fr); gap: 12px; align-items: stretch; }
+.story-map-canvas { min-width: 0; padding: 8px; border: 1px solid rgba(187,213,255,.14); border-radius: 16px; background: rgba(2,10,27,.4); overflow: hidden; }
+.story-map-svg { display: block; width: 100%; min-height: 360px; }
+.story-map-water { fill: #081a3b; stroke: rgba(187,213,255,.16); stroke-width: 2; }
+.story-map-terrain { fill: var(--region-color); fill-opacity: .11; stroke: var(--region-color); stroke-opacity: .4; stroke-width: 2; stroke-dasharray: 7 6; }
+.story-map-region-label { fill: rgba(221,234,255,.48); font-size: 15px; letter-spacing: .12em; }
+.story-map-region-label tspan + tspan { fill: rgba(157,180,217,.55); font-size: 9px; letter-spacing: .04em; }
+.story-map-route { fill: none; stroke: rgba(112,233,223,.55); stroke-width: 3; stroke-dasharray: 3 10; stroke-linecap: round; }
+.story-map-route.muted { stroke: rgba(132,154,193,.17); }
+.story-map-location { cursor: pointer; outline: none; }
+.story-map-location.filtered { display: none; }
+.story-map-location circle:first-child { fill: #152b53; stroke: #8c9fc4; stroke-width: 2; }
+.story-map-location.open circle:first-child { stroke: #70e9df; }
+.story-map-location.locked circle:first-child { stroke: #8b7eae; stroke-dasharray: 3 3; }
+.story-map-location .story-map-location-core { fill: #ffe2a0; stroke: none; }
+.story-map-location text { fill: #dce8ff; font-size: 12px; paint-order: stroke; stroke: #081a3b; stroke-width: 5px; stroke-linejoin: round; }
+.story-map-location.locked text { fill: #a7a8c2; }
+.story-map-location.selected circle:first-child, .story-map-location.chapter-current circle:first-child { filter: url(#story-map-glow); stroke: #ffe2a0; stroke-width: 3; }
+.story-map-location.selected text { fill: #fff5cf; font-weight: 700; }
+.story-map-location:focus-visible circle:first-child { stroke: #ffffff; stroke-width: 4; }
+.story-map-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 9px 3px 0; color: #91a5c8; font-size: .62rem; }
+.legend-dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: #70e9df; }
+.legend-dot.locked { background: #8b7eae; }
+.legend-line { display: inline-block; width: 19px; margin: 0 5px 3px 0; border-top: 2px dashed #70e9df; }
+.story-map-details { padding: 18px; border: 1px solid rgba(169,155,255,.2); border-radius: 16px; background: rgba(9,19,45,.66); }
+.story-map-details h4 { margin: 8px 0 10px; color: #f7f8ff; font-size: 1.14rem; }
+.story-map-details > p { color: #aebdda; font-size: .72rem; line-height: 1.75; }
+.story-map-location-meta { padding: 9px 11px; border-left: 2px solid rgba(112,233,223,.68); background: rgba(112,233,223,.05); }
+.story-map-location-meta b { display: inline-block; min-width: 38px; margin-right: 3px; color: #70e9df; font-size: .63rem; }
+.story-map-related { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(187,213,255,.12); }
+.story-map-related > strong { display: block; margin-bottom: 7px; color: #dce8ff; font-size: .7rem; }
+.story-map-related > small { color: #8599bc; font-size: .64rem; }
+.story-map-chapter-link { display: grid; width: 100%; gap: 2px; margin-top: 5px; padding: 8px 9px; border: 1px solid rgba(187,213,255,.13); border-radius: 9px; color: #aebddd; text-align: left; background: rgba(255,255,255,.025); }
+.story-map-chapter-link:hover:not(:disabled) { border-color: rgba(112,233,223,.5); background: rgba(112,233,223,.06); }
+.story-map-chapter-link span { color: #9d8fff; font: .59rem ui-monospace, Consolas, monospace; }
+.story-map-chapter-link strong { color: #e9f0ff; font-size: .68rem; }
+.story-map-chapter-link small { color: #8496b7; font-size: .59rem; }
+.story-map-chapter-link.locked { opacity: .58; }
+.story-map-continuity { margin: 12px 2px 0; color: #91a4c5; font-size: .64rem; line-height: 1.7; }
+.story-map-continuity strong { color: #ffe2a0; }
+
+@media (max-width: 840px) {
+  .story-map-layout { grid-template-columns: 1fr; }
+  .story-map-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+  .story-map-details > .eyebrow, .story-map-details > h4, .story-map-related { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .story-map-heading { flex-direction: column; gap: 8px; }
+  .story-map-version { width: max-content; }
+  .story-map-canvas { overflow-x: auto; }
+  .story-map-svg { min-width: 710px; }
+  .story-map-details { display: block; }
+}
 .enemy-intel-card { display: grid; grid-template-columns: 72px 1fr; min-width: 0; overflow: hidden; border: 1px solid rgba(187,213,255,.15); border-radius: 12px; background: rgba(5,11,28,.52); }
 .enemy-intel-art { position: relative; min-height: 94px; overflow: hidden; background: radial-gradient(circle at 50% 20%, rgba(169,155,255,.2), transparent 70%), #101936; }
 .enemy-intel-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
