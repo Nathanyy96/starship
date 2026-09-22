@@ -61,6 +61,14 @@
       return data.banners.find(function (banner) { return banner.id === id; });
     }
 
+    // Keep the summon result cards on the same canonical portrait source as
+    // character development and the design document.  Falling back to image
+    // only preserves compatibility with legacy cards that have no portrait
+    // wrapper yet.
+    function characterPortraitSource(card) {
+      return card && (card.portraitImage || card.image || card.backgroundImage) || "";
+    }
+
     function showMessage(text, isError) {
       message.textContent = text;
       message.className = isError ? "message error" : "message";
@@ -84,8 +92,9 @@
       var tag = badge ? "<span class=\"result-tag\">" + badge + "</span>" : "";
       var duplicateLine = duplicate ? "<div class=\"duplicate-reward\">重複轉換：" + escapeHtml(duplicate) + "</div>" : "";
       var imageStyle = "--accent:" + escapeHtml(card.accent || "#8f7cff");
-      if (card.image) {
-        imageStyle += ";--card-image:url(" + escapeHtml(card.image) + ")";
+      var portrait = characterPortraitSource(card);
+      if (portrait) {
+        imageStyle += ";--card-image:url(" + escapeHtml(portrait) + ")";
       }
       return "<article class=\"result-card rarity-" + card.rarity + (item.featured ? " featured" : "") + "\">" +
         "<div class=\"card-art\" style=\"" + imageStyle + "\">" +
