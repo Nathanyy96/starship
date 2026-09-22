@@ -33,7 +33,7 @@ def load_future_story():
         "import('./src/data.js').then(({default:d}) => "
         "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), story:d.storyChapters, "
         "v3:d.version3StoryChapters, v4:d.version4StoryChapters, v5:d.version5StoryChapters, "
-        "releasePlan:d.futureCharacterReleasePlan, futureRevision:d.futureStoryRevision})))"
+        "releasePlan:d.futureCharacterReleasePlan, futureRevision:d.futureStoryRevision, replan:d.storyReplan})))"
     )
     result = subprocess.run(
         [str(node), "--input-type=module", "-e", export_script],
@@ -71,24 +71,24 @@ def add_bullet(document, text):
 
 def add_story_table(document):
     rows = [
-        ("3.0", "回聲之門", "村口的三面旗", "瑟蕾雅回到獸靈之村，第一次把母親的拒絕放在自己的思念之前，留下由村民共同保管的空位。"),
-        ("3.1", "誰替她寫回覆", "黑木匣裡的未完成句", "回覆台模仿瑟蕾雅的聲音；她刪除預設聲紋，讓『我不知道』也能被完整保留。"),
-        ("3.2", "白榆河的黑星", "白榆河的輪班表", "她熄掉中央主訊號，讓澄音與岑芽接手四段水路，並在河床發現指向鍛路鎮的黑星。"),
-        ("3.3", "火把不是王冠", "空白握柄與兩小時後", "洛恩與她把火源、停爐權和撤退路線交給鎮民，救急不再等於坐上唯一的座位。"),
-        ("3.4", "北門的母親", "風路守望表", "艾妲的信留下『不要把我帶走』；瑟蕾雅不把拒絕變成追趕任務，改用可回頭測線前進。"),
-        ("3.5", "門外先寫信", "把第一頁留給活著的人", "她知道門是為自己開的，仍先寫信、先詢問，留下可拒絕、可撤回、可重談的第一條星界之律。"),
-        ("4.0", "新曙港的第一束光", "天文台輪班表", "根系圖以她的第一筆為中心；她讓第一束光照亮退回點，而不是最短航路。"),
-        ("4.1", "碎星工坊的熱源", "空爐旁的工具架", "霜核保存她與母親的身世片段；她讓霜火輪值，不讓能力再次集中在自己身上。"),
-        ("4.2", "遠望塔的長距離回覆", "信標見習筆記", "虹橋以母親的聲音呼喚她；兩端都保留關閉權，熟悉的聲音不再直接等於邀請。"),
-        ("4.3", "白夜航路的記憶", "失效訊息清單", "三條命線呈現三種可能的瑟蕾雅；她保留本人取回記憶的權利，不強迫復原。"),
-        ("4.4", "海溝守門人", "四把鑰匙的交班", "根門只認她一人的聲音；她把開門與叫停拆成四把鑰匙，聽見母親要求她不要獨自進門。"),
-        ("4.5", "第二條律", "可撤回協議手冊", "長冬是中央系統等待她簽名的結果；她公開拒絕、撤回與重談，北境神話篇正式轉向共同承擔。"),
-        ("5.0", "根冠上的第十盞燈", "北境的根名冊", "第十盞燈刻著『不要點亮』；她把九份根系交回各界，不以世界中心的身分追母親。"),
-        ("5.1", "霜火雙核", "長夜裡的工具架", "冷核還原她曾主動選擇離開的記憶；她不燒掉痛苦，也不把它交給公共權力。"),
-        ("5.2", "虹橋以外的回覆", "橋上不設王座", "虹橋叫出她的原名；她把名字拿回自己手中，不讓名字成為門的鑰匙。"),
-        ("5.3", "命線織庭的空白梭", "織線學徒的三次練習", "三條未來都像真的；她不替任何線主剪掉可能，把空白梭交回選擇者。"),
-        ("5.4", "深海的回聲守門人", "第四把鑰匙的交班", "艾妲要求她不要獨自進門；瑟蕾雅選擇安全回到水面，帶回一封不必立刻回答的信。"),
-        ("5.5", "長冬後的九界新曙", "把神話寫回人手", "終端能讓艾妲回來但會重建唯一中心；她選擇交班，成為可被替換的見證人，收到母親回信。"),
+        ("3.0", "回聲井的第九塊石", "村口的三面旗", "瑟蕾雅回到獸靈之村，讓第九塊石與村民共同保管；回家的路不再由她一個人命名。"),
+        ("3.1", "未完成的回覆", "村口的三面旗", "蘿堤亞與霽羅拆開自動補完的聲音，瑟蕾雅刪除預設聲紋，讓『我還不知道』保留成合法回覆。"),
+        ("3.2", "四段水路", "村口的三面旗", "澄音與岑芽把中央水路拆成四段，黑星被保留為證據，隊伍不再用平均答案蓋住地方差異。"),
+        ("3.3", "鍛路鎮的火", "空白握柄與北門守望", "洛恩把火源、停爐權與撤退路線交給鎮民，救急不再等於坐上唯一的座位。"),
+        ("3.4", "北門的收件人", "空白握柄與北門守望", "艾妲的信寫著『不要把我帶回去』；瑟蕾雅不把拒絕變成追趕任務，改用可回頭的收件地址前進。"),
+        ("3.5", "終端的第一頁", "空白握柄與北門守望", "她在終端留下可拒絕、可撤回、可交班的第一頁，並以此接上北境根系，而不是接上新的王座。"),
+        ("4.0", "新曙港的根圖", "曙港的輪班與遠望塔", "根系圖不再以她為唯一中心；奧蕾雅讓第一束光先照亮退回點，而不是最短航路。"),
+        ("4.1", "霜火鍛環", "曙港的輪班與遠望塔", "凱嵐把霜火拆成雙核輪值，艾妲的記憶被保存卻不被公共權力佔用。"),
+        ("4.2", "虹徑的兩端", "曙港的輪班與遠望塔", "索萊與塔莉亞建立雙向關閉權，熟悉的聲音不再直接等於邀請。"),
+        ("4.3", "白夜的缺頁", "可撤回的白夜", "三條命線呈現三種可能的瑟蕾雅；她保留本人取回記憶的權利，不強迫復原。"),
+        ("4.4", "深海根門", "可撤回的白夜", "凱爾把勇敢改成知道何時上浮；四把鑰匙分開保管，瑟蕾雅帶回一封不必立刻回答的信。"),
+        ("4.5", "第二條律", "可撤回的白夜", "長冬是中央系統等待她簽名的結果；她與伊萊拉把拒絕、撤回與交班寫進共同規則。"),
+        ("5.0", "根冠的第十盞燈", "根名冊、霜火與虹橋", "第十盞燈刻著『等待有人拒絕』；她把九份根系交回各界，不以世界中心的身分追母親。"),
+        ("5.1", "霜火雙核", "根名冊、霜火與虹橋", "布蘭把冷核與熱核拆成可交班工具；瑟蕾雅不燒掉痛苦，也不把它交給公共權力。"),
+        ("5.2", "虹橋以外", "根名冊、霜火與虹橋", "伊芮恩守住虹橋兩端；瑟蕾雅把原名拿回自己手中，不讓名字成為門的鑰匙。"),
+        ("5.3", "命線織庭的空白梭", "空白梭與長冬後的信", "三條未來都像真的；她不替任何線的主人剪掉可能，把空白梭交回選擇者。"),
+        ("5.4", "深海的回信", "空白梭與長冬後的信", "艾妲要求她不要獨自進門；瑟蕾雅選擇安全回到水面，帶回一封可以慢慢回答的信。"),
+        ("5.5", "長冬後的新曙", "空白梭與長冬後的信", "終端能讓艾妲回來但會重建唯一中心；她選擇交班，成為可被替換的見證人，收到母親回信。"),
     ]
     table = document.add_table(rows=1, cols=4)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -115,32 +115,40 @@ def add_story_table(document):
 
 
 def add_future_story_body(document, story):
-    """Append the complete 3.0–5.5 main and side-story scenes."""
-    document.add_heading("五、3.0–5.5 後續版本完整正文", level=2)
+    """Append the complete 1.1–5.5 re-planned main and side-story scenes."""
+    document.add_heading("五、1.1–5.5 劇情重編完整正文", level=2)
     intro = document.add_paragraph()
     intro.add_run("閱讀定位：").bold = True
     intro.add_run(
-        "1.0–2.5 的瑟蕾雅、獸靈之村與既有世界設定是正史根基；3.0–3.5 使用『回聲之門』重製版，"
-        "讓新角色先以故事夥伴身分慢慢建立關係，再在合適的大版本進入卡池。新版先處理瑟蕾雅回到村子、面對母親拒絕與走向北門的個人弧線；4.0–5.5 再以北歐神話意象"
+        "1.0 的瑟蕾雅、獸靈之村與四小節旋律是正史根基；1.1 起以故事問題重新編排，讓新角色先以故事夥伴身分慢慢建立關係，再在合適的大版本進入卡池。"
+        "新版先處理聽見他人、建立可撤回的回覆、回到獸靈之村、面對母親拒絕與走向北門的弧線；4.0–5.5 再以北歐神話意象"
         "重新理解根系、命線、霜火、虹橋、深海守門與長冬，但不直接套用既有神名或神話劇本。"
         "每一版都讓瑟蕾雅面對一個看似只能由她決定的中心，再把拒絕、撤回與交班的權利交還給受影響的人。"
         "每個大版本維持五個小版本，但只安排 2–3 名新四星；其他已完成角色保留於主線與支線，"
         "讓瑟蕾雅與每個人的信任、衝突和情感都能有回收。以下正文與 src/data.js 的未開放版本資料同步。"
     )
 
+    replanned = [chapter for chapter in story.get("story", []) if chapter.get("storyRevisionId") == (story.get("replan") or {}).get("id")]
     for version_group, label in (
-        (story.get("v3", []), "3.0–3.5"),
-        (story.get("v4", []), "4.0–4.5"),
-        (story.get("v5", []), "5.0–5.5"),
+        ([chapter for chapter in replanned if 1.1 <= float(chapter.get("version", 0)) <= 2.5], "1.1–2.5"),
+        ([chapter for chapter in replanned if 3 <= float(chapter.get("version", 0)) < 4], "3.0–3.5"),
+        ([chapter for chapter in replanned if 4 <= float(chapter.get("version", 0)) < 5], "4.0–4.5"),
+        ([chapter for chapter in replanned if float(chapter.get("version", 0)) >= 5], "5.0–5.5"),
     ):
-        document.add_heading(f"{label} 版本正文", level=3)
+        document.add_heading(f"{label} 重編正文", level=3)
         for chapter in version_group:
             version = chapter.get("version", "")
             title = chapter.get("title", "未命名章節")
-            document.add_heading(f"{version} {title}", level=4)
+            kind = "主線" if chapter.get("type") == "main" else "合併支線"
+            document.add_heading(f"{version}｜{kind}｜{title}", level=4)
             summary = document.add_paragraph()
             summary.add_run("章節摘要：").bold = True
             summary.add_run(chapter.get("summary", ""))
+            guide = chapter.get("narrativeGuide") or {}
+            if guide:
+                guide_paragraph = document.add_paragraph()
+                guide_paragraph.add_run("閱讀導讀：").bold = True
+                guide_paragraph.add_run("焦點：" + guide.get("focus", "") + "；懸念：" + guide.get("hook", "") + "；收束：" + guide.get("payoff", ""))
             for index, scene in enumerate(chapter.get("scenes", []), start=1):
                 document.add_heading(f"{index}. {scene.get('title', '未命名幕次')}", level=5)
                 document.add_paragraph(scene.get("body", ""))
@@ -263,15 +271,15 @@ def add_character_relationships(document, story):
 
 
 def add_future_story_revision(document, story):
-    """Document the active 3.0–3.5 rewrite without deleting the 1.0–2.5 canon."""
-    revision = story.get("futureRevision") or {}
+    """Document the active 1.1–5.5 rewrite without deleting the 1.0 opening."""
+    revision = story.get("replan") or {}
     if not revision:
         return
-    document.add_heading("3.0–3.5 劇情重製版：回聲之門", level=2)
+    document.add_heading("1.1 起劇情重編版：角色服務於故事", level=2)
     document.add_paragraph(
-        "這是目前鎖定版本採用的新版橋接稿。1.0–2.5 的瑟蕾雅、獸靈之村、雷恩、莉亞、伊薩爾、"
-        "艾妲與潮眼事件維持原始正史；3.0–3.5 改以回到最初的家、面對母親的拒絕、再走向北門為主軸。"
-        "原先的未開放正文不刪除，僅作為可回溯素材；遊戲與本文件以本重製版的摘要、導讀與幕次為準。"
+        "1.0 的瑟蕾雅穿越界痕、抵達獸靈之村、與雷恩、莉亞、伊薩爾相遇，以及第十三扇窗與四小節旋律保留為正史開端。"
+        "1.1 起不再讓角色登場主導版本；每一名角色先因不可替代的知識、責任、分歧或情感需要出現，再決定是否進入卡池。"
+        "舊版草稿不刪除，僅作為可回溯素材；遊戲與本文件以這份重編版的摘要、導讀與幕次為準。"
     )
     premise = document.add_paragraph()
     premise.add_run("重製核心：").bold = True

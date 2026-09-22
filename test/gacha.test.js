@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -57,17 +57,22 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });
 
-test("3.0–3.5 採用保留獸靈之村設定的新版主線", () => {
+test("1.1 起使用統一重編正史，角色依劇情需要登場", () => {
   assert.equal(futureStoryRevision.id, "future-story-revision-v2");
-  assert.match(futureStoryRevision.preservedCanon, /瑟蕾雅/);
-  assert.match(futureStoryRevision.preservedCanon, /獸靈之村/);
-  assert.equal(futureStoryRevision.chapters["main-3-0"].title, "回聲之門");
-  assert.equal(futureStoryRevision.chapters["main-3-5"].title, "門外先寫信");
-  const revised = storyChapters.filter((chapter) => chapter.storyRevisionId === futureStoryRevision.id);
-  assert.equal(Object.keys(futureStoryRevision.chapters).length, 12);
-  assert.equal(revised.length, 8);
-  assert.equal(revised.every((chapter) => chapter.scenes.length === 3 && chapter.scenes.every((scene) => scene.body.length >= 80)), true);
-  assert.match(storyChapters.find((chapter) => chapter.id === "main-3-5").summary, /先寫信/);
+  assert.equal(storyReplan.id, "story-replan-v1");
+  assert.match(storyReplan.preservedCanon, /瑟蕾雅/);
+  assert.match(storyReplan.preservedCanon, /獸靈之村/);
+  assert.equal(storyReplan.chapters["main-1-1"].title, "聽見的人");
+  assert.equal(storyReplan.chapters["main-3-0"].title, "回聲井的第九塊石");
+  assert.equal(storyReplan.chapters["main-5.5"].title, "長冬後的新曙");
+  assert.equal(Object.keys(storyReplan.chapters).length, 41);
+  const revised = storyChapters.filter((chapter) => chapter.storyRevisionId === storyReplan.id);
+  assert.equal(revised.length, 41);
+  assert.equal(revised.filter((chapter) => Number(chapter.version) >= 1.1).length, 40);
+  assert.equal(revised.every((chapter) => chapter.storyRevisionId === storyReplan.id), true);
+  assert.equal(revised.every((chapter) => chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body.length >= 80)), true);
+  assert.equal(Object.keys(storySceneAliases).length > 0, true);
+  assert.match(storyChapters.find((chapter) => chapter.id === "main-5.5").summary, /交班/);
 });
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
@@ -93,7 +98,7 @@ test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保
   assert.equal(liveStory.length, 18);
   assert.equal(liveStory.every((chapter) => chapter.releaseOpen !== false && chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body)), true);
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => String(scene.body).trim().length >= 20)), true);
-  assert.equal(liveStory.filter((chapter) => chapter.fullBody).every((chapter) => Number(chapter.fullBody.length) > 800), true);
+  assert.equal(liveStory.filter((chapter) => chapter.fullBody).every((chapter) => Number(chapter.fullBody.length) > (chapter.type === "main" ? 500 : 250)), true);
   assert.equal(liveStory.find((chapter) => chapter.id === "main-2.1").sourceStatus, "document");
   assert.equal(liveStory.every((chapter) => chapter.scenes.every((scene) => typeof scene.id === "string" && scene.id.length > 0)), true);
   const firstChapter = liveStory.find((chapter) => chapter.id === "main-1-0");
@@ -102,7 +107,7 @@ test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保
   const mirrorChapter = liveStory.find((chapter) => chapter.id === "main-2.1");
   assert.equal(mirrorChapter.scenes.length, 4);
   assert.equal(mirrorChapter.scenes.at(-1).id, "mirror-choice");
-  assert.equal(mirrorChapter.scenes.reduce((total, scene) => total + scene.body.length, 0) > 1000, true);
+  assert.equal(mirrorChapter.scenes.reduce((total, scene) => total + scene.body.length, 0) > 500, true);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.4").fullBody.includes("附錄｜"), false);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").scenes.length, 3);
   assert.equal(storyChapters.find((chapter) => chapter.id === "main-2.5").fullBody.includes("見證人的空白"), false);

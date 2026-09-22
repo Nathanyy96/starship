@@ -351,7 +351,8 @@
         if (separator < 0) return;
         var oldChapterId = key.slice(0, separator);
         var oldSceneId = key.slice(separator + 1);
-        var migratedKey = aliases[oldChapterId + ":" + oldSceneId] || ((aliases[oldChapterId] && oldSceneId) ? aliases[oldChapterId] + ":" + oldSceneId : null);
+        var sceneAliases = data.storySceneAliases || {};
+        var migratedKey = sceneAliases[oldChapterId + ":" + oldSceneId] || aliases[oldChapterId + ":" + oldSceneId] || ((aliases[oldChapterId] && oldSceneId) ? aliases[oldChapterId] + ":" + oldSceneId : null);
         if (migratedKey && migratedKey !== key && !completed[migratedKey]) completed[migratedKey] = completed[key];
         if (migratedKey && migratedKey !== key) delete completed[key];
       });

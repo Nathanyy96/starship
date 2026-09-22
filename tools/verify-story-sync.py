@@ -25,7 +25,7 @@ def load_game_data() -> dict:
         "import('./src/data.js').then(({default:d}) => "
         "process.stdout.write(JSON.stringify({cards:Object.values(d.cards), "
         "activeCards:d.activeCards, futureCards:d.futureCards, "
-        "story:d.storyChapters}))).catch((error) => { console.error(error); process.exit(1); })"
+        "story:d.storyChapters, replan:d.storyReplan}))).catch((error) => { console.error(error); process.exit(1); })"
     )
     result = subprocess.run(
         [str(node), "--input-type=module", "-e", export_script],
@@ -60,6 +60,8 @@ def main() -> None:
     stories = data["story"]
     cards = data["cards"]
     future_stories = [chapter for chapter in stories if float(chapter["version"]) >= 3]
+    replan_id = (data.get("replan") or {}).get("id")
+    replanned_stories = [chapter for chapter in stories if chapter.get("storyRevisionId") == replan_id and float(chapter["version"]) >= 1.1]
     future_cards = [card for card in cards if float(card["releaseVersion"]) >= 3]
     live_cards = [card for card in cards if float(card["releaseVersion"]) <= 2.5]
 
@@ -81,19 +83,30 @@ def main() -> None:
         for index, body in enumerate(scene_strings(chapter))
         if body not in text
     ]
+    missing_replanned_scenes = [
+        f"{chapter['id']}:{index + 1}"
+        for chapter in replanned_stories
+        for index, body in enumerate(scene_strings(chapter))
+        if body not in text
+    ]
     missing_card_names = [card["name"] for card in cards if card["name"] not in text]
     version_counts = {}
+    major_version_counts = {}
     for chapter in stories:
         entry = version_counts.setdefault(chapter["version"], {"main": 0, "side": 0})
         entry[chapter.get("type", "main")] += 1
+        major = str(int(float(chapter["version"])))
+        major_entry = major_version_counts.setdefault(major, {"main": 0, "side": 0})
+        major_entry[chapter.get("type", "main")] += 1
 
     checks = {
         "story_chapters": len(stories),
         "future_story_chapters": len(future_stories),
+        "replanned_story_chapters": len(replanned_stories),
         "future_chapters_locked": all(chapter.get("releaseOpen") is False for chapter in future_stories),
-        "each_version_has_main_and_side": all(
+        "each_major_version_has_main_and_merged_side": all(
             counts["main"] >= 1 and counts["side"] >= 1
-            for counts in version_counts.values()
+            for counts in major_version_counts.values()
         ),
         "story_versions": sorted(version_counts),
         "card_records": len(cards),
@@ -107,6 +120,7 @@ def main() -> None:
         "document_missing_side_titles": missing_side_titles,
         "document_missing_card_names": missing_card_names,
         "document_missing_future_scene_bodies": missing_future_scenes,
+        "document_missing_replanned_scene_bodies": missing_replanned_scenes,
     }
     print(json.dumps(checks, ensure_ascii=False, indent=2))
     list_checks = {
@@ -114,6 +128,7 @@ def main() -> None:
         "document_missing_side_titles",
         "document_missing_card_names",
         "document_missing_future_scene_bodies",
+        "document_missing_replanned_scene_bodies",
     }
     failures = [
         key

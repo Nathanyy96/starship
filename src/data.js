@@ -15,12 +15,18 @@
   }
   if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
 
-  // 1.0–2.5 保留原始正史；3.0–3.5 使用重製版橋接到北境神話篇。
+  // 舊版未開放草稿仍保留供追溯；實際故事從 1.1 起由 story-replan.js 統一重編。
   var futureStoryRevision = null;
   if (typeof require === "function") {
     try { futureStoryRevision = require("./future-story-revision.js"); } catch (error) { futureStoryRevision = null; }
   }
   if (!futureStoryRevision && typeof globalThis !== "undefined") futureStoryRevision = globalThis.StarshipFutureStoryRevision || null;
+
+  var storyReplan = null;
+  if (typeof require === "function") {
+    try { storyReplan = require("./story-replan.js"); } catch (error) { storyReplan = null; }
+  }
+  if (!storyReplan && typeof globalThis !== "undefined") storyReplan = globalThis.StarshipStoryReplan || null;
 
   // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
   // 這份規劃刻意把「故事初登場」和「預計可抽版本」分開，避免為了卡池節奏
@@ -1849,6 +1855,42 @@
     return { chapters: applyContinuityGuides(grouped), aliases: aliases };
   }
 
+  function applyStoryReplan(chapters, aliases) {
+    var patches = storyReplan && storyReplan.chapters ? storyReplan.chapters : {};
+    var sceneAliases = {};
+    var replanned = chapters.map(function (chapter) {
+      var patch = patches[chapter.id];
+      if (!patch) return chapter;
+      var oldScenes = chapter.scenes || [];
+      var nextScenes = patch.scenes || [];
+      oldScenes.forEach(function (oldScene, index) {
+        if (!nextScenes.length) return;
+        var targetIndex = Math.min(nextScenes.length - 1, Math.floor(index * nextScenes.length / Math.max(oldScenes.length, 1)));
+        var target = nextScenes[targetIndex];
+        if (target && target.id !== oldScene.id) sceneAliases[chapter.id + ":" + oldScene.id] = chapter.id + ":" + target.id;
+      });
+      var fullBody = patch.fullBody || nextScenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n");
+      return Object.assign({}, chapter, patch, {
+        id: chapter.id,
+        type: chapter.type,
+        version: chapter.version,
+        versionLabel: chapter.versionLabel,
+        releaseOpen: chapter.releaseOpen,
+        legacyIds: chapter.legacyIds,
+        fullBody: fullBody,
+        storyRevisionId: storyReplan.id,
+        storyRevisionTitle: storyReplan.title,
+        storyStatus: "replanned-from-1.1"
+      });
+    });
+    Object.keys(aliases || {}).forEach(function (key) {
+      var target = aliases[key];
+      if (sceneAliases[target]) aliases[key] = sceneAliases[target];
+    });
+    Object.keys(sceneAliases).forEach(function (key) { aliases[key] = sceneAliases[key]; });
+    return { chapters: replanned, sceneAliases: sceneAliases };
+  }
+
   var rawLiveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
   var rawAllStoryChapters = rawLiveStoryChapters.concat(version3StoryChapters, version4StoryChapters, version5StoryChapters);
   var groupedStory = groupSideStoryChapters(rawAllStoryChapters);
@@ -1858,8 +1900,11 @@
       fullBody: chapter.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n")
     });
   });
+  var storyReplanResult = applyStoryReplan(allStoryChapters, groupedStory.aliases);
+  allStoryChapters = storyReplanResult.chapters;
   var liveStoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) <= 2.5; });
   var storyChapterAliases = groupedStory.aliases;
+  var storySceneAliases = storyReplanResult.sceneAliases;
   var groupedVersion3StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 3 && Number(chapter.version) < 4; });
   var groupedVersion4StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 4 && Number(chapter.version) < 5; });
   var groupedVersion5StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 5; });
@@ -1871,6 +1916,7 @@
     futureCharacterPlan: futureCharacterPlan,
     futureCharacterReleasePlan: futureCharacterReleasePlan,
     futureStoryRevision: futureStoryRevision,
+    storyReplan: storyReplan,
     version3Cards: version3Cards,
     activeFour: activeFour,
     activeThree: activeThree,
@@ -1887,6 +1933,7 @@
     version4StoryChapters: groupedVersion4StoryChapters,
     version5StoryChapters: groupedVersion5StoryChapters,
     storyChapterAliases: storyChapterAliases,
+    storySceneAliases: storySceneAliases,
     northernMythArc: northernMythArc,
     storySource: storySource,
     characterBattleStats: characterBattleStats,
