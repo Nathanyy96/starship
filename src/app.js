@@ -65,8 +65,14 @@
     // character development and the design document.  Falling back to image
     // only preserves compatibility with legacy cards that have no portrait
     // wrapper yet.
+    // Keep the legacy summon surface on the same clean portrait source as the
+    // player app and design documents.  The query also invalidates a browser
+    // cache that may contain an older labeled card with the same filename.
+    var characterPortraitAssetVersion = "portrait-source-sync-20260922";
     function characterPortraitSource(card) {
-      return card && (card.portraitImage || card.image || card.backgroundImage) || "";
+      var source = card && (card.portraitImage || card.image || card.backgroundImage) || "";
+      if (!source || /^(data|blob):/i.test(source) || /[?&]v=/.test(source)) return source;
+      return source + (source.indexOf("?") >= 0 ? "&" : "?") + "v=" + characterPortraitAssetVersion;
     }
 
     function showMessage(text, isError) {

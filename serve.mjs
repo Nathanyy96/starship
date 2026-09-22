@@ -11,6 +11,7 @@ const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissi
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
+const retiredLabeledPortraitRoot = path.resolve(root, "assets", "cards", "labeled-png");
 const configuredDataDirectory = process.env.STARSHIP_DATA_DIR || path.join(root, "data");
 const dataDirectory = path.resolve(configuredDataDirectory);
 const playerDatabasePath = path.join(dataDirectory, "players.json");
@@ -1100,6 +1101,12 @@ const server = http.createServer((request, response) => {
   }
   const relativePath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
   const filePath = path.resolve(root, "." + relativePath);
+
+  if (filePath === retiredLabeledPortraitRoot || filePath.startsWith(retiredLabeledPortraitRoot + path.sep)) {
+    response.writeHead(410, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
+    response.end("Retired portrait source");
+    return;
+  }
 
   if (relativePath.startsWith("/data/") || (filePath !== root && !filePath.startsWith(root + path.sep))) {
     response.writeHead(403);

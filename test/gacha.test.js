@@ -87,9 +87,13 @@ test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯�
   const portraitIds = Object.keys(cards);
   assert.equal(portraitIds.length, 43);
   assert.equal(portraitIds.every((id) => {
+    const card = cards[id];
+    assert.equal(card.portraitImage, `./assets/cards/complete/${id}.svg`);
+    assert.equal(fs.existsSync(path.join(__dirname, "..", card.image)), true);
     const svg = fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8");
     return svg.includes('viewBox="0 0 1024 1536"') &&
       svg.includes(`data-character-id="${id}"`) &&
+      svg.includes(`href="../${path.basename(card.image)}"`) &&
       svg.includes("<image ") &&
       !svg.includes("<text") &&
       !svg.includes("translate(") &&
@@ -98,6 +102,17 @@ test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯�
   const futureIds = Object.values(cards).filter((card) => Number(card.releaseVersion) >= 3).map((card) => card.id);
   assert.equal(new Set(futureIds).size, futureIds.length);
   assert.equal(futureIds.every((id) => fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8").includes(`data-character-id="${id}"`)), true);
+});
+
+test("角色介面不會回退到舊式 labeled-png", () => {
+  const playerApp = fs.readFileSync(path.join(__dirname, "..", "src", "player-app.js"), "utf8");
+  const legacyApp = fs.readFileSync(path.join(__dirname, "..", "src", "app.js"), "utf8");
+  const server = fs.readFileSync(path.join(__dirname, "..", "serve.mjs"), "utf8");
+  assert.match(playerApp, /portraitImage \|\| card\.image \|\| card\.backgroundImage/);
+  assert.match(legacyApp, /portraitImage \|\| card\.image \|\| card\.backgroundImage/);
+  assert.match(server, /retiredLabeledPortraitRoot/);
+  assert.doesNotMatch(playerApp, /labeled-png/);
+  assert.doesNotMatch(legacyApp, /labeled-png/);
 });
 
 test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {

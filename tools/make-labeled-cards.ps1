@@ -1,3 +1,8 @@
+# Retired on 2026-09-22.  The game and design documents now share the clean
+# portrait SVGs in assets/cards/complete.  Running the former renderer would
+# recreate the old labeled-png images and make the document/game sources drift.
+throw "The labeled-card renderer is retired. Use tools/make-complete-portraits.mjs and assets/cards/complete instead."
+
 Add-Type -AssemblyName System.Drawing
 
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)

@@ -45,7 +45,15 @@
       return String(value === undefined || value === null ? "" : value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
     }
     function number(value) { return Number(value || 0).toLocaleString("zh-Hant-TW"); }
-    function characterPortraitSource(card) { return card && (card.portraitImage || card.image || card.backgroundImage) || ""; }
+    // All character surfaces must use the same clean portrait source as the
+    // design documents.  The version query is intentional: deployed browsers
+    // may still have an older labeled card cached at the same asset URL.
+    var characterPortraitAssetVersion = "portrait-source-sync-20260922";
+    function characterPortraitSource(card) {
+      var source = card && (card.portraitImage || card.image || card.backgroundImage) || "";
+      if (!source || /^(data|blob):/i.test(source) || /[?&]v=/.test(source)) return source;
+      return source + (source.indexOf("?") >= 0 ? "&" : "?") + "v=" + characterPortraitAssetVersion;
+    }
     function bannerById(id) { return data.banners.find(function (banner) { return banner.id === id; }); }
     function bossStageById(id) { return (data.bossStages || []).find(function (stage) { return stage.id === id; }); }
     function voyageNodeById(id) { return (data.voyageConfig && data.voyageConfig.nodes || []).find(function (node) { return node.id === id; }); }
@@ -1463,8 +1471,9 @@
     function renderBackdrop(card) {
       var panel = byId("banner-panel");
       panel.style.setProperty("--featured-accent", card ? (card.accent || "#9e92ff") : "#9e92ff");
-      panel.style.setProperty("--featured-image", card && card.backgroundImage ? "url(\"" + card.backgroundImage + "\")" : "none");
-      panel.classList.toggle("has-featured-backdrop", Boolean(card && card.backgroundImage));
+      var featuredImage = card ? characterPortraitSource(card) : "";
+      panel.style.setProperty("--featured-image", featuredImage ? "url(\"" + featuredImage + "\")" : "none");
+      panel.classList.toggle("has-featured-backdrop", Boolean(featuredImage));
       panel.setAttribute("data-featured", card ? card.name : "回覆召集");
     }
     function render() {
