@@ -2,8 +2,10 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("現行資料開放 1.0–2.5，3.0 以後先保留", () => {
   assert.equal(activeCards.some((card) => card.releaseVersion === "2.0"), true);
@@ -74,6 +76,15 @@ test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
   assert.equal(characterAnimations.celesia.src, "./video/astralyn-1.0-1.5/celesia_5s.mp4");
   assert.equal(characterAnimations.mave.durationSeconds, 5);
   assert.equal(animationIds.every((id) => activeCards.some((card) => card.id === id)), true);
+});
+
+test("所有角色完整立繪的名片移到畫面外，不遮住角色", () => {
+  const portraitIds = Object.keys(cards);
+  assert.equal(portraitIds.length, 43);
+  assert.equal(portraitIds.every((id) => {
+    const svg = fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8");
+    return svg.includes('viewBox="0 0 1024 1760"') && svg.includes("translate(38 1570)") && !svg.includes("translate(38 38)");
+  }), true);
 });
 
 test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {

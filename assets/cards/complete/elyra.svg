@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" role="img" aria-label="伊萊拉 ★★★★ 淨">
-  <rect width="1024" height="1536" fill="#080d22"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1760" role="img" aria-label="伊萊拉 ★★★★ 淨">
+  <rect width="1024" height="1760" fill="#080d22"/>
   <image href="../elyra.png" x="0" y="0" width="1024" height="1536" preserveAspectRatio="xMidYMid meet"/>
   <defs>
     <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -11,13 +11,14 @@
       <stop offset="1" stop-color="#65d7c7" stop-opacity=".64"/>
     </linearGradient>
   </defs>
-  <g transform="translate(38 38)" filter="url(#softShadow)">
-    <rect x="0" y="0" width="390" height="220" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
-    <text x="30" y="52" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="21" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
-    <text x="30" y="111" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="40" font-weight="800">伊萊拉</text>
-    <text x="30" y="151" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="27" font-weight="800" letter-spacing="3">★★★★</text>
-    <rect x="218" y="126" width="136" height="48" rx="20" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
-    <text x="286" y="159" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">淨</text>
-    <text x="30" y="192" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="16" letter-spacing="2">Elyra</text>
+  <!-- Metadata sits in a footer outside the artwork; it never covers the face or body. -->
+  <g transform="translate(38 1570)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="948" height="150" rx="24" fill="url(#panel)" stroke="#e5edff" stroke-opacity=".5"/>
+    <text x="30" y="38" fill="#d9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="20" font-weight="700" letter-spacing="4">STAR-LAW / PORTRAIT</text>
+    <text x="30" y="91" fill="#ffffff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="38" font-weight="800">伊萊拉</text>
+    <text x="30" y="126" fill="#ffe5a4" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="25" font-weight="800" letter-spacing="3">★★★★</text>
+    <text x="250" y="126" fill="#c6d3ed" font-family="Segoe UI, sans-serif" font-size="18" letter-spacing="2">Elyra</text>
+    <rect x="790" y="47" width="128" height="52" rx="22" fill="#071329" fill-opacity=".72" stroke="#d6e7ff" stroke-opacity=".55"/>
+    <text x="854" y="81" text-anchor="middle" fill="#e9faff" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif" font-size="22" font-weight="800">淨</text>
   </g>
 </svg>
