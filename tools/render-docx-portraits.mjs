@@ -74,7 +74,10 @@ await Promise.all(entries.map(async (card) => {
     ? Buffer.from(await inlineSvgResources(source))
     : source;
   await sharp(input)
-    .resize({ width: 560, height: 760, fit: "contain", background: { r: 255, g: 255, b: 255, alpha: 1 } })
+    // The document gallery uses a fixed portrait frame.  Covering the frame
+    // keeps the source scene visible to every edge instead of adding white
+    // side bands around otherwise complete backgrounds.
+    .resize({ width: 560, height: 760, fit: "cover", position: "centre" })
     .png()
     .toFile(target);
 }));
