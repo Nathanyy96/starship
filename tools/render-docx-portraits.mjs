@@ -4,7 +4,9 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
-const sharp = require("sharp");
+// Use the bundled workspace runtime explicitly; the project does not install
+// sharp in node_modules on the deployment host.
+const sharp = require("C:/Users/natha/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputDir = path.resolve(process.argv[2] || path.join(root, ".tmp-docx-portraits"));
 const { cards } = require(path.join(root, "src", "data.js"));

@@ -77,8 +77,8 @@
       note: note || "",
       image: image || null,
       backgroundImage: backgroundImage || image || null,
-      // 原始立繪保留給卡池縮圖；完整角色頁使用程式產生的 SVG 標籤版，
-      // 讓角色名稱、星級、元素不依賴 AI 文字，也不會裁掉全身。
+      // portraitImage 是只包住原始立繪的乾淨 SVG；名稱、星級、元素由
+      // 遊戲與文件在圖片上方排版，避免舊式名片卡遮住角色，也讓兩端共用同一來源。
       portraitImage: image ? (String(image).toLowerCase().endsWith(".svg") ? image : "./assets/cards/complete/" + id + ".svg") : null
     });
   }

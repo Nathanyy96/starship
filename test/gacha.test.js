@@ -83,13 +83,21 @@ test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
   assert.equal(animationIds.every((id) => activeCards.some((card) => card.id === id)), true);
 });
 
-test("所有角色完整立繪的名片移到畫面外，不遮住角色", () => {
+test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯示", () => {
   const portraitIds = Object.keys(cards);
   assert.equal(portraitIds.length, 43);
   assert.equal(portraitIds.every((id) => {
     const svg = fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8");
-    return svg.includes('viewBox="0 0 1024 1760"') && svg.includes("translate(38 1570)") && !svg.includes("translate(38 38)");
+    return svg.includes('viewBox="0 0 1024 1536"') &&
+      svg.includes(`data-character-id="${id}"`) &&
+      svg.includes("<image ") &&
+      !svg.includes("<text") &&
+      !svg.includes("translate(") &&
+      !svg.includes("STAR-LAW / PORTRAIT");
   }), true);
+  const futureIds = Object.values(cards).filter((card) => Number(card.releaseVersion) >= 3).map((card) => card.id);
+  assert.equal(new Set(futureIds).size, futureIds.length);
+  assert.equal(futureIds.every((id) => fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8").includes(`data-character-id="${id}"`)), true);
 });
 
 test("1.0–2.5 劇情完整開放，3.0–5.5 主線與支線都已建檔但保持鎖定", () => {

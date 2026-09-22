@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_NODE = Path(r"C:\Users\natha\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe")
 
 
-OUT = r"C:\starship\gacha-system\星界之律遊戲設定總覽.docx"
+OUT = os.environ.get("STARSHIP_DOCX_OUT", r"C:\starship\gacha-system\星界之律遊戲設定總覽.docx")
 
 
 def set_cell_shading(cell, fill):
@@ -172,14 +172,21 @@ def load_character_catalog():
         node = Path("node")
     script = "const d=require('./src/data.js'); process.stdout.write(JSON.stringify(Object.values(d.cards)));"
     result = subprocess.run([str(node), "-e", script], cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8")
-    return sorted(json.loads(result.stdout), key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", "")))
+    # Google Docs tabs曾經把同一名角色從不同素材資料夾各插入一次。
+    # 文件輸出只接受 card id 作為唯一鍵，避免第三大版本再出現重複立繪。
+    unique = {}
+    for card in json.loads(result.stdout):
+        card_id = str(card.get("id", "")).strip()
+        if card_id and card_id not in unique:
+            unique[card_id] = card
+    return sorted(unique.values(), key=lambda card: (float(card.get("releaseVersion", 0)), card.get("id", "")))
 
 
 def add_character_portrait_catalog(doc, portrait_dir):
     cards = load_character_catalog()
     add_page_break(doc)
     add_heading(doc, "角色完整立繪圖鑑", 1)
-    add_text(doc, "以下圖鑑與 src/data.js 的 cards 同步，收錄 1.0–5.5 全部角色。每張圖都使用完整立繪，並在圖下固定標示角色名稱、星級、元素、版本與目前開放狀態；後續版本角色雖已建檔，仍會以鎖定狀態保留。", size=10.5, after=8)
+    add_text(doc, "以下圖鑑與 src/data.js 的 cards 同步，收錄 1.0–5.5 全部角色，每個角色只出現一次。每張圖使用與遊戲相同的乾淨完整立繪；角色名字、星級與元素以文字排在圖片上方，版本與目前開放狀態列在圖片下方。後續版本角色雖已建檔，仍會以鎖定狀態保留。", size=10.5, after=8)
     table = doc.add_table(rows=0, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
@@ -195,7 +202,21 @@ def add_character_portrait_catalog(doc, portrait_dir):
         cell = table.rows[-1].cells[index % 3]
         cell.text = ""
         image_path = Path(portrait_dir) / (str(card.get("id")) + ".png")
-        paragraph = cell.paragraphs[0]
+        label = cell.paragraphs[0]
+        label.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        name = label.add_run(str(card.get("name", "")))
+        set_run_font(name, size=10.2, color="000000", bold=True)
+        label.paragraph_format.space_after = Pt(1)
+        label.paragraph_format.keep_with_next = True
+
+        identity = cell.add_paragraph()
+        identity.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        identity_run = identity.add_run("★" * int(card.get("rarity", 0)) + "  ·  " + str(card.get("element", "")) + "元素")
+        set_run_font(identity_run, size=8.2, color="3B5C82", bold=True)
+        identity.paragraph_format.space_after = Pt(3)
+        identity.paragraph_format.keep_with_next = True
+
+        paragraph = cell.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         if image_path.exists():
             # Keep the final row together with its captions when Word paginates
@@ -206,10 +227,7 @@ def add_character_portrait_catalog(doc, portrait_dir):
             fallback = paragraph.add_run("立繪待補")
             set_run_font(fallback, size=9, color="8A3D3D", bold=True)
         paragraph.paragraph_format.space_after = Pt(3)
-        caption = cell.add_paragraph()
-        caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        name = caption.add_run(str(card.get("name", "")))
-        set_run_font(name, size=10, color="000000", bold=True)
+        paragraph.paragraph_format.keep_together = True
         meta = cell.add_paragraph()
         meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
         version = str(card.get("releaseVersion", ""))
@@ -229,6 +247,32 @@ def load_world_map_catalog():
     script = "const d=require('./src/data.js'); process.stdout.write(JSON.stringify({map:d.storyWorldMap,story:d.storyChapters}));"
     result = subprocess.run([str(node), "-e", script], cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8")
     return json.loads(result.stdout)
+
+
+def load_story_catalog():
+    node = Path(os.environ.get("STARSHIP_NODE", str(DEFAULT_NODE)))
+    if not node.exists():
+        node = Path("node")
+    script = "const d=require('./src/data.js'); process.stdout.write(JSON.stringify(d.storyChapters));"
+    result = subprocess.run([str(node), "-e", script], cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8")
+    return json.loads(result.stdout)
+
+
+def add_story_full_text(doc):
+    chapters = load_story_catalog()
+    add_heading(doc, "完整劇情正文（主線與支線）", 2)
+    add_text(doc, "以下正文直接從 src/data.js 的 storyChapters 產生，主線與合併支線都保留完整幕次。文件不只保存標題，遊戲與文件可用同一份正文做同步檢查。", size=9.8, after=6)
+    for chapter in chapters:
+        kind = "主線" if chapter.get("type") == "main" else "支線"
+        add_heading(doc, f"{chapter.get('version', '')}｜{chapter.get('title', '')}（{kind}）", 2)
+        summary = chapter.get("summary", "")
+        if summary:
+            add_text(doc, "章節摘要｜" + str(summary), size=9.5, color="3B5C82", after=4)
+        for index, scene in enumerate(chapter.get("scenes", []), start=1):
+            add_heading(doc, str(scene.get("title", f"第 {index} 幕")), 3)
+            body = str(scene.get("body", "")).strip()
+            if body:
+                add_text(doc, body, size=9.2, after=8)
 
 
 def add_world_map_section(doc):
@@ -432,6 +476,8 @@ def main():
         "新帳號自動取得瑟蕾雅。完成 1.0 主線任意一幕後，可在大廳自選雷恩或莉亞。",
         "通關星界試煉第 10 關後，再開啟一次雷恩或莉亞自選，第二份獎勵優先顯示尚未取得的角色。",
     ])
+
+    add_story_full_text(doc)
 
     add_world_map_section(doc)
 

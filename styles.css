@@ -927,6 +927,14 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .skin-empty { display: block; padding: 16px; }.skin-empty h4 { margin: 5px 0; color: #dfe8ff; font-size: .85rem; }.skin-empty p { margin: 0; color: #8fa1c2; font-size: .68rem; }
 .portrait-skin-active { border-color: color-mix(in srgb, var(--skin-accent, #d06cff) 70%, #fff); box-shadow: inset 0 0 42px color-mix(in srgb, var(--skin-accent, #d06cff) 22%, transparent), 0 0 28px color-mix(in srgb, var(--skin-accent, #d06cff) 24%, transparent); }
 .portrait-skin-badge { position: absolute; top: 14px; left: 14px; z-index: 2; padding: 6px 9px; border: 1px solid rgba(255,255,255,.34); border-radius: 999px; color: #fff6ff; background: rgba(92, 44, 128, .68); font-size: .61rem; letter-spacing: .08em; }
+.character-portrait-column { display: flex; min-width: 0; flex-direction: column; gap: 9px; }
+.portrait-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 2px 4px 0; }
+.portrait-heading > div { min-width: 0; }
+.portrait-heading strong { display: block; overflow: hidden; color: #f8f9ff; font-size: 1.18rem; letter-spacing: .06em; text-overflow: ellipsis; white-space: nowrap; }
+.portrait-heading small { display: block; margin-top: 3px; overflow: hidden; color: #9eafd0; font-size: .62rem; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; }
+.portrait-heading > span { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding-bottom: 2px; color: #ffe4a5; font-size: .74rem; letter-spacing: .08em; white-space: nowrap; }
+.portrait-heading > span b { padding: 4px 8px; border: 1px solid rgba(112,233,223,.34); border-radius: 999px; color: #8ff4e7; background: rgba(112,233,223,.07); font-size: .6rem; font-weight: 600; letter-spacing: .04em; }
+.character-portrait-frame { flex: 1 1 auto; }
 @keyframes pet-sparkle { 0%, 100% { transform: translateY(0) scale(1); opacity: .75; } 50% { transform: translateY(-4px) scale(1.12); opacity: 1; } }
 @media (max-width: 980px) { .voyage-layout, .pet-layout { grid-template-columns: 1fr; } .voyage-node-list { grid-template-columns: repeat(3, minmax(110px, 1fr)); } }
 @media (max-width: 980px) { .voyage-guide-body { grid-template-columns: 1fr; } }
