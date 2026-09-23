@@ -6,6 +6,8 @@ tools/__pycache__/
 # Local roster and document render experiments.
 .tmp-*.mjs
 assets/cards/generated/
+assets/cards/labeled/
+assets/cards/labeled-png/
 docx-qa-*/
 docx-render-*/
 # Kaggle/video experiments and render outputs remain local until curated.
