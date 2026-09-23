@@ -3,3 +3,10 @@ data/players.json.tmp
 data/players.json.bak
 _docx_qa_*/
 tools/__pycache__/
+# Local roster and document render experiments.
+.tmp-*.mjs
+assets/cards/generated/
+docx-qa-*/
+docx-render-*/
+# Kaggle/video experiments and render outputs remain local until curated.
+video/

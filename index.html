@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=portrait-source-sync-20260922">
+  <link rel="stylesheet" href="./styles.css?v=story-ui-repair-20260922b">
 </head>
 <body>
   <main class="page-shell">
@@ -61,7 +61,7 @@
         <button id="open-announcements" class="lobby-quick-card announcement-quick" type="button"><span class="quick-icon" aria-hidden="true">📣</span><span class="quick-copy"><strong>公告</strong><small id="announcement-quick-status">更新內容與獎勵</small></span><span class="quick-badge">NEW</span></button>
         <button id="open-tutorial" class="lobby-quick-card tutorial-quick" type="button"><span class="quick-icon" aria-hidden="true">?</span><span class="quick-copy"><strong>新手教學</strong><small id="tutorial-quick-status">完成教學可領獎</small></span><span class="quick-badge" id="tutorial-quick-badge">GUIDE</span></button>
       </div>
-      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>文件資料同步中</span></div>
+      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>1.0–2.5 內容已開放</span></div>
       <div class="lobby-menu-grid">
         <button id="open-story" class="lobby-menu-card story-menu" type="button"><span class="menu-index">01</span><span class="menu-icon">◈</span><strong>劇情</strong><small>閱讀界痕調查與各版本角色線</small><span class="menu-arrow">→</span></button>
         <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
@@ -100,7 +100,7 @@
       <div id="announcement-list" class="announcement-list"></div>
     </section>
 
-    <section id="story-view" class="game-view panel" hidden>
+    <section id="story-view" class="game-view panel story-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">1.0–2.5</span></div>
       <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0–2.5</button><button id="story-side-tab" class="small-button" type="button">支線 1.0–2.5</button></div>
       <section id="story-world-map" class="story-world-map-panel" aria-labelledby="story-map-title"></section>
@@ -109,7 +109,7 @@
 
     <section id="character-view" class="game-view panel" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
-      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複抽到角色時命座會立即自動增加，培養頁不再放置多餘的命座按鈕。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>命座規則 <b>重複自動 +1</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
+      <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複抽到角色時命座會立即自動增加。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>專用晶核 <b id="character-core">0</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
       <div class="character-list-tools" aria-label="角色搜尋與篩選"><label class="character-search-field"><span>搜尋角色</span><input id="character-search" type="search" placeholder="輸入名稱或元素" autocomplete="off"></label><label class="character-filter-field"><span>顯示</span><select id="character-filter"><option value="all">全部角色</option><option value="owned">已取得</option><option value="rarity4">四星角色</option><option value="rarity3">三星角色</option></select></label><span id="character-list-count" class="character-list-count"></span></div>
       <div id="character-list" class="character-list"></div>
       <section id="character-detail" class="character-detail" hidden></section>
@@ -133,7 +133,7 @@
       </section>
     </dialog>
 
-    <section id="trial-view" class="game-view panel" hidden>
+    <section id="trial-view" class="game-view panel trial-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
       <div class="trial-layout">
         <aside class="trial-stage-rail">
@@ -297,8 +297,8 @@
   <script src="./src/future-story-revision.js?v=story-revision-v2-20260921"></script>
   <script src="./src/story-replan.js?v=story-replan-v1-20260921"></script>
   <script src="./src/story-world-map.js?v=story-world-map-v1-20260921"></script>
-  <script src="./src/data.js?v=portrait-source-sync-20260922"></script>
+  <script src="./src/data.js?v=story-ui-repair-20260922b"></script>
   <script src="./src/battle.js?v=pet-customization-20260920"></script>
-  <script src="./src/player-app.js?v=portrait-source-sync-20260922"></script>
+  <script src="./src/player-app.js?v=story-ui-repair-20260922b"></script>
 </body>
 </html>

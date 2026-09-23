@@ -3,7 +3,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const sharp = require("C:/Users/natha/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp");
+const sharp = require("sharp");
 const { cards } = require("../src/data.js");
 const portraitCards = Object.values(cards);
 

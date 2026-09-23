@@ -144,6 +144,23 @@
     cards.veyra, cards.harlow, cards.elorna, cards.chodan, cards.magenta,
     cards.hina, cards.siyeon, cards.mave
   ];
+  // 劇情人物依「角色圖鑑｜單人完整立繪」分頁的圖像順序建檔；不進入卡池。
+  var storyCharacters = Object.freeze({
+    sevin: { name: "塞維恩", romanizedName: "Sevin", portrait: "./assets/story-characters/sevin.png" },
+    seifra: { name: "賽芙拉", romanizedName: "Seifra", portrait: "./assets/story-characters/seifra.png" },
+    noyas: { name: "諾亞斯", romanizedName: "Noyas", portrait: "./assets/story-characters/noyas.png" },
+    kailin: { name: "凱琳", romanizedName: "Kailin", portrait: "./assets/story-characters/kailin.png" },
+    oun: { name: "奧恩", romanizedName: "Oun", portrait: "./assets/story-characters/oun.png" },
+    mila: { name: "米菈", romanizedName: "Mila", portrait: "./assets/story-characters/mila.png" },
+    vark: { name: "老瓦克", romanizedName: "Vark", portrait: "./assets/story-characters/vark.png" }
+  });
+  var characterAssets = Object.freeze(Object.fromEntries(Object.values(cards).map(function (entry) {
+    var currentRelease = Number(entry.releaseVersion) <= 2.5;
+    var documentCardName = entry.id === "isar" ? "Isar_原稿_星律卡面.png" : entry.id === "rena" ? "Rena_原稿_星律卡面.png" : entry.romanizedName + "_星律卡面.png";
+    return [entry.id, Object.freeze({ portrait: entry.image, documentCardName: currentRelease ? documentCardName : null,
+      documentTab: currentRelease ? (Number(entry.releaseVersion) < 2 ? "角色圖鑑｜單人完整立繪" : "角色圖鑑｜第二大版本") : null })];
+  })));
+  var isarAscended = Object.freeze({ id: "isar-ascended", baseCharacterId: "isar", name: "伊薩爾｜四星升格", rarity: 4, element: "烈", portrait: "./assets/story-characters/isar-ascended.png", playable: false });
   var version2Cards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle];
   var version4Cards = [cards.aurelia, cards.kairen, cards.sorae, cards.talia, cards.neve, cards.kael, cards.elyra];
   var version5Cards = [cards.vestra, cards.brann, cards.eirin, cards.sava, cards.niela, cards.hervan, cards.daria];
@@ -1917,6 +1934,9 @@
 
   return {
     cards: cards,
+    characterAssets: characterAssets,
+    storyCharacters: storyCharacters,
+    isarAscended: isarAscended,
     activeCards: activeCards,
     futureCards: futureCards,
     futureCharacterPlan: futureCharacterPlan,
