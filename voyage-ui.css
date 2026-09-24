@@ -1,0 +1,287 @@
+/* 星艦導航艙：所有玩家畫面共用的視覺與導覽 */
+:root {
+  --bg: #050b1a;
+  --panel: #111c36;
+  --panel-strong: #172544;
+  --line: rgba(172, 201, 234, .26);
+  --text: #f5f6fa;
+  --muted: #c5d1e3;
+  --accent: #e9bd76;
+  --accent-2: #79dfd6;
+  --danger: #ffb0a7;
+  --shadow: 0 18px 44px rgba(1, 5, 18, .3);
+  color-scheme: dark;
+}
+
+html { scroll-padding-top: 92px; scroll-behavior: auto; }
+body {
+  color: var(--text);
+  background: #050b1a url('./assets/ui/astral-hub.png') center top / cover fixed no-repeat;
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
+}
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(3, 8, 22, .5), rgba(4, 10, 25, .91) 58%, #050b1a);
+  content: '';
+  pointer-events: none;
+}
+::selection { color: #081321; background: #f4ce8f; }
+:where(button, input, select, summary, a):focus-visible { outline: 3px solid #f4ce8f; outline-offset: 3px; }
+button, input, select { accent-color: var(--accent-2); }
+button { touch-action: manipulation; }
+button:disabled { opacity: .52; }
+button:active:not(:disabled) { transform: translateY(1px); }
+* { scrollbar-color: #566d8b #09142b; }
+.page-shell { width: min(1480px, calc(100% - 56px)); padding: 22px 0 80px; }
+.topbar { align-items: center; gap: 24px; margin: 0 0 18px; padding: 10px 0 20px; }
+.topbar::after { background: linear-gradient(90deg, rgba(233, 189, 118, .65), rgba(121, 223, 214, .24), transparent); }
+.brand-lockup { min-width: 0; gap: 17px; }
+.game-icon { width: 64px; height: 64px; flex: 0 0 auto; border-radius: 14px; }
+.topbar .eyebrow, .lobby-hero .eyebrow, .lobby-heading .eyebrow, .lobby-continue .eyebrow { display: none; }
+.topbar h1 { margin: 0 0 5px; font-size: clamp(1.85rem, 3vw, 2.65rem); letter-spacing: -.025em; line-height: 1.2; text-shadow: none; }
+.topbar .subtitle { max-width: 60ch; color: #d1dcec; font-size: .88rem; }
+.player-badge { max-width: 300px; border-radius: 12px; background: #0b1830; }
+.player-badge small { color: #e9bd76; }
+.player-badge strong { font-size: .96rem; }
+.player-badge .small-button { min-height: 34px; }
+
+.destination-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 62px;
+  margin: 0 0 22px;
+  padding: 7px 10px;
+  overflow-x: auto;
+  border: 1px solid rgba(233, 189, 118, .28);
+  border-radius: 14px;
+  background: rgba(7, 17, 36, .97);
+  box-shadow: 0 14px 34px rgba(0, 4, 14, .3);
+  scrollbar-width: thin;
+}
+.destination-nav button {
+  position: relative;
+  min-width: 68px;
+  min-height: 44px;
+  flex: 1 0 auto;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 9px;
+  color: #d0dbeb;
+  background: transparent;
+  font-size: .88rem;
+  font-weight: 650;
+  white-space: nowrap;
+  transition: color .18s ease, background .18s ease;
+}
+.destination-nav button:hover { color: #fff; background: rgba(233, 189, 118, .13); }
+.destination-nav button.active { color: #101b2b; background: #f0c989; box-shadow: 0 5px 15px rgba(0, 0, 0, .24); }
+
+.panel, .resource, .lobby-menu-card, .lobby-quick-card {
+  border-color: rgba(172, 201, 234, .26);
+  background-color: #101c36;
+  box-shadow: 0 18px 44px rgba(1, 5, 18, .3);
+}
+.panel { border-radius: 16px; }
+.eyebrow { display: none; }
+.lobby-quick-card .quick-icon { display: none; }
+.primary-action :is(span, strong, small) { color: #111a27 !important; }
+.small-button, .secondary-action, select {
+  color: #f4f6fa;
+  background: #182744;
+  border-color: rgba(172, 201, 234, .38);
+}
+:is(.small-button, .secondary-action, .exchange-action):hover:not(:disabled) { color: #fff; border-color: #f0c989; background: #243755; }
+:is(input, select):focus-visible { outline: 3px solid #f4ce8f; outline-offset: 2px; }
+.story-chapter-button:hover, .story-scene-button:hover, .auth-choice-button:hover { border-color: #f0c989; }
+.primary-action { color: #111a27 !important; background: #f0c989 !important; border-color: #f0c989 !important; font-weight: 800; }
+.primary-action:hover:not(:disabled) { background: #ffe0ab !important; }
+.message { color: #9af0e7; }
+.message.error { color: #ffb0a7; }
+
+.auth-gate {
+  min-height: min(640px, calc(100svh - 130px));
+  grid-template-columns: minmax(300px, .94fr) minmax(420px, 1.06fr);
+  margin-top: 20px;
+  border-radius: 18px;
+  border-color: rgba(233, 189, 118, .35);
+  background: linear-gradient(100deg, rgba(5, 13, 32, .45), rgba(5, 13, 32, .95) 55%), url('./assets/ui/astral-hall.png') center / cover no-repeat;
+}
+.auth-gate::before { background: linear-gradient(90deg, transparent 25%, rgba(4, 11, 28, .4) 48%, transparent); }
+.auth-gate-visual { background: transparent; }
+.auth-gate-visual::before, .auth-gate-visual::after, .auth-gate-orbit { display: none; }
+.auth-gate-sigil { width: 154px; height: 154px; border-radius: 28px; }
+.auth-gate-content { max-width: 710px; padding: clamp(32px, 5vw, 74px); }
+.auth-gate-content .eyebrow { display: none; }
+.auth-gate-content h2 { margin: 0 0 16px; font-size: clamp(2rem, 3.4vw, 3.5rem); letter-spacing: -.025em; line-height: 1.24; text-shadow: none; }
+.auth-gate-content > p:not(.eyebrow) { color: #d5dfef; font-size: 1rem; line-height: 1.7; }
+.auth-choice-button { min-height: 92px; border-radius: 12px; }
+.auth-choice-button strong { font-size: 1.12rem; }
+.auth-choice-button small { color: #d2def0; font-size: .83rem; }
+.auth-choice-button.primary-action small { color: #273447; }
+.auth-choice-button.secondary-action { background: rgba(14, 30, 58, .9); }
+.auth-form label { color: #ecf2fb; font-size: .9rem; }
+.auth-form input { min-height: 50px; font-size: 1rem; }
+.auth-form input::placeholder { color: #b2c1da; }
+.auth-form-actions button { min-height: 48px; }
+
+.lobby-hero {
+  min-height: 360px;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  align-items: end;
+  padding: clamp(28px, 4vw, 56px);
+  border-color: rgba(233, 189, 118, .35);
+  background: linear-gradient(90deg, rgba(5, 11, 28, .88), rgba(5, 11, 28, .45) 72%), url('./assets/ui/astral-hub.png') center 42% / cover no-repeat;
+}
+.game-lobby::before { display: none; }
+.lobby-hero::after { background: linear-gradient(0deg, rgba(3, 9, 22, .42), transparent 60%); }
+.game-lobby:not([hidden]) .lobby-hero { animation: bridge-arrival .42s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes bridge-arrival {
+  from { opacity: .8; transform: translateY(8px); filter: brightness(.84); }
+  to { opacity: 1; transform: translateY(0); filter: brightness(1); }
+}
+.lobby-hero-copy h2 { max-width: 18ch; margin: 0 0 14px; font-size: clamp(2.4rem, 5vw, 4.7rem); letter-spacing: -.03em; line-height: 1.16; }
+.lobby-hero-copy > p:not(.eyebrow) { max-width: 55ch; color: #e0e8f3; font-size: 1rem; line-height: 1.7; }
+.lobby-hero-radar { width: 160px; height: 160px; opacity: .82; }
+.lobby-status span { border-color: rgba(233, 189, 118, .36); color: #ffdda1; background: rgba(8, 18, 39, .77); font-size: .8rem; }
+.lobby-next-step { display: flex; align-items: end; gap: 24px; max-width: 720px; margin-top: 28px; }
+.lobby-next-step > div { min-width: 0; }
+.lobby-next-step strong { display: block; color: #fff; font-size: 1.08rem; }
+.lobby-next-step p { margin: 5px 0 0; color: #e2eaf5; font-size: .86rem; line-height: 1.5; }
+.lobby-next-step .primary-action { min-width: 150px; min-height: 48px; flex: 0 0 auto; padding: 10px 20px; border-radius: 9px; }
+.lobby-quick-actions { justify-content: flex-start; margin: 16px 0 12px; }
+.lobby-quick-card { min-width: 220px; min-height: 74px; border-radius: 12px; background: rgba(15, 29, 57, .94); }
+.lobby-quick-card:hover { border-color: #f0c989; box-shadow: 0 18px 32px rgba(0, 4, 14, .27); }
+.lobby-heading { margin: 14px 0 12px; }
+.lobby-heading h2 { margin: 0; font-size: clamp(1.4rem, 2.2vw, 2rem); }
+.lobby-heading > span { color: #d0daeb; font-size: .88rem; }
+.lobby-menu-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.lobby-menu-card {
+  min-height: 184px;
+  justify-content: flex-end;
+  padding: 22px;
+  border-radius: 13px;
+  background: linear-gradient(0deg, rgba(5, 13, 30, .92), rgba(8, 19, 43, .38)), url('./assets/ui/astral-hall.png') center / cover no-repeat;
+}
+.lobby-menu-card::before, .lobby-menu-card::after { display: none; }
+.lobby-menu-card:hover { border-color: #f0c989; box-shadow: 0 20px 40px rgba(0, 4, 14, .38); }
+.lobby-menu-card .menu-index, .lobby-menu-card .menu-icon { display: none; }
+.lobby-menu-card strong { font-size: 1.27rem; letter-spacing: .02em; }
+.lobby-menu-card small { max-width: 25ch; min-height: 0; color: #e1e8f4; font-size: .85rem; line-height: 1.5; }
+.lobby-menu-card .menu-arrow { color: #f0c989; font-size: 1.35rem; }
+.story-menu, .voyage-menu { grid-column: span 2; min-height: 220px; }
+.story-menu { background-image: linear-gradient(0deg, rgba(5, 13, 30, .96), rgba(5, 13, 30, .13)), url('./assets/ui/astral-hub.png'); background-position: center 54%; }
+.gacha-menu { background-image: linear-gradient(0deg, rgba(5, 13, 30, .96), rgba(5, 13, 30, .13)), url('./assets/ui/astral-hall.png'); }
+.trial-menu, .boss-menu { background-image: linear-gradient(0deg, rgba(5, 13, 30, .96), rgba(5, 13, 30, .1)), url('./assets/ui/astral-trial.png'); }
+.voyage-menu { background-image: linear-gradient(0deg, rgba(5, 13, 30, .96), rgba(5, 13, 30, .13)), url('./assets/ui/astral-hub.png'); background-position: center 72%; }
+.pet-menu { background-image: linear-gradient(0deg, rgba(5, 13, 30, .96), rgba(5, 13, 30, .13)), url('./assets/pets/companion-workshop-bg.png'); }
+.lobby-continue { margin-top: 22px; border-color: rgba(233, 189, 118, .35); border-radius: 13px; background: #152441; }
+.lobby-continue .eyebrow { display: none; }
+.lobby-continue strong { font-size: 1.16rem; }
+.lobby-continue p:not(.eyebrow) { color: #d0dced; font-size: .9rem; }
+.lobby-continue .primary-action { min-height: 48px; }
+
+/* Every destination shares one legible bridge frame. */
+.game-view, .gacha-hall { scroll-margin-top: 92px; }
+.game-view { min-height: 0; border-radius: 16px; background: linear-gradient(145deg, rgba(17, 31, 58, .98), rgba(6, 14, 32, .97)); }
+.view-toolbar { margin-bottom: 24px; padding-bottom: 20px; border-color: rgba(233, 189, 118, .28); }
+.view-toolbar .eyebrow { display: none; }
+.view-toolbar h2 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.5rem); letter-spacing: -.02em; }
+.view-toolbar > span, .view-toolbar-meta { color: #d1deef; }
+.back-lobby { min-height: 44px; }
+.resource-bar { margin-bottom: 18px; }
+.resource { border-radius: 12px; }
+.resource small, .rule-list span, .banner-description, .rules-footnote { color: #d0dced; }
+.banner-panel, .rules-panel, .results-panel, .lower-grid .panel { border-radius: 16px; }
+.banner-panel, .rules-panel { order: 0; }
+.banner-panel { background-image: linear-gradient(90deg, rgba(6, 14, 32, .96), rgba(6, 14, 32, .7)), url('./assets/ui/astral-hall.png'); }
+.story-reader { border-radius: 14px; background: #0e1c37; }
+.story-summary, .story-scene-reader > p, .story-chapter-button small, .story-scene-button, .story-scene-button small { color: #cbd8ec; }
+.story-scene-reader > p { max-width: 72ch; font-size: .95rem; line-height: 1.85; }
+.story-chapter-button, .trial-stage-button { min-height: 54px; }
+.story-chapter-button.active, .story-scene-button.active { border-color: #f0c989; background: rgba(233, 189, 118, .13); }
+.trial-arena { background-image: linear-gradient(145deg, rgba(10, 22, 46, .82), rgba(6, 13, 31, .74)), url('./assets/ui/astral-trial.png'); }
+.voyage-intro, .pet-intro { border-color: rgba(233, 189, 118, .32); }
+
+@media (max-width: 1100px) {
+  .lobby-menu-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .story-menu, .voyage-menu { grid-column: span 2; }
+  .destination-nav button { flex-grow: 0; }
+}
+@media (max-width: 760px) {
+  body { background-attachment: scroll; }
+  .page-shell { width: min(100% - 28px, 680px); padding-top: 12px; }
+  .topbar { flex-wrap: wrap; }
+  .player-badge { max-width: none; width: 100%; }
+  .destination-nav { margin-bottom: 16px; border-radius: 11px; }
+  .auth-gate { grid-template-columns: 1fr; min-height: 0; }
+  .auth-gate-visual { display: none; }
+  .auth-gate-content { max-width: none; padding: 30px; }
+  .lobby-hero { grid-template-columns: 1fr; min-height: 320px; }
+  .lobby-hero-radar { display: none; }
+  .lobby-next-step { align-items: stretch; flex-direction: column; gap: 14px; }
+  .lobby-next-step .primary-action { width: 100%; }
+  .lobby-menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .story-menu, .voyage-menu { grid-column: span 2; }
+  .game-view { padding: 20px; }
+  .view-toolbar { grid-template-columns: 1fr; gap: 12px; }
+  .view-toolbar .back-lobby { width: max-content; }
+  .banner-layout, .lower-grid, .story-layout { grid-template-columns: minmax(0, 1fr); }
+  .story-chapters, .story-reader { min-width: 0; }
+  .story-chapter-button { min-width: 0; }
+  .story-chapter-button span { min-width: 0; overflow-wrap: anywhere; }
+  .character-list-tools { flex-wrap: wrap; }
+  .resource-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .page-shell { width: calc(100% - 24px); }
+  .topbar { padding: 4px 0 17px; }
+  .topbar h1 { font-size: 1.75rem; }
+  .topbar .subtitle { font-size: .8rem; }
+  .game-icon { width: 48px; height: 48px; }
+  .destination-nav { width: calc(100vw - 24px); gap: 2px; padding: 6px; }
+  .destination-nav button { min-width: 64px; min-height: 42px; padding: 7px 9px; }
+  .auth-gate-content { padding: 24px 18px; }
+  .auth-gate-content h2 { font-size: 1.85rem; }
+  .auth-choice, .auth-form { grid-template-columns: 1fr; }
+  .auth-choice-button { min-height: 78px; }
+  .auth-form-actions { justify-content: stretch; }
+  .auth-form-actions button { flex: 1; }
+  .lobby-hero { min-height: 330px; padding: 23px 20px; }
+  .lobby-hero-copy h2 { font-size: 2.5rem; }
+  .lobby-status { gap: 6px; }
+  .lobby-status span { padding: 5px 8px; font-size: .7rem; }
+  .lobby-quick-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lobby-quick-card { min-width: 0; padding: 10px; }
+  .lobby-heading { align-items: flex-start; gap: 4px; }
+  .lobby-heading > span { font-size: .76rem; }
+  .lobby-menu-grid { gap: 8px; }
+  .lobby-menu-card { min-height: 170px; padding: 15px; }
+  .story-menu, .voyage-menu { min-height: 190px; }
+  .lobby-menu-card strong { font-size: 1.08rem; }
+  .lobby-menu-card small { font-size: .75rem; }
+  .lobby-menu-card .menu-arrow { right: 10px; bottom: 9px; }
+  .game-view { padding: 15px; }
+  .story-reader { padding: 16px; }
+  .story-chapters { grid-template-columns: 1fr; }
+  .character-search-field, .character-filter-field { min-width: 0; width: 100%; }
+  .panel { padding: 18px; }
+  .resource { min-width: 0; padding: 10px; }
+  .resource strong { font-size: 1rem; }
+}
+@media (max-width: 360px) {
+  .lobby-quick-actions, .lobby-menu-grid { grid-template-columns: 1fr; }
+  .story-menu, .voyage-menu { grid-column: auto; }
+  .lobby-menu-card { min-height: 130px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .destination-nav button, .lobby-menu-card, .lobby-quick-card { transition: none; }
+  .game-lobby:not([hidden]) .lobby-hero { animation: none; }
+}

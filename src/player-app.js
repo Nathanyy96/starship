@@ -112,6 +112,13 @@
       }
       hideGameViews();
       byId(viewId).hidden = false;
+      byId("destination-nav").hidden = false;
+      document.querySelectorAll("#destination-nav button").forEach(function (button) {
+        var active = button.getAttribute("data-view") === viewId;
+        button.classList.toggle("active", active);
+        if (active) button.setAttribute("aria-current", "page");
+        else button.removeAttribute("aria-current");
+      });
       if (viewId === "game-lobby") { renderLobby(); }
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
@@ -123,7 +130,12 @@
       if (viewId === "voyage-view") { renderVoyage(); }
       if (viewId === "pet-view") { renderPets(); loadPetShowcases(); }
       if (viewId === "gacha-hall") { render(); }
-      byId(viewId).scrollIntoView({ behavior: "smooth", block: "start" });
+      var heading = byId(viewId).querySelector("h2");
+      if (heading) {
+        heading.setAttribute("tabindex", "-1");
+        heading.focus({ preventScroll: true });
+      }
+      byId(viewId).scrollIntoView({ behavior: "instant", block: "start" });
     }
     function setHallVisible(visible) {
       if (visible) { showView("gacha-hall"); } else { byId("gacha-hall").hidden = true; }
@@ -155,6 +167,7 @@
       game = null;
       byId("player-gate").hidden = false;
       byId("player-badge").hidden = true;
+      byId("destination-nav").hidden = true;
       hideGameViews();
       setControlsEnabled(false);
       byId("player-name-input").value = storedName();
@@ -1522,6 +1535,9 @@
     }
 
     byId("known-player-button").addEventListener("click", function () { setAuthMode("login"); });
+    document.querySelectorAll("#destination-nav button").forEach(function (button) {
+      button.addEventListener("click", function () { showView(button.getAttribute("data-view")); });
+    });
     byId("new-player-button").addEventListener("click", function () { setAuthMode("register"); });
     byId("auth-back").addEventListener("click", showAuthChoice);
     byId("player-form").addEventListener("submit", function (event) { event.preventDefault(); submitAuth(byId("player-name-input").value, byId("player-password-input").value); });
