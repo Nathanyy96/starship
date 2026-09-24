@@ -9,7 +9,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { updateCycle, updateVersion } = await import("../src/data.js");
+const { updateCycle, updateVersion, storySceneAliases } = (await import("../src/data.js")).default;
 
 async function freePort() {
   const listener = net.createServer();
@@ -50,6 +50,7 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     original.collection.lia = 2;
     original.characterProgress.lia = { level: 21, affinity: 4, constellation: 1, constellationCore: 1, breakthrough: false };
     original.storyProgress.completedScenes["main-1-0:signal"] = { starSand: 100 };
+    original.storyProgress.completedScenes["main-1-1:pickup"] = { starSand: 100 };
     original.updateRewards.claimedVersions = { [updateVersion]: { starSand: 3200 } };
     original.trialProgress = { version: updateVersion, selectedTeam: ["lia"], clearedStages: [1, 10], attempts: { 1: 10 }, bestStage: 10, lastBattle: { won: true } };
     original.bossProgress = { version: updateVersion, selectedBossId: "boss-star-warden", selectedTeam: ["lia"], attempts: { "boss-star-warden": 10 }, lastBattle: { won: true } };
@@ -74,6 +75,8 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
     assert.ok(first.storyProgress.completedScenes["main-1-0:signal"]);
+    assert.ok(first.storyProgress.completedScenes[storySceneAliases["main-1-1:pickup"]]);
+    assert.ok(first.storyProgress.completedScenes["main-1-1:pickup"]);
     assert.ok(first.updateRewards.claimedVersions[updateVersion]);
     assert.ok(first.updateRewards.claimedVersions[updateCycle]);
     assert.deepEqual(first.trialProgress.clearedStages, []);

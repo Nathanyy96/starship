@@ -1886,6 +1886,14 @@
     var replanned = chapters.map(function (chapter) {
       var patch = patches[chapter.id];
       if (!patch) return chapter;
+      // 已開放章節以匯入的完整正文為準；重編提綱不可覆蓋玩家閱讀的長篇原稿。
+      if (chapter.releaseOpen !== false && chapter.sourceStatus === "document" && chapter.fullBody) {
+        (patch.scenes || []).forEach(function (shortScene, index) {
+          var original = chapter.scenes[Math.min(chapter.scenes.length - 1, Math.floor(index * chapter.scenes.length / Math.max(patch.scenes.length, 1)))];
+          if (original && shortScene.id !== original.id) sceneAliases[chapter.id + ":" + shortScene.id] = chapter.id + ":" + original.id;
+        });
+        return chapter;
+      }
       var oldScenes = chapter.scenes || [];
       var nextScenes = patch.scenes || [];
       oldScenes.forEach(function (oldScene, index) {

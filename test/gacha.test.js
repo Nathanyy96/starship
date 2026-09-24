@@ -57,7 +57,7 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });
 
-test("1.1 起使用統一重編正史，角色依劇情需要登場", () => {
+test("已開放故事保留文件長篇正文，未開放篇章使用重編稿", () => {
   assert.equal(futureStoryRevision.id, "future-story-revision-v2");
   assert.equal(storyReplan.id, "story-replan-v1");
   assert.match(storyReplan.preservedCanon, /瑟蕾雅/);
@@ -67,10 +67,16 @@ test("1.1 起使用統一重編正史，角色依劇情需要登場", () => {
   assert.equal(storyReplan.chapters["main-5.5"].title, "長冬後的新曙");
   assert.equal(Object.keys(storyReplan.chapters).length, 41);
   const revised = storyChapters.filter((chapter) => chapter.storyRevisionId === storyReplan.id);
-  assert.equal(revised.length, 41);
-  assert.equal(revised.filter((chapter) => Number(chapter.version) >= 1.1).length, 40);
+  assert.equal(revised.length, 24);
+  assert.equal(revised.every((chapter) => chapter.releaseOpen === false), true);
   assert.equal(revised.every((chapter) => chapter.storyRevisionId === storyReplan.id), true);
   assert.equal(revised.every((chapter) => chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body.length >= 80)), true);
+  const source = require("../src/story-source.js");
+  const restored = storyChapters.filter((chapter) => chapter.releaseOpen !== false && chapter.sourceStatus === "document");
+  assert.equal(restored.length, 18);
+  assert.equal(restored.filter((chapter) => chapter.id !== "main-2.1" && chapter.id !== "side-2.4-witness").every((chapter) => chapter.scenes.map((scene) => scene.body).join("\n") === source.chapters[chapter.id].scenes.map((scene) => scene.body).join("\n")), true);
+  assert.equal(restored.every((chapter) => chapter.scenes.map((scene) => scene.body).join("\n").length >= source.chapters[chapter.id].scenes.map((scene) => scene.body).join("\n").length), true);
+  assert.equal(restored.filter((chapter) => chapter.type === "main" && Number(chapter.version) <= 1.5).every((chapter) => chapter.scenes.reduce((sum, scene) => sum + scene.body.replace(/\s/g, "").length, 0) >= 10000), true);
   assert.equal(Object.keys(storySceneAliases).length > 0, true);
   assert.match(storyChapters.find((chapter) => chapter.id === "main-5.5").summary, /交班/);
 });

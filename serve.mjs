@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, storyChapters, storySceneAliases, storyChapterAliases, characterBattleStats, trialStages, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -317,14 +317,28 @@ function ensurePlayerMilestones(currentState) {
   const preservedProgress = snapshotPlayerProgress(currentState);
   const state = createGame(currentState || freshPlayerState()).getState();
   restorePlayerProgress(state, preservedProgress);
+  const completedScenes = state.storyProgress && state.storyProgress.completedScenes;
+  if (completedScenes) {
+    Object.entries(completedScenes).forEach(([key, reward]) => {
+      const separator = key.indexOf(":");
+      if (separator < 0) return;
+      const chapterId = key.slice(0, separator);
+      const sceneId = key.slice(separator + 1);
+      const migratedKey = storySceneAliases[key] || storyChapterAliases[key] || (storyChapterAliases[chapterId] ? storyChapterAliases[chapterId] + ":" + sceneId : null);
+      if (migratedKey && migratedKey !== key) {
+        if (!completedScenes[migratedKey]) completedScenes[migratedKey] = reward;
+      }
+    });
+    if (storyChapterAliases[state.storyProgress.currentChapter]) state.storyProgress.currentChapter = storyChapterAliases[state.storyProgress.currentChapter];
+  }
   state.collection = state.collection || {};
   state.recruitment = state.recruitment || {};
   // 任何登入都要確保主角存在；這也會修復早期建立、但尚未有 starterGranted
   // 標記或標記與角色數量不同步的舊存檔。
   state.collection.celesia = Math.max(1, Number(state.collection.celesia) || 0);
   state.recruitment.starterGranted = true;
-  const completedScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
-  if (Object.keys(completedScenes).some((key) => key.indexOf("main-1-0:") === 0) && !state.recruitment.story10ChoiceClaimed) {
+  const claimedStoryScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
+  if (Object.keys(claimedStoryScenes).some((key) => key.indexOf("main-1-0:") === 0) && !state.recruitment.story10ChoiceClaimed) {
     state.recruitment.story10ChoiceAvailable = true;
   }
   const clearedStages = state.trialProgress && Array.isArray(state.trialProgress.clearedStages) ? state.trialProgress.clearedStages : [];
