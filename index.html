@@ -6,7 +6,6 @@
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
   <link rel="stylesheet" href="./styles.css?v=story-ui-repair-20260922b">
-  <link rel="stylesheet" href="./voyage-ui.css?v=bridge-20260923">
 </head>
 <body>
   <main class="page-shell">
@@ -48,19 +47,6 @@
       </div>
     </section>
 
-    <nav id="destination-nav" class="destination-nav" aria-label="星艦目的地" hidden>
-      <button type="button" data-view="game-lobby">大廳</button>
-      <button type="button" data-view="story-view">劇情</button>
-      <button type="button" data-view="gacha-hall">抽卡</button>
-      <button type="button" data-view="character-view">角色</button>
-      <button type="button" data-view="trial-view">試煉</button>
-      <button type="button" data-view="boss-view">Boss</button>
-      <button type="button" data-view="dispatch-view">委託</button>
-      <button type="button" data-view="voyage-view">迷航</button>
-      <button type="button" data-view="pet-view">星伴</button>
-      <button type="button" data-view="announcement-view">公告</button>
-    </nav>
-
     <section id="game-lobby" class="game-lobby" hidden>
       <div class="lobby-hero panel">
         <div class="lobby-hero-copy">
@@ -68,7 +54,6 @@
           <h2>星界之律大廳</h2>
           <p>在回覆台之間整理線索，推進文件中的旅程，召集角色並培養已取得的夥伴。</p>
           <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span><span id="lobby-update-label">大更新獎勵 +3,200 星砂</span></div>
-          <div class="lobby-next-step"><div><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
         </div>
         <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
       </div>
@@ -87,6 +72,7 @@
         <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
         <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
+      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
     </section>
 
@@ -313,6 +299,6 @@
   <script src="./src/story-world-map.js?v=story-world-map-v1-20260921"></script>
   <script src="./src/data.js?v=story-ui-repair-20260922b"></script>
   <script src="./src/battle.js?v=pet-customization-20260920"></script>
-  <script src="./src/player-app.js?v=bridge-20260923"></script>
+  <script src="./src/player-app.js?v=story-ui-repair-20260922b"></script>
 </body>
 </html>
