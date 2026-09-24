@@ -295,7 +295,8 @@
     }
   });
 
-  var trialVersion = "2.0-2.5";
+  var updateCycle = "2026-09-23-maintenance";
+  var trialVersion = updateCycle;
   var trialMaxRewards = 10;
   // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
   // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。完成 30 關並使用版本內
@@ -349,7 +350,7 @@
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
   // 六種素材來源分成 Lv.1–3 三個獎勵檔位，讓玩家可以透過戰鬥穩定準備突破材料，
   // 同時保留隊伍搭配與重複挑戰的空間。每個檔位安排兩個 Boss，避免刪除既有角色的素材來源。
-  var bossVersion = "2.0-2.5";
+  var bossVersion = updateCycle;
   var bossMaxRewards = 10;
   var bossStages = [
     { id: "boss-star-warden", name: "星序守望者", region: "星序觀測環", description: "守望者以錯位星序建立護盾，指揮與減防角色能更快找到破口。", recommendedPower: 1500, environment: "錯位星序", environmentEffect: "敵方護盾重新排列，支援與破防效果更有價值", enemyTrait: "星序護盾", enemyTraitEffect: "首領首次施放技能會重建一次護盾", trialRule: "shield", modifiers: { enemyDefense: 1.06, teamAttack: 1.03 }, enemies: [{ name: "星序守衛", maxHp: 2700, attack: 190, defense: 145, speed: 82, count: 2 }, { name: "星序守望者", maxHp: 5200, attack: 260, defense: 215, speed: 96, count: 1 }], reward: { materialId: "star-crest", materialName: "星序碎晶", amount: 1, characterExp: 360 } },
@@ -402,7 +403,7 @@
     });
   });
 
-  var dispatchVersion = "2.0-2.5";
+  var dispatchVersion = updateCycle;
   var dispatchMissions = [
     { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1200, echoPowder: 4 } },
     { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
@@ -411,7 +412,7 @@
 
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
   // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
-  var voyageVersion = "2.0-2.5";
+  var voyageVersion = updateCycle;
   var maveLuminousSkin = { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", themeLabel: "ARCHIVE OUTFIT", previewTitle: "流光檔案", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" };
   var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第一個夏日造型測試；保留梅芙的臉部特徵，改變服裝、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第二個夏日造型測試；保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
@@ -556,6 +557,7 @@
     Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
   ]);
   var announcements = Object.freeze([
+    Object.freeze({ id: "maintenance-2026-09-23", badge: "維護更新", date: "2026.09.23", title: "對戰獎勵重置與更新補給", copy: "目前開放內容維持 1.0–2.5，尚未推出新版本。星界試煉、Boss、星港委託與星海迷航的本期關卡進度和可領獎勵重新開始；星伴玩法與進度維持原樣。", reward: "+3,200 星砂已於登入時自動發放，每個帳號限一次。", highlights: ["原有星砂、經驗、素材與其他資源保留", "角色、養成、劇情、寵物與裝扮保留", "已領取的獎勵不扣回；本期可再次挑戰領取"] }),
     Object.freeze({ id: "update-2.0-2.5", badge: "大更新", date: "2.0–2.5", title: "第二大版本｜潮眼回覆正式開放", copy: "主線與支線 1.0–2.5 已接入長篇閱讀器；2.0–2.5 角色、星界試煉與星港委託一起加入星界之律大廳。", reward: "+3,200 星砂更新獎勵；每個帳號可領取一次。", highlights: ["劇情正文不再只顯示標題", "星界試煉擴充為 30 關", "版本進度更新不會刪除角色與培養資料"] }),
     Object.freeze({ id: "tutorial-launch", badge: "新手支援", date: "本次更新", title: "新手教學上線", copy: "第一次進入大廳後，可以從新手教學快速了解劇情、抽卡、培養、戰力、星界試煉與星港委託。", reward: "+920 星砂、+600 角色經驗。", highlights: ["完成一次即可領取", "獎勵會寫入目前登入的玩家帳號", "舊玩家也可以補看並領取一次"] }),
     Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功可取得 50 星砂與 1,500 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
@@ -1989,6 +1991,7 @@
     tutorialSteps: tutorialSteps,
     announcements: announcements,
     updateVersion: "2.0-2.5",
+    updateCycle: updateCycle,
     updateReward: Object.freeze({ starSand: 3200 })
   };
 }));

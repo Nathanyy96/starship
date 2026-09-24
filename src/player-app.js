@@ -192,7 +192,7 @@
       var completedScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
       if (Object.keys(completedScenes).some(function (key) { return key.indexOf("main-1-0:") === 0; }) && !state.recruitment.story10ChoiceClaimed) { state.recruitment.story10ChoiceAvailable = true; }
       if (state.trialProgress && state.trialProgress.clearedStages && state.trialProgress.clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) { state.recruitment.trial10ChoiceAvailable = true; }
-      var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
+      var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
       state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
       if (!state.updateRewards.claimedVersions[updateVersion]) {
@@ -487,9 +487,9 @@
       if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
       byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
-      var updateVersion = data.updateVersion || data.trialVersion || "2.0-2.5";
+      var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
       var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
-      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = updateClaimed ? "大更新獎勵 +3,200 星砂（已領取）" : "大更新獎勵 +3,200 星砂";
+      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = "更新獎勵 +" + Number(data.updateReward && data.updateReward.starSand || 3200).toLocaleString() + " 星砂" + (updateClaimed ? "（已發放）" : "");
       var tutorialDone = tutorialProgress(state).rewardClaimed === true;
       var tutorialQuick = byId("open-tutorial");
       if (tutorialQuick) tutorialQuick.classList.toggle("completed", tutorialDone);

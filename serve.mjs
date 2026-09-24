@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, storyChapters, characterBattleStats, trialStages, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -19,8 +19,7 @@ const playerDatabaseBackupPath = playerDatabasePath + ".bak";
 const port = Number(process.env.PORT || 8080);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
-const currentUpdateVersion = "2.0-2.5";
-const updateReward = Object.freeze({ starSand: 3200 });
+const currentUpdateVersion = updateCycle;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
 const databaseBaselines = new WeakMap();
@@ -606,7 +605,7 @@ function completeStoryScene(currentState, body) {
 function completeTutorial(currentState) {
   const state = ensurePlayerMilestones(currentState);
   const game = createGame(state);
-  return game.completeTutorial({ version: currentUpdateVersion, reward: tutorialReward });
+  return game.completeTutorial({ version: updateVersion, reward: tutorialReward });
 }
 
 function trialStageById(stageId) {
@@ -912,6 +911,8 @@ async function handleApi(request, response, requestUrl) {
 
     if (requestUrl.pathname === "/api/player/session") {
       const player = playerFromSession(database, body.token);
+      player.record.state = ensurePlayerMilestones(player.record.state);
+      await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state });
       return;
     }
