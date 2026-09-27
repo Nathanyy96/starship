@@ -1033,3 +1033,52 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .character-animation-dialog { width: min(860px, calc(100vw - 32px)); max-width: none; max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid rgba(169,155,255,.48); border-radius: 22px; color: #eef3ff; background: radial-gradient(circle at 15% 0%, rgba(169,155,255,.18), transparent 34%), linear-gradient(145deg, rgba(16,26,59,.98), rgba(5,11,28,.98)); box-shadow: 0 28px 90px rgba(0,0,0,.55), 0 0 55px rgba(112,233,223,.1); }.character-animation-dialog::backdrop { background: rgba(2,6,20,.78); backdrop-filter: blur(8px); }
 .character-animation-shell { padding: 20px; }.character-animation-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }.character-animation-head h3 { margin: 4px 0 5px; color: #f8f9ff; font-size: 1.35rem; }.character-animation-head p:last-child { margin: 0; color: #aebcda; font-size: .72rem; }.character-animation-head .small-button { width: auto; flex: 0 0 auto; white-space: nowrap; }.character-animation-stage { display: grid; min-height: 390px; place-items: center; margin-top: 16px; padding: 14px; border: 1px solid rgba(187,213,255,.16); border-radius: 16px; background: radial-gradient(circle at 50% 15%, rgba(112,233,223,.1), transparent 43%), rgba(3,9,25,.76); }.character-animation-video { display: block; width: min(100%, 352px); height: auto; max-height: calc(100vh - 220px); aspect-ratio: 352 / 544; border: 1px solid rgba(224,235,255,.2); border-radius: 12px; background: #040817; object-fit: contain; box-shadow: 0 16px 42px rgba(0,0,0,.32); }.character-animation-empty { color: #9eafd0; font-size: .78rem; }.character-animation-caption { margin: 11px 2px 0; color: #7889ab; font-size: .62rem; text-align: center; }
 @media (max-width: 640px) { .character-animation-dialog { width: calc(100vw - 20px); max-height: calc(100vh - 20px); border-radius: 17px; }.character-animation-shell { padding: 15px; }.character-animation-head { gap: 10px; }.character-animation-head h3 { font-size: 1.08rem; }.character-animation-head .small-button { padding: 6px 8px; font-size: .64rem; }.character-animation-stage { min-height: 280px; margin-top: 12px; padding: 8px; }.character-animation-video { max-height: calc(100vh - 175px); } }
+
+/* Luminous entry and home surfaces; retain existing game navigation and scene themes. */
+body:has(#player-gate:not([hidden])) { background: linear-gradient(rgba(232,248,247,.12), rgba(219,238,236,.48)), url("./assets/ui/login-starlake-dawn.png") center / cover fixed no-repeat; }
+body:has(#game-lobby:not([hidden])) { background: linear-gradient(rgba(232,248,247,.08), rgba(219,238,236,.5)), url("./assets/ui/lobby-garden-morning.png") center / cover fixed no-repeat; }
+body:has(#player-gate:not([hidden])) .topbar, body:has(#game-lobby:not([hidden])) .topbar { padding: 18px; border-radius: 18px; background: rgba(245,251,249,.92); color: #183e4a; }
+body:has(#player-gate:not([hidden])) .topbar h1, body:has(#game-lobby:not([hidden])) .topbar h1 { color: #183e4a; text-shadow: none; }
+body:has(#player-gate:not([hidden])) .topbar .subtitle, body:has(#game-lobby:not([hidden])) .topbar .subtitle { color: #49666e; }
+body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not([hidden])) .topbar .eyebrow { color: #286f77; }
+.auth-gate { background: url("./assets/ui/login-starlake-dawn.png") center / cover no-repeat; border-color: #c1dad9; box-shadow: 0 18px 55px rgba(30,77,87,.18); }
+.auth-gate::before { background: linear-gradient(90deg, transparent 12%, rgba(245,251,249,.92) 44%, rgba(245,251,249,.98)); }
+.auth-gate-content h2 { color: #183e4a; text-shadow: none; }
+.auth-gate-content > p:not(.eyebrow), .auth-form label, .auth-gate .message { color: #49666e; }
+.auth-gate .eyebrow, .auth-mode-badge { color: #286f77; }
+.auth-gate-visual { background: none; }
+.auth-gate-visual::before, .auth-gate-visual::after, .auth-gate-orbit { border-color: rgba(234,203,139,.7); box-shadow: none; }
+.auth-gate-caption { color: #244f59; }
+.auth-gate-sigil { box-shadow: 0 12px 40px rgba(29,69,82,.2); }
+.auth-gate .primary-action, #game-lobby .primary-action { color: #fff; background: #246f79 !important; border-color: #246f79; box-shadow: none; }
+.auth-gate-orbit { background: #d8bc80; }
+.auth-gate .primary-action small { color: #e4f5f4; }
+.auth-gate .secondary-action, .auth-gate .small-button { color: #24525c; border-color: #8fb4b9; background: #edf6f3; }
+.auth-gate .secondary-action small { color: #49666e; }
+.auth-form input { color: #183e4a; background: #fff; border-color: #98b9bc; }
+.auth-form input::placeholder { color: #647d83; }
+.auth-gate button:focus-visible, .auth-form input:focus-visible, #game-lobby button:focus-visible { outline: 3px solid #b77b25; outline-offset: 3px; }
+#game-lobby .lobby-hero { min-height: 260px; background: linear-gradient(90deg, rgba(244,250,247,.96), rgba(244,250,247,.88) 46%, rgba(244,250,247,.05)), url("./assets/ui/lobby-garden-morning.png") center 45% / cover no-repeat; border-color: #bdd7d5; }
+#game-lobby .lobby-hero::after { background: none; }
+#game-lobby .lobby-hero-copy h2, #game-lobby .lobby-heading h2, #game-lobby .lobby-continue strong, #game-lobby .lobby-menu-card strong, #game-lobby .quick-copy strong { color: #183e4a; text-shadow: none; }
+#game-lobby .lobby-hero-copy > p:not(.eyebrow), #game-lobby .lobby-menu-card small, #game-lobby .quick-copy small, #game-lobby .lobby-continue p:not(.eyebrow), #game-lobby .lobby-heading > span { color: #49666e; }
+#game-lobby .eyebrow { color: #286f77; }
+#game-lobby .lobby-status span { color: #245c65; border-color: #b4d3d0; background: #e7f3ee; }
+#game-lobby .lobby-hero-radar { border-color: #d5b878; background: rgba(236,247,242,.7); box-shadow: none; }
+#game-lobby .lobby-hero-radar b { color: #24525c; }
+#game-lobby .lobby-menu-card, #game-lobby .lobby-quick-card, #game-lobby .lobby-continue, #game-lobby .milestone-card { background: rgba(246,251,247,.95); border-color: #b8d1cf; box-shadow: 0 8px 24px rgba(30,77,87,.12); }
+#game-lobby .lobby-menu-card:hover, #game-lobby .lobby-quick-card:hover { background: #fffdf5; border-color: #52959a; box-shadow: 0 10px 26px rgba(30,77,87,.18); }
+#game-lobby .menu-icon, #game-lobby .menu-arrow, #game-lobby .quick-icon { color: #286f77; text-shadow: none; background: none; }
+#game-lobby .menu-index { color: #57787f; }
+#game-lobby .lobby-heading { padding: 14px 18px; border-radius: 12px; background: rgba(246,251,247,.94); }
+#game-lobby .milestone-card strong { color: #76521c; }
+#game-lobby .milestone-card p, #game-lobby .milestone-choice span, #game-lobby .milestone-choice small { color: #49666e; }
+#game-lobby .milestone-choice { background: #f9f2e3; border-color: #c5ac75; }
+@media (max-width: 820px) {
+  .auth-gate::before { background: linear-gradient(180deg, transparent, rgba(245,251,249,.96) 180px); }
+  .auth-gate-content { padding: 24px; }
+  #game-lobby .lobby-hero { background-position: 65% center; }
+}
+@media (prefers-reduced-motion: reduce) { #game-lobby .lobby-menu-card, .auth-choice-button { transition: none; } }
+#game-lobby .quick-badge, #game-lobby .menu-new-badge { color: #76521c; background: #faf0d8; border-color: #cbb985; }
+@media (max-width: 820px) { #game-lobby .lobby-hero { background-image: linear-gradient(90deg, rgba(244,250,247,.96), rgba(244,250,247,.8)), url("./assets/ui/lobby-garden-morning.png"); } }
