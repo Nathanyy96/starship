@@ -43,7 +43,7 @@
     function rosterCards() {
       var owned = game ? game.getState().collection : {};
       return Object.values(data.cards).filter(function (card) {
-        return data.activeCards.some(function (active) { return active.id === card.id; }) || Number(owned[card.id]) > 0;
+        return Number(card.releaseVersion) >= 1 && Number(card.releaseVersion) < 2 || Number(owned[card.id]) > 0;
       });
     }
     function byId(id) { return document.getElementById(id); }
@@ -54,7 +54,7 @@
     // All character surfaces must use the same clean portrait source as the
     // design documents.  The version query is intentional: deployed browsers
     // may still have an older labeled card cached at the same asset URL.
-    var characterPortraitAssetVersion = "official-1-0-20261001";
+    var characterPortraitAssetVersion = "first-major-roster-20261001";
     function characterPortraitSource(card, state) {
       // SVG wrappers reference sibling PNGs; browsers do not load those external
       // references when the SVG is used as a CSS background or an <img> source.

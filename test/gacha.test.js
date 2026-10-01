@@ -26,6 +26,18 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
 });
 
+test("第一大版本十八名規劃可玩角色全部入圖鑑但只開放 1.0", () => {
+  const season = Object.values(cards).filter((card) => Number(card.releaseVersion) >= 1 && Number(card.releaseVersion) < 2);
+  assert.equal(season.length, 18);
+  assert.equal(season.filter((card) => card.rarity === 4).length, 11);
+  assert.equal(season.filter((card) => card.rarity === 3).length, 7);
+  for (const id of ["cenwu", "ruida", "yuan", "elorna", "rovienne"]) {
+    assert.ok(season.some((card) => card.id === id));
+    assert.ok(fs.existsSync(path.join(__dirname, "..", cards[id].image)));
+    assert.equal(activeCards.some((card) => card.id === id), false);
+  }
+});
+
 test("既有艾洛娜可切換陸地與深水型態，存檔保留選擇", () => {
   const player = game({ state: state({ collection: { elorna: 1 } }) });
   assert.equal(player.setCharacterForm({ cardId: "elorna", formId: "deepwater" }).state.characterProgress.elorna.activeForm, "deepwater");
@@ -73,7 +85,7 @@ test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
 
 test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯示", () => {
   const portraitIds = Object.keys(cards);
-  assert.equal(portraitIds.length, 43);
+  assert.equal(portraitIds.length, 47);
   assert.equal(portraitIds.every((id) => {
     const card = cards[id];
     assert.equal(card.portraitImage, `./assets/cards/complete/${id}.svg`);

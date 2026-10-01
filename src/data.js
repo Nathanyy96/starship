@@ -170,6 +170,10 @@
     hina: card("hina", "Hina", "Hina", 4, "燕", "#6fa8ff", "1.1", "1.1｜QWER 旅行吉他手", "./assets/cards/hina.png"),
     siyeon: card("siyeon", "Siyeon", "Siyeon", 4, "淨", "#b7e9d6", "1.1", "1.1｜QWER 旅行歌手與拾音師", "./assets/cards/siyeon.png"),
     mave: card("mave", "梅芙", "Mave", 4, "幻", "#d06cff", "1.5", "1.5｜公共檔案仲裁官", "./assets/cards/mave.png"),
+    cenwu: card("cenwu", "岑霧", "Cenwu", 3, "待定", "#a4b9d6", "1.1", "1.1｜山腰驛站站長；元素與戰鬥定位待文件驗收", "./assets/cards/cenwu.png"),
+    ruida: card("ruida", "芮妲", "Ruida", 3, "待定", "#c29bc5", "1.1", "1.1｜迴音谷車夫；元素與戰鬥定位待文件驗收", "./assets/cards/ruida.png"),
+    yuan: card("yuan", "榆安", "Yuan", 3, "待定", "#8fc7b6", "1.1", "1.1｜隨車藥師；元素與戰鬥定位待文件驗收", "./assets/cards/yuan.png"),
+    rovienne: card("rovienne", "羅薇恩", "Rovienne", 4, "星", "#a3b19f", "1.6", "1.2 登場｜定界局首席工程師；1.6 首發規劃待作者審閱", "./assets/cards/rovienne.png"),
     risan: card("risan", "璃珊", "Risan", 4, "幻", "#c08cff", "2.0", "2.0｜潮汐書庫檔案員、海圖師", "./assets/cards/risan.png"),
     yaoze: card("yaoze", "曜澤", "Yaoze", 4, "月", "#91b9e8", "2.0", "2.0｜白帆岬燈塔守望員", "./assets/cards/yaoze.png"),
     maro: card("maro", "瑪洛", "Maro", 3, "淨", "#86dbc9", "2.0", "2.0｜診所實習生、地址站助手", "./assets/cards/maro.png"),
@@ -212,7 +216,7 @@
   var legacyCards = [
     cards.celesia, cards.reyn, cards.lia, cards.isar, cards.rena, cards.eda,
     cards.veyra, cards.harlow, cards.elorna, cards.chodan, cards.magenta,
-    cards.hina, cards.siyeon, cards.mave
+    cards.hina, cards.siyeon, cards.cenwu, cards.ruida, cards.yuan, cards.mave, cards.rovienne
   ];
   // 劇情人物依「角色圖鑑｜單人完整立繪」分頁的圖像順序建檔；不進入卡池。
   var storyCharacters = Object.freeze({
@@ -223,15 +227,19 @@
     oun: { name: "奧恩", romanizedName: "Oun", portrait: "./assets/story-characters/oun.png" },
     mila: { name: "米菈", romanizedName: "Mila", portrait: "./assets/story-characters/mila.png" },
     vark: { name: "老瓦克", romanizedName: "Vark", portrait: "./assets/story-characters/vark.png" },
-    cenwu: { name: "岑霧", romanizedName: "Cenwu", portrait: null, firstAppearance: "1.1", role: "山腰驛站站長" },
-    ruida: { name: "芮妲", romanizedName: "Ruida", portrait: null, firstAppearance: "1.1", role: "迴音谷車夫" },
-    yuan: { name: "榆安", romanizedName: "Yuan", portrait: null, firstAppearance: "1.1", role: "隨車藥師" }
+    cenwu: { name: "岑霧", romanizedName: "Cenwu", portrait: "./assets/cards/cenwu.png", firstAppearance: "1.1", role: "山腰驛站站長" },
+    ruida: { name: "芮妲", romanizedName: "Ruida", portrait: "./assets/cards/ruida.png", firstAppearance: "1.1", role: "迴音谷車夫" },
+    yuan: { name: "榆安", romanizedName: "Yuan", portrait: "./assets/cards/yuan.png", firstAppearance: "1.1", role: "隨車藥師" },
+    musa: { name: "穆莎", romanizedName: "Musa", portrait: "./assets/story-characters/musa.png", firstAppearance: "1.2", role: "橋北林聚落採集者", artStatus: "第一版設計稿" },
+    kerida: { name: "珂芮妲", romanizedName: "Kerida", portrait: "./assets/story-characters/kerida.png", firstAppearance: "1.2", role: "半退休資深外勤測量師", artStatus: "第二版待作者確認" },
+    dori: { name: "朵梨", romanizedName: "Dori", portrait: "./assets/story-characters/dori.png", firstAppearance: "1.3", role: "洛汀港補給船工", artStatus: "第一版設計稿" },
+    wenlan: { name: "溫藍", romanizedName: "Wenlan", portrait: "./assets/story-characters/wenlan.png", firstAppearance: "1.4", role: "鐘庭物資管事", artStatus: "第一版設計稿" }
   });
   var characterAssets = Object.freeze(Object.fromEntries(Object.values(cards).map(function (entry) {
     var currentRelease = Number(entry.releaseVersion) <= 2.5;
     var documentCardName = entry.id === "isar" ? "Isar_原稿_星律卡面.png" : entry.id === "rena" ? "Rena_原稿_星律卡面.png" : entry.romanizedName + "_星律卡面.png";
     return [entry.id, Object.freeze({ portrait: entry.image, documentCardName: currentRelease ? documentCardName : null,
-      documentTab: currentRelease ? (Number(entry.releaseVersion) < 2 ? "角色圖鑑｜單人完整立繪" : "角色圖鑑｜第二大版本") : null })];
+      documentTab: currentRelease ? (Number(entry.releaseVersion) < 2 ? "第一大版本角色圖建" : "角色圖鑑｜第二大版本") : null })];
   })));
   var isarAscended = Object.freeze({ id: "isar-ascended", baseCharacterId: "isar", name: "伊薩爾｜四星升格", rarity: 4, element: "烈", portrait: "./assets/story-characters/isar-ascended.png", playable: false });
   var version2Cards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle];
