@@ -9,7 +9,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { updateCycle, updateVersion, storySceneAliases } = (await import("../src/data.js")).default;
+const { updateCycle, updateVersion, storySceneAliases, storyChapters } = (await import("../src/data.js")).default;
 
 async function freePort() {
   const listener = net.createServer();
@@ -69,8 +69,8 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const first = (await post("/api/player/session", { token: registration.token })).state;
     assert.equal(first.resources.starSand, 7400);
     assert.equal(first.resources.starMarks, 17);
-    assert.equal(first.resources.echoPowder, 23);
-    assert.equal(first.resources.characterExp, 9850);
+    assert.equal(first.resources.echoPowder, 33);
+    assert.equal(first.resources.characterExp, 10850);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
@@ -94,6 +94,23 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const second = (await post("/api/player/login", { name: "舊玩家", password: "maintenance-test-password" })).state;
     assert.equal(second.resources.starSand, first.resources.starSand);
     assert.deepEqual(second.updateRewards.claimedVersions, first.updateRewards.claimedVersions);
+    const scenes = storyChapters.find((chapter) => chapter.id === "main-1-0").scenes;
+    for (const scene of scenes) {
+      const result = await post("/api/player/story-progress", { token: registration.token, action: "complete", chapterId: "main-1-0", sceneId: scene.id });
+      if (scene !== scenes.at(-1)) assert.equal(result.reward.starSand, 0);
+      else {
+        assert.equal(result.reward.starSand, 1500); // 已領的舊第一幕 100 星砂抵扣。
+        assert.equal(result.reward.characterExp, 3000);
+        assert.equal(result.reward.echoPowder, 5);
+      }
+    }
+    const afterStory = (await post("/api/player/session", { token: registration.token })).state;
+    assert.equal(afterStory.resources.starSand, first.resources.starSand + 1500);
+    assert.equal(afterStory.resources.characterExp, first.resources.characterExp + 3000);
+    assert.equal(afterStory.resources.echoPowder, first.resources.echoPowder + 5);
+    assert.ok(afterStory.storyProgress.claimedVersions["1.0"]);
+    const repeated = await post("/api/player/story-progress", { token: registration.token, action: "complete", chapterId: "main-1-0", sceneId: scenes.at(-1).id });
+    assert.equal(repeated.alreadyClaimed, true);
   } finally {
     server.kill();
     fs.rmSync(directory, { recursive: true, force: true });

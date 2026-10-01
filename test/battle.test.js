@@ -18,11 +18,11 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.ok(battle.logs.length > 0);
   assert.equal(battle.reward.starSand, trialReward.starSand);
   assert.equal(battle.reward.characterExp, trialReward.characterExp);
-  assert.equal(trialReward.starSand, 50);
-  assert.equal(trialReward.characterExp, 1500);
+  assert.equal(trialReward.starSand, 75);
+  assert.equal(trialReward.characterExp, 1800);
   assert.equal(battle.environment, trialStages[0].environment);
   assert.equal(battle.enemyTrait, trialStages[0].enemyTrait);
-  assert.equal(trialMaxRewards, 10);
+  assert.equal(trialMaxRewards, 20);
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {

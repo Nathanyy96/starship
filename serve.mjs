@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, storySceneAliases, storyChapterAliases, characterBattleStats, trialStages, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -349,7 +349,9 @@ function ensurePlayerMilestones(currentState) {
   state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
   if (!state.updateRewards.claimedVersions[currentUpdateVersion]) {
     state.resources.starSand += updateReward.starSand;
-    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, grantedAt: new Date().toISOString() };
+    state.resources.characterExp += updateReward.characterExp;
+    state.resources.echoPowder += updateReward.echoPowder;
+    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, echoPowder: updateReward.echoPowder, grantedAt: new Date().toISOString() };
   }
   if (state.trialProgress.version !== currentUpdateVersion) {
     state.trialProgress.version = currentUpdateVersion;
@@ -600,20 +602,30 @@ function completeStoryScene(currentState, body) {
   }
   const scene = storySceneById(chapter, body.sceneId);
   const key = chapter.id + ":" + scene.id;
-  const storyReward = { starSand: 100, characterExp: 650 };
+  const storyReward = { starSand: 0, characterExp: 0, echoPowder: 0 };
   state.storyProgress = state.storyProgress || { currentChapter: chapter.id, completedScenes: {} };
   state.storyProgress.completedScenes = state.storyProgress.completedScenes || {};
+  state.storyProgress.claimedVersions = state.storyProgress.claimedVersions || {};
   state.storyProgress.currentChapter = chapter.id;
-  if (state.storyProgress.completedScenes[key]) {
-    return { state, alreadyClaimed: true, reward: { starSand: 0, characterExp: 0 }, chapter, scene };
+  const wasCompleted = Boolean(state.storyProgress.completedScenes[key]);
+  if (!wasCompleted) state.storyProgress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: 0, characterExp: 0 };
+  if (chapter.id === "main-1-0" && scene.id === chapter.scenes.at(-1).id && !state.storyProgress.claimedVersions[storyVersionReward.version]) {
+    if (!chapter.scenes.every((item) => state.storyProgress.completedScenes[chapter.id + ":" + item.id])) throw new Error("請先讀完本版本的前四幕");
+    const oldClaims = Object.entries(state.storyProgress.completedScenes).filter(([oldKey]) => oldKey.startsWith("main-1-0:"));
+    const oldSand = oldClaims.reduce((sum, [, claim]) => sum + Math.max(0, Number(claim.starSand) || 0), 0);
+    const oldExp = oldClaims.reduce((sum, [, claim]) => sum + Math.max(0, Number(claim.characterExp) || 0), 0);
+    storyReward.starSand = Math.max(0, storyVersionReward.starSand - oldSand);
+    storyReward.characterExp = Math.max(0, storyVersionReward.characterExp - oldExp);
+    storyReward.echoPowder = storyVersionReward.echoPowder;
+    state.resources.starSand += storyReward.starSand;
+    state.resources.characterExp += storyReward.characterExp;
+    state.resources.echoPowder += storyReward.echoPowder;
+    state.storyProgress.claimedVersions[storyVersionReward.version] = { claimedAt: new Date().toISOString(), reward: storyReward };
   }
-  state.storyProgress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: storyReward.starSand, characterExp: storyReward.characterExp };
-  state.resources.starSand += storyReward.starSand;
-  state.resources.characterExp += storyReward.characterExp;
   if (chapter.id === "main-1-0" && !state.recruitment.story10ChoiceClaimed) {
     state.recruitment.story10ChoiceAvailable = true;
   }
-  return { state: createGame(state).getState(), alreadyClaimed: false, reward: storyReward, chapter, scene };
+  return { state: createGame(state).getState(), alreadyClaimed: wasCompleted && !Object.values(storyReward).some(Boolean), reward: storyReward, chapter, scene };
 }
 
 function completeTutorial(currentState) {
@@ -643,7 +655,7 @@ function runTrial(currentState, body) {
   if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
   if (stage.id > 1 && state.trialProgress.clearedStages.indexOf(stage.id - 1) < 0) throw new Error("請先通關前一關");
   const attempts = Number(state.trialProgress.attempts[stage.id] || 0);
-  if (attempts >= 10) throw new Error("本關在目前版本已完成 10 次，請等待下次遊戲更新重置挑戰次數");
+  if (attempts >= trialMaxRewards) throw new Error("本關在目前版本已完成 " + trialMaxRewards + " 次，請等待下次遊戲更新重置挑戰次數");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
   const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
   const rewardStarSand = Number(stage.reward && stage.reward.starSand || 0);
@@ -660,7 +672,7 @@ function runTrial(currentState, body) {
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true;
   }
-  return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: 10 - state.trialProgress.attempts[stage.id] } : { starSand: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: 10 - attempts } };
+  return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: trialMaxRewards - state.trialProgress.attempts[stage.id] } : { starSand: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: trialMaxRewards - attempts } };
 }
 
 function bossStageById(bossId) {

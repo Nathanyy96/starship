@@ -61,7 +61,7 @@
         <button id="open-announcements" class="lobby-quick-card announcement-quick" type="button"><span class="quick-icon" aria-hidden="true">📣</span><span class="quick-copy"><strong>公告</strong><small id="announcement-quick-status">更新內容與獎勵</small></span><span class="quick-badge">NEW</span></button>
         <button id="open-tutorial" class="lobby-quick-card tutorial-quick" type="button"><span class="quick-icon" aria-hidden="true">?</span><span class="quick-copy"><strong>新手教學</strong><small id="tutorial-quick-status">完成教學可領獎</small></span><span class="quick-badge" id="tutorial-quick-badge">GUIDE</span></button>
       </div>
-      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>1.0–2.5 內容已開放</span></div>
+      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>1.0 主線與卡池已開放</span></div>
       <div class="lobby-menu-grid">
         <button id="open-story" class="lobby-menu-card story-menu" type="button"><span class="menu-index">01</span><span class="menu-icon">◈</span><strong>劇情</strong><small>閱讀界痕調查與各版本角色線</small><span class="menu-arrow">→</span></button>
         <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
@@ -72,7 +72,7 @@
         <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
         <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
-      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0–2.5 的遊戲入口。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
+      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0 主線；後續版本尚在製作。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
     </section>
 
@@ -101,8 +101,8 @@
     </section>
 
     <section id="story-view" class="game-view panel story-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">1.0–2.5</span></div>
-      <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0–2.5</button><button id="story-side-tab" class="small-button" type="button">支線 1.0–2.5</button></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">主線 1.0 已開放</span></div>
+      <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0</button><button id="story-side-tab" class="small-button" type="button">支線籌備中</button></div>
       <section id="story-world-map" class="story-world-map-panel" aria-labelledby="story-map-title"></section>
       <div class="story-layout"><nav id="story-chapters" class="story-chapters" aria-label="劇情章節"></nav><article id="story-reader" class="story-reader"></article></div>
     </section>
@@ -190,7 +190,7 @@
 
     <section id="voyage-view" class="game-view panel voyage-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
-      <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商店、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>本期特殊裝扮</span><strong id="voyage-skin-name">流光檔案裝</strong><small id="voyage-skin-copy">特殊結局可取得，不改變角色戰鬥數值。</small></div></div>
+      <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商店、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>本期特殊裝扮</span><strong id="voyage-skin-name">梅芙｜夏日海灘派對</strong><small id="voyage-skin-copy">特殊結局可取得，不改變角色戰鬥數值。</small></div></div>
       <details class="voyage-guide" open>
         <summary><span><span class="eyebrow">HOW TO PLAY</span><strong>星海迷航遊玩指引</strong></span><span class="voyage-guide-summary">選航線 → 編隊 → 做選擇 → 打敗終端</span></summary>
         <div class="voyage-guide-body">
@@ -218,7 +218,7 @@
     </section>
 
     <div id="gacha-hall" class="gacha-hall" hidden>
-      <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0–2.5 角色池</span></div>
+      <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0 角色池</span></div>
     <section class="resource-bar" aria-label="資源">
       <div class="resource"><span class="resource-icon sand">✦</span><span><small>星砂</small><strong id="star-sand">0</strong></span></div>
       <div class="resource"><span class="resource-icon mark">◇</span><span><small>星痕（重複4★）</small><strong id="star-marks">0</strong></span></div>
@@ -235,7 +235,7 @@
           <select id="banner-select" aria-label="選擇卡池"></select>
         </div>
         <p id="banner-description" class="banner-description"></p>
-        <div class="banner-subline" aria-label="卡池標籤"><span>1.0—2.5 角色回音</span><span>50 抽硬保底</span><span>前 20 抽無 4★</span></div>
+        <div class="banner-subline" aria-label="卡池標籤"><span>1.0 角色回音</span><span>50 抽硬保底</span><span>前 20 抽無 4★</span></div>
         <div class="featured-heading"><span>從文件角色選一隻限定 4★</span><select id="featured-select" aria-label="選擇限定 4 星角色"></select></div>
         <div id="featured-card" class="featured-card"></div>
 
@@ -254,7 +254,8 @@
         <div id="message" class="message" role="status"></div>
       </div>
 
-      <aside class="panel rules-panel">
+      <details class="panel rules-panel">
+        <summary>抽卡詳情・機率與保底</summary>
         <p class="eyebrow">VISIBLE RULES</p>
         <h2>公開機率</h2>
         <div class="rule-list">
@@ -263,12 +264,13 @@
           <div><span>其他 4★ 合計</span><strong>45%</strong><small>同一池其餘文件角色合計</small></div>
           <div><span>三星角色</span><strong>20%</strong><small>非 4★ 結果中的角色機率；依目前卡池列出的三星共用</small></div>
           <div><span>一般回響</span><strong>80%</strong><small>非 4★ 結果的其餘部分，轉為回響粉</small></div>
-          <div><span>第 21 抽</span><strong>10%</strong><small>前 20 抽不出 4★，從這一抽開始提升</small></div>
-          <div><span>之後每抽</span><strong>+4%</strong><small>按單格逐抽計算</small></div>
+          <div><span>第 21–30 抽</span><strong>15%</strong><small>每抽機率相同</small></div>
+          <div><span>第 31–40 抽</span><strong>25%</strong><small>每抽機率相同</small></div>
+          <div><span>第 41–49 抽</span><strong>指數成長</strong><small>由 25% 逐抽加速，第 49 抽約 90%；每抽精確機率顯示於保底計數</small></div>
           <div class="hard-rule"><span>第 50 抽</span><strong>100%</strong><small>硬保底，必定 4★</small></div>
         </div>
         <p class="rules-footnote">十連只是操作便利，不把 4★ 藏到最後一格；歪到其他 4★ 會補償 1,000 星砂，常駐與尚未開放的復刻分開計數。</p>
-      </aside>
+      </details>
     </section>
 
     <section id="results" class="panel results-panel">
@@ -287,15 +289,29 @@
     </section>
 
     <footer>
-      <span>現行實作：50 抽硬保底／前 20 抽無 4★／21 抽起每抽 +4%／劇情 1.0–2.5</span>
+      <span>現行實作：50 抽硬保底／21–30 抽 15%／31–40 抽 25%／41–49 抽指數成長／劇情 1.0</span>
       <span>卡面固定顯示角色名稱、星級與元素；立繪完整比例不裁切</span>
     </footer>
     </div>
   </main>
   <script src="./src/gacha.js?v=voyage-route-selection-20260920"></script>
   <script src="./src/story-source.js?v=pet-customization-20260920"></script>
+  <script src="./src/story-1-0-current.js"></script>
   <script src="./src/future-story-revision.js?v=story-revision-v2-20260921"></script>
   <script src="./src/story-replan.js?v=story-replan-v1-20260921"></script>
+  <script src="./src/story-expansion-2x.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-extra.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part2.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part3.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part4.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part5.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part6.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part7.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part8.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part9.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part10.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part11.js?v=story-expansion-20260924"></script>
+  <script src="./src/story-expansion-2x-part12.js?v=story-expansion-20260924"></script>
   <script src="./src/story-world-map.js?v=story-world-map-v1-20260921"></script>
   <script src="./src/data.js?v=restore-long-story-20260923"></script>
   <script src="./src/battle.js?v=pet-customization-20260920"></script>

@@ -17,8 +17,8 @@
     hardPity: 50,
     noEarlyFourStarPulls: 20,
     pityStartPull: 21,
-    pityStartRate: 0.10,
-    pityStep: 0.04,
+    pityStartRate: 0.15,
+    pityStep: 0,
     featuredRate: 0.55,
     threeStarRate: 0.20,
     bonusStarSandRate: 0.08,
@@ -114,7 +114,11 @@
 
     // 保留一格真正的硬保底：前一抽不會因為機率先到 100% 而被誤標成硬保底。
     // 第 50 抽由 _rollOne 的 isHardPity 直接保證，讓 UI 能清楚區分軟保底與硬保底。
-    var rate = rules.pityStartRate + (pullNumber - rules.pityStartPull) * rules.pityStep;
+    if (pullNumber <= 30) return 0.15;
+    if (pullNumber <= 40) return 0.25;
+    // 41–49 抽以指數曲線加速；第 50 抽仍由硬保底保證。
+    var progress = (pullNumber - 40) / (rules.hardPity - 40);
+    var rate = 0.25 + 0.75 * (Math.pow(2, progress) - 1);
     return Math.min(0.99, Math.max(0, rate));
   }
 
@@ -197,7 +201,8 @@
       },
       storyProgress: {
         currentChapter: "main-1-0",
-        completedScenes: {}
+        completedScenes: {},
+        claimedVersions: {}
       },
       trialProgress: {
         version: "2.0-2.5",
@@ -322,6 +327,7 @@
     state.recruitment = Object.assign(initialState().recruitment, isPlainObject(source.recruitment) ? source.recruitment : {});
     state.storyProgress = Object.assign(initialState().storyProgress, isPlainObject(source.storyProgress) ? source.storyProgress : {});
     state.storyProgress.completedScenes = isPlainObject(state.storyProgress.completedScenes) ? state.storyProgress.completedScenes : {};
+    state.storyProgress.claimedVersions = isPlainObject(state.storyProgress.claimedVersions) ? state.storyProgress.claimedVersions : {};
     state.trialProgress = Object.assign(initialState().trialProgress, isPlainObject(source.trialProgress) ? source.trialProgress : {});
     state.trialProgress.selectedTeam = Array.isArray(state.trialProgress.selectedTeam) ? state.trialProgress.selectedTeam.slice(0, 4) : [];
     state.trialProgress.clearedStages = Array.isArray(state.trialProgress.clearedStages) ? state.trialProgress.clearedStages.filter(function (id) { return Number.isInteger(id) && id > 0; }) : [];
@@ -370,6 +376,25 @@
     state.voyageProgress.lastEnding = isPlainObject(state.voyageProgress.lastEnding) ? state.voyageProgress.lastEnding : null;
     state.cosmetics = Object.assign(initialState().cosmetics, isPlainObject(source.cosmetics) ? source.cosmetics : {});
     state.cosmetics.skins = isPlainObject(state.cosmetics.skins) ? state.cosmetics.skins : {};
+    // Retired outfit ownership moves to its replacement without resetting rewards or progress.
+    var retiredSkinId = "skin-mave-luminous-archive";
+    var replacementSkinId = "skin-mave-summer-beach-party";
+    var retiredUnlock = state.cosmetics.skins[retiredSkinId];
+    Object.keys(state.voyageProgress.claimedRewards).forEach(function (endingId) {
+      var claim = state.voyageProgress.claimedRewards[endingId];
+      if (isPlainObject(claim) && claim.skinId === retiredSkinId) {
+        if (!retiredUnlock) retiredUnlock = { unlockedAt: claim.claimedAt || null, source: "star-sea-voyage", ending: endingId };
+        claim.skinId = replacementSkinId;
+      }
+    });
+    if (retiredUnlock && !state.cosmetics.skins[replacementSkinId]) {
+      state.cosmetics.skins[replacementSkinId] = clone(retiredUnlock);
+    }
+    delete state.cosmetics.skins[retiredSkinId];
+    var previousEnding = state.voyageProgress.lastEnding;
+    if (previousEnding && isPlainObject(previousEnding.reward) && previousEnding.reward.skinId === retiredSkinId) {
+      previousEnding.reward.skinId = replacementSkinId;
+    }
     state.petProgress = Object.assign(initialState().petProgress, isPlainObject(source.petProgress) ? source.petProgress : {});
     state.petProgress.version = typeof state.petProgress.version === "string" && state.petProgress.version ? state.petProgress.version : "2.1-companion-workshop";
     state.petProgress.selectedPetId = typeof state.petProgress.selectedPetId === "string" ? state.petProgress.selectedPetId : "star-fox";
@@ -523,8 +548,10 @@
       // 重複角色立即提升 1 命，並留下 1 枚該角色專用晶核；
       // 專用晶核可在角色培養頁繼續突破，絕不與其他角色共用。
       progress.constellation = Math.min(this.rules.constellation.max, Math.max(0, Number(progress.constellation) || 0) + 1);
-      progress.constellationCore = Math.max(0, Number(progress.constellationCore) || 0) + 1;
-      constellationCoreGranted = 1;
+      if (previousCopies < this.rules.constellation.max) {
+        progress.constellationCore = Math.max(0, Number(progress.constellationCore) || 0) + 1;
+        constellationCoreGranted = 1;
+      }
     }
     this.state.characterProgress[card.id] = progress;
     return { previousCopies: previousCopies, progress: progress, constellationCoreGranted: constellationCoreGranted };
@@ -709,9 +736,17 @@
       duplicateReward.starSand = this.rules.duplicateFourStar.starSand;
       duplicateReward.characterExp = this.rules.duplicateFourStar.characterExp;
       duplicateReward.constellationCore = copy ? copy.constellationCoreGranted : 0;
+      if (previousCopies >= this.rules.constellation.max + 1) {
+        duplicateReward.starSand += 160;
+        duplicateReward.characterExp += 360;
+      }
     } else if (card && !isFirstAcquisition && card.rarity === 3) {
       duplicateReward.characterExp = this.rules.duplicateThreeStar.characterExp;
       duplicateReward.constellationCore = copy ? copy.constellationCoreGranted : 0;
+      if (previousCopies >= this.rules.constellation.max + 1) {
+        duplicateReward.starSand += 60;
+        duplicateReward.characterExp += 240;
+      }
     }
 
     // 只有「出了 4★ 但歪到其他 4★」才發放補償，避免普通未出金時變成無限資源。

@@ -14,6 +14,11 @@
     try { storySource = require("./story-source.js"); } catch (error) { storySource = null; }
   }
   if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
+  var currentStory10 = null;
+  if (typeof require === "function") {
+    try { currentStory10 = require("./story-1-0-current.js"); } catch (error) { currentStory10 = null; }
+  }
+  if (!currentStory10 && typeof globalThis !== "undefined") currentStory10 = globalThis.StarshipStory10Current || null;
 
   // 舊版未開放草稿仍保留供追溯；實際故事從 1.1 起由 story-replan.js 統一重編。
   var futureStoryRevision = null;
@@ -27,6 +32,71 @@
     try { storyReplan = require("./story-replan.js"); } catch (error) { storyReplan = null; }
   }
   if (!storyReplan && typeof globalThis !== "undefined") storyReplan = globalThis.StarshipStoryReplan || null;
+  var storyExpansion = null;
+  if (typeof require === "function") {
+    try { storyExpansion = require("./story-expansion-2x.js"); } catch (error) { storyExpansion = null; }
+  }
+  if (!storyExpansion && typeof globalThis !== "undefined") storyExpansion = globalThis.StarshipStoryExpansion2x || null;
+  var storyExpansionExtra = null;
+  if (typeof require === "function") {
+    try { storyExpansionExtra = require("./story-expansion-2x-extra.js"); } catch (error) { storyExpansionExtra = null; }
+  }
+  if (!storyExpansionExtra && typeof globalThis !== "undefined") storyExpansionExtra = globalThis.StarshipStoryExpansion2xExtra || null;
+  var storyExpansionPart2 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart2 = require("./story-expansion-2x-part2.js"); } catch (error) { storyExpansionPart2 = null; }
+  }
+  if (!storyExpansionPart2 && typeof globalThis !== "undefined") storyExpansionPart2 = globalThis.StarshipStoryExpansion2xPart2 || null;
+  var storyExpansionPart3 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart3 = require("./story-expansion-2x-part3.js"); } catch (error) { storyExpansionPart3 = null; }
+  }
+  if (!storyExpansionPart3 && typeof globalThis !== "undefined") storyExpansionPart3 = globalThis.StarshipStoryExpansion2xPart3 || null;
+  var storyExpansionPart4 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart4 = require("./story-expansion-2x-part4.js"); } catch (error) { storyExpansionPart4 = null; }
+  }
+  if (!storyExpansionPart4 && typeof globalThis !== "undefined") storyExpansionPart4 = globalThis.StarshipStoryExpansion2xPart4 || null;
+  var storyExpansionPart5 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart5 = require("./story-expansion-2x-part5.js"); } catch (error) { storyExpansionPart5 = null; }
+  }
+  if (!storyExpansionPart5 && typeof globalThis !== "undefined") storyExpansionPart5 = globalThis.StarshipStoryExpansion2xPart5 || null;
+  var storyExpansionPart6 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart6 = require("./story-expansion-2x-part6.js"); } catch (error) { storyExpansionPart6 = null; }
+  }
+  if (!storyExpansionPart6 && typeof globalThis !== "undefined") storyExpansionPart6 = globalThis.StarshipStoryExpansion2xPart6 || null;
+  var storyExpansionPart7 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart7 = require("./story-expansion-2x-part7.js"); } catch (error) { storyExpansionPart7 = null; }
+  }
+  if (!storyExpansionPart7 && typeof globalThis !== "undefined") storyExpansionPart7 = globalThis.StarshipStoryExpansion2xPart7 || null;
+  var storyExpansionPart8 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart8 = require("./story-expansion-2x-part8.js"); } catch (error) { storyExpansionPart8 = null; }
+  }
+  if (!storyExpansionPart8 && typeof globalThis !== "undefined") storyExpansionPart8 = globalThis.StarshipStoryExpansion2xPart8 || null;
+  var storyExpansionPart9 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart9 = require("./story-expansion-2x-part9.js"); } catch (error) { storyExpansionPart9 = null; }
+  }
+  if (!storyExpansionPart9 && typeof globalThis !== "undefined") storyExpansionPart9 = globalThis.StarshipStoryExpansion2xPart9 || null;
+  var storyExpansionPart10 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart10 = require("./story-expansion-2x-part10.js"); } catch (error) { storyExpansionPart10 = null; }
+  }
+  if (!storyExpansionPart10 && typeof globalThis !== "undefined") storyExpansionPart10 = globalThis.StarshipStoryExpansion2xPart10 || null;
+  var storyExpansionPart11 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart11 = require("./story-expansion-2x-part11.js"); } catch (error) { storyExpansionPart11 = null; }
+  }
+  if (!storyExpansionPart11 && typeof globalThis !== "undefined") storyExpansionPart11 = globalThis.StarshipStoryExpansion2xPart11 || null;
+  var storyExpansionPart12 = null;
+  if (typeof require === "function") {
+    try { storyExpansionPart12 = require("./story-expansion-2x-part12.js"); } catch (error) { storyExpansionPart12 = null; }
+  }
+  if (!storyExpansionPart12 && typeof globalThis !== "undefined") storyExpansionPart12 = globalThis.StarshipStoryExpansion2xPart12 || null;
 
   var storyWorldMap = null;
   if (typeof require === "function") {
@@ -152,7 +222,10 @@
     kailin: { name: "凱琳", romanizedName: "Kailin", portrait: "./assets/story-characters/kailin.png" },
     oun: { name: "奧恩", romanizedName: "Oun", portrait: "./assets/story-characters/oun.png" },
     mila: { name: "米菈", romanizedName: "Mila", portrait: "./assets/story-characters/mila.png" },
-    vark: { name: "老瓦克", romanizedName: "Vark", portrait: "./assets/story-characters/vark.png" }
+    vark: { name: "老瓦克", romanizedName: "Vark", portrait: "./assets/story-characters/vark.png" },
+    cenwu: { name: "岑霧", romanizedName: "Cenwu", portrait: null, firstAppearance: "1.1", role: "山腰驛站站長" },
+    ruida: { name: "芮妲", romanizedName: "Ruida", portrait: null, firstAppearance: "1.1", role: "迴音谷車夫" },
+    yuan: { name: "榆安", romanizedName: "Yuan", portrait: null, firstAppearance: "1.1", role: "隨車藥師" }
   });
   var characterAssets = Object.freeze(Object.fromEntries(Object.values(cards).map(function (entry) {
     var currentRelease = Number(entry.releaseVersion) <= 2.5;
@@ -165,10 +238,10 @@
   var version4Cards = [cards.aurelia, cards.kairen, cards.sorae, cards.talia, cards.neve, cards.kael, cards.elyra];
   var version5Cards = [cards.vestra, cards.brann, cards.eirin, cards.sava, cards.niela, cards.hervan, cards.daria];
 
-  // 本次大更新開放劇情與 2.0–2.5 角色；1.0–1.5 卡池仍保留，讓舊角色不會消失。
-  var activeCards = [
-    ...legacyCards, ...version2Cards
-  ];
+  // 正式版首期只開放 1.0；舊帳號已取得的角色仍由存檔保留。
+  var releasedVersion = "1.0";
+  var storyVersionReward = Object.freeze({ version: "1.0", starSand: 1600, characterExp: 3000, echoPowder: 5 });
+  var activeCards = Object.values(cards).filter(function (entry) { return entry.releaseVersion === releasedVersion; });
   var legacyFour = legacyCards.filter(function (item) { return item.rarity === 4; });
   var legacyThree = legacyCards.filter(function (item) { return item.rarity === 3; });
   var activeFour = activeCards.filter(function (item) { return item.rarity === 4; });
@@ -295,14 +368,14 @@
     }
   });
 
-  var updateCycle = "2026-09-23-maintenance";
+  var updateCycle = "2026-10-01-official-1-0";
   var trialVersion = updateCycle;
-  var trialMaxRewards = 10;
+  var trialMaxRewards = 20;
   // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
   // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。完成 30 關並使用版本內
   // 的可重複獎勵後，足以養成一支 4★ 隊伍，不需要依賴重複抽卡。
   // 原共鳴券已取消；每張券按單抽等價 160 星砂併入獎勵。
-  var trialReward = Object.freeze({ starSand: 50, characterExp: 1500 });
+  var trialReward = Object.freeze({ starSand: 75, characterExp: 1800 });
   // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
   var trialStages = [
@@ -413,8 +486,7 @@
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
   // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
   var voyageVersion = updateCycle;
-  var maveLuminousSkin = { id: "skin-mave-luminous-archive", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜流光檔案裝", themeLabel: "ARCHIVE OUTFIT", previewTitle: "流光檔案", description: "本期特殊結局獎勵；只改變角色外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取", previewImage: "./assets/cards/skins/mave-luminous-archive.png", accent: "#d06cff" };
-  var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第一個夏日造型測試；保留梅芙的臉部特徵，改變服裝、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
+  var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取；原季裝持有者自動轉換", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第二個夏日造型測試；保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
   var voyageConfig = {
     version: voyageVersion,
@@ -462,11 +534,11 @@
     endingRewards: {
       normal: { starSand: 160, characterExp: 500 },
       hidden: { starSand: 280, characterExp: 700, petTokens: 1 },
-      special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-luminous-archive" }
+      special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-summer-beach-party" }
     },
     // seasonSkin 保留給舊版航程與相容性；seasonSkins 讓角色培養頁可同時預覽多個造型。
-    seasonSkin: maveLuminousSkin,
-    seasonSkins: [maveLuminousSkin, maveSummerSkin, harlowSummerSkin]
+    seasonSkin: maveSummerSkin,
+    seasonSkins: [maveSummerSkin, harlowSummerSkin]
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
@@ -557,14 +629,12 @@
     Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
   ]);
   var announcements = Object.freeze([
-    Object.freeze({ id: "maintenance-2026-09-23", badge: "維護更新", date: "2026.09.23", title: "對戰獎勵重置與更新補給", copy: "目前開放內容維持 1.0–2.5，尚未推出新版本。星界試煉、Boss、星港委託與星海迷航的本期關卡進度和可領獎勵重新開始；星伴玩法與進度維持原樣。", reward: "+3,200 星砂已於登入時自動發放，每個帳號限一次。", highlights: ["原有星砂、經驗、素材與其他資源保留", "角色、養成、劇情、寵物與裝扮保留", "已領取的獎勵不扣回；本期可再次挑戰領取"] }),
-    Object.freeze({ id: "update-2.0-2.5", badge: "大更新", date: "2.0–2.5", title: "第二大版本｜潮眼回覆正式開放", copy: "主線與支線 1.0–2.5 已接入長篇閱讀器；2.0–2.5 角色、星界試煉與星港委託一起加入星界之律大廳。", reward: "+3,200 星砂更新獎勵；每個帳號可領取一次。", highlights: ["劇情正文不再只顯示標題", "星界試煉擴充為 30 關", "版本進度更新不會刪除角色與培養資料"] }),
-    Object.freeze({ id: "tutorial-launch", badge: "新手支援", date: "本次更新", title: "新手教學上線", copy: "第一次進入大廳後，可以從新手教學快速了解劇情、抽卡、培養、戰力、星界試煉與星港委託。", reward: "+920 星砂、+600 角色經驗。", highlights: ["完成一次即可領取", "獎勵會寫入目前登入的玩家帳號", "舊玩家也可以補看並領取一次"] }),
-    Object.freeze({ id: "trial-improvement", badge: "玩法更新", date: "星界試煉", title: "試煉戰報與敵方情報優化", copy: "每隻可派出角色會直接顯示個別戰力，關卡會展示敵人圖片、攻防速度與敵方特性，方便玩家思考隊伍配合。", reward: "每次成功可取得 50 星砂與 1,500 角色經驗。", highlights: ["最多 4 名角色出戰", "每關每版本最多領獎 10 次", "低於推薦戰力也可能靠協同獲勝"] }),
-    Object.freeze({ id: "system-stability", badge: "系統優化", date: "資料保存", title: "玩家進度保存與介面穩定性改善", copy: "登入後的角色持有、命座、專用晶核、等級、資源、保底與劇情紀錄會持續保存；更新時只重置公告明確標示的版本玩法進度。", reward: "角色與養成資料不會因遊戲更新被重置。", highlights: ["修正劇情長文顯示與章節邊界", "角色列表與詳情加入戰力", "圖標、行動版排版與大廳入口調整"] }),
-    Object.freeze({ id: "constellation-balance", badge: "戰鬥平衡", date: "命之座／試煉", title: "命座回饋與後期敵方壓力重新校準", copy: "三星滿命滿等不再只增加很小的面板；四星每命也提高技能與面板。試煉 21–30 調整敵方攻擊曲線，讓後期不會只堆生命拖時間，也不會因傷害過高失去組隊空間。", reward: "所有角色與既有培養進度保留，測試補給可直接檢查完整開放名冊。", highlights: ["三星滿命滿等約接近一般四星 55 等", "四星滿命仍保留稀有度與高等級優勢", "終局敵人有清楚推薦戰力與可承受的攻擊壓力"] }),
-    Object.freeze({ id: "breakthrough-boss", badge: "養成更新", date: "角色培養", title: "80 等突破與 Boss 挑戰開放", copy: "六種 Boss 分成 Lv.1–3 三檔獎勵；每場勝利會給專屬材料與通用突破印記，避免任何角色因指定 Boss 太難而卡住。", reward: "Boss 勝利可取得突破材料、通用印記與角色經驗；玩家角色與培養進度不會被重置。", highlights: ["Lv.3 的獎勵更豐富", "通用印記可替代任何指定材料", "100 等保留為後續版本玩法，不在本次開放"] }),
-    Object.freeze({ id: "star-sea-pet", badge: "玩法更新", date: "星海迷航／星伴培育", title: "主線之外的兩個獨立遊玩區域", copy: "星海迷航提供隨機航線、事件選擇與特殊結局；星伴培育讓玩家照顧寵物、設計外觀與特效，並決定是否公開展示。", reward: "特殊結局可取得本期四星裝扮；寵物探索與社群評分可取得獨立小獎勵。", highlights: ["三條航線與三種結局", "每期隨機一名四星角色裝扮", "公開／私人展示由玩家自行設定"] })
+    Object.freeze({
+      id: "release-1-0", badge: "版本公告", date: "1.0", title: "1.0 劇情與 QW 召集開放",
+      copy: "目前開放 1.0 劇情與卡池。後續章節和角色仍在製作，開放時間另行公告。",
+      reward: "登入補給：3,200 星砂、1,000 角色經驗、10 回響粉；1.0 五幕讀完可另領 1,600 星砂、3,000 角色經驗、5 回響粉。",
+      highlights: ["1.0 限定角色：Chodan、Magenta", "1.0 三星角色：雷恩、莉亞、伊薩爾", "未開放角色不進入卡池", "既有角色、資源與培養進度保留"]
+    })
   ]);
   var storyChapters = [
     {
@@ -578,9 +648,9 @@
       ]
     },
     {
-      id: "main-1-1", type: "main", version: "1.1", title: "旅行回音", region: "移動舞台",
-      summary: "沿著 1.1 的旅行線索，追蹤 Hina 與 Siyeon 留下的聲音與拾音記錄。",
-      characters: ["hina", "siyeon"],
+      id: "main-1-1", type: "main", version: "1.1", title: "四個人的合奏", region: "霧橋鎮・迴音谷",
+      summary: "瑟蕾雅一行先在山腰驛站找到 Hina，再於迴音谷找到 Siyeon；六人合力撤出受困者，讓 QWER 的重聚有了共同度過的日常。",
+      characters: ["celesia", "reyn", "chodan", "magenta", "hina", "siyeon"],
       scenes: [
         { id: "stage", title: "QWER 的移動舞台", body: "旅行舞台不在固定地圖上停留，只有短暫的聲音與星痕可以確認它曾經經過。" },
         { id: "pickup", title: "拾音師的記錄", body: "Siyeon 將零散聲音整理成可以回覆的片段，Hina 則用吉他聲替下一個節點留下方向。" },
@@ -1138,13 +1208,13 @@
   var banners = [
     {
       id: "limited-1-0-to-2-0",
-      name: "限定｜1.0–1.5 回覆召集",
+      name: "限定｜1.0 QW 回覆召集",
       type: "limited",
       poolKey: "limited",
-      defaultFeaturedId: "celesia",
-      description: "1.0–1.5 舊版限定池；可從文件既有 4★ 中選一隻，選中者 55%，其餘 4★ 合計 45%。",
-      featured4Stars: legacyFour,
-      standard4Stars: legacyFour,
+      defaultFeaturedId: "chodan",
+      description: "1.0 限定池；Chodan、Magenta 為當期 4★。",
+      featured4Stars: [cards.chodan, cards.magenta],
+      standard4Stars: [cards.chodan, cards.magenta],
       standard3Stars: activeThree
     },
     {
@@ -1164,6 +1234,7 @@
       name: "限定｜2.0–2.5 潮眼回覆召集",
       type: "limited",
       poolKey: "limited",
+      active: false,
       defaultFeaturedId: "risan",
       description: "2.0–2.5 新限定池；可從璃珊、曜澤、伊芙琳、澪歌、菲芮、諾芮亞、奧薇拉中選一隻，選中者 55%。",
       featured4Stars: version2Four,
@@ -1172,10 +1243,10 @@
     },
     {
       id: "standard-echo",
-      name: "常駐｜回音召集（1.0–2.5）",
+      name: "常駐｜回音召集（1.0）",
       type: "standard",
       poolKey: "standard",
-      description: "常駐池獨立計數；收錄目前已開放的 1.0–2.5 角色，沒有精選保證。",
+      description: "常駐池獨立計數；只收錄目前已開放的 1.0 角色，沒有精選保證。",
       featured4Stars: [],
       standard4Stars: activeFour,
       standard3Stars: activeThree
@@ -1254,7 +1325,7 @@
 
   var storyContinuityGuides = {
     "main-1-0": { focus: "瑟蕾雅第一次穿過界痕，從求生與查案開始，發現黑晶巨獸其實是在尋找回家的路。", hook: "她在第十三扇窗聽見母親留下的四小節旋律，卻只取得一片漆與一個未完成地址。", payoff: "瑟蕾雅學會把隊友放進地圖，不再把自己畫成唯一的退路。" },
-    "main-1-1": { focus: "瑟蕾雅沿著回音追查母親的線索，也第一次看見不同的人可以對同一條路給出不同答案。", hook: "移動舞台的聲音把她帶往北境，但回音的收件人始終沒有承諾會回來。", payoff: "她把『想去』和『現在就要出發』分開，為後續尋找彼岸留下空間。" },
+    "main-1-1": { focus: "先後找到 Hina 和 Siyeon；四人重聚後，瑟蕾雅學會把未完成的地圖交給同伴共同校正。", hook: "迴音谷錯位使救援隊與樂器車分在兩岸，北側斷路也讓山村補給受阻。", payoff: "眾人救出受困者，留下車輛與器材的損失；小型演出後，瑟蕾雅與雷恩接受北側斷路調查。" },
     "main-1-2": { focus: "瑟蕾雅與測量師、橋樑匠整理被遺構切斷的路，確認界痕不只會移動，也會改寫誰能被看見。", hook: "一枚舊測量釘指向黑晶來源，卻同時標出一個尚未同意公開的名字。", payoff: "她第一次選擇保留未知，讓查案不再等同於帶走答案。" },
     "main-1-3": { focus: "瑟蕾雅在洛汀港學會，完整的名冊不代表擁有替所有人命名的權利。", hook: "潮線的錯誤讀值牽出一份被刪掉的舊名單，也讓她的母親線索與公共檔案重疊。", payoff: "她把港口的回覆分成公共規則與私人地址，避免用拯救之名重演越界。" },
     "main-1-4": { focus: "瑟蕾雅終於靠近彼岸，卻發現重逢不能用一扇門強行完成。", hook: "艾妲的信只要求她先說清楚能在哪裡停下，而不是保證一定會開門。", payoff: "瑟蕾雅承認思念與等待可以同時存在，並為母女的下一次對話留下選擇。" },
@@ -1787,6 +1858,74 @@
     return applyContinuityGuides(merged);
   }
 
+  function expandPublishedStory(chapters) {
+    var additions = storyExpansion && storyExpansion.chapters ? storyExpansion.chapters : {};
+    var extraAdditions = storyExpansionExtra && storyExpansionExtra.chapters ? storyExpansionExtra.chapters : {};
+    var furtherAdditions = storyExpansionExtra && storyExpansionExtra.further ? storyExpansionExtra.further : {};
+    var part2Additions = storyExpansionPart2 && storyExpansionPart2.chapters ? storyExpansionPart2.chapters : {};
+    var part3Additions = storyExpansionPart3 && storyExpansionPart3.chapters ? storyExpansionPart3.chapters : {};
+    var part4Additions = storyExpansionPart4 && storyExpansionPart4.chapters ? storyExpansionPart4.chapters : {};
+    var part5Additions = storyExpansionPart5 && storyExpansionPart5.chapters ? storyExpansionPart5.chapters : {};
+    var part6Additions = storyExpansionPart6 && storyExpansionPart6.chapters ? storyExpansionPart6.chapters : {};
+    var part7Additions = storyExpansionPart7 && storyExpansionPart7.chapters ? storyExpansionPart7.chapters : {};
+    var part8Additions = storyExpansionPart8 && storyExpansionPart8.chapters ? storyExpansionPart8.chapters : {};
+    var part9Additions = storyExpansionPart9 && storyExpansionPart9.chapters ? storyExpansionPart9.chapters : {};
+    var part10Additions = storyExpansionPart10 && storyExpansionPart10.chapters ? storyExpansionPart10.chapters : {};
+    var part11Additions = storyExpansionPart11 && storyExpansionPart11.chapters ? storyExpansionPart11.chapters : {};
+    var part12Additions = storyExpansionPart12 && storyExpansionPart12.chapters ? storyExpansionPart12.chapters : {};
+    var finalAdditions = storyExpansionPart12 && storyExpansionPart12.further ? storyExpansionPart12.further : {};
+    var closingAdditions = storyExpansionPart12 && storyExpansionPart12.closing ? storyExpansionPart12.closing : {};
+    return chapters.map(function (chapter) {
+      var chapterAdditions = additions[chapter.id];
+      var chapterExtras = extraAdditions[chapter.id] || {};
+      var chapterFurther = furtherAdditions[chapter.id] || {};
+      var chapterPart2 = part2Additions[chapter.id] || {};
+      var chapterPart3 = part3Additions[chapter.id] || {};
+      var chapterPart4 = part4Additions[chapter.id] || {};
+      var chapterPart5 = part5Additions[chapter.id] || {};
+      var chapterPart6 = part6Additions[chapter.id] || {};
+      var chapterPart7 = part7Additions[chapter.id] || {};
+      var chapterPart8 = part8Additions[chapter.id] || {};
+      var chapterPart9 = part9Additions[chapter.id] || {};
+      var chapterPart10 = part10Additions[chapter.id] || {};
+      var chapterPart11 = part11Additions[chapter.id] || {};
+      var chapterPart12 = part12Additions[chapter.id] || {};
+      var chapterFinal = finalAdditions[chapter.id] || {};
+      var chapterClosing = closingAdditions[chapter.id] || {};
+      if ((!chapterAdditions && !Object.keys(chapterExtras).length && !Object.keys(chapterFurther).length && !Object.keys(chapterPart2).length && !Object.keys(chapterPart3).length && !Object.keys(chapterPart4).length && !Object.keys(chapterPart5).length && !Object.keys(chapterPart6).length && !Object.keys(chapterPart7).length && !Object.keys(chapterPart8).length && !Object.keys(chapterPart9).length && !Object.keys(chapterPart10).length && !Object.keys(chapterPart11).length && !Object.keys(chapterPart12).length && !Object.keys(chapterFinal).length && !Object.keys(chapterClosing).length) || chapter.releaseOpen === false) return chapter;
+      chapterAdditions = chapterAdditions || {};
+      var scenes = chapter.scenes.map(function (scene, sceneIndex) {
+        var continuation = [chapterAdditions[scene.id], chapterExtras[scene.id], chapterFurther[scene.id], chapterPart2[scene.id], chapterPart3[scene.id], chapterPart4[scene.id], chapterPart5[scene.id], chapterPart6[scene.id], chapterPart7[scene.id], chapterPart8[scene.id], chapterPart9[scene.id], chapterPart10[scene.id], chapterPart11[scene.id], chapterPart12[scene.id], chapterFinal[scene.id], chapterClosing[scene.id], closingAdditions[chapter.id + ":" + scene.id]].filter(Boolean).join("\n\n");
+        if (!continuation) return scene;
+        var original = String(scene.body || "").trim();
+        var storyEnd = original.match(/\n*——[^\n]*完——\s*$/u);
+        if (storyEnd) original = original.slice(0, storyEnd.index).trim();
+        var isLastScene = sceneIndex === chapter.scenes.length - 1;
+        var body;
+        var beginsBeforeOriginal = (chapter.id === "main-2.2" && scene.id === "deep-line") || (chapter.id === "main-2.5" && scene.id === "tide-eye");
+        if (beginsBeforeOriginal) {
+          body = continuation.trim() + "\n\n" + original;
+        } else if (isLastScene || chapter.id === "main-2.1") {
+          body = original + "\n\n" + continuation.trim();
+        } else {
+          var target = Math.floor(original.length * 0.1);
+          var boundary = original.indexOf("\n", target);
+          if (boundary < 0 || boundary > original.length * 0.65) boundary = original.indexOf("。", target);
+          if (boundary < 0 || boundary > original.length * 0.65) boundary = target;
+          else boundary += 1;
+          body = original.slice(0, boundary).trim() + "\n\n" + continuation.trim() + "\n\n" + original.slice(boundary).trim();
+        }
+        if (storyEnd) body += "\n\n" + storyEnd[0].trim();
+        return Object.assign({}, scene, { body: body });
+      });
+      return Object.assign({}, chapter, {
+        scenes: scenes,
+        fullBody: scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
+        sourceStatus: "expanded-from-document"
+      });
+    });
+  }
+
   var sideStoryGroupSpecs = [
     { id: "side-1-0-village", range: "1.0–1.1", title: "第十三把椅子與今天不排練", region: "白鐘城・霧橋鎮", members: ["side-1-0-village", "side-1-1-qwer"] },
     { id: "side-1-2-water", range: "1.2–1.3", title: "獵人歸林與雨停以前", region: "獸靈之村・洛汀港", members: ["side-1-2-water", "side-1-3-harbor"] },
@@ -1887,7 +2026,7 @@
       var patch = patches[chapter.id];
       if (!patch) return chapter;
       // 已開放章節以匯入的完整正文為準；重編提綱不可覆蓋玩家閱讀的長篇原稿。
-      if (chapter.releaseOpen !== false && chapter.sourceStatus === "document" && chapter.fullBody) {
+      if (chapter.releaseOpen !== false && (chapter.sourceStatus === "document" || chapter.sourceStatus === "expanded-from-document") && chapter.fullBody) {
         (patch.scenes || []).forEach(function (shortScene, index) {
           var original = chapter.scenes[Math.min(chapter.scenes.length - 1, Math.floor(index * chapter.scenes.length / Math.max(patch.scenes.length, 1)))];
           if (original && shortScene.id !== original.id) sceneAliases[chapter.id + ":" + shortScene.id] = chapter.id + ":" + original.id;
@@ -1924,7 +2063,7 @@
     return { chapters: replanned, sceneAliases: sceneAliases };
   }
 
-  var rawLiveStoryChapters = mergeImportedStory(storyChapters.concat(version2StoryChapters));
+  var rawLiveStoryChapters = expandPublishedStory(mergeImportedStory(storyChapters.concat(version2StoryChapters)));
   var rawAllStoryChapters = rawLiveStoryChapters.concat(version3StoryChapters, version4StoryChapters, version5StoryChapters);
   var groupedStory = groupSideStoryChapters(rawAllStoryChapters);
   var allStoryChapters = groupedStory.chapters.map(function (chapter) {
@@ -1935,7 +2074,18 @@
   });
   var storyReplanResult = applyStoryReplan(allStoryChapters, groupedStory.aliases);
   allStoryChapters = storyReplanResult.chapters;
-  var liveStoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) <= 2.5; });
+  allStoryChapters = allStoryChapters.map(function (chapter) {
+    if (chapter.id === "main-1-0" && currentStory10) {
+      chapter = Object.assign({}, chapter, {
+        title: currentStory10.title,
+        scenes: currentStory10.scenes,
+        fullBody: currentStory10.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
+        sourceStatus: "document"
+      });
+    }
+    return Object.assign({}, chapter, { releaseOpen: chapter.id === "main-1-0" });
+  });
+  var liveStoryChapters = allStoryChapters.filter(function (chapter) { return chapter.releaseOpen; });
   var storyChapterAliases = groupedStory.aliases;
   var storySceneAliases = storyReplanResult.sceneAliases;
   var groupedVersion3StoryChapters = allStoryChapters.filter(function (chapter) { return Number(chapter.version) >= 3 && Number(chapter.version) < 4; });
@@ -1964,6 +2114,7 @@
     version5Cards: version5Cards,
     // 1.0–2.5 是 live 劇情；3.0–5.5 先完整建檔但保持鎖定，供後續版本開放。
     storyChapters: allStoryChapters,
+    storyVersionReward: storyVersionReward,
     liveStoryChapters: liveStoryChapters,
     version2StoryChapters: version2StoryChapters,
     version3StoryChapters: groupedVersion3StoryChapters,
@@ -1998,8 +2149,8 @@
     tutorialReward: tutorialReward,
     tutorialSteps: tutorialSteps,
     announcements: announcements,
-    updateVersion: "2.0-2.5",
+    updateVersion: "1.0",
     updateCycle: updateCycle,
-    updateReward: Object.freeze({ starSand: 3200 })
+    updateReward: Object.freeze({ starSand: 3200, characterExp: 1000, echoPowder: 10 })
   };
 }));

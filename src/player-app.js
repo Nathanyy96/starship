@@ -40,6 +40,12 @@
     var characterListFilter = "all";
     var game = null;
 
+    function rosterCards() {
+      var owned = game ? game.getState().collection : {};
+      return Object.values(data.cards).filter(function (card) {
+        return data.activeCards.some(function (active) { return active.id === card.id; }) || Number(owned[card.id]) > 0;
+      });
+    }
     function byId(id) { return document.getElementById(id); }
     function escapeHtml(value) {
       return String(value === undefined || value === null ? "" : value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
@@ -196,8 +202,11 @@
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
       state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
       if (!state.updateRewards.claimedVersions[updateVersion]) {
-        state.resources.starSand += Number(data.updateReward && data.updateReward.starSand || 3200);
-        state.updateRewards.claimedVersions[updateVersion] = { starSand: Number(data.updateReward && data.updateReward.starSand || 3200), grantedAt: new Date().toISOString() };
+        var releaseReward = data.updateReward || { starSand: 3200, characterExp: 1000, echoPowder: 10 };
+        state.resources.starSand += Number(releaseReward.starSand || 0);
+        state.resources.characterExp += Number(releaseReward.characterExp || 0);
+        state.resources.echoPowder += Number(releaseReward.echoPowder || 0);
+        state.updateRewards.claimedVersions[updateVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, echoPowder: releaseReward.echoPowder, grantedAt: new Date().toISOString() };
       }
       if (state.trialProgress && state.trialProgress.version !== updateVersion) {
         state.trialProgress.version = updateVersion;
@@ -378,9 +387,10 @@
     }
     function storySceneById(chapter, id) { return chapter && chapter.scenes.find(function (scene) { return scene.id === id; }); }
     function sceneKey(chapterId, sceneId) { return chapterId + ":" + sceneId; }
-    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen !== false && Number(chapter.version) <= 2.5; }); }
+    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen === true; }); }
     function lockedStoryChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen === false; }); }
     function sceneClaimed(state, chapterId, sceneId) { return Boolean(storyProgress(state).completedScenes[sceneKey(chapterId, sceneId)]); }
+    function storyVersionClaimed(state) { return Boolean(storyProgress(state).claimedVersions && storyProgress(state).claimedVersions["1.0"]); }
     function developmentCost(card, level) {
       var rules = api.DEFAULT_RULES.development;
       var isFourStar = card && card.rarity === 4;
@@ -483,7 +493,7 @@
     }
     function renderLobby() {
       if (!game) return;
-      var state = game.getState(); var progress = storyProgress(state); var completed = Object.keys(progress.completedScenes).length; var total = data.storyChapters.filter(function (item) { return item.releaseOpen !== false; }).reduce(function (sum, chapter) { return sum + chapter.scenes.length; }, 0); var chapter = storyChapterById(progress.currentChapter) || data.storyChapters[0];
+      var state = game.getState(); var progress = storyProgress(state); var openChapters = data.storyChapters.filter(function (item) { return item.releaseOpen === true; }); var completed = openChapters.reduce(function (sum, item) { return sum + item.scenes.filter(function (scene) { return Boolean(progress.completedScenes[sceneKey(item.id, scene.id)]); }).length; }, 0); var total = openChapters.reduce(function (sum, chapter) { return sum + chapter.scenes.length; }, 0); var chapter = storyChapterById(progress.currentChapter) || data.storyChapters[0];
       if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
       byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
@@ -551,13 +561,13 @@
     function storyMapFilterMatches(location) {
       if (currentStoryMapFilter === "all") return true;
       var start = storyMapVersionStart(location.versionRange);
-      if (currentStoryMapFilter === "live") return start <= 2.5;
+      if (currentStoryMapFilter === "live") return start <= 1.0;
       if (currentStoryMapFilter === "3") return start >= 3 && start < 4;
       if (currentStoryMapFilter === "4") return start >= 4 && start < 5;
       if (currentStoryMapFilter === "5") return start >= 5;
       return true;
     }
-    function storyMapLocationIsOpen(location) { return storyMapVersionStart(location && location.versionRange) <= 2.5; }
+    function storyMapLocationIsOpen(location) { return storyMapVersionStart(location && location.versionRange) <= 1.0; }
     function storyMapRegionById(id) {
       var map = data.storyWorldMap;
       return map && (map.regions || []).find(function (region) { return region.id === id; });
@@ -621,7 +631,7 @@
       }).join("");
       var selectedRegion = storyMapRegionById(selected && selected.regionId) || {};
       var selectedChapters = storyMapChapterMarkup(selected || map.locations[0]);
-      var filters = [["all", "全圖"], ["live", "1.0–2.5 已開放"], ["3", "3.0–3.5"], ["4", "4.0–4.5"], ["5", "5.0–5.5"]].map(function (item) {
+      var filters = [["all", "全圖"], ["live", "1.0 已開放"], ["3", "3.0–3.5"], ["4", "4.0–4.5"], ["5", "5.0–5.5"]].map(function (item) {
         return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
       }).join("");
       var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
@@ -632,8 +642,11 @@
       currentStorySceneId = scene.id;
       var claimed = sceneClaimed(state, chapter.id, scene.id);
       var sceneIndex = Math.max(0, chapter.scenes.findIndex(function (item) { return item.id === scene.id; }));
+      var finalScene = chapter.id === "main-1-0" && sceneIndex === chapter.scenes.length - 1;
+      var versionClaimed = storyVersionClaimed(state);
+      var priorScenesComplete = chapter.scenes.slice(0, -1).every(function (item) { return sceneClaimed(state, chapter.id, item.id); });
       var sceneTitle = storySceneDisplayTitle(chapter, scene, sceneIndex);
-      var sceneButtons = chapter.scenes.map(function (item, index) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</span><small>" + (sceneClaimed(state, chapter.id, item.id) ? "已領取本幕獎勵" : "完成後 +100 星砂・+650 經驗") + "</small></button>"; }).join("");
+      var sceneButtons = chapter.scenes.map(function (item, index) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</span><small>" + (index === chapter.scenes.length - 1 ? (versionClaimed ? "1.0 版本獎勵已領取" : "讀完五幕可領 1.0 版本獎勵") : (sceneClaimed(state, chapter.id, item.id) ? "已讀完" : "尚未讀完")) + "</small></button>"; }).join("");
       var fullChapter = chapter.scenes.map(function (item, index) {
         return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body") + "</article>";
       }).join("");
@@ -644,11 +657,11 @@
       var needsLongDraft = chapter.type === "main" && chapter.releaseOpen !== false && length < 10000;
       var sourceLabel = chapter.sourceStatus === "document-tab-missing" ? "補充正文" : (needsLongDraft ? "現存原稿" : "文件正文");
       var portraitEntries = Object.keys(data.storyCharacters || {}).map(function (id) { return data.storyCharacters[id]; }).concat(chapter.characters.map(function (id) { return data.cards[id]; }).filter(Boolean));
-      var scenePortraits = portraitEntries.filter(function (entry) { return entry.name && String(scene.body || "").includes(entry.name); }).slice(0, 4).map(function (entry) {
+      var scenePortraits = portraitEntries.filter(function (entry) { return entry.name && (entry.portrait || entry.image) && String(scene.body || "").includes(entry.name); }).slice(0, 4).map(function (entry) {
         var source = entry.portrait || characterPortraitSource(entry);
         return "<figure class=\"story-portrait\"><img src=\"" + escapeHtml(source) + "\" alt=\"" + escapeHtml(entry.name + " 角色立繪") + "\" loading=\"lazy\"><figcaption><strong>" + escapeHtml(entry.name) + "</strong><small>" + escapeHtml(entry.romanizedName || "") + "</small></figcaption></figure>";
       }).join("");
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + (scenePortraits ? "<div class=\"story-portraits\" aria-label=\"本幕登場角色\">" + scenePortraits + "</div>" : "") + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>首次看完獎勵</span><strong>+100 星砂・+650 角色經驗</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + (claimed ? " disabled" : "") + ">" + (claimed ? "已領取" : "看完本幕並領取") + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>" + (needsLongDraft ? "目前收錄的劇情" : "本章完整劇情") + "</span><small>" + (needsLongDraft ? "現存原稿尚未達長篇篇幅；以下顯示目前收錄的所有幕次" : "所有幕次內容都會顯示") + "</small></div><div>" + fullChapter + "</div></section>";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + (scenePortraits ? "<div class=\"story-portraits\" aria-label=\"本幕登場角色\">" + scenePortraits + "</div>" : "") + storyBodyMarkup(scene.body) + "<div class=\"story-reward-bar\"><span>1.0 版本獎勵・五幕完成領取一次</span><strong>+1,600 星砂・+3,000 角色經驗・+5 回響粉</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + ((finalScene ? versionClaimed || !priorScenesComplete : claimed) ? " disabled" : "") + ">" + (finalScene ? (versionClaimed ? "版本獎勵已領取" : "完成第五幕並領取版本獎勵") : (claimed ? "已讀完" : "標記本幕已讀完")) + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>" + (needsLongDraft ? "目前收錄的劇情" : "本章完整劇情") + "</span><small>" + (needsLongDraft ? "現存原稿尚未達長篇篇幅；以下顯示目前收錄的所有幕次" : "所有幕次內容都會顯示") + "</small></div><div>" + fullChapter + "</div></section>";
     }
     function moveStoryPlotToTop() {
       var reader = byId("story-reader");
@@ -692,8 +705,8 @@
       if (!game) return;
       var state = game.getState(); var chapters = storyChapterList(); var current = storyChapterById(currentStoryChapterId);
       if (!chapters.length) {
-        byId("story-chapters").innerHTML = "<div class=\"empty\">劇情資料尚未載入，請重新整理頁面；玩家存檔不會因此被清除。</div>";
-        byId("story-reader").innerHTML = "<div class=\"empty\">目前沒有可顯示的已開放劇情。若重新整理後仍看不到，請聯絡管理員檢查部署版本。</div>";
+        byId("story-chapters").innerHTML = "<div class=\"empty\">這類劇情尚未開放。</div>";
+        byId("story-reader").innerHTML = "<div class=\"empty\">目前可閱讀 1.0 主線；支線仍在製作。</div>";
         if (byId("story-world-map")) byId("story-world-map").innerHTML = "";
         return;
       }
@@ -703,7 +716,7 @@
       var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
       decorateStoryRoadmap();
-      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0–2.5｜3.0–5.5 已建檔" : "支線 1.0–2.5｜3.0–5.5 已建檔";
+      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0 已開放｜後續章節籌備中" : "支線籌備中";
       renderStoryWorldMap(current);
       renderStoryReader(state, current);
       decorateStoryMythic(current);
@@ -711,20 +724,20 @@
     }
     function renderCharacters() {
       if (!game) return;
-      var state = game.getState(); var owned = data.activeCards.filter(function (card) { return (state.collection[card.id] || 0) > 0; }).length;
+      var state = game.getState(); var owned = rosterCards().filter(function (card) { return (state.collection[card.id] || 0) > 0; }).length;
       byId("character-view-status").textContent = "已取得 " + owned + " 名";
       byId("character-exp").textContent = number(state.resources.characterExp);
-      var personalCoreTotal = data.activeCards.reduce(function (sum, card) { var progress = state.characterProgress[card.id] || {}; return sum + (Number(progress.constellationCore) || 0); }, 0);
+      var personalCoreTotal = rosterCards().reduce(function (sum, card) { var progress = state.characterProgress[card.id] || {}; return sum + (Number(progress.constellationCore) || 0); }, 0);
       if (byId("character-core")) byId("character-core").textContent = number(personalCoreTotal);
       byId("character-star-marks").textContent = number(state.resources.starMarks);
       var searchTerm = characterSearchTerm.trim().toLocaleLowerCase();
-      var visibleCards = data.activeCards.filter(function (card) {
+      var visibleCards = rosterCards().filter(function (card) {
         var copies = state.collection[card.id] || 0;
         var matchesFilter = characterListFilter === "all" || (characterListFilter === "owned" && copies > 0) || (characterListFilter === "rarity4" && card.rarity === 4) || (characterListFilter === "rarity3" && card.rarity === 3);
         var searchable = [card.name, card.romanizedName, card.element, card.releaseVersion, card.id].join(" ").toLocaleLowerCase();
         return matchesFilter && (!searchTerm || searchable.indexOf(searchTerm) >= 0);
       });
-      byId("character-list-count").textContent = "顯示 " + visibleCards.length + " / " + data.activeCards.length + " 名";
+      byId("character-list-count").textContent = "顯示 " + visibleCards.length + " / " + rosterCards().length + " 名";
       byId("character-list").innerHTML = visibleCards.length ? visibleCards.map(function (card) {
         var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var portrait = characterPortraitSource(card); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (portrait ? ";--card-image:url(\"" + escapeHtml(portrait) + "\")" : "");
         var growthAction;
@@ -830,16 +843,30 @@
     }
     function completeStoryScene(chapterId, sceneId) {
       if (remoteMode) {
-        apiRequest("/api/player/story-progress", { action: "complete", chapterId: chapterId, sceneId: sceneId }).then(function (payload) { updateGameFromState(payload.state); renderStory(); renderLobby(); renderCharacters(); showMessage(payload.alreadyClaimed ? "這一幕的獎勵已領取。" : "劇情完成：" + rewardText(payload.reward || {}) + "並儲存到帳號。", false); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/story-progress", { action: "complete", chapterId: chapterId, sceneId: sceneId }).then(function (payload) { updateGameFromState(payload.state); renderStory(); renderLobby(); renderCharacters(); showMessage(payload.alreadyClaimed ? "這一幕已讀完。" : (payload.reward && (payload.reward.starSand || payload.reward.characterExp || payload.reward.echoPowder) ? "版本獎勵：" + rewardText(payload.reward) + "已存入帳號。" : "本幕已讀完；讀完第五幕可領版本獎勵。"), false); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       var chapter = storyChapterById(chapterId); if (!chapter || chapter.releaseOpen === false) { showMessage("這個版本的劇情已建檔，但尚未開放。", true); return; }
       var state = game.getState(); var progress = storyProgress(state); var key = sceneKey(chapterId, sceneId);
-      if (progress.completedScenes[key]) { showMessage("這一幕的星砂獎勵已領取。", false); return; }
-      var storyReward = { starSand: 100, characterExp: 650 };
-      progress.currentChapter = chapterId; progress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: storyReward.starSand, characterExp: storyReward.characterExp }; state.resources.starSand += storyReward.starSand; state.resources.characterExp += storyReward.characterExp;
+      progress.claimedVersions = progress.claimedVersions || {};
+      var finalScene = sceneId === chapter.scenes[chapter.scenes.length - 1].id;
+      if (progress.completedScenes[key] && (!finalScene || progress.claimedVersions["1.0"])) { showMessage("這一幕已讀完。", false); return; }
+      if (finalScene && !chapter.scenes.slice(0, -1).every(function (item) { return Boolean(progress.completedScenes[sceneKey(chapterId, item.id)]); })) { showMessage("請先讀完前四幕。", true); return; }
+      var storyReward = { starSand: 0, characterExp: 0, echoPowder: 0 };
+      progress.currentChapter = chapterId;
+      if (!progress.completedScenes[key]) progress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: 0, characterExp: 0 };
+      if (finalScene && !progress.claimedVersions["1.0"]) {
+        var oldClaims = Object.keys(progress.completedScenes).filter(function (oldKey) { return oldKey.indexOf("main-1-0:") === 0; }).map(function (oldKey) { return progress.completedScenes[oldKey]; });
+        var oldSand = oldClaims.reduce(function (sum, item) { return sum + Math.max(0, Number(item.starSand) || 0); }, 0);
+        var oldExp = oldClaims.reduce(function (sum, item) { return sum + Math.max(0, Number(item.characterExp) || 0); }, 0);
+        storyReward.starSand = Math.max(0, data.storyVersionReward.starSand - oldSand);
+        storyReward.characterExp = Math.max(0, data.storyVersionReward.characterExp - oldExp);
+        storyReward.echoPowder = data.storyVersionReward.echoPowder;
+        state.resources.starSand += storyReward.starSand; state.resources.characterExp += storyReward.characterExp; state.resources.echoPowder += storyReward.echoPowder;
+        progress.claimedVersions["1.0"] = { claimedAt: new Date().toISOString(), reward: storyReward };
+      }
       if (chapterId === "main-1-0" && !state.recruitment.story10ChoiceClaimed) state.recruitment.story10ChoiceAvailable = true;
-      updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); renderCharacters(); showMessage("劇情完成：" + rewardText(storyReward) + "並儲存到這個瀏覽器。", false);
+      updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); renderCharacters(); showMessage(finalScene ? "版本獎勵：" + rewardText(storyReward) + "已儲存。" : "本幕已讀完；讀完第五幕可領版本獎勵。", false);
     }
     function developCharacter(cardId) {
       currentCharacterId = cardId;
@@ -910,7 +937,7 @@
       }).join("");
     }
     function battleCharacterById(id) {
-      return data.cards[id] || data.activeCards.find(function (card) { return card.id === id; }) || null;
+      return data.cards[id] || rosterCards().find(function (card) { return card.id === id; }) || null;
     }
     function battleHealthPercent(unit) {
       var maxHp = Math.max(1, Number(unit && unit.maxHp) || 1); return Math.max(0, Math.min(100, Math.round((Number(unit && unit.hp) || 0) / maxHp * 100)));
@@ -983,14 +1010,14 @@
       byId("trial-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>TRIAL " + String(current.id).padStart(2, "0") + "</span><span>" + escapeHtml(current.region) + "</span>" + (current.finalStage ? "<span>FINAL</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>敵方編成：" + escapeHtml(enemyText) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般試煉") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>推薦戰力 <b>" + number(current.recommendedPower) + "</b></span><span>本版本獎勵 <b>" + number(Number(current.reward && current.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂 + " + number(trialCharacterExp) + " 經驗</b></span><span>可領次數 <b>" + attempts + " / " + maxRewards + "</b></span></div>";
       decorateTrialMythic(current);
       if (byId("trial-enemy-intel")) byId("trial-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>先看敵人的攻防與速度，再安排隊伍協同</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
-      var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
+      var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
       byId("trial-team-list").innerHTML = owned.length ? owned.map(function (card) {
         var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentTrialTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url(\"" + escapeHtml(image) + "\")" : "");
         return "<button class=\"trial-team-card " + (selected ? "selected" : "") + "\" data-trial-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small><small>技能｜" + escapeHtml(stats.skillName || "—") + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>";
       }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
-      var startButton = byId("start-trial-battle"); startButton.disabled = !trialUnlocked(state, current.id) || !currentTrialTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 10 次" : "開始自走棋戰鬥";
+      var startButton = byId("start-trial-battle"); startButton.disabled = !trialUnlocked(state, current.id) || !currentTrialTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 " + maxRewards + " 次" : "開始自走棋戰鬥";
       renderTrialBattleResult(state);
     }
     function toggleTrialTeam(cardId) {
@@ -1013,7 +1040,7 @@
       try {
         var state = game.getState(); var progress = trialProgress(state); var attempts = trialAttempts(state, stage.id); var maxRewards = data.trialMaxRewards || 10;
         if (!trialUnlocked(state, stage.id)) throw new Error("請先通關前一關");
-        if (attempts >= maxRewards) throw new Error("本關在目前版本已完成 10 次，請等待下次遊戲更新重置挑戰次數");
+        if (attempts >= maxRewards) throw new Error("本關在目前版本已完成 " + maxRewards + " 次，請等待下次遊戲更新重置挑戰次數");
         if (!currentTrialTeam.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
         if (currentTrialTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
         var battle = window.StarshipBattle.simulateBattle({ team: currentTrialTeam, stats: effectiveBattleStats(state), stage: stage }); progress.selectedTeam = currentTrialTeam.slice(); progress.lastBattle = battle;
@@ -1052,7 +1079,7 @@
       if (byId("boss-enemy-intel")) byId("boss-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">BOSS INTEL</span><strong>首領情報</strong></div><small>不同角色需要的突破材料，來自不同 Boss</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       var materials = "<span>星界通用突破印記 <b>" + number(state.breakthroughMaterials["universal-core"] || 0) + "</b></span>" + (data.bossStages || []).map(function (stage) { var item = stage.reward || {}; return "<span>" + escapeHtml(item.materialName || "突破材料") + " <b>" + number(state.breakthroughMaterials[item.materialId] || 0) + "</b></span>"; }).filter(function (value, index, list) { return list.indexOf(value) === index; }).join("");
       if (byId("boss-material-inventory")) byId("boss-material-inventory").innerHTML = materials;
-      var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
+      var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentBossTeam = currentBossTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("boss-team-count").textContent = currentBossTeam.length + " / 4 · 戰力 " + number(trialPower(currentBossTeam, state));
       byId("boss-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentBossTeam.indexOf(card.id) >= 0; var requirement = data.characterBreakthroughs[card.id]; var image = characterPortraitSource(card); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url(\"" + escapeHtml(image) + "\")" : ""); return "<button class=\"trial-team-card boss-team-card " + (selected ? "selected" : "") + "\" data-boss-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>需要：" + escapeHtml(requirement ? requirement.materialName : "未設定") + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可挑戰 Boss 的角色。</div>";
@@ -1104,7 +1131,7 @@
       if (!current) { byId("dispatch-missions").innerHTML = "<div class=\"empty\">目前沒有開放的星港委託。</div>"; return; }
       currentDispatchMissionId = current.id;
       if (Array.isArray(progress.selectedTeam) && !currentDispatchTeam.length) currentDispatchTeam = progress.selectedTeam.slice(0, 4);
-      var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
+      var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentDispatchTeam = currentDispatchTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("dispatch-missions").innerHTML = missions.map(function (mission) { var claimed = Boolean(progress.claimed[mission.id]); return "<button class=\"dispatch-mission-card " + (mission.id === current.id ? "active " : "") + (claimed ? "claimed" : "") + "\" data-dispatch-mission=\"" + escapeHtml(mission.id) + "\" type=\"button\"><span class=\"mission-index\">" + escapeHtml(mission.id.replace("dispatch-", "").slice(0, 2).toUpperCase()) + "</span><span><strong>" + escapeHtml(mission.name) + "</strong><small>" + escapeHtml(mission.region) + " · 推薦 " + number(mission.recommendedPower) + "</small></span><em>" + (claimed ? "已完成" : "可執行") + "</em></button>"; }).join("");
       var claimed = Boolean(progress.claimed[current.id]);
@@ -1242,12 +1269,12 @@
         var stage = currentStage;
         byId("voyage-node-enemy").innerHTML = stage ? "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>節點敵方情報</strong></div><small>可先讀取敵人資料再決定編隊</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(stage) + "</div>" : "<div class=\"voyage-event-note\"><span class=\"eyebrow\">EVENT / CHOICE</span><strong>這個節點不需要戰鬥，選擇會影響後續結局。</strong></div>";
         if (node.choices && node.choices.length) {
-          byId("voyage-node-actions").innerHTML = node.choices.map(function (choice) { var hasThree = currentVoyageTeam.some(function (id) { var card = data.activeCards.find(function (item) { return item.id === id; }); return card && card.rarity === 3; }); var hasFour = currentVoyageTeam.some(function (id) { var card = data.activeCards.find(function (item) { return item.id === id; }); return card && card.rarity === 4; }); var missingFlag = choice.requiresFlag && progress.flags[choice.requiresFlag] !== true; var missingMixed = choice.requiresMixedTeam && !(hasThree && hasFour); var missingFragments = Number(choice.costFragments || 0) > Number(progress.fragments || 0); var locked = missingFlag || missingMixed || missingFragments; var lockReason = missingFlag ? "尚未取得必要線索" : missingMixed ? "需要三星與四星混編" : missingFragments ? "星海碎片不足" : ""; return "<button class=\"voyage-choice-button " + (locked ? "locked" : "") + "\" data-voyage-choice=\"" + escapeHtml(choice.id) + "\" type=\"button\"" + (locked ? " disabled" : "") + "><strong>" + escapeHtml(choice.label) + "</strong><small>" + escapeHtml(choice.description || "") + (choice.costFragments ? " · 消耗 " + choice.costFragments + " 碎片" : "") + (lockReason ? " · " + lockReason : "") + "</small></button>"; }).join("");
+          byId("voyage-node-actions").innerHTML = node.choices.map(function (choice) { var hasThree = currentVoyageTeam.some(function (id) { var card = rosterCards().find(function (item) { return item.id === id; }); return card && card.rarity === 3; }); var hasFour = currentVoyageTeam.some(function (id) { var card = rosterCards().find(function (item) { return item.id === id; }); return card && card.rarity === 4; }); var missingFlag = choice.requiresFlag && progress.flags[choice.requiresFlag] !== true; var missingMixed = choice.requiresMixedTeam && !(hasThree && hasFour); var missingFragments = Number(choice.costFragments || 0) > Number(progress.fragments || 0); var locked = missingFlag || missingMixed || missingFragments; var lockReason = missingFlag ? "尚未取得必要線索" : missingMixed ? "需要三星與四星混編" : missingFragments ? "星海碎片不足" : ""; return "<button class=\"voyage-choice-button " + (locked ? "locked" : "") + "\" data-voyage-choice=\"" + escapeHtml(choice.id) + "\" type=\"button\"" + (locked ? " disabled" : "") + "><strong>" + escapeHtml(choice.label) + "</strong><small>" + escapeHtml(choice.description || "") + (choice.costFragments ? " · 消耗 " + choice.costFragments + " 碎片" : "") + (lockReason ? " · " + lockReason : "") + "</small></button>"; }).join("");
         } else {
           byId("voyage-node-actions").innerHTML = "<button class=\"primary-action\" data-voyage-advance=\"1\" type=\"button\">" + (stage ? "進入自走棋戰鬥" : "確認並繼續航行") + "</button>";
         }
       }
-      var owned = data.activeCards.filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
+      var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentVoyageTeam = currentVoyageTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("voyage-team-count").textContent = currentVoyageTeam.length + " / 4 · 戰力 " + number(trialPower(currentVoyageTeam, state));
       byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url(\"" + escapeHtml(image) + "\")" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
@@ -1466,11 +1493,11 @@
     }
     function renderCollection(state) {
       var container = byId("collection");
-      container.innerHTML = data.activeCards.map(function (card) {
+      container.innerHTML = rosterCards().map(function (card) {
         var copies = state.collection[card.id] || 0;
         return "<div class=\"collection-item " + (copies ? "owned" : "locked") + "\"><span class=\"collection-rarity\">" + "★".repeat(card.rarity) + "</span><span class=\"collection-name\">" + escapeHtml(card.name) + " <small>" + escapeHtml(card.element) + "</small></span><span class=\"collection-count\">" + (copies ? "×" + copies : "未取得") + "</span></div>";
       }).join("");
-      byId("collection-count").textContent = Object.keys(state.collection).filter(function (id) { return state.collection[id] > 0; }).length + " / " + data.activeCards.length;
+      byId("collection-count").textContent = Object.keys(state.collection).filter(function (id) { return state.collection[id] > 0; }).length + " / " + rosterCards().length;
     }
     function renderHistory(state) {
       var entries = state.history.slice().reverse().slice(0, 8);

@@ -55,6 +55,7 @@
   var locations = [
     { id: "beast-village", name: "獸靈之村", regionId: "origin-forest", x: 136, y: 294, terrain: "森林村落", versionRange: "1.0–3.2", description: "原始開場與瑟蕾雅第一次留下四小節旋律的地方。", aliases: ["獸靈之村"] },
     { id: "mistbridge", name: "霧橋鎮", regionId: "origin-forest", x: 248, y: 252, terrain: "霧橋峽口", versionRange: "1.0–1.1", description: "白鐘城外的橋鎮，保存最早的回覆台與村口消息。", aliases: ["白鐘城・霧橋鎮"] },
+    { id: "echo-valley", name: "迴音谷", regionId: "origin-forest", x: 310, y: 225, terrain: "錯位山谷", versionRange: "1.1", description: "山腰驛站以北的谷地；QWER在此重聚並參與兩岸救援。", aliases: ["霧橋鎮・迴音谷"] },
     { id: "travel-stage", name: "移動舞台", regionId: "origin-forest", x: 350, y: 292, terrain: "巡迴平台", versionRange: "1.1", description: "沿著舊路移動的臨時舞台，瑟蕾雅在這裡第一次學會聽見不完整的聲音。", aliases: ["移動舞台"] },
     { id: "waterline", name: "水工線", regionId: "origin-forest", x: 414, y: 354, terrain: "地下水工線", versionRange: "1.2", description: "連接森林與港口的舊水工線，橋下遺構藏著早期測線。", aliases: ["水工線"] },
     { id: "lotin-harbor", name: "洛汀港", regionId: "tide-west", x: 416, y: 474, terrain: "潮汐港灣", versionRange: "1.2–1.3", description: "獸靈之村的水路出口，潮線在這裡第一次被寫成共同交班。", aliases: ["洛汀港"] },
@@ -90,6 +91,7 @@
 
   var routes = [
     { id: "origin-to-harbor", from: "beast-village", to: "mistbridge", label: "霧橋舊路", direction: "東南" },
+    { id: "mistbridge-to-echo", from: "mistbridge", to: "echo-valley", label: "山腰驛站路", direction: "東北" },
     { id: "stage-to-water", from: "mistbridge", to: "travel-stage", label: "巡迴舞台線", direction: "東" },
     { id: "water-to-lotin", from: "travel-stage", to: "waterline", label: "水工線", direction: "東南" },
     { id: "lotin-to-bell", from: "waterline", to: "lotin-harbor", label: "潮線出口", direction: "南" },
@@ -134,7 +136,7 @@
   var chapterLocations = {
     "main-1-0": ["beast-village"],
     "side-1-0-village": ["beast-village", "mistbridge"],
-    "main-1-1": ["travel-stage"],
+    "main-1-1": ["mistbridge", "echo-valley"],
     "main-1-2": ["waterline"],
     "side-1-2-water": ["beast-village", "lotin-harbor"],
     "main-1-3": ["lotin-harbor"],
