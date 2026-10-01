@@ -81,7 +81,6 @@
       var parts = [];
       if (reward && reward.starSand) { parts.push("+" + reward.starSand + " 星砂"); }
       if (reward && reward.starMarks) { parts.push("+" + reward.starMarks + " 星痕"); }
-      if (reward && reward.echoPowder) { parts.push("+" + reward.echoPowder + " 回響粉"); }
       return parts.join("、") || "無額外資源";
     }
 

@@ -84,7 +84,6 @@
       var parts = [];
       if (reward.starSand) { parts.push("+" + reward.starSand + " 星砂"); }
       if (reward.starMarks) { parts.push("+" + reward.starMarks + " 星痕"); }
-      if (reward.echoPowder) { parts.push("+" + reward.echoPowder + " 回響粉"); }
       return parts.join("、");
     }
 
@@ -158,7 +157,6 @@
 
       byId("star-sand").textContent = number(state.resources.starSand);
       byId("star-marks").textContent = number(state.resources.starMarks);
-      byId("echo-powder").textContent = number(state.resources.echoPowder);
       byId("banner-description").textContent = banner.description;
       byId("pity-count").textContent = pity.pullsSince4Star + " / " + pity.hardPity;
       byId("pity-rate").textContent = pity.currentFourStarRateText;

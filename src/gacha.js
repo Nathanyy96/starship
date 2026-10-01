@@ -23,7 +23,7 @@
     threeStarRate: 0.20,
     bonusStarSandRate: 0.08,
     bonusStarSandAmount: 40,
-    nonCharacterReward: Object.freeze({ echoPowder: 1 }),
+    nonCharacterReward: Object.freeze({ characterExp: 120 }),
     development: Object.freeze({
       // 80 等後先進行角色專屬突破；現行版本最高開放到 90 等。
       // 100 等保留給後續版本的第二階段玩法，現在不會出現在玩家介面。
@@ -78,7 +78,7 @@
     assert(rules.threeStarRate >= 0 && rules.threeStarRate <= 1, "threeStarRate 必須介於 0 與 1 之間");
     assert(rules.bonusStarSandRate >= 0 && rules.bonusStarSandRate <= 1, "bonusStarSandRate 必須介於 0 與 1 之間");
     assert(Number.isInteger(rules.bonusStarSandAmount) && rules.bonusStarSandAmount >= 0, "bonusStarSandAmount 必須是非負整數");
-    assert(Number.isInteger(rules.nonCharacterReward.echoPowder) && rules.nonCharacterReward.echoPowder >= 0, "nonCharacterReward.echoPowder 必須是非負整數");
+    assert(Number.isInteger(rules.nonCharacterReward.characterExp) && rules.nonCharacterReward.characterExp >= 0, "nonCharacterReward.characterExp 必須是非負整數");
     assert(Number.isInteger(rules.development.maxLevel) && rules.development.maxLevel > 1, "development.maxLevel 必須是大於 1 的整數");
     assert(Number.isInteger(rules.development.breakthroughLevel) && rules.development.breakthroughLevel >= 1 && rules.development.breakthroughLevel < rules.development.maxLevel, "development.breakthroughLevel 必須介於 1 與 maxLevel 之間");
     assert(Number.isInteger(rules.development.futureMaxLevel) && rules.development.futureMaxLevel > rules.development.maxLevel, "development.futureMaxLevel 必須高於目前 maxLevel");
@@ -184,7 +184,6 @@
       resources: {
         starSand: 160,
         starMarks: 0,
-        echoPowder: 0,
         characterExp: 800
       },
       pity: {},
@@ -303,11 +302,12 @@
       progress.affinity = Number.isInteger(progress.affinity) && progress.affinity >= 0 ? progress.affinity : 0;
       progress.constellation = Number.isInteger(progress.constellation) && progress.constellation >= 0 ? progress.constellation : 0;
       progress.constellationCore = Number.isInteger(progress.constellationCore) && progress.constellationCore >= 0 ? progress.constellationCore : 0;
+      if (id === "elorna") progress.activeForm = progress.activeForm === "deepwater" ? "deepwater" : "land";
       progress.breakthrough = progress.breakthrough === true;
       // 舊版曾把重複角色直接寫成命座；依持有數量補回尚未使用的個人晶核，
       // 讓像「莉亞持有 5 次」的舊帳號也能繼續提升，不會卡在只能按一次。
       var copies = Number(state.collection[id] || 0);
-      var earnedByCopies = Math.max(0, copies - 1);
+      var earnedByCopies = Math.min(6, Math.max(0, copies - 1));
       var constellationFromCopies = Math.min(6, earnedByCopies);
       progress.constellation = Math.max(progress.constellation, constellationFromCopies);
       progress.constellationCore = Math.max(progress.constellationCore, earnedByCopies);
@@ -316,7 +316,7 @@
     Object.keys(state.collection).forEach(function (id) {
       if (state.characterProgress[id]) return;
       var copies = Math.max(0, Number(state.collection[id]) || 0);
-      state.characterProgress[id] = { level: 1, affinity: 0, constellation: Math.min(6, Math.max(0, copies - 1)), constellationCore: Math.max(0, copies - 1) };
+      state.characterProgress[id] = { level: 1, affinity: 0, constellation: Math.min(6, Math.max(0, copies - 1)), constellationCore: Math.min(6, Math.max(0, copies - 1)) };
       state.characterProgress[id].breakthrough = false;
     });
     state.breakthroughMaterials = isPlainObject(source.breakthroughMaterials) ? source.breakthroughMaterials : {};
@@ -443,9 +443,14 @@
       return normalizedEntry;
     }) : [];
 
-    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach(function (key) {
+    ["starSand", "starMarks", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(state.resources[key]) && state.resources[key] >= 0, "資源數量必須是非負整數：" + key);
     });
+    // 正式版不再使用回響粉；舊存檔按每份 120 經驗轉換一次。
+    var retiredEchoPowder = Number(state.resources.echoPowder || 0);
+    assert(Number.isInteger(retiredEchoPowder) && retiredEchoPowder >= 0, "舊回響粉數量必須是非負整數");
+    state.resources.characterExp += retiredEchoPowder * 120;
+    delete state.resources.echoPowder;
 
     banners.forEach(function (banner) {
       var saved = isPlainObject(source.pity && source.pity[banner.poolKey]) ? source.pity[banner.poolKey] : {};
@@ -487,7 +492,7 @@
   }
 
   function makeEmptyReward() {
-    return { starSand: 0, starMarks: 0, echoPowder: 0, characterExp: 0, constellationCore: 0, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null };
+    return { starSand: 0, starMarks: 0, characterExp: 0, constellationCore: 0, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null };
   }
 
   /**
@@ -562,6 +567,17 @@
     assert(card, "找不到角色：" + cardId);
     var copy = this._grantCardCopy(card);
     return { card: clone(card), copies: this.state.collection[card.id], state: this.getState() };
+  };
+
+  GachaGame.prototype.setCharacterForm = function (options) {
+    options = options || {};
+    assert(options.cardId === "elorna", "此角色沒有可切換的正式型態");
+    assert(options.formId === "land" || options.formId === "deepwater", "找不到這個角色型態");
+    assert((this.state.collection.elorna || 0) > 0, "尚未取得艾洛娜，無法切換型態");
+    var progress = this.getCharacterProgress("elorna");
+    progress.activeForm = options.formId;
+    this.state.characterProgress.elorna = progress;
+    return { cardId: "elorna", formId: options.formId, state: this.getState() };
   };
 
   GachaGame.prototype.developCharacter = function (options) {
@@ -717,8 +733,8 @@
       card = pick(banner.standard3Stars, this.rng.bind(this));
       pity.pullsSince4Star = pityPullNumber;
     } else {
-      // 非角色結果仍給回響粉；另有 8% 小機率掉落少量星砂。
-      resourceReward.echoPowder = this.rules.nonCharacterReward.echoPowder;
+      // 非角色結果提供養成經驗；另有 8% 小機率掉落少量星砂。
+      resourceReward.characterExp = this.rules.nonCharacterReward.characterExp;
       if (validateRandomValue(this.rng()) < this.rules.bonusStarSandRate) {
         resourceReward.starSand = this.rules.bonusStarSandAmount;
       }
@@ -756,7 +772,6 @@
 
     this.state.resources.starSand += duplicateReward.starSand + resourceReward.starSand + compensationReward.starSand;
     this.state.resources.starMarks += duplicateReward.starMarks + resourceReward.starMarks;
-    this.state.resources.echoPowder += duplicateReward.echoPowder + resourceReward.echoPowder;
     this.state.resources.characterExp += duplicateReward.characterExp + resourceReward.characterExp;
 
     return {
@@ -975,7 +990,7 @@
     Object.keys(configuredReward).forEach(function (key) { reward[key] = configuredReward[key]; });
     var alreadyClaimed = Boolean(progress.claimedRewards[endingId]);
     if (!alreadyClaimed) {
-      ["starSand", "starMarks", "echoPowder", "characterExp"].forEach(function (key) {
+      ["starSand", "starMarks", "characterExp"].forEach(function (key) {
         if (Number.isInteger(reward[key]) && reward[key] > 0) this.state.resources[key] += reward[key];
       }, this);
       ["petFood", "petToys", "petTokens", "showcaseToken"].forEach(function (key) {

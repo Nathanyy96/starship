@@ -100,7 +100,7 @@
 
   var storyWorldMap = null;
   if (typeof require === "function") {
-    try { storyWorldMap = require("./story-world-map.js"); } catch (error) { storyWorldMap = null; }
+    try { storyWorldMap = require("./story-world-map-1-0.js"); } catch (error) { storyWorldMap = null; }
   }
   if (!storyWorldMap && typeof globalThis !== "undefined") storyWorldMap = globalThis.StarshipStoryWorldMap || null;
 
@@ -240,7 +240,7 @@
 
   // 正式版首期只開放 1.0；舊帳號已取得的角色仍由存檔保留。
   var releasedVersion = "1.0";
-  var storyVersionReward = Object.freeze({ version: "1.0", starSand: 1600, characterExp: 3000, echoPowder: 5 });
+  var storyVersionReward = Object.freeze({ version: "1.0", starSand: 1600, characterExp: 3600, starMarks: 1 });
   var activeCards = Object.values(cards).filter(function (entry) { return entry.releaseVersion === releasedVersion; });
   var legacyFour = legacyCards.filter(function (item) { return item.rarity === 4; });
   var legacyThree = legacyCards.filter(function (item) { return item.rarity === 3; });
@@ -371,45 +371,19 @@
   var updateCycle = "2026-10-01-official-1-0";
   var trialVersion = updateCycle;
   var trialMaxRewards = 20;
-  // 試煉每次成功都提供一大筆獨立角色經驗；每關每版本最多領 10 次，
+  // 試煉每次成功都提供角色經驗；每關每版本最多領 20 次，
   // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。完成 30 關並使用版本內
   // 的可重複獎勵後，足以養成一支 4★ 隊伍，不需要依賴重複抽卡。
   // 原共鳴券已取消；每張券按單抽等價 160 星砂併入獎勵。
   var trialReward = Object.freeze({ starSand: 75, characterExp: 1800 });
-  // 星界試煉共有 30 關。除了推薦戰力逐關提升，每關也有環境與敵方特性，
+  // 星界試煉共有 30 關，全部使用第一大版本圖鑑中已命名的物種。
   // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
-  var trialStages = [
-    { id: 1, name: "回覆台外圍", region: "界痕入口", recommendedPower: 420, environment: "薄霧界痕", environmentEffect: "隊伍技能冷卻略快", modifiers: { teamSpeed: 1.06 }, enemyTrait: "回聲脆弱", enemyTraitEffect: "敵人受到協同傷害時更容易失衡", trialRule: "echo", enemies: [{ name: "界痕幼體", maxHp: 560, attack: 78, defense: 38, speed: 65, count: 2 }], reward: trialReward },
-    { id: 2, name: "獸靈村口", region: "獸靈之村", recommendedPower: 560, environment: "獸靈林線", environmentEffect: "隊伍防禦小幅提升", modifiers: { teamDefense: 1.04 }, enemyTrait: "先手獵襲", enemyTraitEffect: "敵人首輪速度提高", trialRule: "ambush", enemies: [{ name: "失序獸靈", maxHp: 720, attack: 92, defense: 48, speed: 70, count: 2 }], reward: trialReward },
-    { id: 3, name: "北行測線", region: "北方界痕", recommendedPower: 720, environment: "北行風口", environmentEffect: "高速角色更容易搶到行動順序", modifiers: { teamSpeed: 1.1, enemySpeed: 1.04 }, enemyTrait: "獵犬追蹤", enemyTraitEffect: "敵人會優先鎖定較脆弱的角色", trialRule: "mark", enemies: [{ name: "裂痕獵犬", maxHp: 760, attack: 110, defense: 55, speed: 90, count: 2 }, { name: "裂痕巢核", maxHp: 980, attack: 82, defense: 70, speed: 48, count: 1 }], reward: trialReward },
-    { id: 4, name: "移動舞台後台", region: "旅行舞台", recommendedPower: 900, environment: "移動舞台", environmentEffect: "速度提升，但技能需要更精準的輪轉", modifiers: { teamSpeed: 1.14, teamAttack: 0.98 }, enemyTrait: "噪音壓制", enemyTraitEffect: "敵方干擾會延後角色技能冷卻", trialRule: "noise", enemies: [{ name: "噪音殘響", maxHp: 880, attack: 125, defense: 60, speed: 105, count: 2 }, { name: "失焦拾音器", maxHp: 920, attack: 105, defense: 68, speed: 75, count: 1 }], reward: trialReward },
-    { id: 5, name: "橋下遺構", region: "水工線", recommendedPower: 1100, environment: "橋下重壓", environmentEffect: "敵方外殼更厚，破防角色更重要", modifiers: { enemyDefense: 1.12 }, enemyTrait: "重殼", enemyTraitEffect: "敵方防禦提高，受到減防後才會明顯下降", trialRule: "shell", enemies: [{ name: "遺構鎧獸", maxHp: 1450, attack: 138, defense: 96, speed: 52, count: 2 }], reward: trialReward },
-    { id: 6, name: "潮線斷口", region: "洛汀港", recommendedPower: 1320, environment: "潮線斷口", environmentEffect: "治療量降低，必須用護盾與減傷維持隊伍", modifiers: { healing: 0.82, enemyAttack: 1.04 }, enemyTrait: "潮蝕", enemyTraitEffect: "敵人命中後會降低受治療量", trialRule: "corrosion", enemies: [{ name: "潮痕寄生體", maxHp: 1180, attack: 155, defense: 88, speed: 108, count: 2 }, { name: "潮核", maxHp: 1550, attack: 124, defense: 108, speed: 56, count: 1 }], reward: trialReward },
-    { id: 7, name: "鐘庭外廊", region: "彼岸鐘庭", recommendedPower: 1560, environment: "逆時鐘庭", environmentEffect: "每三回合敵方會重新取得先手", modifiers: { enemySpeed: 1.12 }, enemyTrait: "逆時", enemyTraitEffect: "敵方技能週期縮短，不能只靠單一輸出", trialRule: "time", enemies: [{ name: "逆時鐘影", maxHp: 1420, attack: 178, defense: 102, speed: 112, count: 2 }, { name: "鐘庭守門核", maxHp: 1800, attack: 145, defense: 125, speed: 60, count: 1 }], reward: trialReward },
-    { id: 8, name: "公共檔案庫下層", region: "公共檔案庫", recommendedPower: 1820, environment: "公共檔案庫", environmentEffect: "敵方會複寫一次增益，清除與控場更有價值", modifiers: { enemyAttack: 1.05, enemyDefense: 1.06 }, enemyTrait: "空白複寫", enemyTraitEffect: "敵人首次施放技能時會獲得短暫護盾", trialRule: "copy", enemies: [{ name: "刪節檔案獸", maxHp: 1700, attack: 195, defense: 128, speed: 92, count: 2 }, { name: "空白頁", maxHp: 2100, attack: 158, defense: 145, speed: 58, count: 1 }], reward: trialReward },
-    { id: 9, name: "五線回覆門", region: "1.0–1.5 交界", recommendedPower: 2100, environment: "多重交界", environmentEffect: "隊伍攻擊略升，但敵方會集中火力", modifiers: { teamAttack: 1.04, enemyAttack: 1.1 }, enemyTrait: "多重界痕", enemyTraitEffect: "敵人會標記同一目標，重裝與治療需要互相配合", trialRule: "multi", enemies: [{ name: "多重界痕體", maxHp: 2050, attack: 220, defense: 145, speed: 118, count: 2 }, { name: "交界核心", maxHp: 2450, attack: 185, defense: 165, speed: 64, count: 1 }], reward: trialReward },
-    { id: 10, name: "星界試煉終端", region: "回覆中樞", recommendedPower: 2440, environment: "回覆中樞", environmentEffect: "終端首領開場帶有護盾，先破盾再爆發", modifiers: { enemyAttack: 1.12, enemyDefense: 1.1 }, enemyTrait: "終端護盾", enemyTraitEffect: "首領與護衛開場持有一次性護盾", trialRule: "shield", milestone: "trial10Choice", enemies: [{ name: "終端界痕王", maxHp: 3300, attack: 255, defense: 190, speed: 105, count: 1 }, { name: "終端護衛", maxHp: 2200, attack: 210, defense: 155, speed: 122, count: 2 }], reward: trialReward },
-    { id: 11, name: "北門風路", region: "北門高地", recommendedPower: 2700, environment: "北門風路", environmentEffect: "速度與標記效果提高，但敵方會快速反擊", modifiers: { teamSpeed: 1.08, enemySpeed: 1.08, enemyAttack: 1.05 }, enemyTrait: "風標鎖定", enemyTraitEffect: "敵方首領會標記生命最低者", trialRule: "mark", enemies: [{ name: "風路獵影", maxHp: 3000, attack: 245, defense: 170, speed: 142, count: 2 }, { name: "北門風核", maxHp: 3800, attack: 220, defense: 185, speed: 78, count: 1 }], reward: trialReward },
-    { id: 12, name: "白榆河上游", region: "白榆河", recommendedPower: 3000, environment: "白榆河分流", environmentEffect: "每次治療也會清除一層潮蝕", modifiers: { healing: 0.9, teamDefense: 1.05 }, enemyTrait: "分流反噬", enemyTraitEffect: "敵方核心被擊中時會反擊一次", trialRule: "corrosion", enemies: [{ name: "分流寄生體", maxHp: 3300, attack: 265, defense: 180, speed: 118, count: 2 }, { name: "白榆蓄水核", maxHp: 4300, attack: 230, defense: 210, speed: 66, count: 1 }], reward: trialReward },
-    { id: 13, name: "四段水路", region: "白榆河", recommendedPower: 3350, environment: "四段水路", environmentEffect: "支援角色的防禦與速度效果延長", modifiers: { teamDefense: 1.08, teamSpeed: 1.04 }, enemyTrait: "交班中斷", enemyTraitEffect: "敵人會在技能命中後暫停隊伍增益", trialRule: "noise", enemies: [{ name: "交班斷流獸", maxHp: 3800, attack: 285, defense: 205, speed: 104, count: 2 }, { name: "四段閘核", maxHp: 5000, attack: 245, defense: 235, speed: 62, count: 1 }], reward: trialReward },
-    { id: 14, name: "鍛路鎮熱管", region: "鍛路鎮", recommendedPower: 3700, environment: "鍛路熱管", environmentEffect: "爆發傷害提高，但敵方攻擊也會升溫", modifiers: { teamAttack: 1.08, enemyAttack: 1.12 }, enemyTrait: "過載火線", enemyTraitEffect: "首領每三回合強化下一次攻擊", trialRule: "overload", enemies: [{ name: "熱管鎧獸", maxHp: 4300, attack: 315, defense: 220, speed: 86, count: 2 }, { name: "過載火核", maxHp: 5600, attack: 285, defense: 250, speed: 70, count: 1 }], reward: trialReward },
-    { id: 15, name: "空白座前庭", region: "鍛路鎮", recommendedPower: 4100, environment: "空白座前庭", environmentEffect: "首領受到控場與減防時更脆弱", modifiers: { enemyDefense: 1.14, teamAttack: 1.03 }, enemyTrait: "空座守門", enemyTraitEffect: "護衛倒下前會替首領分攤部分傷害", trialRule: "guard", enemies: [{ name: "空座守衛", maxHp: 4200, attack: 300, defense: 245, speed: 108, count: 2 }, { name: "空白座守門人", maxHp: 7200, attack: 340, defense: 275, speed: 74, count: 1 }], reward: trialReward },
-    { id: 16, name: "北門回頭點", region: "北門高地", recommendedPower: 4550, environment: "可回頭測線", environmentEffect: "隊伍速度提高，失敗時會保留部分護盾", modifiers: { teamSpeed: 1.12, teamDefense: 1.05 }, enemyTrait: "退回陷阱", enemyTraitEffect: "敵人會把低血量角色拉回攻擊順序", trialRule: "mark", enemies: [{ name: "退回獵影", maxHp: 5000, attack: 345, defense: 260, speed: 150, count: 2 }, { name: "回頭風核", maxHp: 6500, attack: 310, defense: 285, speed: 82, count: 1 }], reward: trialReward },
-    { id: 17, name: "終端檔案門", region: "星界終端", recommendedPower: 5050, environment: "終端檔案門", environmentEffect: "敵方技能帶有清除增益效果", modifiers: { enemyAttack: 1.14, enemyDefense: 1.12 }, enemyTrait: "檔案覆寫", enemyTraitEffect: "敵方首領會清除隊伍一個正面效果", trialRule: "copy", enemies: [{ name: "覆寫檔案獸", maxHp: 5600, attack: 380, defense: 290, speed: 116, count: 2 }, { name: "終端索引核", maxHp: 7600, attack: 340, defense: 320, speed: 76, count: 1 }], reward: trialReward },
-    { id: 18, name: "最後回覆台", region: "星界終端", recommendedPower: 5600, environment: "最後回覆台", environmentEffect: "治療與護盾效率取決於隊伍角色多樣性", modifiers: { healing: 0.86, enemyAttack: 1.16 }, enemyTrait: "最後回覆", enemyTraitEffect: "敵人生命越低，攻擊越高", trialRule: "execute", enemies: [{ name: "終末界痕體", maxHp: 6300, attack: 405, defense: 310, speed: 126, count: 2 }, { name: "最後回覆核", maxHp: 8300, attack: 365, defense: 340, speed: 84, count: 1 }], reward: trialReward },
-    { id: 19, name: "星界邊緣線", region: "星界終端", recommendedPower: 6200, environment: "星界邊緣線", environmentEffect: "所有效果波動加劇，隊伍協同會直接影響勝負", modifiers: { teamAttack: 1.06, teamDefense: 0.96, enemyAttack: 1.18, enemyDefense: 1.16 }, enemyTrait: "邊緣崩解", enemyTraitEffect: "敵人會隨回合增加傷害，速戰與續航都重要", trialRule: "decay", enemies: [{ name: "邊緣崩解體", maxHp: 7000, attack: 430, defense: 330, speed: 138, count: 2 }, { name: "邊緣中樞", maxHp: 9200, attack: 390, defense: 365, speed: 90, count: 1 }], reward: trialReward },
-    { id: 20, name: "星界之律終局", region: "星界終端", recommendedPower: 6900, environment: "星界之律終局", environmentEffect: "終局首領會輪換護盾、增傷與壓制，必須完整運用隊伍配合", modifiers: { teamAttack: 1.05, teamDefense: 1.02, enemyAttack: 1.2, enemyDefense: 1.18 }, enemyTrait: "終局輪換", enemyTraitEffect: "首領每三回合輪換一種戰鬥姿態", trialRule: "finale", enemies: [{ name: "終局護衛", maxHp: 7800, attack: 450, defense: 350, speed: 148, count: 2 }, { name: "星界之律王座", maxHp: 13000, attack: 470, defense: 390, speed: 92, count: 1 }], reward: trialReward },
-    { id: 21, name: "潮汐書庫外環", region: "潮汐書庫", recommendedPower: 7350, environment: "潮汐書頁", environmentEffect: "每兩回合會交換敵我速度排序，先手不代表永遠先手", modifiers: { teamSpeed: 1.06, enemySpeed: 1.1, enemyAttack: 1.06 }, enemyTrait: "書頁倒流", enemyTraitEffect: "敵方會短暫複製上一個被擊倒單位的增益", trialRule: "time", enemies: [{ name: "霜頁倒流獸", mythicClass: "frost-wolf", maxHp: 8200, attack: 500, defense: 360, speed: 132, count: 2 }, { name: "霜根索引核", mythicClass: "world-root", maxHp: 9800, attack: 460, defense: 390, speed: 88, count: 1 }], reward: trialReward },
-    { id: 22, name: "白帆岬燈路", region: "白帆岬", recommendedPower: 7850, environment: "白帆逆光", environmentEffect: "遠程角色命中提高，但敵方護衛會優先切入後排", modifiers: { teamAttack: 1.06, enemySpeed: 1.12, enemyDefense: 1.08 }, enemyTrait: "燈路切入", enemyTraitEffect: "敵人會繞過前排並標記後排最低生命角色", trialRule: "mark", enemies: [{ name: "虹徑切入獸", mythicClass: "rainbow-warden", maxHp: 8700, attack: 520, defense: 365, speed: 156, count: 2 }, { name: "彩徑守望核", mythicClass: "rainbow-warden", maxHp: 10400, attack: 475, defense: 410, speed: 96, count: 1 }], reward: trialReward },
-    { id: 23, name: "鏡潮島裂面", region: "鏡潮島", recommendedPower: 8400, environment: "折光裂面", environmentEffect: "正面增益會被折射一次，清除與重新施放需要輪轉", modifiers: { healing: 0.9, enemyAttack: 1.1, enemyDefense: 1.08 }, enemyTrait: "鏡像誤讀", enemyTraitEffect: "敵方會把第一個正面效果轉成自身護盾", trialRule: "copy", enemies: [{ name: "命線鏡獸", mythicClass: "fate-weaver", maxHp: 9300, attack: 550, defense: 390, speed: 120, count: 2 }, { name: "織命主鏡", mythicClass: "fate-weaver", maxHp: 11800, attack: 500, defense: 430, speed: 82, count: 1 }], reward: trialReward },
-    { id: 24, name: "深潮測線", region: "深潮測線", recommendedPower: 9000, environment: "低壓深潮", environmentEffect: "治療與護盾效率降低，但控制成功後敵方會暴露弱點", modifiers: { healing: 0.78, teamDefense: 1.08, enemyAttack: 1.12 }, enemyTrait: "深潮壓迫", enemyTraitEffect: "敵方每次命中都會疊加潮蝕，支援與淨化不可缺少", trialRule: "corrosion", enemies: [{ name: "霜海寄生體", mythicClass: "frost-wolf", maxHp: 10200, attack: 575, defense: 405, speed: 126, count: 2 }, { name: "霜海閘核", mythicClass: "world-root", maxHp: 12500, attack: 510, defense: 450, speed: 76, count: 1 }], reward: trialReward },
-    { id: 25, name: "風廊維護線", region: "風廊", recommendedPower: 9650, environment: "高空風廊", environmentEffect: "速度波動加劇，角色連續行動時傷害提高", modifiers: { teamSpeed: 1.12, enemySpeed: 1.14, teamDefense: 0.98 }, enemyTrait: "風廊追擊", enemyTraitEffect: "敵方會在連續兩次行動後獲得追擊", trialRule: "ambush", enemies: [{ name: "風角追獵者", mythicClass: "frost-wolf", maxHp: 10900, attack: 610, defense: 420, speed: 168, count: 2 }, { name: "虹風信標獸", mythicClass: "rainbow-warden", maxHp: 13200, attack: 535, defense: 455, speed: 102, count: 1 }], reward: trialReward },
-    { id: 26, name: "霧鏡議庭前廊", region: "霧鏡議庭", recommendedPower: 10350, environment: "霧鏡審理場", environmentEffect: "每三回合重新判定一個角色的目標，隊伍需要多功能定位", modifiers: { enemyAttack: 1.14, enemyDefense: 1.1, teamAttack: 1.04 }, enemyTrait: "審理標記", enemyTraitEffect: "被標記角色受到更多傷害，但也能對首領造成額外破防", trialRule: "multi", enemies: [{ name: "符文執行獸", mythicClass: "fate-weaver", maxHp: 11600, attack: 640, defense: 445, speed: 142, count: 2 }, { name: "命線裁定核", mythicClass: "fate-weaver", maxHp: 14100, attack: 570, defense: 490, speed: 86, count: 1 }], reward: trialReward },
-    { id: 27, name: "潮眼修復井", region: "潮眼外圍", recommendedPower: 11100, environment: "潮眼脈動", environmentEffect: "敵方護盾會依生命比例重建，爆發與持續傷害都要安排", modifiers: { enemyDefense: 1.14, enemyAttack: 1.12, healing: 0.88 }, enemyTrait: "護盾回潮", enemyTraitEffect: "首領每四回合重建護盾，打斷技能可以延後回潮", trialRule: "shield", enemies: [{ name: "世界根鎧獸", mythicClass: "world-root", maxHp: 12600, attack: 670, defense: 475, speed: 110, count: 2 }, { name: "根脈修復核", mythicClass: "world-root", maxHp: 15400, attack: 595, defense: 530, speed: 72, count: 1 }], reward: trialReward },
-    { id: 28, name: "第二條律試讀室", region: "星界終端二層", recommendedPower: 11900, environment: "試讀規則場", environmentEffect: "隊伍第一次倒下不會立刻出局，但會留下永久減益", modifiers: { teamAttack: 1.08, enemyAttack: 1.16, enemyDefense: 1.12 }, enemyTrait: "規則覆寫", enemyTraitEffect: "首領會在血量低於一半時改寫一條環境規則", trialRule: "copy", enemies: [{ name: "霜火規則獸", mythicClass: "fire-giant", maxHp: 13600, attack: 700, defense: 500, speed: 132, count: 2 }, { name: "霜火試讀王座", mythicClass: "fire-giant", maxHp: 16800, attack: 630, defense: 560, speed: 80, count: 1 }], reward: trialReward },
-    { id: 29, name: "新曙港邊界", region: "新曙港", recommendedPower: 12750, environment: "新曙潮線", environmentEffect: "所有角色技能效果提高，但敵方會隨回合增加攻擊", modifiers: { teamAttack: 1.1, teamSpeed: 1.04, enemyAttack: 1.18, enemyDefense: 1.14 }, enemyTrait: "曙潮增壓", enemyTraitEffect: "敵方每回合獲得增傷，必須在有限回合內完成突破", trialRule: "decay", enemies: [{ name: "長冬崩解體", mythicClass: "frost-wolf", maxHp: 14800, attack: 735, defense: 530, speed: 150, count: 2 }, { name: "長冬邊界核", mythicClass: "world-root", maxHp: 18200, attack: 660, defense: 590, speed: 92, count: 1 }], reward: trialReward },
-    { id: 30, name: "星界之律第二終局", region: "第二條律終端", recommendedPower: 12800, recommendedPowerNote: "建議隊伍戰力約 12,800；低於此值仍可能靠治療、重裝與破防協同通關，但失誤容忍度會明顯降低。", environment: "第二條律終局", environmentEffect: "首領輪換護盾、封鎖與反擊三種姿態，必須完整運用隊伍協同", modifiers: { teamAttack: 1.08, teamDefense: 1.04, enemyAttack: 1.14, enemyDefense: 1.12 }, enemyTrait: "三律輪換", enemyTraitEffect: "首領每三回合更換姿態；護衛與王座會交替施壓，不再只靠高生命拖長戰鬥。", trialRule: "finale", finalStage: true, enemies: [{ name: "末冬護衛", mythicClass: "rainbow-warden", maxHp: 12500, attack: 620, defense: 500, speed: 164, count: 2 }, { name: "新律王座", mythicClass: "fire-giant", maxHp: 18000, attack: 690, defense: 585, speed: 100, count: 1 }], reward: trialReward },
-  ];
+  var trialStages = null;
+  if (typeof require === "function") {
+    try { trialStages = require("./trial-1-0.js"); } catch (error) { trialStages = null; }
+  }
+  if (!trialStages && typeof globalThis !== "undefined") trialStages = globalThis.StarshipTrial10 || null;
+  if (!trialStages) throw new Error("找不到 1.0 試煉圖鑑資料");
 
   // 星海迷航是休閒探索玩法，不應直接借用第 18／30 關的高難度試煉終幕。
   // 這三個專用戰鬥只保留敵人特性與閱讀回饋，推薦戰力和傷害控制在一般玩家能
@@ -478,7 +452,7 @@
 
   var dispatchVersion = updateCycle;
   var dispatchMissions = [
-    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1200, echoPowder: 4 } },
+    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1680 } },
     { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
     { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
   ];
@@ -623,7 +597,7 @@
     Object.freeze({ id: "gacha", icon: "✧", title: "了解回覆召集", copy: "限定 4★ 可先選目標；前 20 抽不出 4★，第 21 抽起機率逐步提高，第 50 抽必定出 4★。歪到其他 4★ 會有星砂補償。" }),
     Object.freeze({ id: "growth", icon: "⬡", title: "培養與戰力", copy: "角色培養會提升生命、攻擊、防禦、速度與戰力；重複角色會增加命座並留下該角色專用晶核。三星滿命滿等約接近一般四星 55 等，四星滿命也會提升技能倍率與面板。" }),
     Object.freeze({ id: "trial", icon: "✹", title: "星界試煉與隊伍協同", copy: "最多派出 4 名角色。每關會顯示推薦戰力、敵人數值與特性；總戰力只是參考，治療、護盾、減防、速度和技能搭配都會影響勝負。" }),
-    Object.freeze({ id: "dispatch", icon: "⌁", title: "用額外玩法取得養成資源", copy: "星港委託是每版本一次的短篇戰鬥任務，能取得星砂、角色經驗、回響粉或星痕；版本更新後任務進度會重置，角色不會消失。" }),
+    Object.freeze({ id: "dispatch", icon: "⌁", title: "用額外玩法取得養成資源", copy: "星港委託是每版本一次的短篇戰鬥任務，能取得星砂、角色經驗或星痕；版本更新後任務進度會重置，角色不會消失。" }),
     Object.freeze({ id: "boss", icon: "♢", title: "80 等突破與 Boss", copy: "角色升到 80 等後不能直接繼續升級；請在 Boss 選單挑戰 Lv.1–3 三檔首領，收集專屬材料或星界通用突破印記，再完成突破並升到現行上限 90 等。100 等仍是後續版本預留內容。" }),
     Object.freeze({ id: "voyage", icon: "✹", title: "星海迷航與特殊結局", copy: "這是獨立於主線的短局航程。選擇事件、商店與休整方式，找出一般、隱藏和協鳴特殊結局；本期特殊四星裝扮藏在特殊結局獎勵裡。" }),
     Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
@@ -632,7 +606,7 @@
     Object.freeze({
       id: "release-1-0", badge: "版本公告", date: "1.0", title: "1.0 劇情與 QW 召集開放",
       copy: "目前開放 1.0 劇情與卡池。後續章節和角色仍在製作，開放時間另行公告。",
-      reward: "登入補給：3,200 星砂、1,000 角色經驗、10 回響粉；1.0 五幕讀完可另領 1,600 星砂、3,000 角色經驗、5 回響粉。",
+      reward: "登入補給：3,200 星砂、2,200 角色經驗；1.0 五幕讀完可另領 1,600 星砂、3,600 角色經驗、1 星痕。舊回響粉會自動轉為角色經驗。",
       highlights: ["1.0 限定角色：Chodan、Magenta", "1.0 三星角色：雷恩、莉亞、伊薩爾", "未開放角色不進入卡池", "既有角色、資源與培養進度保留"]
     })
   ]);
@@ -1193,16 +1167,7 @@
     });
   });
 
-  var northernMythTrialThemes = {
-    21: "霜頁倒流", 22: "虹徑回覆", 23: "命線折光", 24: "霜海深潮", 25: "虹風獵路",
-    26: "符文裁定", 27: "世界根脈", 28: "霜火試讀", 29: "長冬崩解", 30: "末冬新律"
-  };
-  trialStages.forEach(function (stage) {
-    if (!northernMythTrialThemes[stage.id]) return;
-    stage.mythicArc = northernMythArc.id;
-    stage.mythicTheme = northernMythTrialThemes[stage.id];
-    stage.mythicNote = "北境神話篇敵群：以原創的霜、根、命線與虹徑意象重新設計，不直接對應任何神話角色。";
-  });
+
 
   // 限定池的精選候選就是文件中的既有 4★；玩家選一隻後，其他 4★ 合計為 45%。
   var banners = [
@@ -2112,8 +2077,8 @@
     version2Cards: version2Cards,
     version4Cards: version4Cards,
     version5Cards: version5Cards,
-    // 1.0–2.5 是 live 劇情；3.0–5.5 先完整建檔但保持鎖定，供後續版本開放。
-    storyChapters: allStoryChapters,
+    // 正式服目前只提供 1.0 正文；後續版本保留於開發檔，不輸出到遊戲章節。
+    storyChapters: liveStoryChapters,
     storyVersionReward: storyVersionReward,
     liveStoryChapters: liveStoryChapters,
     version2StoryChapters: version2StoryChapters,
@@ -2151,6 +2116,6 @@
     announcements: announcements,
     updateVersion: "1.0",
     updateCycle: updateCycle,
-    updateReward: Object.freeze({ starSand: 3200, characterExp: 1000, echoPowder: 10 })
+    updateReward: Object.freeze({ starSand: 3200, characterExp: 2200 })
   };
 }));

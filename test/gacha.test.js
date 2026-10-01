@@ -26,6 +26,14 @@ test("後續角色都有完整立繪來源，但不會混入現行卡池", () =>
   assert.equal(Object.keys(characterBattleStats).includes("cenya"), true);
 });
 
+test("既有艾洛娜可切換陸地與深水型態，存檔保留選擇", () => {
+  const player = game({ state: state({ collection: { elorna: 1 } }) });
+  assert.equal(player.setCharacterForm({ cardId: "elorna", formId: "deepwater" }).state.characterProgress.elorna.activeForm, "deepwater");
+  assert.equal(game({ state: player.getState() }).getState().characterProgress.elorna.activeForm, "deepwater");
+  assert.throws(() => player.setCharacterForm({ cardId: "elorna", formId: "unknown" }));
+  assert.throws(() => game({ state: state({ collection: {} }) }).setCharacterForm({ cardId: "elorna", formId: "deepwater" }));
+});
+
 test("角色規劃完整建檔至 5.5，後續角色不進入現行卡池", () => {
   assert.equal(version5Cards.length, 7);
   assert.equal(version5Cards.filter((card) => card.rarity === 4).length >= 1, true);
@@ -48,28 +56,11 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });
 
-test("已開放故事保留文件長篇正文，未開放篇章使用重編稿", () => {
-  assert.equal(futureStoryRevision.id, "future-story-revision-v2");
-  assert.equal(storyReplan.id, "story-replan-v1");
-  assert.match(storyReplan.preservedCanon, /瑟蕾雅/);
-  assert.match(storyReplan.preservedCanon, /獸靈之村/);
-  assert.equal(storyReplan.chapters["main-1-1"].title, "聽見的人");
-  assert.equal(storyReplan.chapters["main-3-0"].title, "回聲井的第九塊石");
-  assert.equal(storyReplan.chapters["main-5.5"].title, "長冬後的新曙");
-  assert.equal(Object.keys(storyReplan.chapters).length, 41);
-  const revised = storyChapters.filter((chapter) => chapter.storyRevisionId === storyReplan.id);
-  assert.equal(revised.length, 24);
-  assert.equal(revised.every((chapter) => chapter.releaseOpen === false), true);
-  assert.equal(revised.every((chapter) => chapter.storyRevisionId === storyReplan.id), true);
-  assert.equal(revised.every((chapter) => chapter.scenes.length >= 3 && chapter.scenes.every((scene) => scene.body.length >= 80)), true);
-  const restored = storyChapters.filter((chapter) => chapter.releaseOpen === true);
-  assert.deepEqual(restored.map((chapter) => chapter.id), ["main-1-0"]);
-  assert.equal(restored[0].sourceStatus, "document");
-  assert.equal(restored[0].scenes.length, 5);
-  assert.equal(restored[0].fullBody.length > 20000, true);
-  assert.match(restored[0].fullBody, /Chodan/);
-  assert.equal(Object.keys(storySceneAliases).length > 0, true);
-  assert.match(storyChapters.find((chapter) => chapter.id === "main-5.5").summary, /交班/);
+test("正式遊戲只載入 1.0 完整正文", () => {
+  assert.deepEqual(storyChapters.map((chapter) => chapter.id), ["main-1-0"]);
+  assert.equal(storyChapters[0].scenes.length, 5);
+  assert.equal(storyChapters[0].fullBody.length > 20000, true);
+  assert.equal(storyChapters[0].sourceStatus, "document");
 });
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
@@ -123,24 +114,11 @@ test("1.0 主線開放，其餘章節保持鎖定", () => {
   assert.equal(storyChapters.filter((chapter) => chapter.id !== "main-1-0").every((chapter) => chapter.releaseOpen === false), true);
 });
 
-test("4.0 起接入原創北境神話篇，且不改動 3.0–3.5 的主題", () => {
-  assert.equal(northernMythArc.startingVersion, "4.0");
-  assert.equal(Object.keys(northernMythArc.versions).length, 12);
-  assert.equal(version4Cards.length > 0, true);
-  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 4 && chapter.mythicArc === northernMythArc.id).length, 16);
-  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) >= 3 && Number(chapter.version) < 4).some((chapter) => chapter.mythicArc), false);
-});
-
-test("世界地圖覆蓋所有章節，且從獸靈之村到新曙終端保持連通", () => {
-  assert.equal(storyWorldMap.id, "story-world-map-v1");
-  assert.equal(storyWorldMap.regions.length, 5);
-  assert.equal(storyWorldMap.locations.length >= 30, true);
-  assert.equal(Object.keys(storyWorldMap.chapterLocations).length, storyChapters.length);
-  assert.equal(storyChapters.every((chapter) => storyWorldMap.chapterLocations[chapter.id].length > 0), true);
-  assert.equal(storyChapters.every((chapter) => storyWorldMap.regionAliases[chapter.region]), true);
-  assert.equal(storyWorldMap.routes.every((route) => storyWorldMap.locations.some((location) => location.id === route.from) && storyWorldMap.locations.some((location) => location.id === route.to)), true);
+test("正式遊戲地圖只呈現 1.0 路線", () => {
+  assert.equal(storyWorldMap.locations.length, 4);
+  assert.deepEqual(Object.keys(storyWorldMap.chapterLocations), ["main-1-0"]);
+  assert.equal(storyWorldMap.routes.length, 3);
   assert.equal(storyWorldMap.chapterLocations["main-1-0"].includes("beast-village"), true);
-  assert.equal(storyWorldMap.chapterLocations["main-5.5"].includes("new-dawn-terminal"), true);
 });
 
 test("星港委託提供額外玩法與非抽卡獎勵", () => {
@@ -168,7 +146,7 @@ test("通用突破印記可以讓玩家不用被指定高難度 Boss 卡住", ()
   const gacha = game({
     breakthroughRequirements: characterBreakthroughs,
     state: state({
-      resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 },
+      resources: { starSand: 100000, starMarks: 0, characterExp: 100000 },
       collection: { celesia: 1 },
       characterProgress: { celesia: { level: 80, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false } },
       breakthroughMaterials: { "universal-core": 4 }
@@ -206,7 +184,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
     petOutfits,
     petEffects,
     petChallenges,
-    state: state({ resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 }, collection: { celesia: 1, reyn: 1 } })
+    state: state({ resources: { starSand: 100000, starMarks: 0, characterExp: 100000 }, collection: { celesia: 1, reyn: 1 } })
   });
   const start = gacha.startVoyage({ routeId: "route-echo", team: ["celesia", "reyn"] });
   assert.equal(start.node.id, "voyage-start");
@@ -296,7 +274,7 @@ test("版本遷移保留角色、等級、命座晶核與已完成劇情", () =>
 
 function state(overrides) {
   return Object.assign({
-    resources: { starSand: 100000, starMarks: 0, echoPowder: 0 },
+    resources: { starSand: 100000, starMarks: 0 },
     pity: {
       limited: { pullsSince4Star: 0, guaranteedFeatured: false },
       standard: { pullsSince4Star: 0, guaranteedFeatured: false }
@@ -321,7 +299,7 @@ test("角色到 80 等後必須消耗指定 Boss 材料，突破後才能升到 
   const gacha = game({
     breakthroughRequirements: characterBreakthroughs,
     state: state({
-      resources: { starSand: 100000, starMarks: 0, echoPowder: 0, characterExp: 100000 },
+      resources: { starSand: 100000, starMarks: 0, characterExp: 100000 },
       collection: { celesia: 1 },
       characterProgress: { celesia: { level: 80, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false } },
       breakthroughMaterials: { "star-crest": 4 }
@@ -361,8 +339,8 @@ test("三星與一般回響共用非 4★ 結果，不另開三星卡池", () =>
   const resourceOutcome = resource.pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
   assert.equal(resourceOutcome.results[0].kind, "resource");
   assert.equal(resourceOutcome.results[0].rarity, 0);
-  assert.equal(resourceOutcome.results[0].resourceReward.echoPowder, 1);
-  assert.equal(resourceOutcome.state.resources.echoPowder, 1);
+  assert.equal(resourceOutcome.results[0].resourceReward.characterExp, 120);
+  assert.equal(resourceOutcome.state.resources.characterExp, 920);
 });
 
 test("前 20 抽不會出 4★，第 21 抽才開始判定", () => {
@@ -444,7 +422,7 @@ test("重複角色轉換成文件指定的資源", () => {
   secondState.pity.limited.pullsSince4Star = 20;
   const second = game({ state: secondState, rng: () => 0 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
   assert.equal(second.results[0].isFirstAcquisition, false);
-  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, echoPowder: 0, characterExp: 240, constellationCore: 1, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null });
+  assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, characterExp: 240, constellationCore: 1, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null });
   assert.equal(second.state.resources.starMarks, 1);
   assert.equal(second.state.resources.starSand, 100000 - 160 * 2 + 50);
   assert.equal(second.state.characterProgress.chodan.constellation, 1);
@@ -470,7 +448,7 @@ test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續�
 
 test("舊共鳴券會按單抽等價轉成星砂，抽卡只使用星砂", () => {
   const gacha = game({
-    state: state({ resources: { starSand: 0, tickets: 1, starMarks: 10, echoPowder: 0 } }),
+    state: state({ resources: { starSand: 0, tickets: 1, starMarks: 10 } }),
     rng: () => 0.999999
   });
   assert.equal(gacha.getState().resources.starSand, 160);

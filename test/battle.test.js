@@ -37,21 +37,19 @@ test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
 
-test("星海迷航終幕提供可讀的推薦戰力並維持可承受的壓力", () => {
-  const finalStage = trialStages.find((stage) => stage.id === 30);
-  assert.equal(finalStage.recommendedPower, 12800);
-  assert.match(finalStage.recommendedPowerNote, /12,800/);
-  assert.equal(finalStage.modifiers.enemyAttack, 1.14);
-  assert.ok(finalStage.enemies.every((enemy) => enemy.attack <= 690));
-  assert.ok(finalStage.enemies.some((enemy) => enemy.attack >= 620));
-  const battle = simulateBattle({
-    team: ["celesia", "harlow", "lia", "reyn"],
-    stats: characterBattleStats,
-    stage: finalStage,
-    rng: () => 0.5
-  });
-  assert.equal(battle.recommendedPower, 12800);
-  assert.equal(battle.powerRatio, 0.13);
+test("正式試煉 30 關以角色成長分段校準", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const team = ["celesia", "reyn", "lia", "isar"];
+  function run(level, stage) {
+    const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation: 0 }]));
+    return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
+  }
+  assert.equal(trialStages[29].recommendedPower, 6040);
+  assert.equal(run(1, trialStages[0]).rounds >= 8, true);
+  assert.equal(run(60, trialStages[9]).rounds >= 18 && run(60, trialStages[9]).rounds <= 28, true);
+  assert.equal(run(45, trialStages[9]).rounds <= 40, true);
+  assert.equal(run(90, trialStages[29]).rounds <= 30, true);
+  assert.equal(run(25, trialStages[29]).won, false);
 });
 
 test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終幕", () => {
@@ -78,12 +76,11 @@ test("戰鬥達到演算上限時回傳 timeout，不誤判成失敗或通關", 
   assert.match(battle.logs.at(-1), /演算保護上限/);
 });
 
-test("試煉 21–30 使用北境神話篇原創敵群與獨立敵人圖像標記", () => {
-  const mythicStages = trialStages.filter((stage) => stage.id >= 21);
-  assert.equal(mythicStages.length, 10);
-  assert.ok(mythicStages.every((stage) => stage.mythicArc === "northern-myth-arc" && stage.mythicTheme));
-  assert.ok(mythicStages.every((stage) => stage.enemies.every((enemy) => enemy.mythicClass)));
-  assert.ok(mythicStages.some((stage) => stage.enemies.some((enemy) => enemy.name === "世界根鎧獸")));
+test("試煉全部使用 1.0 已出場的圖鑑魔物與新棘背獸", () => {
+  const names = new Set(trialStages.flatMap((stage) => stage.enemies.map((enemy) => enemy.name)));
+  assert.deepEqual([...names].sort(), ["開場巨獸原生型", "黑晶異變巨獸", "黑晶棘背獸"].sort());
+  assert.ok(trialStages.every((stage) => stage.enemies.every((enemy) => enemy.image && enemy.image.endsWith(".webp"))));
+  assert.ok(trialStages.every((stage) => stage.environmentEffect.includes("訓練模擬")));
 });
 
 test("四星培養成長幅度高於三星，重複角色留下個人命座晶核", () => {

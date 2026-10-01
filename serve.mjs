@@ -337,10 +337,12 @@ function ensurePlayerMilestones(currentState) {
   // 標記或標記與角色數量不同步的舊存檔。
   state.collection.celesia = Math.max(1, Number(state.collection.celesia) || 0);
   state.recruitment.starterGranted = true;
-  const claimedStoryScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
-  if (Object.keys(claimedStoryScenes).some((key) => key.indexOf("main-1-0:") === 0) && !state.recruitment.story10ChoiceClaimed) {
-    state.recruitment.story10ChoiceAvailable = true;
+  const priorStoryReward = state.storyProgress && state.storyProgress.claimedVersions && state.storyProgress.claimedVersions["1.0"] && state.storyProgress.claimedVersions["1.0"].reward;
+  if (priorStoryReward && !Object.prototype.hasOwnProperty.call(priorStoryReward, "starMarks")) {
+    state.resources.starMarks += 1;
+    priorStoryReward.starMarks = 1;
   }
+  state.recruitment.story10ChoiceAvailable = Boolean(state.storyProgress && state.storyProgress.claimedVersions && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed);
   const clearedStages = state.trialProgress && Array.isArray(state.trialProgress.clearedStages) ? state.trialProgress.clearedStages : [];
   if (clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) {
     state.recruitment.trial10ChoiceAvailable = true;
@@ -350,8 +352,7 @@ function ensurePlayerMilestones(currentState) {
   if (!state.updateRewards.claimedVersions[currentUpdateVersion]) {
     state.resources.starSand += updateReward.starSand;
     state.resources.characterExp += updateReward.characterExp;
-    state.resources.echoPowder += updateReward.echoPowder;
-    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, echoPowder: updateReward.echoPowder, grantedAt: new Date().toISOString() };
+    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, grantedAt: new Date().toISOString() };
   }
   if (state.trialProgress.version !== currentUpdateVersion) {
     state.trialProgress.version = currentUpdateVersion;
@@ -542,12 +543,12 @@ function integerOrCurrent(value, current) {
 function updateAdminState(currentState, body) {
   const state = JSON.parse(JSON.stringify(currentState));
   if (body.resources) {
-    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach((key) => {
+    ["starSand", "starMarks", "characterExp"].forEach((key) => {
       state.resources[key] = integerOrCurrent(body.resources[key], state.resources[key]);
     });
   }
   if (body.resourceDelta) {
-    ["starSand", "starMarks", "echoPowder", "characterExp"].forEach((key) => {
+    ["starSand", "starMarks", "characterExp"].forEach((key) => {
       const delta = body.resourceDelta[key] === undefined ? 0 : body.resourceDelta[key];
       if (!Number.isInteger(delta)) throw new Error("資源增減必須是整數");
       state.resources[key] += delta;
@@ -602,7 +603,7 @@ function completeStoryScene(currentState, body) {
   }
   const scene = storySceneById(chapter, body.sceneId);
   const key = chapter.id + ":" + scene.id;
-  const storyReward = { starSand: 0, characterExp: 0, echoPowder: 0 };
+  const storyReward = { starSand: 0, characterExp: 0, starMarks: 0 };
   state.storyProgress = state.storyProgress || { currentChapter: chapter.id, completedScenes: {} };
   state.storyProgress.completedScenes = state.storyProgress.completedScenes || {};
   state.storyProgress.claimedVersions = state.storyProgress.claimedVersions || {};
@@ -616,10 +617,10 @@ function completeStoryScene(currentState, body) {
     const oldExp = oldClaims.reduce((sum, [, claim]) => sum + Math.max(0, Number(claim.characterExp) || 0), 0);
     storyReward.starSand = Math.max(0, storyVersionReward.starSand - oldSand);
     storyReward.characterExp = Math.max(0, storyVersionReward.characterExp - oldExp);
-    storyReward.echoPowder = storyVersionReward.echoPowder;
+    storyReward.starMarks = storyVersionReward.starMarks;
     state.resources.starSand += storyReward.starSand;
     state.resources.characterExp += storyReward.characterExp;
-    state.resources.echoPowder += storyReward.echoPowder;
+    state.resources.starMarks += storyReward.starMarks;
     state.storyProgress.claimedVersions[storyVersionReward.version] = { claimedAt: new Date().toISOString(), reward: storyReward };
   }
   if (chapter.id === "main-1-0" && !state.recruitment.story10ChoiceClaimed) {
@@ -1067,6 +1068,17 @@ async function handleApi(request, response, requestUrl) {
       const player = playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = game.developCharacter({ cardId: body.cardId });
+      player.record.state = game.getState();
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/character-form") {
+      const player = playerFromSession(database, body.token);
+      const game = createGame(player.record.state);
+      const result = game.setCharacterForm({ cardId: body.cardId, formId: body.formId });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);

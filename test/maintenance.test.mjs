@@ -69,8 +69,8 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const first = (await post("/api/player/session", { token: registration.token })).state;
     assert.equal(first.resources.starSand, 7400);
     assert.equal(first.resources.starMarks, 17);
-    assert.equal(first.resources.echoPowder, 33);
-    assert.equal(first.resources.characterExp, 10850);
+    assert.equal(Object.hasOwn(first.resources, "echoPowder"), false);
+    assert.equal(first.resources.characterExp, 14810);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
@@ -100,14 +100,14 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
       if (scene !== scenes.at(-1)) assert.equal(result.reward.starSand, 0);
       else {
         assert.equal(result.reward.starSand, 1500); // 已領的舊第一幕 100 星砂抵扣。
-        assert.equal(result.reward.characterExp, 3000);
-        assert.equal(result.reward.echoPowder, 5);
+        assert.equal(result.reward.characterExp, 3600);
+        assert.equal(result.reward.starMarks, 1);
       }
     }
     const afterStory = (await post("/api/player/session", { token: registration.token })).state;
     assert.equal(afterStory.resources.starSand, first.resources.starSand + 1500);
-    assert.equal(afterStory.resources.characterExp, first.resources.characterExp + 3000);
-    assert.equal(afterStory.resources.echoPowder, first.resources.echoPowder + 5);
+    assert.equal(afterStory.resources.characterExp, first.resources.characterExp + 3600);
+    assert.equal(afterStory.resources.starMarks, first.resources.starMarks + 1);
     assert.ok(afterStory.storyProgress.claimedVersions["1.0"]);
     const repeated = await post("/api/player/story-progress", { token: registration.token, action: "complete", chapterId: "main-1-0", sceneId: scenes.at(-1).id });
     assert.equal(repeated.alreadyClaimed, true);
