@@ -7,6 +7,8 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 
+  var firstMajorKits = typeof require === "function" ? require("./first-major-kits.js") : globalThis.StarshipFirstMajorKits;
+
   // 長篇劇情以獨立生成檔載入，避免把 20 萬字正文塞進規則與角色資料同一段。
   // Node 測試透過 require 載入；瀏覽器則由 index.html / test.html 先載入全域物件。
   var storySource = null;
@@ -170,9 +172,9 @@
     hina: card("hina", "Hina", "Hina", 4, "燕", "#6fa8ff", "1.1", "1.1｜QWER 旅行吉他手", "./assets/cards/hina.png"),
     siyeon: card("siyeon", "Siyeon", "Siyeon", 4, "淨", "#b7e9d6", "1.1", "1.1｜QWER 旅行歌手與拾音師", "./assets/cards/siyeon.png"),
     mave: card("mave", "梅芙", "Mave", 4, "幻", "#d06cff", "1.5", "1.5｜公共檔案仲裁官", "./assets/cards/mave.png"),
-    cenwu: card("cenwu", "岑霧", "Cenwu", 3, "待定", "#a4b9d6", "1.1", "1.1｜山腰驛站站長；元素與戰鬥定位待文件驗收", "./assets/cards/cenwu.png"),
-    ruida: card("ruida", "芮妲", "Ruida", 3, "待定", "#c29bc5", "1.1", "1.1｜迴音谷車夫；元素與戰鬥定位待文件驗收", "./assets/cards/ruida.png"),
-    yuan: card("yuan", "榆安", "Yuan", 3, "待定", "#8fc7b6", "1.1", "1.1｜隨車藥師；元素與戰鬥定位待文件驗收", "./assets/cards/yuan.png"),
+    cenwu: card("cenwu", "岑霧", "Cenwu", 3, "燕", "#a4b9d6", "1.1", "1.1｜山腰驛站站長；路標複核與控場", "./assets/cards/cenwu.png"),
+    ruida: card("ruida", "芮妲", "Ruida", 3, "烈", "#c29bc5", "1.1", "1.1｜迴音谷車夫；護送換位與承傷", "./assets/cards/ruida.png"),
+    yuan: card("yuan", "榆安", "Yuan", 3, "淨", "#8fc7b6", "1.1", "1.1｜隨車藥師；分次配藥與救急", "./assets/cards/yuan.png"),
     rovienne: card("rovienne", "羅薇恩", "Rovienne", 4, "星", "#a3b19f", "1.6", "1.2 登場｜定界局首席工程師；1.6 首發規劃待作者審閱", "./assets/cards/rovienne.png"),
     risan: card("risan", "璃珊", "Risan", 4, "幻", "#c08cff", "2.0", "2.0｜潮汐書庫檔案員、海圖師", "./assets/cards/risan.png"),
     yaoze: card("yaoze", "曜澤", "Yaoze", 4, "月", "#91b9e8", "2.0", "2.0｜白帆岬燈塔守望員", "./assets/cards/yaoze.png"),
@@ -345,11 +347,20 @@
     ,daria: { rarity: 4, role: "指揮", maxHp: 1430, attack: 230, defense: 170, speed: 120, range: 3, attackName: "新曙落筆", skillName: "交班見證", skillPower: 1.4, skillEffect: "提升全隊攻擊與防禦，並重置一名隊友技能冷卻" }
   };
 
+  Object.keys(firstMajorKits).forEach(function (id) {
+    characterBattleStats[id] = Object.assign({}, firstMajorKits[id], { element: cards[id].element, growthModel: "first-major" });
+  });
+
   // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調。
   // 低基礎戰力的 4★ 會進入「平衡成長帶」：不是依性別加成，而是依實際面板
   // 補足起始戰力並提高 70–90 等成長，避免法師、支援或治療因功能定位被判定為低人一等。
   Object.keys(characterBattleStats).forEach(function (id) {
     var stats = characterBattleStats[id];
+    if (stats.growthModel === "first-major") {
+      stats.growthBand = "first-major";
+      stats.growthRates = { main: 0.0114, defense: 0.0114, speed: 0.0007 };
+      return;
+    }
     if (stats.rarity !== 4) {
       stats.growthRates = { main: 0.03, defense: 0.022, speed: 0.009 };
       return;

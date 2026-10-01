@@ -83,6 +83,29 @@ test("試煉全部使用 1.0 已出場的圖鑑魔物與新棘背獸", () => {
   assert.ok(trialStages.every((stage) => stage.environmentEffect.includes("訓練模擬")));
 });
 
+test("第一大版本後續十名角色有完整技能、命座與受控成長", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const ids = ["cenwu", "ruida", "yuan", "veyra", "harlow", "rena", "elorna", "eda", "mave", "rovienne"];
+  assert.ok(ids.every((id) => characterBattleStats[id].signature && characterBattleStats[id].constellations.length === 6));
+  const at80 = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(ids.map((id) => [id, { level: 80 }])) });
+  assert.ok(ids.every((id) => at80[id].maxHp / characterBattleStats[id].maxHp > 1.8 && at80[id].maxHp / characterBattleStats[id].maxHp < 2));
+  assert.ok(ids.every((id) => at80[id].speed / characterBattleStats[id].speed < 1.08));
+  const full = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(ids.map((id) => [id, { level: 90, constellation: 6 }])) });
+  assert.ok(ids.every((id) => full[id].maxHp > at80[id].maxHp));
+});
+
+test("後續技能實際進入戰鬥且艾洛娜雙形態採不同效果", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const stage = trialStages[0];
+  const make = (id, activeForm) => simulateBattle({ team: [id], stats: buildEffectiveStats(characterBattleStats, { characterProgress: { [id]: { level: 45, constellation: 6, activeForm } } }), stage, rng: () => .5 });
+  for (const id of ["cenwu", "ruida", "yuan", "veyra", "harlow", "rena", "eda", "mave", "rovienne"]) {
+    const result = make(id);
+    assert.ok(result.logs.some((line) => line.includes(characterBattleStats[id].skillName)), id);
+  }
+  assert.ok(make("elorna", "land").logs.some((line) => line.includes("留下測線")));
+  assert.ok(make("elorna", "deepwater").logs.some((line) => line.includes("救援")));
+});
+
 test("四星培養成長幅度高於三星，重複角色留下個人命座晶核", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
   const fourAtZero = buildEffectiveStats(characterBattleStats, { characterProgress: { celesia: { level: 20, constellation: 0 } } }).celesia;
@@ -95,8 +118,9 @@ test("四星培養成長幅度高於三星，重複角色留下個人命座晶�
   assert.ok(fourAtZero.attack / fourBase.attack > threeAtZero.attack / threeBase.attack);
   assert.ok(four.attack > fourAtZero.attack);
   assert.ok(three.attack > threeAtZero.attack);
-  const fourPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], characterBattleStats));
-  const threePowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 3).map((id) => teamPower([id], characterBattleStats));
+  const legacyIds = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].growthModel !== "first-major");
+  const fourPowers = legacyIds.filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], characterBattleStats));
+  const threePowers = legacyIds.filter((id) => characterBattleStats[id].rarity === 3).map((id) => teamPower([id], characterBattleStats));
   assert.ok(Math.min(...fourPowers) > Math.max(...threePowers));
 });
 
@@ -104,15 +128,15 @@ test("四星低基礎功能型角色在 70–90 等使用平衡成長帶", () =>
   const { buildEffectiveStats } = require("../src/battle.js");
   const progress = { characterProgress: Object.fromEntries(Object.keys(characterBattleStats).map((id) => [id, { level: 90 }])) };
   const statsAt90 = buildEffectiveStats(characterBattleStats, progress);
-  const fourStarPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4).map((id) => teamPower([id], statsAt90));
+  const fourStarPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4 && characterBattleStats[id].growthModel !== "first-major").map((id) => teamPower([id], statsAt90));
   assert.ok(Math.min(...fourStarPowers) / Math.max(...fourStarPowers) > 0.8);
-  assert.equal(characterBattleStats.mave.growthBand, "parity");
-  assert.equal(characterBattleStats.mave.growthRates.main, 0.05);
+  assert.equal(characterBattleStats.elorna.growthBand, "first-major");
+  assert.equal(characterBattleStats.elorna.growthRates.main, 0.0114);
 });
 
 test("命座成長讓三星滿命滿等接近四星 55 等，四星滿命也有明顯回饋", () => {
   const { buildEffectiveStats, constellationGrowth } = require("../src/battle.js");
-  const ids = Object.keys(characterBattleStats);
+  const ids = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].growthModel !== "first-major");
   const threeIds = ids.filter((id) => characterBattleStats[id].rarity === 3);
   const fourIds = ids.filter((id) => characterBattleStats[id].rarity === 4);
   const statsFor = (level, constellation, selectedIds) => buildEffectiveStats(characterBattleStats, {
