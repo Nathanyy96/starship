@@ -8,6 +8,7 @@
   "use strict";
 
   var firstMajorKits = typeof require === "function" ? require("./first-major-kits.js") : globalThis.StarshipFirstMajorKits;
+  var coreKits = typeof require === "function" ? require("./core-kits.js") : globalThis.StarshipCoreKits;
 
   // 長篇劇情以獨立生成檔載入，避免把 20 萬字正文塞進規則與角色資料同一段。
   // Node 測試透過 require 載入；瀏覽器則由 index.html / test.html 先載入全域物件。
@@ -349,6 +350,9 @@
 
   Object.keys(firstMajorKits).forEach(function (id) {
     characterBattleStats[id] = Object.assign({}, firstMajorKits[id], { element: cards[id].element, growthModel: "first-major" });
+  });
+  Object.keys(coreKits).forEach(function (id) {
+    characterBattleStats[id] = Object.assign({}, coreKits[id], { element: cards[id].element, growthModel: "first-major" });
   });
 
   // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調。

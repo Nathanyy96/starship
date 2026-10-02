@@ -18,6 +18,45 @@
   function hasEffect(unit, name) {
     return (unit.effects || []).some(function (effect) { return effect.name === name; });
   }
+  var combat = null;
+  function coreAlly(id) { return combat && combat.team.find(function (unit) { return unit.id === id && unit.hp > 0; }); }
+  function coreFollowup(source, target, multiplier) {
+    if (!source || !target || target.hp <= 0) return;
+    var previous = combat.followup;
+    combat.followup = true;
+    hit(target, source.attack * multiplier);
+    combat.followup = previous;
+  }
+  function afterHit(source, target, skill) {
+    if (!combat || combat.followup || !source || source.isEnemy || !target || !target.isEnemy) return;
+    var round = combat.round;
+    ["celesia", "hina", "magenta"].forEach(function (id) {
+      var owner = coreAlly(id), mark = target.coreMarks && target.coreMarks[id];
+      if (!owner || !mark || mark.until < round || owner === source || target.hp <= 0) return;
+      if (id === "celesia") {
+        mark.allies = mark.allies || [];
+        if (mark.allies.indexOf(source.id) < 0) mark.allies.push(source.id);
+        if (mark.followRound !== round) { coreFollowup(owner, target, owner.constellation >= 5 ? .65 : owner.constellation >= 3 ? .55 : .45); mark.followRound = round; }
+        if (owner.constellation >= 2 && mark.allies.length === 2) coreFollowup(source, target, .15);
+        if (owner.constellation >= 6 && mark.allies.length >= 3 && mark.finalRound !== round) { coreFollowup(owner, target, .9); mark.finalRound = round; owner.skillCooldown = Math.max(0, owner.skillCooldown - 1); }
+      } else if (id === "hina" && owner.constellation >= 2 && mark.followRound !== round) {
+        coreFollowup(owner, target, owner.constellation >= 5 ? .65 : .45); mark.followRound = round;
+      } else if (id === "magenta" && owner.constellation >= 6 && mark.followRound !== round) {
+        coreFollowup(owner, target, .7); mark.followRound = round; mark.until += 1;
+      }
+    });
+    if (target.hp <= 0 && target.coreMarks) {
+      var next = alive(combat.enemies).slice().sort(function (a, b) { return b.hp - a.hp; })[0];
+      if (next) ["celesia", "hina", "magenta"].forEach(function (id) {
+        var owner = coreAlly(id), mark = target.coreMarks[id];
+        if (!owner || !mark || owner.constellation < 4) return;
+        next.coreMarks = next.coreMarks || {}; next.coreMarks[id] = { until: round + 2, allies: [] };
+        if (id === "celesia") owner.skillCooldown = Math.max(0, owner.skillCooldown - 1);
+        if (id === "hina" && owner.constellation >= 6) coreFollowup(owner, next, .8);
+        if (id === "magenta") addEffect(next, "defenseMultiplier", .85, 2);
+      });
+    }
+  }
   function addEffect(unit, name, value, turns) {
     unit.effects = unit.effects || [];
     // One active effect per category prevents four supports from multiplying a
@@ -40,6 +79,11 @@
       return { name: effect.name, value: effect.value, turns: effect.turns - 1 };
     }).filter(function (effect) { return effect.turns > 0; });
     if (unit.skillCooldown > 0) unit.skillCooldown -= 1;
+    if (combat && unit.echoRecord && unit.echoRecord.settleRound <= combat.round) {
+      var singer = coreAlly("siyeon");
+      if (singer && unit.hp > 0) { heal(unit, Math.min(unit.echoRecord.amount, singer.maxHp * unit.echoRecord.cap)); if (singer.constellation >= 4) cleanse(unit); }
+      unit.echoRecord = null;
+    }
   }
 
   function expandEnemies(stage) {
@@ -163,7 +207,47 @@
       target.shield -= absorbed;
       damage -= absorbed;
     }
+    if (combat && !target.isEnemy && damage > 0) {
+      if (target.id === "isar" && target.constellation >= 4 && target.hp < target.maxHp * .5) {
+        damage = Math.round(damage * .85);
+      }
+      var reyn = coreAlly("reyn"), cover = target.cover;
+      if (reyn && cover && cover.until >= combat.round && reyn !== target) {
+        var share = Math.round(damage * (reyn.constellation >= 6 && damage >= target.hp ? 1 : .4));
+        damage -= share;
+        reyn.hp = Math.max(1, reyn.hp - Math.round(share * (reyn.constellation >= 6 && share >= target.hp ? .5 : reyn.constellation >= 3 ? .68 : .75)));
+        if (reyn.constellation >= 2 && cover.counterRound !== combat.round) { coreFollowup(reyn, alive(combat.enemies)[0], reyn.constellation >= 5 ? .9 : .7); cover.counterRound = combat.round; }
+        if (reyn.constellation >= 6 && share >= target.hp) target.cover = null;
+      }
+      var escort = target.escort, escorter = escort && coreAlly(escort.by);
+      if (escorter && escort.until >= combat.round && escorter !== target) {
+        var redirected = Math.round(damage * escort.ratio); damage -= redirected;
+        escorter.hp = Math.max(1, escorter.hp - redirected);
+        target.escort = null;
+      }
+      var isar = coreAlly("isar");
+      if (isar && isar !== target && isar.constellation >= 6 && target.hp < target.maxHp * .5 && combat.round - (isar.lastInterceptRound || -2) >= 2) {
+        var intercepted = Math.round(damage * .3); damage -= intercepted; isar.hp = Math.max(1, isar.hp - intercepted); coreFollowup(isar, alive(combat.enemies)[0], .8); isar.lastInterceptRound = combat.round;
+      }
+      if (target.echoRecord) target.echoRecord.amount += damage * target.echoRecord.ratio;
+      if (target.id === "isar" && target.constellation >= 2 && target.huntCounterUntil >= combat.round && target.huntCounterRound !== combat.round) {
+        var hunterTarget = alive(combat.enemies)[0];
+        coreFollowup(target, hunterTarget, target.constellation >= 5 ? 1.1 : .8);
+        if (target.constellation >= 5 && hunterTarget) addEffect(hunterTarget, "attackMultiplier", .9, 2);
+        target.huntCounterRound = combat.round;
+      }
+    }
     if (damage > 0) target.hp = Math.max(0, target.hp - damage);
+    if (combat && target.id === "isar" && target.constellation >= 4 && target.hp > 0 && target.hp < target.maxHp * .5) {
+      addEffect(target, "defenseMultiplier", 1.15, 2);
+      addEffect(target, "healingMultiplier", 1.1, 2);
+    }
+    if (combat && !target.isEnemy && target.hp > 0 && target.hp < target.maxHp * .3) {
+      var lia = coreAlly("lia"); lia && (lia.emergencyUsed = lia.emergencyUsed || {});
+      if (lia && lia.constellation >= 6 && !lia.emergencyUsed[target.id]) { heal(target, lia.maxHp * .1); addEffect(target, "healOverTime", lia.maxHp * .08, 1); lia.emergencyUsed[target.id] = true; }
+      var siyeon = coreAlly("siyeon");
+      if (siyeon && siyeon.constellation >= 6 && target.echoRecord && !target.echoRecord.early) { heal(target, Math.min(target.echoRecord.amount, siyeon.maxHp * target.echoRecord.cap)); target.echoRecord.early = true; target.echoRecord.amount = 0; addEffect(target, "damageTaken", .9, 1); }
+    }
     return damage;
   }
 
@@ -201,6 +285,7 @@
   function useSignatureSkill(actor, allies, enemies, logs) {
     var kit = actor.signature;
     if (!kit) return false;
+    if (kit.type === "core") return useCoreSkill(actor, allies, enemies, logs);
     var c = actor.constellation || 0;
     var duration = kit.duration + (c >= 1 ? 1 : 0);
     var stronger = c >= 3 ? 1.2 : 1;
@@ -215,9 +300,11 @@
       addEffect(target, "damageTaken", 1 + (kit.markBonus || .06) * (c >= 5 ? 1.35 : 1), duration);
       if (kit.defenseDown) addEffect(target, "defenseMultiplier", kit.defenseDown * (c >= 5 ? .94 : 1), duration);
       if (kit.slow) addEffect(target, "speedMultiplier", kit.slow * (c >= 5 ? .95 : 1), duration);
+      if (kit.type === "control") {
+          target.skillCooldown = Math.min(target.skillCooldown + 1, target.skillCooldownMax + 1);
+      }
       if (c >= 2) {
         if (kit.type === "control") {
-          target.skillCooldown = Math.min(target.skillCooldown + 1, target.skillCooldownMax + 1);
           var delayed = alive(enemies).find(function (unit) { return unit !== target; });
           if (delayed) delayed.skillCooldown = Math.min(delayed.skillCooldown + 1, delayed.skillCooldownMax + 1);
         }
@@ -238,6 +325,7 @@
       var protectedUnits = living.slice().sort(function (a, b) { return a.hp / a.maxHp - b.hp / b.maxHp; }).slice(0, kit.targets || 1);
       protectedUnits.forEach(function (unit) {
         giveShield(unit, actor.maxHp * kit.shield * stronger * (c >= 1 ? 1.08 : 1));
+        if (unit !== actor) unit.escort = { by: actor.id, ratio: kit.burden ? .32 : .3, until: combat.round + duration };
         if (c >= 6 && unit.hp < unit.maxHp * .35) giveShield(unit, actor.maxHp * .06);
       });
       actor.guard = Math.max(actor.guard || 0, kit.guard);
@@ -271,6 +359,54 @@
       return true;
     }
     return false;
+  }
+
+  function useCoreSkill(actor, allies, enemies, logs) {
+    var kind = actor.signature.kind, c = actor.constellation || 0;
+    var target = chooseTarget(actor, enemies), subject = weakest(allies), damage = 0;
+    if (["star", "hunt", "bass", "string"].includes(kind) && !target) return false;
+    if (kind === "star" || kind === "string") {
+      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (kind === "star" ? c >= 3 ? 1.7 : 1.4 : c >= 3 ? 1.8 : 1.5));
+      target.coreMarks = target.coreMarks || {};
+      target.coreMarks[actor.id] = { until: combat.round + (c >= 1 ? 3 : 2), allies: [] };
+      addEffect(target, "damageTaken", kind === "star" && c >= 5 ? 1.12 : 1.08, c >= 1 ? 3 : 2);
+      if (kind === "string") { if (c >= 1) addEffect(actor, "speedMultiplier", 1.05, 1); if (c >= 4) addEffect(target, "speedMultiplier", .9, 2); }
+    } else if (kind === "cover") {
+      subject = weakest(allies.filter(function (unit) { return unit !== actor; }));
+      if (!subject) return false;
+      subject.cover = { until: combat.round + 2 };
+      if (c >= 1) addEffect(subject, "speedMultiplier", 1.08, 2);
+      if (c >= 4 && subject.hp < subject.maxHp * .4) giveShield(subject, actor.maxHp * .08);
+    } else if (kind === "lia") {
+      if (!subject || subject.hp >= subject.maxHp) return false;
+      var requested = actor.maxHp * (c >= 3 ? .22 : .18), actual = heal(subject, requested);
+      addEffect(subject, "healOverTime", actor.maxHp * (c >= 5 ? .08 : .06), c >= 1 ? 3 : 2);
+      if (c >= 2 && actual < requested) giveShield(subject, Math.min(actor.maxHp * .1, (requested - actual) * .5));
+      if (c >= 4 && subject.hp < subject.maxHp * .4) { cleanse(subject); addEffect(actor, "speedMultiplier", 1.1, 1); }
+    } else if (kind === "hunt") {
+      var high = target.hp > target.maxHp * .5;
+      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 1.95 : 1.65) * (high ? c >= 1 ? 1.25 : 1.2 : 1));
+      addEffect(actor, "damageTaken", c >= 1 ? .8 : .85, 1);
+      actor.huntTarget = target.id;
+      if (c >= 2) actor.huntCounterUntil = combat.round + 1;
+      if (c >= 4 && actor.hp < actor.maxHp * .5) { addEffect(actor, "defenseMultiplier", 1.15, 2); addEffect(actor, "healingMultiplier", 1.1, 2); }
+    } else if (kind === "beat") {
+      alive(allies).forEach(function (unit) { addEffect(unit, "speedMultiplier", c >= 3 ? 1.13 : 1.1, 2); });
+      combat.beat = { owner: actor, remaining: c >= 1 ? 3 : 2, used: [], bonus: c >= 5 ? .14 : .1, until: combat.round + 2 };
+    } else if (kind === "bass") {
+      var debuffed = (target.effects || []).some(function (effect) { return effect.value < 1 || effect.name === "damageTaken" || effect.name === "marked"; });
+      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 2.1 : 1.75) * (debuffed ? c >= 5 ? 1.3 : 1.2 : 1));
+      alive(enemies).filter(function (unit) { return unit !== target; }).forEach(function (unit) { hit(unit, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 1.25 : 1.1) + (debuffed && c >= 2 ? actor.attack * .35 : 0)); });
+      addEffect(target, "defenseMultiplier", c >= 1 ? .85 : .88, 2);
+      target.coreMarks = target.coreMarks || {}; target.coreMarks.magenta = { until: combat.round + 2 };
+    } else if (kind === "echo") {
+      alive(allies).sort(function (a, b) { return a.hp / a.maxHp - b.hp / b.maxHp; }).slice(0, 2).forEach(function (unit) {
+        heal(unit, actor.maxHp * (c >= 3 ? .11 : .08));
+        unit.echoRecord = { amount: 0, ratio: c >= 5 ? .4 : .3, cap: c >= 5 ? .2 : c >= 1 ? .18 : .14, settleRound: combat.round + 2 };
+      });
+    }
+    logs.push(displayName(actor) + " 使用「" + actor.skillName + "」" + (damage ? "，造成 " + damage + " 傷害" : "") + "。");
+    return true;
   }
 
   function useCharacterSkill(actor, allies, enemies, logs) {
@@ -390,6 +526,7 @@
       return unit;
     });
     var enemies = expandEnemies(stage);
+    combat = { team: team, enemies: enemies, round: 0, followup: false, beat: null };
     enemies.forEach(function (enemy) {
       enemy.attack = Math.max(1, Math.round(enemy.attack * enemyFactor * modifiers.enemyAttack));
       enemy.defense = Math.max(1, Math.round(enemy.defense * (0.98 + (1 - luck) * 0.12) * modifiers.enemyDefense));
@@ -404,6 +541,7 @@
     var maxRounds = Number.isFinite(configuredMaxRounds) && configuredMaxRounds >= 60 ? Math.floor(configuredMaxRounds) : 120;
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
       round += 1;
+      combat.round = round;
       team.concat(enemies).forEach(function (unit) { if (unit.hp > 0) tickUnit(unit); });
       if (stage.trialRule === "decay" && round > 1) enemies.forEach(function (enemy) { if (enemy.hp > 0) addEffect(enemy, "attackMultiplier", 1.035, 2); });
       var order = alive(team).concat(alive(enemies)).sort(function (a, b) {
@@ -416,8 +554,19 @@
         var allies = isTeam ? team : enemies;
         var targets = isTeam ? enemies : team;
         if (actor.skillCooldown <= 0) {
+          var beat = isTeam && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= round && combat.beat.owner !== actor ? combat.beat : null;
+          if (beat && actor.signature && ["core", "mark", "control"].includes(actor.signature.type)) addEffect(actor, "attackMultiplier", 1 + beat.bonus, 2);
+          var prospectiveTarget = isTeam ? chooseTarget(actor, targets) : null;
+          var beforeSkillHp = prospectiveTarget ? prospectiveTarget.hp : 0;
           var usedSkill = isTeam ? useCharacterSkill(actor, allies, targets, logs) : useEnemySkill(actor, allies, targets, logs, stage);
           if (usedSkill) {
+            if (isTeam && prospectiveTarget && prospectiveTarget.hp < beforeSkillHp) afterHit(actor, prospectiveTarget, true);
+            if (beat) {
+              beat.remaining -= 1; beat.used.push(actor.id);
+              if (beat.owner.constellation >= 2 && (!actor.signature || ["heal", "guard", "support"].includes(actor.signature.type))) addEffect(actor, "damageTaken", .92, 2);
+              if (beat.owner.constellation >= 4 && beat.used.length === 1) beat.owner.skillCooldown = Math.max(0, beat.owner.skillCooldown - 1);
+              if (beat.owner.constellation >= 6 && new Set(beat.used).size >= 3 && !beat.finalUsed) { beat.remaining += 1; beat.finalUsed = true; team.forEach(function (unit) { addEffect(unit, "speedMultiplier", 1.05, 2); }); }
+            }
             actor.skillUses += 1;
             actor.skillCooldown = actor.skillCooldownMax;
             return;
@@ -427,6 +576,7 @@
         if (!target) return;
         var attackMultiplier = effectValue(actor, "attackMultiplier", 1);
         var damage = hit(target, actor.attack * attackMultiplier);
+        if (isTeam) afterHit(actor, target, false);
         logs.push(displayName(actor) + " 使用「" + (actor.attackName || "基本攻擊") + "」攻擊 " + displayName(target) + "，造成 " + damage + " 傷害。" );
         if (!isTeam && stage.trialRule === "corrosion") addEffect(target, "healingMultiplier", .72, 2);
         if (!isTeam && (stage.trialRule === "multi" || stage.trialRule === "mark")) addEffect(target, "marked", 1, 2);
@@ -434,6 +584,7 @@
       });
     }
     var won = alive(enemies).length === 0 && alive(team).length > 0;
+    combat = null;
     var timedOut = !won && alive(team).length > 0 && alive(enemies).length > 0 && round >= maxRounds;
     var status = won ? "won" : timedOut ? "timeout" : "defeat";
     logs.push(won
