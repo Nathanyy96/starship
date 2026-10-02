@@ -23,8 +23,11 @@
   function coreFollowup(source, target, multiplier) {
     if (!source || !target || target.hp <= 0) return;
     var previous = combat.followup;
+    var previousActor = combat.activeActor;
     combat.followup = true;
+    combat.activeActor = null;
     hit(target, source.attack * multiplier);
+    combat.activeActor = previousActor;
     combat.followup = previous;
   }
   function afterHit(source, target, skill) {
@@ -192,6 +195,7 @@
   }
 
   function hit(target, rawDamage) {
+    if (combat && combat.activeActor && !combat.activeActor.isEnemy && target.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) rawDamage *= 1 + combat.beat.bonus;
     var defense = target.defense * effectValue(target, "defenseMultiplier", 1);
     var damage = Math.max(1, Math.round(rawDamage * effectValue(target, "damageTaken", 1) * (1 - clamp(defense / 420, 0, .62))));
     if (hasEffect(target, "marked")) {
@@ -252,6 +256,10 @@
   }
 
   function heal(target, rawAmount) {
+    if (combat && combat.activeActor && !combat.activeActor.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) {
+      rawAmount *= 1 + combat.beat.bonus;
+      if (combat.beat.owner.constellation >= 2) addEffect(target, "damageTaken", .92, 2);
+    }
     var amount = Math.max(0, Math.round(rawAmount * effectValue(target, "healingMultiplier", 1)));
     var before = target.hp;
     target.hp = Math.min(target.maxHp, target.hp + amount);
@@ -274,6 +282,10 @@
     return alive(units).slice().sort(function (a, b) { return a.hp / a.maxHp - b.hp / b.maxHp; })[0] || null;
   }
   function giveShield(unit, amount) {
+    if (combat && combat.activeActor && !combat.activeActor.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) {
+      amount *= 1 + combat.beat.bonus;
+      if (combat.beat.owner.constellation >= 2) addEffect(unit, "damageTaken", .92, 2);
+    }
     unit.shield = Math.min(Math.round(unit.maxHp * .28), Math.max(0, unit.shield || 0) + Math.round(amount));
   }
   function cleanse(unit) {
@@ -555,10 +567,11 @@
         var targets = isTeam ? enemies : team;
         if (actor.skillCooldown <= 0) {
           var beat = isTeam && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= round && combat.beat.owner !== actor ? combat.beat : null;
-          if (beat && actor.signature && ["core", "mark", "control"].includes(actor.signature.type)) addEffect(actor, "attackMultiplier", 1 + beat.bonus, 2);
           var prospectiveTarget = isTeam ? chooseTarget(actor, targets) : null;
           var beforeSkillHp = prospectiveTarget ? prospectiveTarget.hp : 0;
+          combat.activeActor = isTeam ? actor : null;
           var usedSkill = isTeam ? useCharacterSkill(actor, allies, targets, logs) : useEnemySkill(actor, allies, targets, logs, stage);
+          combat.activeActor = null;
           if (usedSkill) {
             if (isTeam && prospectiveTarget && prospectiveTarget.hp < beforeSkillHp) afterHit(actor, prospectiveTarget, true);
             if (beat) {
