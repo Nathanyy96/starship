@@ -472,11 +472,16 @@
     var target = chooseTarget(actor, allies);
     var damage;
     if (rule === "shield" || rule === "copy" || rule === "finale") {
-      if (!actor.shield) actor.shield = Math.round(actor.maxHp * (rule === "finale" ? .2 : .14));
+      // 開場護盾外最多重整兩次；護盾仍在或次數耗盡時改為進攻，
+      // 避免永久刷新把戰鬥推到 120 回合的演算上限。
+      if (!actor.shield && (actor.shieldRefreshes || 0) < 2) {
+        actor.shield = Math.round(actor.maxHp * (rule === "finale" ? .2 : .14));
+        actor.shieldRefreshes = (actor.shieldRefreshes || 0) + 1;
+        logs.push(displayName(actor) + " 發動「" + actor.skillName + "」，重新整理終端護盾。" );
+        return true;
+      }
       if (rule === "finale" && actor.skillUses % 3 === 1) addEffect(actor, "attackMultiplier", 1.24, 2);
       if (rule === "finale" && actor.skillUses % 3 === 2) allies.forEach(function (unit) { addEffect(unit, "attackMultiplier", .82, 2); });
-      logs.push(displayName(actor) + " 發動「" + actor.skillName + "」，重新整理終端護盾。" + (rule === "finale" ? "姿態輪換。" : ""));
-      return true;
     }
     if (!target) return false;
     if (rule === "guard") {
