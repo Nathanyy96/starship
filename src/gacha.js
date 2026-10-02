@@ -282,17 +282,10 @@
     var source = isPlainObject(input) ? clone(input) : initialState();
     var state = initialState();
     state.version = source.version || 1;
-    var legacyTickets = 0;
-    if (isPlainObject(source.resources) && Object.prototype.hasOwnProperty.call(source.resources, "tickets")) {
-      assert(Number.isInteger(source.resources.tickets) && source.resources.tickets >= 0, "舊版共鳴券數量必須是非負整數");
-      legacyTickets = source.resources.tickets;
-    }
-    state.resources = Object.assign(state.resources, isPlainObject(source.resources) ? source.resources : {});
-    delete state.resources.tickets;
-    // 舊版的全域共鳴晶核沒有實際用途；現在只保留各角色自己的命座晶核。
-    // 載入舊存檔時直接移除，不影響角色、命座、等級或其他資源。
-    delete state.resources.resonanceCore;
-    if (legacyTickets > 0) state.resources.starSand += legacyTickets * DEFAULT_RULES.singleCost;
+    var savedResources = isPlainObject(source.resources) ? source.resources : {};
+    ["starSand", "starMarks", "characterExp"].forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(savedResources, key)) state.resources[key] = savedResources[key];
+    });
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
     state.characterProgress = isPlainObject(source.characterProgress) ? source.characterProgress : {};
@@ -436,21 +429,12 @@
       if (!isPlainObject(entry)) return entry;
       var normalizedEntry = clone(entry);
       // 舊版歷史若使用過共鳴券，改以等價單抽星砂顯示。
-      if (normalizedEntry.payment === "ticket") {
-        normalizedEntry.payment = "starSand";
-        normalizedEntry.cost = DEFAULT_RULES.singleCost;
-      }
       return normalizedEntry;
     }) : [];
 
     ["starSand", "starMarks", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(state.resources[key]) && state.resources[key] >= 0, "資源數量必須是非負整數：" + key);
     });
-    // 正式版不再使用回響粉；舊存檔按每份 120 經驗轉換一次。
-    var retiredEchoPowder = Number(state.resources.echoPowder || 0);
-    assert(Number.isInteger(retiredEchoPowder) && retiredEchoPowder >= 0, "舊回響粉數量必須是非負整數");
-    state.resources.characterExp += retiredEchoPowder * 120;
-    delete state.resources.echoPowder;
 
     banners.forEach(function (banner) {
       var saved = isPlainObject(source.pity && source.pity[banner.poolKey]) ? source.pity[banner.poolKey] : {};
@@ -798,7 +782,7 @@
     var count = options.count === undefined ? 1 : options.count;
     var payment = options.payment || "starSand";
     assert(count === 1 || count === 10, "一次只能抽 1 抽或 10 抽");
-    assert(payment === "starSand", "目前抽卡只使用星砂；舊版共鳴券已按單抽等價轉換");
+    assert(payment === "starSand", "目前抽卡只使用星砂");
 
     var cost = count === 10 ? this.rules.tenCost : this.rules.singleCost;
     assert(this.state.resources.starSand >= cost, "星砂不足，需要 " + cost + " 星砂");
@@ -887,11 +871,6 @@
     options = options || {};
     var progress = this.state.tutorialProgress;
     var reward = Object.assign({ starSand: 920, characterExp: 600 }, options.reward || {});
-    if (Object.prototype.hasOwnProperty.call(reward, "tickets")) {
-      assert(Number.isInteger(reward.tickets) && reward.tickets >= 0, "舊版新手教學共鳴券數量必須是非負整數");
-      reward.starSand += reward.tickets * this.rules.singleCost;
-      delete reward.tickets;
-    }
     ["starSand", "characterExp"].forEach(function (key) {
       assert(Number.isInteger(reward[key]) && reward[key] >= 0, "新手教學獎勵必須是非負整數：" + key);
     }, this);

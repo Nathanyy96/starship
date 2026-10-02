@@ -458,13 +458,13 @@ test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續�
   assert.equal(Object.prototype.hasOwnProperty.call(enhanced.state.resources, "resonanceCore"), false);
 });
 
-test("舊共鳴券會按單抽等價轉成星砂，抽卡只使用星砂", () => {
+test("抽卡只使用星砂，並保留星痕兌換與保底紀錄", () => {
   const gacha = game({
-    state: state({ resources: { starSand: 0, tickets: 1, starMarks: 10 } }),
+    state: state({ resources: { starSand: 160, starMarks: 10 } }),
     rng: () => 0.999999
   });
   assert.equal(gacha.getState().resources.starSand, 160);
-  assert.equal(Object.prototype.hasOwnProperty.call(gacha.getState().resources, "tickets"), false);
+  assert.deepEqual(Object.keys(gacha.getState().resources).sort(), ["characterExp", "starMarks", "starSand"]);
   const before = gacha.getPityStatus("limited-1-0-to-2-0");
   const sandOutcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "starSand" });
   assert.equal(sandOutcome.state.resources.starSand, 0);

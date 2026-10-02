@@ -7,7 +7,7 @@
   // 1.0 trial simulations use only identified monsters from the 1.0
   // catalogue. These encounters are combat exercises, not additional story canon.
   var species = {
-    giant: { name: "開場巨獸原生型", image: "./assets/enemies/opening-beast.webp", speed: 72 },
+    giant: { name: "黑晶巨獸（原生型）", image: "./assets/enemies/opening-beast.webp", speed: 72 },
     crystal: { name: "黑晶異變巨獸", image: "./assets/enemies/black-crystal-beast.webp", speed: 78 },
     spine: { name: "黑晶棘背獸", image: "./assets/enemies/black-crystal-spine-beast.webp", speed: 88 },
     horn: { name: "苔角行獸", image: "./assets/enemies/moss-horn-beast.webp", speed: 88 },

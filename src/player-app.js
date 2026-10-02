@@ -645,7 +645,7 @@
         return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
       }).join("");
       var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
-      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">正式版 · 1.0</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>方位</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 1.0 從南驛山谷界痕位移到獸靈之村；休整後西行兩日到白鐘城，最後從北門沿商路出發。</p>";
+      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">正式版 · 1.0</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g><text class=\"story-map-compass\" x=\"1120\" y=\"92\">↑ 北</text></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 1.0 從南驛山谷界痕位移到獸靈之村；休整後西行兩日到白鐘城，最後從北門沿商路出發。</p>";
     }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
@@ -931,7 +931,7 @@
       var approvedMonsterArt = {
         "黑晶異變巨獸": "./assets/enemies/black-crystal-beast.webp",
         "黑晶棘背獸": "./assets/enemies/black-crystal-spine-beast.webp",
-        "開場巨獸原生型": "./assets/enemies/opening-beast.webp",
+        "黑晶巨獸（原生型）": "./assets/enemies/opening-beast.webp",
         "鳴棘蛛": "./assets/enemies/resonant-spider.webp",
         "鳴棘蛛巢母": "./assets/enemies/spider-mother.webp",
         "苔角行獸": "./assets/enemies/moss-horn-beast.webp",
@@ -979,7 +979,7 @@
     }
     function battleUnitMarkup(unit, state, isEnemy) {
       var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var detail = isEnemy ? "敵方單位" : card ? (card.note || "已編入戰鬥") : "已編入戰鬥"; var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
-      return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><div class=\"battle-unit-visual\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></div><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
+      return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><button class=\"battle-unit-visual\" type=\"button\" data-battle-art=\"" + escapeHtml(image || "") + "\" data-battle-name=\"" + escapeHtml(name) + "\" aria-label=\"放大查看 " + escapeHtml(name) + " 立繪\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></button><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
     }
     function battleSceneMarkup(battle, state, stage, mode) {
       if (!battle) return "";
@@ -1598,7 +1598,19 @@
     byId("open-story").addEventListener("click", function () { showView("story-view"); });
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
      byId("open-characters").addEventListener("click", function () { showView("character-view"); });
-     byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
+    byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
+    document.addEventListener("click", function (event) {
+      var opener = event.target.closest("[data-battle-art]");
+      if (!opener) return;
+      var dialog = byId("battle-art-dialog");
+      byId("battle-art-title").textContent = opener.dataset.battleName || "戰鬥立繪";
+      var artwork = byId("battle-art-image");
+      artwork.src = opener.dataset.battleArt;
+      artwork.alt = (opener.dataset.battleName || "戰鬥") + " 立繪完整圖片";
+      dialog.showModal();
+    });
+    byId("close-battle-art").addEventListener("click", function () { byId("battle-art-dialog").close(); });
+    byId("battle-art-dialog").addEventListener("click", function (event) { if (event.target === this) this.close(); });
      byId("open-boss").addEventListener("click", function () { showView("boss-view"); });
      byId("open-dispatch").addEventListener("click", function () { showView("dispatch-view"); });
     byId("open-voyage").addEventListener("click", function () { showView("voyage-view"); });

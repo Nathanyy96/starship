@@ -78,7 +78,7 @@ test("戰鬥達到演算上限時回傳 timeout，不誤判成失敗或通關", 
 
 test("試煉全部使用 1.0 已出場的圖鑑魔物與新棘背獸", () => {
   const names = new Set(trialStages.flatMap((stage) => stage.enemies.map((enemy) => enemy.name)));
-  assert.deepEqual([...names].sort(), ["開場巨獸原生型", "黑晶異變巨獸", "黑晶棘背獸"].sort());
+  assert.deepEqual([...names].sort(), ["黑晶巨獸（原生型）", "黑晶異變巨獸", "黑晶棘背獸"].sort());
   assert.ok(trialStages.every((stage) => stage.enemies.every((enemy) => enemy.image && enemy.image.endsWith(".webp"))));
   assert.ok(trialStages.every((stage) => stage.environmentEffect.includes("訓練模擬")));
 });

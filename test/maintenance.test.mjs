@@ -45,7 +45,7 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const databasePath = path.join(directory, "players.json");
     const database = JSON.parse(fs.readFileSync(databasePath, "utf8"));
     const original = database.players["舊玩家"].state;
-    original.resources = { starSand: 4200, starMarks: 17, echoPowder: 23, characterExp: 9850 };
+    original.resources = { starSand: 4200, starMarks: 17, characterExp: 9850 };
     original.breakthroughMaterials = { "universal-core": 9 };
     original.collection.lia = 2;
     original.characterProgress.lia = { level: 21, affinity: 4, constellation: 1, constellationCore: 1, breakthrough: false };
@@ -69,8 +69,8 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const first = (await post("/api/player/session", { token: registration.token })).state;
     assert.equal(first.resources.starSand, 7400);
     assert.equal(first.resources.starMarks, 17);
-    assert.equal(Object.hasOwn(first.resources, "echoPowder"), false);
-    assert.equal(first.resources.characterExp, 14810);
+    assert.deepEqual(Object.keys(first.resources).sort(), ["characterExp", "starMarks", "starSand"]);
+    assert.equal(first.resources.characterExp, 12050);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
