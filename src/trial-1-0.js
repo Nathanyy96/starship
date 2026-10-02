@@ -63,12 +63,14 @@
     var defense = 48 + index * 5;
     var boss = id % 5 === 0;
     var bossHp = { 5: 2.5, 10: 3.4, 15: 1.95, 20: 1.8, 25: 1.5, 30: 1.1 };
+    // 終段按機制校準有效耐久，使難度逐關逼近終局，而非只在第30關跳升。
+    var lateHpScale = { 21: 1.3, 22: 1.45, 23: 1.6, 24: 1.6, 25: 2, 26: 1.25, 27: 1.8, 28: 1.9, 29: 1.6, 30: 2.64 };
     var names = [row[3], row[4]];
     var enemies = names.map(function (key, position) {
       var monster = species[key];
       return {
         name: monster.name, image: monster.image,
-        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : id === 30 ? 1.1 : 1.3) * (id === 30 ? 2.64 : 1) : 1.5 * (id >= 21 ? 1.35 : id >= 2 && id <= 10 ? 1.18 : 1))),
+        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : id === 30 ? 1.1 : 1.3) : 1.5 * (id >= 21 ? 1.35 : id >= 2 && id <= 10 ? 1.18 : 1)) * (lateHpScale[id] || 1)),
         attack: Math.round(attack * (boss && position === 0 ? 1.08 : 1)),
         defense: Math.round(defense * (boss && position === 0 ? 1.12 : 1)),
         speed: monster.speed + Math.min(25, Math.floor(index / 3)), count: 1
@@ -78,7 +80,7 @@
     return {
       id: id, name: row[0], region: row[1], recommendedPower: Math.round(900 + index * 100 + Math.max(0, id - 20) * 10),
       environment: "圖鑑模擬場", environmentEffect: "此關為訓練模擬，不代表主線新增遭遇。",
-      modifiers: { enemyAttack: id === 30 ? .8 : id >= 21 ? (boss ? 1.09 : 1.07) : boss ? 1.04 : id >= 2 && id <= 10 ? 1.08 : 1, enemyDefense: boss ? 1.03 : 1 },
+      modifiers: { enemyAttack: id === 30 ? .65 : id === 29 ? .85 : id >= 21 ? (boss ? 1.09 : 1.07) : boss ? 1.04 : id >= 2 && id <= 10 ? 1.08 : 1, enemyDefense: boss ? 1.03 : 1 },
       enemyTrait: effects[row[2]][0], enemyTraitEffect: effects[row[2]][1], trialRule: row[2],
       milestone: id === 10 ? "trial10Choice" : undefined,
       finalStage: id === 30,

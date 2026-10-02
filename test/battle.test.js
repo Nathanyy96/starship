@@ -101,6 +101,53 @@ test("試煉終段以滿等四星二至三命隊伍校準", () => {
   assert.equal(healOnly.rounds, 120);
 });
 
+test("試煉21–29關循序接近終局，正常編隊不因單一關卡逾時", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const teams = [
+    ["celesia", "harlow", "siyeon", "magenta"],
+    ["chodan", "magenta", "hina", "siyeon"]
+  ];
+  for (const team of teams) {
+    for (const [stageNumber, level, low, high] of [[21, 75, 16, 35], [25, 80, 29, 50], [29, 90, 30, 60]]) {
+      const constellation = stageNumber === 21 ? 1 : 2;
+      const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));
+      const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
+      for (const seed of [.1, .5, .9]) {
+        const result = simulateBattle({ team, stats, stage: trialStages[stageNumber - 1], rng: () => seed });
+        assert.equal(result.won, true, team.join(",") + " stage " + stageNumber + " seed " + seed);
+        assert.ok(result.rounds >= low && result.rounds <= high, team.join(",") + " stage " + stageNumber + " rounds " + result.rounds);
+      }
+    }
+  }
+});
+
+test("現行1.0可取得角色也能組成符合終關基準的隊伍", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const team = ["celesia", "chodan", "magenta", "lia"];
+  const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 2 }]));
+  const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
+  const result = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
+  assert.equal(result.won, true);
+  assert.ok(result.rounds >= 50 && result.rounds <= 60);
+});
+
+test("第一大版本同職能替換在終關沒有異常快殺或正常輸出逾時", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const groups = [
+    { base: ["celesia", "harlow", "siyeon"], ids: ["magenta", "hina", "isar", "rena"] },
+    { base: ["celesia", "magenta", "siyeon"], ids: ["reyn", "ruida", "harlow", "rovienne", "cenwu", "veyra", "eda", "mave", "chodan", "elorna"] },
+    { base: ["celesia", "magenta", "harlow"], ids: ["lia", "yuan", "siyeon", "elorna"] }
+  ];
+  for (const group of groups) for (const id of group.ids) {
+    const team = [...group.base, id];
+    const characterProgress = Object.fromEntries(team.map((unitId) => [unitId, { level: 90, constellation: 2, activeForm: id === "elorna" && group.base.includes("harlow") ? "deepwater" : "land" }]));
+    const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
+    const result = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
+    assert.equal(result.won, true, id);
+    assert.ok(result.rounds >= 30 && result.rounds <= 85, id + "：" + result.rounds);
+  }
+});
+
 test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終幕", () => {
   const finalNode = voyageConfig.nodes.find((node) => node.id === "voyage-final");
   const voyageFinal = voyageBattleStages.find((stage) => stage.id === finalNode.stageId);
