@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -32,7 +32,7 @@ const authorPreview11Tasks = [
 ];
 const databaseBaselines = new WeakMap();
 function createGame(state) {
-  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, petDefinitions, petOutfits, petEffects, petChallenges });
+  return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges });
 }
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -1052,6 +1052,19 @@ async function handleApi(request, response, requestUrl) {
       const player = playerFromSession(database, body.token);
       const result = runVoyage(player.record.state, body);
       player.record.state = result.state;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/shop" || requestUrl.pathname === "/api/player/character-skin") {
+      const player = playerFromSession(database, body.token);
+      const game = createGame(player.record.state);
+      const result = requestUrl.pathname === "/api/player/shop"
+        ? game.shopAction({ kind: body.kind, id: body.id, payment: body.payment })
+        : game.equipSkin({ cardId: body.cardId, skinId: body.skinId });
+      player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
       sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));

@@ -4,10 +4,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame } = require("../src/gacha.js");
-const { banners, voyageConfig } = require("../src/data.js");
+const { banners, voyageConfig, shopCatalog } = require("../src/data.js");
 const oldId = "skin-mave-luminous-archive";
 const newId = "skin-mave-summer-beach-party";
-const load = (state) => new GachaGame({ banners, voyageConfig, state });
+const load = (state) => new GachaGame({ banners, voyageConfig, shopCatalog, state });
 
 test("retired skin transfers ownership without changing player progress or allowing repeat rewards", () => {
   const unlock = { unlockedAt: "2026-09-01", source: "star-sea-voyage", ending: "special" };
@@ -40,13 +40,13 @@ test("existing summer ownership is preserved and claim-only legacy ownership can
   assert.equal(load({}).getState().cosmetics.skins[newId], undefined);
 });
 
-test("special ending grants the replacement once; catalogue only contains existing summer assets", () => {
+test("special ending grants resources once and no longer grants a free skin", () => {
   const game = load({ collection: { mave: 1, reyn: 1 }, voyageProgress: { flags: { harmonized: true } } });
-  assert.equal(game._finishVoyage(["mave", "reyn"]).reward.skinId, newId);
+  assert.equal(game._finishVoyage(["mave", "reyn"]).reward.skinId, null);
   const sand = game.getState().resources.starSand;
   assert.equal(game._finishVoyage(["mave", "reyn"]).alreadyClaimed, true);
   assert.equal(game.getState().resources.starSand, sand);
-  assert.ok(game.getState().cosmetics.skins[newId]);
+  assert.equal(game.getState().cosmetics.skins[newId], undefined);
   assert.equal(voyageConfig.seasonSkin.id, newId);
   assert.deepEqual(voyageConfig.seasonSkins.map(s => s.id), [newId, "skin-harlow-summer-beach-party"]);
   for (const skin of voyageConfig.seasonSkins) assert.ok(fs.existsSync(path.resolve(__dirname, "..", skin.previewImage)));

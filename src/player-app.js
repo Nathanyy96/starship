@@ -37,6 +37,7 @@
     var testRewardsServerEnabled = null;
     var currentCharacterId = "";
     var currentCharacterSkinId = "";
+    var shopBusy = false;
     var characterSearchTerm = "";
     var characterListFilter = "all";
     var game = null;
@@ -56,18 +57,20 @@
     // design documents.  The version query is intentional: deployed browsers
     // may still have an older labeled card cached at the same asset URL.
     var characterPortraitAssetVersion = "first-major-roster-20261001";
-    function characterPortraitSource(card, state) {
+    function characterPortraitSource(card, state, useEquippedSkin) {
       // SVG wrappers reference sibling PNGs; browsers do not load those external
       // references when the SVG is used as a CSS background or an <img> source.
       var progress = card && state && state.characterProgress && state.characterProgress[card.id];
-      var source = card && card.id === "elorna" && progress && progress.activeForm === "deepwater" ? "./assets/cards/elorna-deepwater.webp" : card && (card.image || card.backgroundImage || card.portraitImage) || "";
+      var equippedId = useEquippedSkin && state && state.cosmetics && state.cosmetics.equippedSkins && card && state.cosmetics.equippedSkins[card.id];
+      var equipped = equippedId && state.cosmetics.skins && state.cosmetics.skins[equippedId] && (data.shopCatalog.skins || []).find(function (item) { return item.id === equippedId && item.characterId === card.id; });
+      var source = equipped ? equipped.image : card && card.id === "elorna" && progress && progress.activeForm === "deepwater" ? "./assets/cards/elorna-deepwater.webp" : card && (card.image || card.backgroundImage || card.portraitImage) || "";
       if (!source || /^(data|blob):/i.test(source) || /[?&]v=/.test(source)) return source;
       return source + (source.indexOf("?") >= 0 ? "&" : "?") + "v=" + characterPortraitAssetVersion;
     }
     function bannerById(id) { return data.banners.find(function (banner) { return banner.id === id; }); }
     function bossStageById(id) { return (data.bossStages || []).find(function (stage) { return stage.id === id; }); }
     function voyageNodeById(id) { return (data.voyageConfig && data.voyageConfig.nodes || []).find(function (node) { return node.id === id; }); }
-    function createClientGame(state) { return new api.GachaGame({ banners: data.banners, state: state, breakthroughRequirements: data.characterBreakthroughs, voyageConfig: data.voyageConfig, petDefinitions: data.petDefinitions, petOutfits: data.petOutfits, petEffects: data.petEffects, petChallenges: data.petChallenges }); }
+    function createClientGame(state) { return new api.GachaGame({ banners: data.banners, state: state, breakthroughRequirements: data.characterBreakthroughs, voyageConfig: data.voyageConfig, shopCatalog: data.shopCatalog, petDefinitions: data.petDefinitions, petOutfits: data.petOutfits, petEffects: data.petEffects, petChallenges: data.petChallenges }); }
     function normalizePlayerName(value) { return String(value || "").normalize("NFKC").trim().replace(/\s+/g, " ").slice(0, 24); }
     function playerKey(name) { return normalizePlayerName(name).toLowerCase(); }
     function localKey(name) { return "starship-gacha-save-v1:" + encodeURIComponent(playerKey(name)); }
@@ -111,7 +114,7 @@
     }
     function hideGameViews() {
       closeCharacterAnimation();
-      ["game-lobby", "story-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
+      ["game-lobby", "shop-view", "story-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
       if (!currentPlayerName || !game) {
@@ -126,6 +129,7 @@
       if (viewId === "story-view") { renderStory(); }
       if (viewId === "author-preview-view") { loadAuthorPreview(); }
       if (viewId === "character-view") { renderCharacters(); }
+      if (viewId === "shop-view") { renderShop(); }
       if (viewId === "trial-view") { renderTrial(); }
       if (viewId === "boss-view") { renderBoss(); }
       if (viewId === "dispatch-view") { renderDispatch(); }
@@ -770,7 +774,7 @@
       });
       byId("character-list-count").textContent = "顯示 " + visibleCards.length + " / " + rosterCards().length + " 名";
       byId("character-list").innerHTML = visibleCards.length ? visibleCards.map(function (card) {
-        var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var portrait = characterPortraitSource(card, game && game.getState()); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (portrait ? ";--card-image:url('" + escapeHtml(portrait) + "')" : "");
+        var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var portrait = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (portrait ? ";--card-image:url('" + escapeHtml(portrait) + "')" : "");
         var growthAction;
         if (!copies) growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\" disabled>" + (Number(card.releaseVersion) > Number(data.updateVersion || "1.0") ? escapeHtml(card.releaseVersion) + " 尚未開放" : "尚未取得") + "</button>";
         else if (needBreakthrough) growthAction = "<button class=\"secondary-action growth-button breakthrough-growth-button\" data-breakthrough-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (availableBreakthrough < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>";
@@ -842,9 +846,11 @@
     }
     function characterSkinMarkup(card, state, skins, activeId) {
       if (!skins.length) return "<section class=\"character-skin-panel skin-empty\"><div><span class=\"eyebrow\">CHARACTER OUTFIT</span><h4>目前沒有專屬造型</h4><p>之後有角色造型時，會在這裡顯示預覽與取得方式。</p></div></section>";
-      return "<div class=\"character-skin-list\">" + skins.map(function (skin) {
-        var active = activeId === skin.id; var unlocked = characterSkinUnlocked(state, skin); var previewImage = skin.previewImage || characterPortraitSource(card, game && game.getState()); var status = unlocked ? "已解鎖" : "尚未解鎖"; var buttonLabel = active ? "顯示原始立繪" : (unlocked ? "查看造型立繪" : "預覽造型");
-        return "<section class=\"character-skin-panel " + (active ? "skin-active " : "") + (unlocked ? "skin-unlocked" : "skin-locked") + "\" style=\"--skin-accent:" + escapeHtml(skin.accent || card.accent || "#9e92ff") + "\"><div class=\"character-skin-preview\"><img src=\"" + escapeHtml(previewImage) + "\" alt=\"" + escapeHtml(card.name + "「" + skin.name + "」造型預覽") + "\" loading=\"lazy\"><div class=\"skin-preview-ribbon\"><span>" + escapeHtml(skin.themeLabel || "SEASON OUTFIT") + "</span><strong>" + escapeHtml(skin.previewTitle || skin.name) + "</strong></div><i class=\"skin-preview-orbit\"></i></div><div class=\"character-skin-copy\"><div class=\"skin-copy-heading\"><div><span class=\"eyebrow\">角色造型</span><h4>" + escapeHtml(skin.name) + "</h4></div><b class=\"skin-status\">" + status + "</b></div><p>" + escapeHtml(skin.description || "只改變角色外觀，不改變戰鬥數值。") + "</p><small>取得方式｜" + escapeHtml(skin.source || "特殊結局獎勵") + "</small><button class=\"secondary-action skin-preview-button\" data-skin-preview=\"" + escapeHtml(skin.id) + "\" type=\"button\" aria-pressed=\"" + (active ? "true" : "false") + "\">" + buttonLabel + "</button></div></section>";
+      var equippedId = state.cosmetics && state.cosmetics.equippedSkins && state.cosmetics.equippedSkins[card.id] || "";
+      var baseButton = state.collection[card.id] ? "<button class=\"secondary-action skin-equip-button\" data-skin-equip=\"\" type=\"button\"" + (!equippedId ? " disabled" : "") + ">" + (!equippedId ? "原始立繪上場中" : "改用原始立繪上場") + "</button>" : "";
+      return "<div class=\"character-skin-list\"><div class=\"skin-base-choice\"><span>上場圖片可以在原始立繪與已購買造型間切換。</span>" + baseButton + "</div><div id=\"character-skin-message\" class=\"message\" role=\"status\" aria-live=\"polite\"></div>" + skins.map(function (skin) {
+        var active = activeId === skin.id; var unlocked = characterSkinUnlocked(state, skin); var equipped = equippedId === skin.id; var previewImage = skin.previewImage || characterPortraitSource(card, game && game.getState()); var status = equipped ? "上場中" : unlocked ? "已收藏" : "尚未購買"; var buttonLabel = active ? "返回上場立繪" : "預覽造型";
+        return "<section class=\"character-skin-panel " + (active ? "skin-active " : "") + (unlocked ? "skin-unlocked" : "skin-locked") + "\" style=\"--skin-accent:" + escapeHtml(skin.accent || card.accent || "#9e92ff") + "\"><div class=\"character-skin-preview\"><img src=\"" + escapeHtml(previewImage) + "\" alt=\"" + escapeHtml(card.name + "「" + skin.name + "」造型預覽") + "\" loading=\"lazy\"><div class=\"skin-preview-ribbon\"><span>" + escapeHtml(skin.themeLabel || "SEASON OUTFIT") + "</span><strong>" + escapeHtml(skin.previewTitle || skin.name) + "</strong></div><i class=\"skin-preview-orbit\"></i></div><div class=\"character-skin-copy\"><div class=\"skin-copy-heading\"><div><span class=\"eyebrow\">角色造型</span><h4>" + escapeHtml(skin.name) + "</h4></div><b class=\"skin-status\">" + status + "</b></div><p>" + escapeHtml(skin.description || "只改變角色外觀，不改變戰鬥數值。") + "</p><small>取得方式｜" + escapeHtml(skin.source || "大廳商店購買") + "</small><div class=\"skin-buttons\"><button class=\"secondary-action skin-preview-button\" data-skin-preview=\"" + escapeHtml(skin.id) + "\" type=\"button\" aria-pressed=\"" + (active ? "true" : "false") + "\">" + buttonLabel + "</button>" + (unlocked && state.collection[card.id] ? "<button class=\"primary-action skin-equip-button\" data-skin-equip=\"" + escapeHtml(skin.id) + "\" type=\"button\"" + (equipped ? " disabled" : "") + ">" + (equipped ? "上場中" : "選為上場造型") + "</button>" : "") + "</div></div></section>";
       }).join("") + "</div>";
     }
     function renderCharacterDetail(cardId) {
@@ -853,7 +859,7 @@
       var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var stats = characterStatsFor(card.id, progress) || {}; var power = characterPower(card.id, state);
       // 角色詳情與文件共用乾淨的 portraitImage；識別資訊獨立排在圖片上方，
       // 不再把名片卡疊在角色臉部、武器或服裝上。
-      var skins = seasonSkinsFor(card.id); var activeSkin = skins.find(function (item) { return item.id === currentCharacterSkinId; }) || null; var skinActive = Boolean(activeSkin); var image = skinActive && activeSkin.previewImage ? activeSkin.previewImage : characterPortraitSource(card, state); var animation = characterAnimationFor(card.id);
+      var skins = seasonSkinsFor(card.id); var activeSkin = skins.find(function (item) { return item.id === currentCharacterSkinId; }) || null; var skinActive = Boolean(activeSkin); var image = skinActive && activeSkin.previewImage ? activeSkin.previewImage : characterPortraitSource(card, state, true); var animation = characterAnimationFor(card.id);
       var portraitHeading = "<div class=\"portrait-heading\"><div><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + " · " + escapeHtml(card.releaseVersion) + " 版本</small></div><span>" + "★".repeat(card.rarity) + "<b>" + escapeHtml(card.element) + "元素</b></span></div>";
       var developAction = !copies ? "<button class=\"primary-action\" type=\"button\" disabled>尚未取得</button>" : needBreakthrough ? "<button class=\"primary-action\" type=\"button\" disabled>請先完成 80 等突破</button>" : atMax ? "<button class=\"primary-action\" type=\"button\" disabled>已達現行上限 90 等</button>" : "<button class=\"primary-action\" data-detail-develop=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">升級　" + cost.characterExp + " 角色經驗</button>";
       var breakthroughAction = needBreakthrough && requirement ? "<button class=\"secondary-action breakthrough-detail-action\" data-detail-breakthrough=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (materialAmount + universalAmount < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>" : "";
@@ -867,6 +873,41 @@
       detail.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); }
+    function equipCharacterSkin(skinId) {
+      var request = { cardId: currentCharacterId, skinId: skinId };
+      function finish(result) { updateGameFromState(result.state); currentCharacterSkinId = ""; renderCharacters(); renderCharacterDetail(currentCharacterId); byId("character-skin-message").textContent = "上場立繪已更新，戰鬥圖片也會使用此造型。"; }
+      function fail(error) { var target = byId("character-skin-message"); target.textContent = error.message; target.className = "message error"; }
+      if (remoteMode) { apiRequest("/api/player/character-skin", request).then(finish).catch(fail); return; }
+      try { var result = game.equipSkin(request); saveLocalState(); finish(result); } catch (error) { fail(error); }
+    }
+    function renderShop() {
+      var state = game.getState(); var catalog = data.shopCatalog; var progress = state.shopProgress || {}; var purchases = progress.version === catalog.version ? progress.purchases || {} : {}; var conversions = progress.version === catalog.version ? progress.conversions || {} : {};
+      byId("shop-version-label").textContent = "本期商店｜" + escapeHtml(catalog.version);
+      byId("shop-balance").innerHTML = "<span>星砂 <b>" + number(state.resources.starSand) + "</b></span><span>角色經驗 <b>" + number(state.resources.characterExp) + "</b></span>";
+      byId("shop-materials").innerHTML = catalog.materials.map(function (item) {
+        var count = Number(purchases[item.id] || 0); var owned = Number(state.breakthroughMaterials[item.id] || 0); var done = count >= item.limit;
+        return "<article class=\"shop-item\"><div class=\"shop-item-copy\"><strong>" + escapeHtml(item.name) + "</strong><small>庫存 " + number(owned) + " · 本期已購 " + count + "/" + item.limit + "</small></div><div class=\"shop-actions\"><button data-shop-kind=\"material\" data-shop-id=\"" + escapeHtml(item.id) + "\" data-shop-payment=\"starSand\" type=\"button\"" + (done || state.resources.starSand < item.sandCost ? " disabled" : "") + ">" + number(item.sandCost) + " 星砂</button><button data-shop-kind=\"material\" data-shop-id=\"" + escapeHtml(item.id) + "\" data-shop-payment=\"characterExp\" type=\"button\"" + (done || state.resources.characterExp < item.expCost ? " disabled" : "") + ">" + number(item.expCost) + " 經驗</button></div></article>";
+      }).join("");
+      byId("shop-skins").innerHTML = catalog.skins.map(function (item) {
+        var owned = Boolean(state.cosmetics.skins[item.id]); var card = data.cards[item.characterId]; var characterOwned = Boolean(state.collection[item.characterId]);
+        return "<article class=\"shop-skin\"><img src=\"" + escapeHtml(item.image) + "\" alt=\"" + escapeHtml(item.name + "造型立繪") + "\" loading=\"lazy\"><div><strong>" + escapeHtml(item.name) + "</strong><p>" + (characterOwned ? "角色已取得，可在培養頁切換上場立繪。" : "可先收藏；角色取得後可在培養頁選為上場立繪。") + "</p><button data-shop-kind=\"skin\" data-shop-id=\"" + escapeHtml(item.id) + "\" data-shop-payment=\"starSand\" type=\"button\"" + (owned || state.resources.starSand < item.sandCost ? " disabled" : "") + ">" + (owned ? "已收藏" : number(item.sandCost) + " 星砂購買") + "</button></div></article>";
+      }).join("");
+      byId("shop-conversions").innerHTML = catalog.conversions.map(function (item) {
+        var count = Number(conversions[item.id] || 0); var done = item.limit != null && count >= item.limit; var from = item.costKey === "starSand" ? "星砂" : "角色經驗"; var to = item.rewardKey === "starSand" ? "星砂" : "角色經驗";
+        return "<article class=\"shop-item\"><div class=\"shop-item-copy\"><strong>" + number(item.cost) + " " + from + " → " + number(item.reward) + " " + to + "</strong><small>" + (item.limit == null ? "不限次數" : "本期已換 " + count + "/" + item.limit + " 次") + "</small></div><div class=\"shop-actions\"><button data-shop-kind=\"conversion\" data-shop-id=\"" + escapeHtml(item.id) + "\" type=\"button\"" + (done || state.resources[item.costKey] < item.cost ? " disabled" : "") + ">立即轉換</button></div></article>";
+      }).join("");
+    }
+    function shopAction(kind, id, payment) {
+      if (shopBusy) return;
+      shopBusy = true;
+      var request = { kind: kind, id: id, payment: payment };
+      var button = byId("shop-view").querySelector('[data-shop-kind="' + kind + '"][data-shop-id="' + id + '"]');
+      if (button) button.disabled = true;
+      function finish(result) { shopBusy = false; updateGameFromState(result.state); renderShop(); renderLobby(); var message = kind === "conversion" ? "資源轉換完成。" : kind === "skin" ? "造型已收藏；取得角色後可到培養頁選為上場圖片。" : "突破材料已加入庫存。"; byId("shop-message").textContent = message; byId("shop-message").className = "message"; }
+      function fail(error) { shopBusy = false; renderShop(); byId("shop-message").textContent = error.message; byId("shop-message").className = "message error"; }
+      if (remoteMode) { apiRequest("/api/player/shop", request).then(finish).catch(fail); return; }
+      try { var result = game.shopAction(request); saveLocalState(); finish(result); } catch (error) { fail(error); }
+    }
     function selectCharacterForm(formId) {
       if (remoteMode) { apiRequest("/api/player/character-form", { cardId: currentCharacterId, formId: formId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderCharacterDetail(currentCharacterId); showMessage("上場型態已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
       try { game.setCharacterForm({ cardId: currentCharacterId, formId: formId }); saveLocalState(); renderCharacters(); renderCharacterDetail(currentCharacterId); showMessage("上場型態已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
@@ -999,7 +1040,7 @@
       return text;
     }
     function battleUnitMarkup(unit, state, isEnemy) {
-      var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var detail = isEnemy ? "敵方單位" : card ? (card.note || "已編入戰鬥") : "已編入戰鬥"; var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
+      var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state, true); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var detail = isEnemy ? "敵方單位" : card ? (card.note || "已編入戰鬥") : "已編入戰鬥"; var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
       return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><button class=\"battle-unit-visual\" type=\"button\" data-battle-art=\"" + escapeHtml(image || "") + "\" data-battle-name=\"" + escapeHtml(name) + "\" aria-label=\"放大查看 " + escapeHtml(name) + " 立繪\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></button><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
     }
     function battleSceneMarkup(battle, state, stage, mode) {
@@ -1063,7 +1104,7 @@
       currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
       byId("trial-team-list").innerHTML = owned.length ? owned.map(function (card) {
-        var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentTrialTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, game && game.getState()); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : "");
+        var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentTrialTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : "");
         return "<button class=\"trial-team-card " + (selected ? "selected" : "") + "\" data-trial-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small><small>技能｜" + escapeHtml(stats.skillName || "—") + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>";
       }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
       var startButton = byId("start-trial-battle"); startButton.disabled = !trialUnlocked(state, current.id) || !currentTrialTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 " + maxRewards + " 次" : "開始自走棋戰鬥";
@@ -1131,7 +1172,7 @@
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentBossTeam = currentBossTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("boss-team-count").textContent = currentBossTeam.length + " / 4 · 戰力 " + number(trialPower(currentBossTeam, state));
-      byId("boss-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentBossTeam.indexOf(card.id) >= 0; var requirement = data.characterBreakthroughs[card.id]; var image = characterPortraitSource(card, game && game.getState()); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card boss-team-card " + (selected ? "selected" : "") + "\" data-boss-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>需要：" + escapeHtml(requirement ? requirement.materialName : "未設定") + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可挑戰 Boss 的角色。</div>";
+      byId("boss-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentBossTeam.indexOf(card.id) >= 0; var requirement = data.characterBreakthroughs[card.id]; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card boss-team-card " + (selected ? "selected" : "") + "\" data-boss-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>需要：" + escapeHtml(requirement ? requirement.materialName : "未設定") + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可挑戰 Boss 的角色。</div>";
       var startButton = byId("start-boss-battle"); startButton.disabled = !currentBossTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 10 次" : "開始 Boss 自走棋";
       renderBossBattleResult(state);
     }
@@ -1187,7 +1228,7 @@
       byId("dispatch-mission-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>DISPATCH</span><span>" + escapeHtml(current.region) + "</span>" + (claimed ? "<span>CLAIMED</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>" + escapeHtml(current.description) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般委託") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>建議面板戰力 <b>" + number(current.recommendedPower) + "</b></span><span>完成獎勵 <b>" + escapeHtml(rewardText(current.reward || {})) + "</b></span><span>版本完成度 <b>" + (claimed ? "已領取" : "未領取") + "</b></span></div>";
       if (byId("dispatch-enemy-intel")) byId("dispatch-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>每份委託的敵人特性不同，編隊不只看總戰力</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       byId("dispatch-team-count").textContent = currentDispatchTeam.length + " / 4 · 戰力 " + number(trialPower(currentDispatchTeam, state));
-      byId("dispatch-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentDispatchTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, game && game.getState()); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card dispatch-team-card " + (selected ? "selected" : "") + "\" data-dispatch-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可執行委託的角色。</div>";
+      byId("dispatch-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentDispatchTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card dispatch-team-card " + (selected ? "selected" : "") + "\" data-dispatch-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可執行委託的角色。</div>";
       var startButton = byId("start-dispatch"); startButton.disabled = claimed || !currentDispatchTeam.length; startButton.textContent = claimed ? "本版本委託已完成" : "執行星港委託";
       renderDispatchBattleResult(state);
     }
@@ -1292,12 +1333,11 @@
     function renderVoyage() {
       if (!game || !byId("voyage-route-list")) return;
       var state = game.getState(); var progress = voyageProgress(state); var config = data.voyageConfig || {}; var routes = config.routes || [];
-      var skin = config.seasonSkin || {};
       var currentNode = progress.status === "active" ? (voyageNodeById(progress.route[progress.nodeIndex]) || null) : null;
       var currentStage = voyageBattleStage(currentNode);
       byId("voyage-description").textContent = config.description || "在主線之外探索一段獨立航程。";
-      byId("voyage-skin-name").textContent = skin.name || "本期特殊裝扮";
-      byId("voyage-skin-copy").textContent = skin.description || "特殊結局獎勵。";
+      byId("voyage-skin-name").textContent = "星砂、經驗與星痕";
+      byId("voyage-skin-copy").textContent = "造型在大廳商店購買，不由迷航免費發放。";
       var activeRoute = progress.status === "active" && progress.routeId ? voyageRouteById(progress.routeId) : null;
       if (activeRoute) currentVoyageRouteId = activeRoute.id;
       else if (progress.selectedRouteId && voyageRouteById(progress.selectedRouteId)) currentVoyageRouteId = progress.selectedRouteId;
@@ -1326,7 +1366,7 @@
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentVoyageTeam = currentVoyageTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("voyage-team-count").textContent = currentVoyageTeam.length + " / 4 · 戰力 " + number(trialPower(currentVoyageTeam, state));
-      byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, game && game.getState()); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
+      byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
       renderVoyageGuide(state, progress, currentNode, currentStage);
       renderVoyageResult(state);
     }
@@ -1639,6 +1679,8 @@
      byId("open-boss").addEventListener("click", function () { showView("boss-view"); });
      byId("open-dispatch").addEventListener("click", function () { showView("dispatch-view"); });
     byId("open-voyage").addEventListener("click", function () { showView("voyage-view"); });
+    byId("open-shop").addEventListener("click", function () { showView("shop-view"); });
+    byId("shop-view").addEventListener("click", function (event) { var button = event.target.closest("[data-shop-kind]"); if (button && !button.disabled) shopAction(button.getAttribute("data-shop-kind"), button.getAttribute("data-shop-id"), button.getAttribute("data-shop-payment")); });
     byId("open-pets").addEventListener("click", function () { showView("pet-view"); });
     byId("open-tutorial").addEventListener("click", function () { showView("tutorial-view"); });
     byId("open-announcements").addEventListener("click", function () { showView("announcement-view"); });
@@ -1678,6 +1720,7 @@
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
        var skinButton = event.target.closest("[data-skin-preview]"); if (skinButton) { var skinId = skinButton.getAttribute("data-skin-preview"); currentCharacterSkinId = currentCharacterSkinId === skinId ? "" : skinId; renderCharacterDetail(currentCharacterId); return; }
+       var equipButton = event.target.closest("[data-skin-equip]"); if (equipButton && !equipButton.disabled) { equipCharacterSkin(equipButton.getAttribute("data-skin-equip")); return; }
        var developButton = event.target.closest("[data-detail-develop]"); if (developButton) { developCharacter(developButton.getAttribute("data-detail-develop")); return; }
        var breakthroughButton = event.target.closest("[data-detail-breakthrough]"); if (breakthroughButton) { breakthroughCharacter(breakthroughButton.getAttribute("data-detail-breakthrough")); return; }
     });

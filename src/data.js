@@ -482,8 +482,8 @@
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
   // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
   var voyageVersion = updateCycle;
-  var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "完成星海迷航協鳴特殊結局後領取；原季裝持有者自動轉換", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
-  var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "第二個夏日造型測試；保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "測試服預覽；正式取得方式待公告", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
+  var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；舊版已取得者保留", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
+  var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "大廳商店購買；角色開放後可選為上場造型", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
   var voyageConfig = {
     version: voyageVersion,
     title: "星海迷航",
@@ -530,11 +530,28 @@
     endingRewards: {
       normal: { starSand: 160, characterExp: 500 },
       hidden: { starSand: 280, characterExp: 700, petTokens: 1 },
-      special: { starSand: 520, characterExp: 1000, starMarks: 1, skinId: "skin-mave-summer-beach-party" }
+      special: { starSand: 520, characterExp: 1000, starMarks: 1 }
     },
-    // seasonSkin 保留給舊版航程與相容性；seasonSkins 讓角色培養頁可同時預覽多個造型。
+    // seasonSkin 保留舊版資料相容性；seasonSkins 只供角色培養頁預覽，取得改由大廳商店處理。
     seasonSkin: maveSummerSkin,
     seasonSkins: [maveSummerSkin, harlowSummerSkin]
+  };
+
+  // 大廳商店使用帳號資源；迷航商站仍只使用當次航程的星海碎片。
+  var shopCatalog = {
+    version: updateCycle,
+    materials: Object.keys(breakthroughMaterialTemplates).map(function (bossId) {
+      var material = breakthroughMaterialTemplates[bossId];
+      return { id: material.materialId, name: material.materialName, sandCost: 480, expCost: 12000, limit: 6 };
+    }).concat([{ id: universalBreakthroughMaterial.materialId, name: universalBreakthroughMaterial.materialName, sandCost: 640, expCost: 16000, limit: 6 }]),
+    skins: [
+      { id: maveSummerSkin.id, name: maveSummerSkin.name, characterId: maveSummerSkin.characterId, image: maveSummerSkin.previewImage, sandCost: 2400 },
+      { id: harlowSummerSkin.id, name: harlowSummerSkin.name, characterId: harlowSummerSkin.characterId, image: harlowSummerSkin.previewImage, sandCost: 2400 }
+    ],
+    conversions: [
+      { id: "sand-to-exp", costKey: "starSand", cost: 160, rewardKey: "characterExp", reward: 3000, limit: null },
+      { id: "exp-to-sand", costKey: "characterExp", cost: 6000, rewardKey: "starSand", reward: 80, limit: 20 }
+    ]
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
@@ -2120,6 +2137,7 @@
     dispatchMissions: dispatchMissions,
     voyageVersion: voyageVersion,
     voyageConfig: voyageConfig,
+    shopCatalog: shopCatalog,
     voyageBattleStages: voyageBattleStages,
     petVersion: petVersion,
      petDefinitions: petDefinitions,

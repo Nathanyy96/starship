@@ -71,10 +71,21 @@
         <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
         <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
         <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
+        <button id="open-shop" class="lobby-menu-card shop-menu" type="button"><span class="menu-index">09</span><span class="menu-icon">✧</span><strong>商店</strong><small>購買突破素材與特殊造型，轉換星砂和角色經驗</small><span class="menu-arrow">→</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0 主線；後續版本尚在製作。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
       <div id="author-preview-entry" class="author-preview-entry" hidden><div><strong>1.1 作者試玩</strong><p>五幕各一張決策卡的首輪試玩版，可選錯重試。進度另存，不發放正式獎勵。</p></div><button id="open-author-preview" class="primary-action" type="button">開始試玩</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
+    </section>
+
+    <section id="shop-view" class="game-view panel shop-view" hidden>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><h2>星界商店</h2><p>突破材料、特殊造型與資源轉換</p></div><span id="shop-version-label"></span></div>
+      <div class="shop-balance" id="shop-balance"></div>
+      <p class="shop-intro">商品以帳號資源購買；星海迷航途中取得的星海碎片只用於當次航程，不在這裡消費。</p>
+      <div id="shop-message" class="message" role="status" aria-live="polite"></div>
+      <section class="shop-section"><div class="shop-heading"><h3>突破材料</h3><p>每種素材本期最多購買 6 個，Boss 關卡仍可另外取得。</p></div><div id="shop-materials" class="shop-materials"></div></section>
+      <section class="shop-section"><div class="shop-heading"><h3>特殊角色造型</h3><p>每款買一次永久收藏。未取得角色也可先收藏，取得角色後到培養頁選為上場圖片；造型不增加戰力。</p></div><div id="shop-skins" class="shop-skins"></div></section>
+      <section class="shop-section"><div class="shop-heading"><h3>資源轉換</h3><p>雙向轉換有損耗；角色經驗換星砂每期最多 20 次。</p></div><div id="shop-conversions" class="shop-conversions"></div></section>
     </section>
 
     <section id="author-preview-view" class="game-view panel author-preview-view" hidden>
@@ -203,7 +214,7 @@
 
     <section id="voyage-view" class="game-view panel voyage-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
-      <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商店、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>本期特殊裝扮</span><strong id="voyage-skin-name">梅芙｜夏日海灘派對</strong><small id="voyage-skin-copy">特殊結局可取得，不改變角色戰鬥數值。</small></div></div>
+      <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商站、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>特殊結局獎勵</span><strong id="voyage-skin-name">星砂、經驗與星痕</strong><small id="voyage-skin-copy">造型在大廳商店購買，不由迷航免費發放。</small></div></div>
       <details class="voyage-guide" open>
         <summary><span><span class="eyebrow">HOW TO PLAY</span><strong>星海迷航遊玩指引</strong></span><span class="voyage-guide-summary">選航線 → 編隊 → 做選擇 → 打敗終端</span></summary>
         <div class="voyage-guide-body">
@@ -306,7 +317,7 @@
     </footer>
     </div>
   </main>
-  <script src="./src/gacha.js?v=official-1-0-20261001"></script>
+  <script src="./src/gacha.js?v=lobby-shop-20261002"></script>
   <script src="./src/story-source.js?v=pet-customization-20260920"></script>
   <script src="./src/story-1-0-current.js"></script>
   <script src="./src/story-1-0-images.js"></script>
@@ -314,9 +325,9 @@
   <script src="./src/trial-1-0.js?v=balance-20261001"></script>
   <script src="./src/first-major-kits.js?v=20261001"></script>
   <script src="./src/core-kits.js?v=20261001"></script>
-  <script src="./src/data.js?v=balance-20261001"></script>
+  <script src="./src/data.js?v=lobby-shop-20261002"></script>
   <script src="./src/battle.js?v=balance-20261001"></script>
-  <script src="./src/player-app.js?v=author-preview-progress-20261002"></script>
+  <script src="./src/player-app.js?v=lobby-shop-20261002"></script>
 </body>
 </html>
 

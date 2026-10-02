@@ -255,8 +255,10 @@
         lastEnding: null
       },
       cosmetics: {
-        skins: {}
+        skins: {},
+        equippedSkins: {}
       },
+      shopProgress: { version: "", purchases: {}, conversions: {} },
       petProgress: {
         version: "2.1-companion-workshop",
         selectedPetId: "star-fox",
@@ -369,6 +371,10 @@
     state.voyageProgress.lastEnding = isPlainObject(state.voyageProgress.lastEnding) ? state.voyageProgress.lastEnding : null;
     state.cosmetics = Object.assign(initialState().cosmetics, isPlainObject(source.cosmetics) ? source.cosmetics : {});
     state.cosmetics.skins = isPlainObject(state.cosmetics.skins) ? state.cosmetics.skins : {};
+    state.cosmetics.equippedSkins = isPlainObject(state.cosmetics.equippedSkins) ? state.cosmetics.equippedSkins : {};
+    state.shopProgress = Object.assign(initialState().shopProgress, isPlainObject(source.shopProgress) ? source.shopProgress : {});
+    state.shopProgress.purchases = isPlainObject(state.shopProgress.purchases) ? state.shopProgress.purchases : {};
+    state.shopProgress.conversions = isPlainObject(state.shopProgress.conversions) ? state.shopProgress.conversions : {};
     // Retired outfit ownership moves to its replacement without resetting rewards or progress.
     var retiredSkinId = "skin-mave-luminous-archive";
     var replacementSkinId = "skin-mave-summer-beach-party";
@@ -490,6 +496,7 @@
     this.now = typeof options.now === "function" ? options.now : function () { return new Date().toISOString(); };
     this.breakthroughRequirements = isPlainObject(options.breakthroughRequirements) ? options.breakthroughRequirements : {};
     this.voyageConfig = isPlainObject(options.voyageConfig) ? options.voyageConfig : {};
+    this.shopCatalog = isPlainObject(options.shopCatalog) ? options.shopCatalog : { materials: [], skins: [], conversions: [] };
     this.petDefinitions = Array.isArray(options.petDefinitions) ? options.petDefinitions : [];
     this.petOutfits = Array.isArray(options.petOutfits) ? options.petOutfits : [];
     this.petEffects = Array.isArray(options.petEffects) ? options.petEffects : [];
@@ -519,6 +526,81 @@
 
   GachaGame.prototype.getState = function () {
     return clone(this.state);
+  };
+
+  GachaGame.prototype.shopAction = function (options) {
+    options = options || {};
+    var kind = String(options.kind || "");
+    var id = String(options.id || "");
+    var payment = String(options.payment || "");
+    var catalog = this.shopCatalog;
+    var progress = this.state.shopProgress;
+    var version = String(catalog.version || "1.0");
+    if (progress.version !== version) {
+      progress.version = version;
+      progress.purchases = {};
+      progress.conversions = {};
+    }
+    var item, costKey, cost, rewardKey, reward, count, limit;
+    if (kind === "material") {
+      item = (catalog.materials || []).find(function (entry) { return entry.id === id; });
+      assert(item, "找不到商店突破材料");
+      assert(payment === "starSand" || payment === "characterExp", "請選擇星砂或角色經驗支付");
+      costKey = payment;
+      cost = Number(payment === "starSand" ? item.sandCost : item.expCost);
+      count = Number(progress.purchases[id] || 0);
+      limit = Number(item.limit);
+      assert(Number.isInteger(limit) && limit > 0 && count < limit, "本期此突破材料已達購買上限");
+    } else if (kind === "skin") {
+      item = (catalog.skins || []).find(function (entry) { return entry.id === id; });
+      assert(item, "找不到可購買的特殊造型");
+      assert(payment === "starSand", "特殊造型只能使用星砂購買");
+      assert(!this.state.cosmetics.skins[id], "已擁有這款角色造型");
+      costKey = "starSand";
+      cost = Number(item.sandCost);
+    } else if (kind === "conversion") {
+      item = (catalog.conversions || []).find(function (entry) { return entry.id === id; });
+      assert(item, "找不到資源轉換項目");
+      costKey = item.costKey;
+      cost = Number(item.cost);
+      rewardKey = item.rewardKey;
+      reward = Number(item.reward);
+      assert(costKey !== rewardKey && ["starSand", "characterExp"].includes(costKey) && ["starSand", "characterExp"].includes(rewardKey), "商店資源轉換設定不正確");
+      count = Number(progress.conversions[id] || 0);
+      limit = item.limit == null ? null : Number(item.limit);
+      assert(limit == null || Number.isInteger(limit) && limit > 0 && count < limit, "本期此資源轉換已達上限");
+    } else {
+      throw new Error("找不到商店操作");
+    }
+    assert(Number.isInteger(cost) && cost > 0, "商店價格設定不正確");
+    if (kind === "conversion") assert(Number.isInteger(reward) && reward > 0, "商店轉換數量設定不正確");
+    assert(Number(this.state.resources[costKey] || 0) >= cost, (costKey === "starSand" ? "星砂" : "角色經驗") + "不足，需要 " + cost);
+    this.state.resources[costKey] -= cost;
+    if (kind === "material") {
+      this.state.breakthroughMaterials[id] = Number(this.state.breakthroughMaterials[id] || 0) + 1;
+      progress.purchases[id] = count + 1;
+    } else if (kind === "skin") {
+      this.state.cosmetics.skins[id] = { unlockedAt: this.now(), source: "lobby-shop" };
+    } else {
+      this.state.resources[rewardKey] += reward;
+      progress.conversions[id] = count + 1;
+    }
+    return { kind: kind, item: clone(item), cost: { key: costKey, amount: cost }, reward: kind === "conversion" ? { key: rewardKey, amount: reward } : null, state: this.getState() };
+  };
+
+  GachaGame.prototype.equipSkin = function (options) {
+    options = options || {};
+    var cardId = String(options.cardId || "");
+    var skinId = String(options.skinId || "");
+    assert(this.cardById[cardId], "找不到角色");
+    assert(Number(this.state.collection[cardId] || 0) > 0, "請先取得角色再選擇上場造型");
+    if (skinId) {
+      var skin = (this.shopCatalog.skins || []).find(function (entry) { return entry.id === skinId && entry.characterId === cardId; });
+      assert(skin && this.state.cosmetics.skins[skinId], "尚未擁有這款角色造型");
+    }
+    if (skinId) this.state.cosmetics.equippedSkins[cardId] = skinId;
+    else delete this.state.cosmetics.equippedSkins[cardId];
+    return { cardId: cardId, skinId: skinId || null, state: this.getState() };
   };
 
   GachaGame.prototype.getCharacterProgress = function (cardId) {

@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
-const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storyWorldMap, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
+const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storyWorldMap, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("正式版只開放 1.0 角色與 QW 卡池", () => {
   assert.deepEqual(activeCards.map((card) => card.id), ["celesia", "reyn", "lia", "isar", "chodan", "magenta"]);
@@ -172,14 +172,15 @@ test("通用突破印記可以讓玩家不用被指定高難度 Boss 卡住", ()
 
 test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此分離", () => {
   assert.equal(voyageConfig.routes.length, 3);
-  assert.ok(voyageConfig.endingRewards.hidden && voyageConfig.endingRewards.special.skinId);
+  assert.ok(voyageConfig.endingRewards.hidden && voyageConfig.endingRewards.special.starMarks);
+  assert.equal(voyageConfig.endingRewards.special.skinId, undefined);
   assert.equal(voyageConfig.seasonSkins.length, 2);
   assert.equal(voyageConfig.seasonSkins[0].id, "skin-mave-summer-beach-party");
   assert.equal(voyageConfig.seasonSkins[0].characterId, "mave");
   assert.equal(voyageConfig.seasonSkins[1].id, "skin-harlow-summer-beach-party");
   assert.equal(voyageConfig.seasonSkins[1].characterId, "harlow");
   assert.equal(voyageConfig.seasonSkins[1].rarity, 4);
-  assert.equal(voyageConfig.seasonSkin.id, voyageConfig.endingRewards.special.skinId);
+  assert.equal(voyageConfig.seasonSkin.id, shopCatalog.skins[0].id);
   assert.equal(petDefinitions.length, 7);
   assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && pet.image.endsWith(".png")), true);
   assert.equal(voyageBattleStages.length, 3);
