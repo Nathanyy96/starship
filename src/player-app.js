@@ -13,6 +13,7 @@
     var playerNameKey = "starship-player-name";
     var currentPlayerName = "";
     var currentPlayerToken = "";
+    var authorPreviewRequestId = 0;
     var authMode = "login";
     var selectedBannerId = (data.banners.find(function (banner) { return banner.active !== false; }) || data.banners[0]).id;
     var currentStoryChapterId = "main-1-0";
@@ -519,7 +520,7 @@
     function renderAuthorPreview(payload) {
       var progress = payload.progress;
       byId("author-preview-progress").textContent = progress.step >= progress.total ? "試玩完成" : "任務 " + (progress.step + 1) + " / " + progress.total;
-      byId("author-preview-feedback").textContent = progress.feedback || "";
+      byId("author-preview-feedback").textContent = progress.correct === false ? "此選項未通過安全檢查，留在本關重試。" + (progress.feedback || "") : progress.feedback || "";
       byId("author-preview-feedback").classList.toggle("needs-retry", progress.correct === false);
       if (!payload.task) {
         byId("author-preview-task").innerHTML = "<h3>已完成本輪試玩</h3><p>你已走完五段任務。請回報哪個選擇不合理、哪個提示不清楚，以及整體節奏是否適合 1.1。</p><p>這次試玩不會領取星砂或改動正式劇情進度。</p>";
@@ -529,8 +530,10 @@
       byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">" + escapeHtml(task.scene) + "</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
     }
     function loadAuthorPreview(action, choice) {
+      var requestId = ++authorPreviewRequestId;
       byId("author-preview-task").innerHTML = "<p>正在載入任務……</p>";
-      apiRequest("/api/author-preview/1-1", { action: action || "view", choice: choice }).then(renderAuthorPreview).catch(function (error) { byId("author-preview-task").textContent = error.message; });
+      byId("author-preview-reset").disabled = true;
+      apiRequest("/api/author-preview/1-1", { action: action || "view", choice: choice }).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) byId("author-preview-task").textContent = error.message; }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
     }
     function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
     function storyBodyMarkup(text, className, actNumber) {

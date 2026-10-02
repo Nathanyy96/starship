@@ -40,9 +40,18 @@ test("1.1 author preview is gated and does not alter game resources", async () =
     assert.equal(preview.progress.mistakes, 1);
     preview = (await post("/api/author-preview/1-1", { token: author.token, action: "answer", choice: 1 })).body;
     assert.equal(preview.progress.step, 1);
+    preview = (await post("/api/author-preview/1-1", { token: author.token, action: "answer", choice: 0 })).body;
+    assert.equal(preview.progress.step, 1);
+    preview = (await post("/api/author-preview/1-1", { token: author.token, action: "answer", choice: 2 })).body;
+    assert.equal(preview.progress.step, 2);
     const session = (await post("/api/player/session", { token: author.token })).body;
     assert.deepEqual(session.state.resources, author.state.resources);
-    preview = (await post("/api/author-preview/1-1", { token: author.token, action: "reset" })).body;
+    assert.equal(session.state.storyProgress.authorPreview11.step, 2);
+    const relogin = (await post("/api/player/login", { name: "Happycow", password: "author-preview-test" })).body;
+    assert.equal(relogin.state.storyProgress.authorPreview11.step, 2);
+    preview = (await post("/api/author-preview/1-1", { token: relogin.token })).body;
+    assert.equal(preview.progress.step, 2);
+    preview = (await post("/api/author-preview/1-1", { token: relogin.token, action: "reset" })).body;
     assert.equal(preview.progress.step, 0);
   } finally {
     child.kill();

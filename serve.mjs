@@ -917,7 +917,8 @@ async function handleApi(request, response, requestUrl) {
         sendJson(response, 403, { ok: false, error: "這個試玩入口目前只開放給作者帳號。" });
         return;
       }
-      let progress = player.record.authorPreview11 || { step: 0, mistakes: 0 };
+      player.record.state.storyProgress = player.record.state.storyProgress || {};
+      let progress = player.record.state.storyProgress.authorPreview11 || player.record.authorPreview11 || { step: 0, mistakes: 0 };
       if (body.action === "reset") progress = { step: 0, mistakes: 0 };
       else if (body.action === "answer") {
         const task = authorPreview11Tasks[progress.step];
@@ -929,8 +930,9 @@ async function handleApi(request, response, requestUrl) {
           progress = { ...progress, mistakes: progress.mistakes + 1, feedback: task.retry, correct: false };
         }
       }
-      player.record.authorPreview11 = progress;
-      await writeDatabase(database);
+      player.record.state.storyProgress.authorPreview11 = progress;
+      delete player.record.authorPreview11;
+      if (body.action === "reset" || body.action === "answer") await writeDatabase(database);
       const task = authorPreview11Tasks[progress.step];
       sendJson(response, 200, { ok: true, progress: { step: progress.step, total: authorPreview11Tasks.length, mistakes: progress.mistakes, feedback: progress.feedback || "", correct: progress.correct }, task: task ? { title: task.title, scene: task.scene, question: task.question, choices: task.choices } : null });
       return;
