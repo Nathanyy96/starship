@@ -110,7 +110,7 @@
     }
     function hideGameViews() {
       closeCharacterAnimation();
-      ["game-lobby", "story-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
+      ["game-lobby", "story-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
       if (!currentPlayerName || !game) {
@@ -123,6 +123,7 @@
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
+      if (viewId === "author-preview-view") { loadAuthorPreview(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "trial-view") { renderTrial(); }
       if (viewId === "boss-view") { renderBoss(); }
@@ -498,6 +499,7 @@
     }
     function renderLobby() {
       if (!game) return;
+      byId("author-preview-entry").hidden = !(remoteMode && playerKey(currentPlayerName) === "happycow");
       var state = game.getState(); var progress = storyProgress(state); var openChapters = data.storyChapters.filter(function (item) { return item.releaseOpen === true; }); var completed = openChapters.reduce(function (sum, item) { return sum + item.scenes.filter(function (scene) { return Boolean(progress.completedScenes[sceneKey(item.id, scene.id)]); }).length; }, 0); var total = openChapters.reduce(function (sum, chapter) { return sum + chapter.scenes.length; }, 0); var chapter = storyChapterById(progress.currentChapter) || data.storyChapters[0];
       if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
@@ -513,6 +515,22 @@
       byId("lobby-continue-title").textContent = (chapter.versionLabel || chapter.version) + "｜" + chapter.title;
       byId("lobby-continue-copy").textContent = chapter.summary;
       renderMilestoneRewards();
+    }
+    function renderAuthorPreview(payload) {
+      var progress = payload.progress;
+      byId("author-preview-progress").textContent = progress.step >= progress.total ? "試玩完成" : "任務 " + (progress.step + 1) + " / " + progress.total;
+      byId("author-preview-feedback").textContent = progress.feedback || "";
+      byId("author-preview-feedback").classList.toggle("needs-retry", progress.correct === false);
+      if (!payload.task) {
+        byId("author-preview-task").innerHTML = "<h3>已完成本輪試玩</h3><p>你已走完五段任務。請回報哪個選擇不合理、哪個提示不清楚，以及整體節奏是否適合 1.1。</p><p>這次試玩不會領取星砂或改動正式劇情進度。</p>";
+        return;
+      }
+      var task = payload.task;
+      byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">" + escapeHtml(task.scene) + "</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
+    }
+    function loadAuthorPreview(action, choice) {
+      byId("author-preview-task").innerHTML = "<p>正在載入任務……</p>";
+      apiRequest("/api/author-preview/1-1", { action: action || "view", choice: choice }).then(renderAuthorPreview).catch(function (error) { byId("author-preview-task").textContent = error.message; });
     }
     function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
     function storyBodyMarkup(text, className, actNumber) {
@@ -645,7 +663,7 @@
         return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
       }).join("");
       var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
-      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">正式版 · 1.0</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g><text class=\"story-map-compass\" x=\"1120\" y=\"92\">↑ 北</text></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 1.0 從南驛山谷界痕位移到獸靈之村；休整後西行兩日到白鐘城，最後從北門沿商路出發。</p>";
+      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">正式版 · 1.0</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 1.0 從南驛山谷界痕位移到獸靈之村；休整後西行兩日到白鐘城，最後從北門沿商路出發。</p>";
     }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
@@ -1596,6 +1614,9 @@
       else { try { var exchanged = game.exchangeFeatured({ bannerId: selectedBannerId }); saveLocalState(); byId("results").innerHTML = "<div class=\"result-summary\"><strong>兌換完成</strong><span>取得 " + escapeHtml(exchanged.card.name) + "（4★｜" + escapeHtml(exchanged.card.element) + "）</span></div>"; render(); showMessage("已使用 10 枚星痕；進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); } }
     });
     byId("open-story").addEventListener("click", function () { showView("story-view"); });
+    byId("open-author-preview").addEventListener("click", function () { showView("author-preview-view"); });
+    byId("author-preview-task").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
+    byId("author-preview-reset").addEventListener("click", function () { loadAuthorPreview("reset"); });
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
      byId("open-characters").addEventListener("click", function () { showView("character-view"); });
     byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
@@ -1709,3 +1730,5 @@
 
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }
 }());
+
+

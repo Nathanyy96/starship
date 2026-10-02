@@ -22,6 +22,14 @@ const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 const currentUpdateVersion = updateCycle;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
+const authorPreviewPlayerKey = "happycow";
+const authorPreview11Tasks = [
+  { title: "核對山腰驛站的路標", scene: "岑霧交給你兩份路標紀錄。舊路牌仍指向封閉的谷底，新的手寫記錄標出安全的山腰轉運線。", question: "你要把哪條路交給芮妲的車隊？", choices: ["照舊路牌走谷底捷徑", "採用山腰轉運線，先向驛站複核", "兩條路都放行，讓車隊自行選擇"], answer: 1, success: "岑霧在路標上蓋章，車隊取得已核對的路線。", retry: "這條路線還沒有通過驛站複核。先核對紀錄，再讓車隊出發。" },
+  { title: "安排車隊的護送次序", scene: "谷口傳來不穩定的回音。芮妲能先帶一車通過，榆安帶著藥箱留在後車。", question: "哪個安排能讓隊伍在突發狀況下互相照應？", choices: ["讓芮妲先探路，確認安全後再接應後車", "讓兩車一起衝過谷口", "把藥箱留在驛站，減輕車重"], answer: 0, success: "芮妲先確認路況，後車收到信號後順利通過。", retry: "車隊需要一個可確認的接應信號，也必須帶上救援物資。" },
+  { title: "處理受傷旅者", scene: "一名旅者在轉運時擦傷，仍想趕上車隊。榆安提醒你，現在最重要的是先確認傷勢。", question: "你如何完成這次交接？", choices: ["先讓旅者上車，抵達後再處理", "只記錄姓名，不必耽誤車隊", "請榆安檢查、記錄狀況，再決定是否上車"], answer: 2, success: "榆安完成檢查與紀錄，旅者獲得安全的後續安排。", retry: "交接紀錄不能代替檢查；先確認旅者的身體狀況。" },
+  { title: "修正異常回音的通報", scene: "谷地的異常回音被誤寫成魔物目擊。現場只有聲響與刻度偏移，尚未發現實體。", question: "要把什麼內容送回驛站？", choices: ["記錄聲響、刻度與時間，標註尚未確認來源", "直接公告魔物入侵", "刪去異常紀錄，以免引起恐慌"], answer: 0, success: "通報保留了可追查的線索，也沒有把推測寫成事實。", retry: "請區分已觀察到的現象與尚未確認的原因。" },
+  { title: "完成谷口交班", scene: "車隊已抵達安全點。岑霧、芮妲與榆安各有一份紀錄，下一班需要知道路線與旅者狀態。", question: "最後要留下哪份交班資料？", choices: ["只留抵達人數", "合併路線、護送信號、傷勢與異常回音紀錄", "等下一班來了再口頭說明"], answer: 1, success: "完整交班讓下一班能沿著已確認的路線繼續工作。", retry: "下一班需要能獨立核對的完整紀錄，不能只靠口頭傳達。" }
+];
 const databaseBaselines = new WeakMap();
 function createGame(state) {
   return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, petDefinitions, petOutfits, petEffects, petChallenges });
@@ -903,6 +911,30 @@ async function handleApi(request, response, requestUrl) {
   const database = await readDatabase();
   databaseBaselines.set(database, cloneDatabase(database));
   try {
+    if (requestUrl.pathname === "/api/author-preview/1-1") {
+      const player = playerFromSession(database, body.token);
+      if (player.key !== authorPreviewPlayerKey) {
+        sendJson(response, 403, { ok: false, error: "這個試玩入口目前只開放給作者帳號。" });
+        return;
+      }
+      let progress = player.record.authorPreview11 || { step: 0, mistakes: 0 };
+      if (body.action === "reset") progress = { step: 0, mistakes: 0 };
+      else if (body.action === "answer") {
+        const task = authorPreview11Tasks[progress.step];
+        if (!task) throw new Error("已完成試玩；可選擇重新開始。");
+        if (!Number.isInteger(body.choice) || body.choice < 0 || body.choice >= task.choices.length) throw new Error("請選擇一個有效選項。");
+        if (body.choice === task.answer) {
+          progress = { ...progress, step: progress.step + 1, feedback: task.success, correct: true };
+        } else {
+          progress = { ...progress, mistakes: progress.mistakes + 1, feedback: task.retry, correct: false };
+        }
+      }
+      player.record.authorPreview11 = progress;
+      await writeDatabase(database);
+      const task = authorPreview11Tasks[progress.step];
+      sendJson(response, 200, { ok: true, progress: { step: progress.step, total: authorPreview11Tasks.length, mistakes: progress.mistakes, feedback: progress.feedback || "", correct: progress.correct }, task: task ? { title: task.title, scene: task.scene, question: task.question, choices: task.choices } : null });
+      return;
+    }
     if (requestUrl.pathname === "/api/player/register") {
       const name = normalizePlayerName(body.name);
       if (!name) throw new Error("請輸入遊戲名稱");

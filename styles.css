@@ -450,6 +450,23 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .lobby-continue strong { display: block; margin: 5px 0 4px; color: #f4f7ff; font-size: .98rem; }
 .lobby-continue p:not(.eyebrow) { color: #94a4c6; font-size: .75rem; }
 .lobby-continue .primary-action { width: auto; min-width: 132px; }
+.author-preview-entry { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:24px 28px; margin:18px 0; border:1px solid #8c76c9; border-radius:16px; background:#1e2148; color:#f5efff; }
+.author-preview-entry[hidden] { display:none; }
+.author-preview-entry strong { font-size:1.2rem; }
+.author-preview-entry p { margin:7px 0 0; color:#d7cee9; line-height:1.6; }
+.author-preview-entry .primary-action { width:auto; min-width:130px; }
+.author-preview-view { max-width:980px; margin-inline:auto; }
+.author-preview-note { color:#d3daf0; font-size:1rem; line-height:1.7; max-width:70ch; margin:24px 0 30px; }
+.author-preview-task { padding:clamp(24px, 4vw, 50px); background:#171d3b; border-radius:16px; color:#f6f6ff; }
+.author-preview-task h3 { font-size:clamp(1.65rem, 3vw, 2.5rem); margin:0 0 20px; }
+.author-preview-task p { font-size:1.08rem; line-height:1.8; max-width:68ch; }
+.author-preview-task strong { display:block; margin:28px 0 16px; font-size:1.13rem; }
+.author-preview-choices { display:grid; gap:12px; }
+.author-preview-choices button { text-align:left; padding:17px 20px; color:#fff; background:#304172; border:1px solid #6074ae; border-radius:12px; font:inherit; cursor:pointer; }
+.author-preview-choices button:hover, .author-preview-choices button:focus-visible { background:#435895; outline:2px solid #c7b6ff; outline-offset:2px; }
+.author-preview-feedback { min-height:28px; margin:20px 0; color:#c5f0da; font-size:1rem; line-height:1.6; }
+.author-preview-feedback.needs-retry { color:#ffd9a4; }
+@media (max-width:640px) { .author-preview-entry { align-items:flex-start; flex-direction:column; } .author-preview-entry .primary-action { width:100%; } }
 .milestone-rewards { display: grid; gap: 12px; }
 .milestone-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 20px; border: 1px solid rgba(246,199,111,.38); border-radius: 18px; background: linear-gradient(105deg, rgba(82,59,39,.38), rgba(21,28,59,.78)); box-shadow: 0 14px 30px rgba(0,0,0,.16); }
 .milestone-card > div:first-child { min-width: 0; }.milestone-card strong { display: block; margin: 4px 0; color: #ffe7ae; font-size: .9rem; }.milestone-card p { color: #bdc7df; font-size: .73rem; }
@@ -574,7 +591,8 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .story-map-filter { padding: 7px 10px; border: 1px solid rgba(187,213,255,.18); border-radius: 999px; color: #9eafd0; background: rgba(255,255,255,.035); font-size: .64rem; }
 .story-map-filter:hover, .story-map-filter.active { border-color: rgba(112,233,223,.58); color: #e5ffff; background: rgba(112,233,223,.11); }
 .story-map-layout { display: grid; grid-template-columns: minmax(0, 1.62fr) minmax(220px, .58fr); gap: 12px; align-items: stretch; }
-.story-map-canvas { min-width: 0; padding: 8px; border: 1px solid rgba(187,213,255,.14); border-radius: 16px; background: rgba(2,10,27,.4); overflow: hidden; }
+.story-map-canvas { position:relative; min-width: 0; padding: 8px; border: 1px solid rgba(187,213,255,.14); border-radius: 16px; background: rgba(2,10,27,.4); overflow: hidden; }
+.story-map-orientation { position:absolute; z-index:2; top:24px; right:24px; display:grid; justify-items:center; gap:2px; padding:10px 14px; border-radius:10px; background:#10264b; color:#fff1c0; box-shadow:0 8px 20px rgba(0,0,0,.28); font-size:.82rem; font-weight:700; line-height:1.4; }
 .story-map-svg { display: block; width: 100%; min-height: 360px; }
 .story-map-water { fill: #081a3b; stroke: rgba(187,213,255,.16); stroke-width: 2; }
 .story-map-terrain { fill: var(--region-color); fill-opacity: .11; stroke: var(--region-color); stroke-opacity: .4; stroke-width: 2; stroke-dasharray: 7 6; }
