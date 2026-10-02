@@ -355,9 +355,8 @@
     characterBattleStats[id] = Object.assign({}, coreKits[id], { element: cards[id].element, growthModel: "first-major" });
   });
 
-  // 4★ 仍保留重裝、支援、速度等職能差異，但整體基礎面板再上調。
-  // 低基礎戰力的 4★ 會進入「平衡成長帶」：不是依性別加成，而是依實際面板
-  // 補足起始戰力並提高 70–90 等成長，避免法師、支援或治療因功能定位被判定為低人一等。
+  // 其他大版本的舊稿先映射到第一大版本的面板帶與等級曲線。
+  // 保留各角色生命／攻防比例與職能差異，避免用愈晚推出愈陡的成長率堆數值。
   Object.keys(characterBattleStats).forEach(function (id) {
     var stats = characterBattleStats[id];
     if (stats.growthModel === "first-major") {
@@ -365,30 +364,15 @@
       stats.growthRates = { main: 0.0114, defense: 0.0114, speed: 0.0007 };
       return;
     }
-    if (stats.rarity !== 4) {
-      stats.growthRates = { main: 0.03, defense: 0.022, speed: 0.009 };
-      return;
-    }
-    stats.maxHp = Math.round(stats.maxHp * 1.16);
-    stats.attack = Math.round(stats.attack * 1.16);
-    stats.defense = Math.round(stats.defense * 1.16);
-    stats.speed = Math.round(stats.speed * 1.06);
     var basePower = Math.round(stats.maxHp / 10 + stats.attack + stats.defense);
-    // 520 是四星非坦克與高面板坦克之間的共同戰力帶目標；
-    // 仍保留重裝／守門的耐久優勢，但不讓功能型四星在後期只因初始面板低而落後。
-    var parityTarget = 520;
-    if (basePower < parityTarget) {
-      var deficit = parityTarget - basePower;
-      stats.maxHp += Math.round(deficit * 1.5);
-      stats.attack += Math.round(deficit * 0.5);
-      stats.defense += Math.round(deficit * 0.35);
-      stats.speed = Math.max(stats.speed, 100);
-      stats.growthBand = "parity";
-      stats.growthRates = { main: 0.05, defense: 0.036, speed: 0.014 };
-    } else {
-      stats.growthBand = "standard";
-      stats.growthRates = { main: 0.04, defense: 0.03, speed: 0.012 };
-    }
+    var lower = stats.rarity === 4 ? 430 : 370;
+    var upper = stats.rarity === 4 ? 490 : 430;
+    var scale = Math.min(upper, Math.max(lower, basePower)) / basePower;
+    stats.maxHp = Math.round(stats.maxHp * scale);
+    stats.attack = Math.round(stats.attack * scale);
+    stats.defense = Math.round(stats.defense * scale);
+    stats.growthBand = "normalized";
+    stats.growthRates = { main: 0.0114, defense: 0.0114, speed: 0.0007 };
   });
 
   var updateCycle = "2026-10-01-official-1-0";

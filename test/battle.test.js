@@ -46,12 +46,40 @@ test("正式試煉 30 關以角色成長分段校準", () => {
     return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
   }
   assert.equal(trialStages[0].recommendedPower, 900);
-  assert.equal(trialStages[29].recommendedPower, 3394);
+  assert.equal(trialStages[29].recommendedPower, 3900);
   assert.equal(run(1, trialStages[0]).rounds >= 8, true);
   assert.equal(run(60, trialStages[9]).rounds >= 20 && run(60, trialStages[9]).rounds <= 45, true);
   assert.equal(run(45, trialStages[9]).rounds <= 60, true);
   assert.equal(run(90, trialStages[29]).won, true);
   assert.equal(run(25, trialStages[29]).won, false);
+});
+
+test("試煉終段以滿等四星二至三命隊伍校準", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const teams = [
+    ["celesia", "magenta", "hina", "siyeon"],
+    ["celesia", "harlow", "siyeon", "magenta"],
+    ["chodan", "magenta", "hina", "siyeon"]
+  ];
+  for (const team of teams) {
+    const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 2 }]));
+    const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
+    const last = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
+    assert.equal(last.won, true, team.join(","));
+    assert.ok(last.rounds >= 18 && last.rounds <= 40, team.join(",") + "：" + last.rounds);
+    assert.ok(teamPower(team, stats) >= trialStages[29].recommendedPower * .9);
+    const c3Progress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 3 }]));
+    const c3Stats = buildEffectiveStats(characterBattleStats, { characterProgress: c3Progress });
+    for (const seed of [.1, .5, .9]) {
+      const c3Result = simulateBattle({ team, stats: c3Stats, stage: trialStages[29], rng: () => seed });
+      assert.equal(c3Result.won, true, team.join(",") + " C3 seed " + seed);
+      assert.ok(c3Result.rounds <= 45, team.join(",") + " C3 seed " + seed);
+    }
+  }
+  const lowTeam = teams[0];
+  const lowProgress = Object.fromEntries(lowTeam.map((id) => [id, { level: 60, constellation: 0 }]));
+  const lowStats = buildEffectiveStats(characterBattleStats, { characterProgress: lowProgress });
+  assert.equal(simulateBattle({ team: lowTeam, stats: lowStats, stage: trialStages[29], rng: () => .5 }).won, false);
 });
 
 test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終幕", () => {
@@ -136,7 +164,7 @@ test("四星低基礎功能型角色在 70–90 等使用平衡成長帶", () =>
   assert.equal(characterBattleStats.elorna.growthRates.main, 0.0114);
 });
 
-test("命座成長讓三星滿命滿等接近四星 55 等，四星滿命也有明顯回饋", () => {
+test("命座讓三星維持可用、四星保有較高上限且舊版角色不膨脹", () => {
   const { buildEffectiveStats, constellationGrowth } = require("../src/battle.js");
   const ids = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].growthModel !== "first-major");
   const threeIds = ids.filter((id) => characterBattleStats[id].rarity === 3);
@@ -150,12 +178,15 @@ test("命座成長讓三星滿命滿等接近四星 55 等，四星滿命也有�
   const fourAt90C0 = powerList(statsFor(90, 0, fourIds), fourIds);
   const fourAt90C6 = powerList(statsFor(90, 6, fourIds), fourIds);
   const median = (values) => values[Math.floor(values.length / 2)];
-  assert.equal(constellationGrowth.threeStar.main, 0.4);
-  assert.equal(constellationGrowth.fourStar.main, 0.12);
+  assert.equal(constellationGrowth.threeStar.main, 0.012);
+  assert.equal(constellationGrowth.fourStar.main, 0.03);
   assert.ok(median(threeAt90C6) >= median(fourAt55) * 0.8);
   assert.ok(Math.max(...threeAt90C6) >= median(fourAt55) * 0.8);
   assert.ok(Math.max(...threeAt90C6) < Math.min(...fourAt90C6));
-  assert.ok(median(fourAt90C6) >= median(fourAt90C0) * 1.1);
+  assert.ok(median(fourAt90C6) >= median(fourAt90C0) * 1.07);
+  const firstMajorFour = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4 && characterBattleStats[id].growthModel === "first-major");
+  const firstMajorAt90C6 = powerList(statsFor(90, 6, firstMajorFour), firstMajorFour);
+  assert.ok(Math.max(...fourAt90C6) <= Math.max(...firstMajorAt90C6) * 1.02);
 });
 
 test("第一大版本18名角色均有專屬技能與六個命座，未開放版本仍維持鎖定", () => {

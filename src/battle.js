@@ -131,12 +131,11 @@
     }, 0);
   }
 
-  // 命座是角色抽到重複後的主要成長回饋。三星的基礎面板與四星差距較大，
-  // 因此三星採用較明顯但仍有上限的追趕倍率；四星則提升每命的存在感，
-  // 讓滿命四星在高難度試煉有價值，但不會靠命座把推薦戰力直接打穿。
+  // 命座以專屬機制為主要回饋；跨版本共用同一面板成長帶。
+  // 三星滿命仍可用，但不靠面板倍率超過同定位四星。
   var CONSTELLATION_GROWTH = Object.freeze({
-    threeStar: Object.freeze({ main: 0.4, defense: 0.13, speed: 0.022, skill: 0.02 }),
-    fourStar: Object.freeze({ main: 0.12, defense: 0.08, speed: 0.025, skill: 0.018 })
+    threeStar: Object.freeze({ main: 0.012, defense: 0.02, speed: 0.004, skill: 0.018 }),
+    fourStar: Object.freeze({ main: 0.03, defense: 0.02, speed: 0.004, skill: 0.018 })
   });
 
   function constellationGrowthFor(rarity) {
@@ -158,9 +157,7 @@
       var mainGrowth = Number(growth.main) || (isFourStar ? 0.04 : 0.03);
       var defenseGrowth = Number(growth.defense) || (isFourStar ? 0.03 : 0.022);
       var speedGrowth = Number(growth.speed) || (isFourStar ? 0.012 : 0.009);
-      var constellationGrowth = base.growthModel === "first-major"
-        ? (isFourStar ? { main: .03, defense: .02, speed: .004, skill: .018 } : { main: .012, defense: .02, speed: .004, skill: .018 })
-        : constellationGrowthFor(base.rarity);
+      var constellationGrowth = constellationGrowthFor(base.rarity);
       var multiplier = 1 + (level - 1) * mainGrowth + constellation * constellationGrowth.main;
       base.maxHp = Math.round(base.maxHp * multiplier);
       base.attack = Math.round(base.attack * multiplier);
