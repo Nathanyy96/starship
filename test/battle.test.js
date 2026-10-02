@@ -22,6 +22,7 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.equal(trialReward.characterExp, 1800);
   assert.equal(battle.environment, trialStages[0].environment);
   assert.equal(battle.enemyTrait, trialStages[0].enemyTrait);
+  assert.ok(battle.enemies.every((enemy) => enemy.image === trialStages[0].enemies[0].image));
   assert.equal(trialMaxRewards, 20);
 });
 
@@ -44,7 +45,8 @@ test("正式試煉 30 關以角色成長分段校準", () => {
     const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation: 0 }]));
     return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
   }
-  assert.equal(trialStages[29].recommendedPower, 6040);
+  assert.equal(trialStages[0].recommendedPower, 900);
+  assert.equal(trialStages[29].recommendedPower, 3394);
   assert.equal(run(1, trialStages[0]).rounds >= 8, true);
   assert.equal(run(60, trialStages[9]).rounds >= 20 && run(60, trialStages[9]).rounds <= 45, true);
   assert.equal(run(45, trialStages[9]).rounds <= 60, true);
@@ -56,7 +58,7 @@ test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終�
   const finalNode = voyageConfig.nodes.find((node) => node.id === "voyage-final");
   const voyageFinal = voyageBattleStages.find((stage) => stage.id === finalNode.stageId);
   assert.ok(voyageFinal);
-  assert.equal(voyageFinal.recommendedPower, 5400);
+  assert.equal(voyageFinal.recommendedPower, 2600);
   assert.ok(voyageFinal.recommendedPower < trialStages[29].recommendedPower);
   assert.equal(voyageFinal.modifiers.enemyAttack, 0.86);
   assert.equal(voyageFinal.finalStage, true);

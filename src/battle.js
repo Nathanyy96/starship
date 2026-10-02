@@ -96,6 +96,7 @@
         result.push({
           id: "enemy-" + groupIndex + "-" + index,
           name: template.name + (template.count > 1 ? " " + (index + 1) : ""),
+          image: template.image || "",
           maxHp: template.maxHp,
           hp: template.maxHp,
           attack: template.attack,
@@ -621,7 +622,7 @@
       synergy: synergy,
       luck: luck,
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp, skillUses: unit.skillUses }; }),
-      enemies: enemies.map(function (unit) { return { name: unit.name, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
+      enemies: enemies.map(function (unit) { return { name: unit.name, image: unit.image, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
       logs: logs.slice(-100),
       reward: won ? clone(stage.reward || {}) : { starSand: 0, characterExp: 0 }
     };

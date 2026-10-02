@@ -58,17 +58,17 @@
   };
   return route.map(function (row, index) {
     var id = index + 1;
-    var hp = 1300 + index * 160 + Math.max(0, 5 - index) * 120;
-    var attack = Math.round((72 + index * 8) * (1 + index * 0.3 / 29));
+    var hp = Math.round((1300 + index * 160 + Math.max(0, 5 - index) * 120) * (1 + index * 0.01));
+    var attack = Math.round((72 + index * 8) * (1 + index * 0.3 / 29) * (1 + index * 0.025));
     var defense = 48 + index * 5;
     var boss = id % 5 === 0;
-    var bossHp = { 5: 3.5, 10: 4.75, 15: 2.7, 20: 2.5, 25: 2.1, 30: 1.5 };
+    var bossHp = { 5: 2.5, 10: 3.4, 15: 1.95, 20: 1.8, 25: 1.5, 30: 1.1 };
     var names = [row[3], row[4]];
     var enemies = names.map(function (key, position) {
       var monster = species[key];
       return {
         name: monster.name, image: monster.image,
-        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : 1.3) : 1.5)),
+        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : id === 30 ? 1.1 : 1.3) : 1.5)),
         attack: Math.round(attack * (boss && position === 0 ? 1.08 : 1)),
         defense: Math.round(defense * (boss && position === 0 ? 1.12 : 1)),
         speed: monster.speed + Math.min(25, Math.floor(index / 3)), count: 1
@@ -76,7 +76,7 @@
     });
     if (names[0] === names[1] && !boss) { enemies[0].count = 2; enemies.pop(); }
     return {
-      id: id, name: row[0], region: row[1], recommendedPower: id <= 10 ? Math.round(2400 + index * 2100 / 9) : Math.round(4500 + (id - 10) * 77),
+      id: id, name: row[0], region: row[1], recommendedPower: Math.round(900 + index * 86),
       environment: "圖鑑模擬場", environmentEffect: "此關為訓練模擬，不代表主線新增遭遇。",
       modifiers: boss ? { enemyAttack: 1.04, enemyDefense: 1.03 } : {},
       enemyTrait: effects[row[2]][0], enemyTraitEffect: effects[row[2]][1], trialRule: row[2],

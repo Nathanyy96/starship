@@ -412,8 +412,8 @@
   // 用 1.0–2.5 已取得角色穩定嘗試的範圍；高難度挑戰仍留在 trialStages。
   var voyageBattleStages = [
     { id: "voyage-combat-1", name: "碎光狹道", region: "星海迷航", recommendedPower: 1200, environment: "碎光航道", environmentEffect: "速度較快的角色容易先手，適合熟悉自走棋戰鬥", modifiers: { teamSpeed: 1.04, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "碎光擾動", enemyTraitEffect: "敵人數量較多但單體傷害較低，先處理高速單位即可", trialRule: "echo", enemies: [{ name: "碎光漂獸", maxHp: 1050, attack: 112, defense: 72, speed: 84, count: 2 }, { name: "碎光航標核", maxHp: 1500, attack: 118, defense: 90, speed: 58, count: 1 }], reward: {} },
-    { id: "voyage-combat-2", name: "折光風暴", region: "星海迷航", recommendedPower: 3500, environment: "折光風暴帶", environmentEffect: "敵方增益會短暫反射，安排技能順序即可拆解", modifiers: { teamAttack: 1.03, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "折光回聲", enemyTraitEffect: "首領第一次施放技能後獲得短暫護盾，破盾後會回到一般狀態", trialRule: "copy", enemies: [{ name: "折光拾荒獸", maxHp: 2850, attack: 188, defense: 132, speed: 105, count: 2 }, { name: "折光風暴核", maxHp: 4600, attack: 222, defense: 168, speed: 74, count: 1 }], reward: {} },
-    { id: "voyage-final", name: "星海終端守門者", region: "未命名終端", recommendedPower: 5400, recommendedPowerNote: "星海迷航終幕建議隊伍戰力約 5,400；低於此值仍可透過治療、護盾與協同通關。", environment: "星海終端", environmentEffect: "守門者會輪換護盾與壓制，但不使用星界試煉終局的高傷害規則", modifiers: { teamAttack: 1.05, teamDefense: 1.03, enemyAttack: 0.86, enemyDefense: 0.92 }, enemyTrait: "終端守門", enemyTraitEffect: "護衛倒下後首領會短暫暴露弱點，先擊破護衛能降低終幕壓力", trialRule: "shield", finalStage: true, enemies: [{ name: "星海護航體", maxHp: 4200, attack: 250, defense: 178, speed: 118, count: 2 }, { name: "星海終端守門者", maxHp: 7200, attack: 302, defense: 228, speed: 82, count: 1 }], reward: {} }
+    { id: "voyage-combat-2", name: "折光風暴", region: "星海迷航", recommendedPower: 2100, environment: "折光風暴帶", environmentEffect: "敵方增益會短暫反射，安排技能順序即可拆解", modifiers: { teamAttack: 1.03, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "折光回聲", enemyTraitEffect: "首領第一次施放技能後獲得短暫護盾，破盾後會回到一般狀態", trialRule: "copy", enemies: [{ name: "折光拾荒獸", maxHp: 2850, attack: 188, defense: 132, speed: 105, count: 2 }, { name: "折光風暴核", maxHp: 4600, attack: 222, defense: 168, speed: 74, count: 1 }], reward: {} },
+    { id: "voyage-final", name: "星海終端守門者", region: "未命名終端", recommendedPower: 2600, recommendedPowerNote: "星海迷航終幕建議以約 2,600 面板戰力的完整隊伍挑戰；低於此值仍可透過治療、護盾與協同通關。", environment: "星海終端", environmentEffect: "守門者會輪換護盾與壓制，但不使用星界試煉終局的高傷害規則", modifiers: { teamAttack: 1.05, teamDefense: 1.03, enemyAttack: 0.86, enemyDefense: 0.92 }, enemyTrait: "終端守門", enemyTraitEffect: "護衛倒下後首領會短暫暴露弱點，先擊破護衛能降低終幕壓力", trialRule: "shield", finalStage: true, enemies: [{ name: "星海護航體", maxHp: 4200, attack: 250, defense: 178, speed: 118, count: 2 }, { name: "星海終端守門者", maxHp: 7200, attack: 302, defense: 228, speed: 82, count: 1 }], reward: {} }
   ];
 
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
@@ -2141,3 +2141,4 @@
     updateReward: Object.freeze({ starSand: 3200, characterExp: 2200 })
   };
 }));
+
