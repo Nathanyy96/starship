@@ -68,7 +68,7 @@
     }
     return powerAnchors[powerAnchors.length - 1][1];
   }
-  return route.map(function (row, index) {
+  var stages = route.map(function (row, index) {
     var id = index + 1;
     var hp = Math.round((1300 + index * 160 + Math.max(0, 5 - index) * 120) * (1 + index * 0.01));
     var attack = Math.round((72 + index * 8) * (1 + index * 0.3 / 29) * (1 + index * 0.025));
@@ -76,7 +76,7 @@
     var boss = id % 5 === 0;
     var bossHp = { 5: 2.5, 10: 3.4, 15: 1.95, 20: 1.8, 25: 1.5, 30: 1.1 };
     // 終段按機制校準有效耐久，使難度逐關逼近終局，而非只在第30關跳升。
-    var lateHpScale = { 21: 1.3, 22: 1.45, 23: 1.6, 24: 1.3, 25: 2, 26: 1.25, 27: 1.8, 28: 1.9, 29: 1.6, 30: 2.64 };
+    var lateHpScale = { 21: 1.3, 22: 1.45, 23: 1.4, 24: 1.34, 25: 2, 26: 1.32, 27: 1.6, 28: 1.7, 29: 1.62, 30: 2.64 };
     var names = [row[3], row[4]];
     var enemies = names.map(function (key, position) {
       var monster = species[key];
@@ -100,4 +100,18 @@
       reward: { starSand: 75, characterExp: 1800 }
     };
   });
+  // 首領關有額外機制，但下一關的基礎耐久不能倒退；否則玩家會感到難度重置。
+  // 逐關以整隊敵方生命作下限，保留原本攻擊、機制和首領倍率的差異。
+  var previousTotalHp = 0;
+  stages.forEach(function (stage) {
+    var currentTotalHp = stage.enemies.reduce(function (total, enemy) { return total + enemy.maxHp * (enemy.count || 1); }, 0);
+    var minimumTotalHp = Math.ceil(previousTotalHp * 1.025);
+    if (currentTotalHp < minimumTotalHp) {
+      var scale = minimumTotalHp / currentTotalHp;
+      stage.enemies.forEach(function (enemy) { enemy.maxHp = Math.ceil(enemy.maxHp * scale); });
+      currentTotalHp = stage.enemies.reduce(function (total, enemy) { return total + enemy.maxHp * (enemy.count || 1); }, 0);
+    }
+    previousTotalHp = currentTotalHp;
+  });
+  return stages;
 }));

@@ -34,6 +34,10 @@ test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.equal(trialStages.length, 30);
   assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 30 }, (_, index) => index + 1));
   assert.ok(trialStages.every((stage, index) => index === 0 || stage.recommendedPower > trialStages[index - 1].recommendedPower));
+  const totalHp = (stage) => stage.enemies.reduce((sum, enemy) => sum + enemy.maxHp * (enemy.count || 1), 0);
+  const totalAttack = (stage) => stage.enemies.reduce((sum, enemy) => sum + enemy.attack * (enemy.count || 1), 0);
+  assert.ok(trialStages.every((stage, index) => index === 0 || totalHp(stage) > totalHp(trialStages[index - 1])), "30 關敵方基礎耐久不可倒退");
+  assert.ok(trialStages.every((stage, index) => index === 0 || totalAttack(stage) > totalAttack(trialStages[index - 1])), "30 關敵方攻擊不可倒退");
   assert.equal(trialStages[29].finalStage, true);
   assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
 });
