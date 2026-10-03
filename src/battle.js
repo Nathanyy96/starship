@@ -131,11 +131,11 @@
     }, 0);
   }
 
-  // 命座以專屬機制為主要回饋；跨版本共用同一面板成長帶。
-  // 三星滿命仍可用，但不靠面板倍率超過同定位四星。
+  // 命座乘在等級後的面板上，避免高等級時 C2 與 C0 幾乎沒有差距。
+  // 三星仍低於同定位四星；伊薩爾由資料層給較高的等級曲線。
   var CONSTELLATION_GROWTH = Object.freeze({
-    threeStar: Object.freeze({ main: 0.012, defense: 0.02, speed: 0.004, skill: 0.018 }),
-    fourStar: Object.freeze({ main: 0.03, defense: 0.02, speed: 0.004, skill: 0.018 })
+    threeStar: Object.freeze({ main: 0.035, defense: 0.035, speed: 0.004, skill: 0.018 }),
+    fourStar: Object.freeze({ main: 0.1, defense: 0.1, speed: 0.004, skill: 0.018 })
   });
 
   function constellationGrowthFor(rarity) {
@@ -158,10 +158,10 @@
       var defenseGrowth = Number(growth.defense) || (isFourStar ? 0.03 : 0.022);
       var speedGrowth = Number(growth.speed) || (isFourStar ? 0.012 : 0.009);
       var constellationGrowth = constellationGrowthFor(base.rarity);
-      var multiplier = 1 + (level - 1) * mainGrowth + constellation * constellationGrowth.main;
+      var multiplier = (1 + (level - 1) * mainGrowth) * (1 + constellation * constellationGrowth.main);
       base.maxHp = Math.round(base.maxHp * multiplier);
       base.attack = Math.round(base.attack * multiplier);
-      base.defense = Math.round(base.defense * (1 + (level - 1) * defenseGrowth + constellation * constellationGrowth.defense));
+      base.defense = Math.round(base.defense * (1 + (level - 1) * defenseGrowth) * (1 + constellation * constellationGrowth.defense));
       base.speed = Math.round(base.speed * (1 + (level - 1) * speedGrowth + constellation * constellationGrowth.speed));
       if (Number.isFinite(Number(base.skillPower))) {
         base.skillPower = Number((Number(base.skillPower) * (1 + constellation * constellationGrowth.skill)).toFixed(4));
@@ -473,7 +473,7 @@
     var damage;
     if (rule === "shield" || rule === "copy" || rule === "finale") {
       // 開場護盾外最多重整兩次；護盾仍在或次數耗盡時改為進攻，
-      // 避免永久刷新把戰鬥推到 120 回合的演算上限。
+      // 避免永久刷新把戰鬥推到演算保護上限。
       if (!actor.shield && (actor.shieldRefreshes || 0) < 2) {
         actor.shield = Math.round(actor.maxHp * (rule === "finale" ? .2 : .14));
         actor.shieldRefreshes = (actor.shieldRefreshes || 0) + 1;
@@ -552,8 +552,8 @@
     var round = 0;
     // 50 回合對有護盾、治療或多階段首領的隊伍過於短，會把尚未結束的戰鬥誤報成失敗。
     // 保留演算保護上限避免真正的永迴圈，但把上限提高並回傳獨立的 timeout 狀態。
-    var configuredMaxRounds = Number(options.maxRounds || stage.maxRounds || 120);
-    var maxRounds = Number.isFinite(configuredMaxRounds) && configuredMaxRounds >= 60 ? Math.floor(configuredMaxRounds) : 120;
+    var configuredMaxRounds = Number(options.maxRounds || stage.maxRounds || 180);
+    var maxRounds = Number.isFinite(configuredMaxRounds) && configuredMaxRounds >= 60 ? Math.floor(configuredMaxRounds) : 180;
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
       round += 1;
       combat.round = round;

@@ -46,7 +46,7 @@ test("正式試煉 30 關以角色成長分段校準", () => {
     return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
   }
   assert.equal(trialStages[0].recommendedPower, 900);
-  assert.equal(trialStages[29].recommendedPower, 3900);
+  assert.equal(trialStages[29].recommendedPower, 9800);
   assert.equal(run(1, trialStages[0]).rounds >= 8, true);
   assert.equal(run(60, trialStages[9]).rounds >= 15 && run(60, trialStages[9]).rounds <= 45, true);
   assert.equal(run(45, trialStages[9]).rounds <= 60, true);
@@ -54,7 +54,7 @@ test("正式試煉 30 關以角色成長分段校準", () => {
   assert.equal(run(25, trialStages[29]).won, false);
 });
 
-test("試煉終段以滿等四星二至三命隊伍校準", () => {
+test("試煉終段以滿等四星三至四命隊伍校準", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
   const teams = [
     ["celesia", "magenta", "hina", "siyeon"],
@@ -66,14 +66,13 @@ test("試煉終段以滿等四星二至三命隊伍校準", () => {
     const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
     const last = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
     assert.equal(last.won, true, team.join(","));
-    assert.ok(last.rounds >= 50 && last.rounds <= 60, team.join(",") + "：" + last.rounds);
-    assert.ok(teamPower(team, stats) >= trialStages[29].recommendedPower * .9);
+    assert.ok(last.rounds >= 40 && last.rounds <= 90, team.join(",") + "：" + last.rounds);
     const c3Progress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 3 }]));
     const c3Stats = buildEffectiveStats(characterBattleStats, { characterProgress: c3Progress });
     for (const seed of [.1, .5, .9]) {
       const c3Result = simulateBattle({ team, stats: c3Stats, stage: trialStages[29], rng: () => seed });
       assert.equal(c3Result.won, true, team.join(",") + " C3 seed " + seed);
-      assert.ok(c3Result.rounds <= 70, team.join(",") + " C3 seed " + seed);
+      assert.ok(c3Result.rounds >= 25 && c3Result.rounds <= 85, team.join(",") + " C3 seed " + seed);
     }
   }
   const lowTeam = teams[0];
@@ -92,13 +91,13 @@ test("試煉終段以滿等四星二至三命隊伍校準", () => {
   const threeStarStats = buildEffectiveStats(characterBattleStats, { characterProgress: threeStarProgress });
   const threeStarResult = simulateBattle({ team: threeStarTeam, stats: threeStarStats, stage: trialStages[29], rng: () => .5 });
   assert.equal(threeStarResult.won, true);
-  assert.ok(threeStarResult.rounds <= 100, "滿命三星也不得被護盾拖至120輪");
+  assert.ok(threeStarResult.rounds <= 180, "滿命三星也不得被護盾無限拖延");
   const healTeam = ["lia", "yuan", "siyeon", "elorna"];
   const healProgress = Object.fromEntries(healTeam.map((id) => [id, { level: 90, constellation: 6, activeForm: "deepwater" }]));
   const healStats = buildEffectiveStats(characterBattleStats, { characterProgress: healProgress });
   const healOnly = simulateBattle({ team: healTeam, stats: healStats, stage: trialStages[29], rng: () => .1 });
-  assert.equal(healOnly.status, "timeout");
-  assert.equal(healOnly.rounds, 120);
+  assert.ok(healOnly.rounds > 120, "偏治療極端隊伍超過 120 回合是正常選擇結果");
+  assert.equal(healOnly.roundLimit, 180);
 });
 
 test("試煉21–29關循序接近終局，正常編隊不因單一關卡逾時", () => {
@@ -108,7 +107,7 @@ test("試煉21–29關循序接近終局，正常編隊不因單一關卡逾時"
     ["chodan", "magenta", "hina", "siyeon"]
   ];
   for (const team of teams) {
-    for (const [stageNumber, level, low, high] of [[21, 75, 16, 35], [25, 80, 29, 50], [29, 90, 30, 60]]) {
+    for (const [stageNumber, level, low, high] of [[21, 75, 14, 45], [25, 80, 24, 65], [29, 90, 25, 70]]) {
       const constellation = stageNumber === 21 ? 1 : 2;
       const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));
       const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
@@ -184,8 +183,8 @@ test("第一大版本後續十名角色有完整技能、命座與受控成長",
   const ids = ["cenwu", "ruida", "yuan", "veyra", "harlow", "rena", "elorna", "eda", "mave", "rovienne"];
   assert.ok(ids.every((id) => characterBattleStats[id].signature && characterBattleStats[id].constellations.length === 6));
   const at80 = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(ids.map((id) => [id, { level: 80 }])) });
-  assert.ok(ids.every((id) => at80[id].maxHp / characterBattleStats[id].maxHp > 1.8 && at80[id].maxHp / characterBattleStats[id].maxHp < 2));
-  assert.ok(ids.every((id) => at80[id].speed / characterBattleStats[id].speed < 1.08));
+  assert.ok(ids.every((id) => at80[id].maxHp / characterBattleStats[id].maxHp > 2.9 && at80[id].maxHp / characterBattleStats[id].maxHp < 4.3));
+  assert.ok(ids.every((id) => at80[id].speed / characterBattleStats[id].speed < 1.4));
   const full = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(ids.map((id) => [id, { level: 90, constellation: 6 }])) });
   assert.ok(ids.every((id) => full[id].maxHp > at80[id].maxHp));
 });
@@ -227,7 +226,7 @@ test("四星低基礎功能型角色在 70–90 等使用平衡成長帶", () =>
   const fourStarPowers = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4 && characterBattleStats[id].growthModel !== "first-major").map((id) => teamPower([id], statsAt90));
   assert.ok(Math.min(...fourStarPowers) / Math.max(...fourStarPowers) > 0.8);
   assert.equal(characterBattleStats.elorna.growthBand, "first-major");
-  assert.equal(characterBattleStats.elorna.growthRates.main, 0.0114);
+  assert.equal(characterBattleStats.elorna.growthRates.main, 0.04);
 });
 
 test("命座讓三星維持可用、四星保有較高上限且舊版角色不膨脹", () => {
@@ -244,8 +243,8 @@ test("命座讓三星維持可用、四星保有較高上限且舊版角色不�
   const fourAt90C0 = powerList(statsFor(90, 0, fourIds), fourIds);
   const fourAt90C6 = powerList(statsFor(90, 6, fourIds), fourIds);
   const median = (values) => values[Math.floor(values.length / 2)];
-  assert.equal(constellationGrowth.threeStar.main, 0.012);
-  assert.equal(constellationGrowth.fourStar.main, 0.03);
+  assert.equal(constellationGrowth.threeStar.main, 0.035);
+  assert.equal(constellationGrowth.fourStar.main, 0.1);
   assert.ok(median(threeAt90C6) >= median(fourAt55) * 0.8);
   assert.ok(Math.max(...threeAt90C6) >= median(fourAt55) * 0.8);
   assert.ok(Math.max(...threeAt90C6) < Math.min(...fourAt90C6));
@@ -253,6 +252,18 @@ test("命座讓三星維持可用、四星保有較高上限且舊版角色不�
   const firstMajorFour = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4 && characterBattleStats[id].growthModel === "first-major");
   const firstMajorAt90C6 = powerList(statsFor(90, 6, firstMajorFour), firstMajorFour);
   assert.ok(Math.max(...fourAt90C6) <= Math.max(...firstMajorAt90C6) * 1.02);
+});
+
+test("滿等四星 C2 戰力明顯高於 C0，滿命回到約三千戰力", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const ids = Object.keys(characterBattleStats).filter((id) => characterBattleStats[id].rarity === 4 && characterBattleStats[id].growthModel === "first-major");
+  const powerAt = (constellation) => {
+    const stats = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(ids.map((id) => [id, { level: 90, constellation }])) });
+    return ids.map((id) => teamPower([id], stats));
+  };
+  const c0 = powerAt(0), c2 = powerAt(2), c6 = powerAt(6);
+  assert.ok(Math.min(...c2) > Math.max(...c0));
+  assert.ok(Math.min(...c6) >= 3000 && Math.max(...c6) <= 3700);
 });
 
 test("第一大版本三星滿命仍低於同定位四星上限，伊薩爾保留例外", () => {

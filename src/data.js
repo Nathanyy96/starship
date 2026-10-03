@@ -355,13 +355,16 @@
     characterBattleStats[id] = Object.assign({}, coreKits[id], { element: cards[id].element, growthModel: "first-major" });
   });
 
-  // 其他大版本的舊稿先映射到第一大版本的面板帶與等級曲線。
-  // 保留各角色生命／攻防比例與職能差異，避免用愈晚推出愈陡的成長率堆數值。
+  // 四星滿等回到可感知的約 3000 戰力成長帶；三星維持較低上限，伊薩爾例外。
+  // 所有版本沿用同一等級曲線，避免晚推出的角色只靠版本數值壓過舊角色。
   Object.keys(characterBattleStats).forEach(function (id) {
     var stats = characterBattleStats[id];
     if (stats.growthModel === "first-major") {
       stats.growthBand = "first-major";
-      stats.growthRates = { main: 0.0114, defense: 0.0114, speed: 0.0007 };
+      stats.growthRates = stats.rarity === 4
+        ? { main: 0.04, defense: 0.04, speed: 0.004 }
+        : id === "isar" ? { main: 0.035, defense: 0.035, speed: 0.004 }
+          : { main: 0.026, defense: 0.026, speed: 0.003 };
       return;
     }
     var basePower = Math.round(stats.maxHp / 10 + stats.attack + stats.defense);
@@ -372,7 +375,9 @@
     stats.attack = Math.round(stats.attack * scale);
     stats.defense = Math.round(stats.defense * scale);
     stats.growthBand = "normalized";
-    stats.growthRates = { main: 0.0114, defense: 0.0114, speed: 0.0007 };
+    stats.growthRates = stats.rarity === 4
+      ? { main: 0.04, defense: 0.04, speed: 0.004 }
+      : { main: 0.026, defense: 0.026, speed: 0.003 };
   });
 
   var updateCycle = "2026-10-01-official-1-0";
@@ -468,6 +473,13 @@
   var voyageVersion = updateCycle;
   var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；舊版已取得者保留", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "大廳商店購買；角色開放後可選為上場造型", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
+  var newSeasonSkins = [
+    { id: "skin-celesia-fluffy-white-cat", characterId: "celesia", characterName: "瑟蕾雅", name: "瑟蕾雅｜綿綿白貓", themeLabel: "FLUFFY WHITE CAT", previewTitle: "綿綿白貓", previewImage: "./assets/cards/skins/celesia-new.png", accent: "#d9c6ef" },
+    { id: "skin-chodan-qwer", characterId: "chodan", characterName: "Chodan", name: "Chodan｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/chodan-new.png", accent: "#d4b7f7" },
+    { id: "skin-magenta-qwer", characterId: "magenta", characterName: "Magenta", name: "Magenta｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/magenta-new.png", accent: "#efb8d9" },
+    { id: "skin-hina-qwer", characterId: "hina", characterName: "Hina", name: "Hina｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/hina-new.png", accent: "#a5d6ee" },
+    { id: "skin-siyeon-qwer", characterId: "siyeon", characterName: "Siyeon", name: "Siyeon｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/siyeon-new.png", accent: "#e4b6c8" }
+  ].map(function (skin) { return Object.assign({ rarity: 4, description: "第一大版本角色圖鑑正式造型；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；取得角色後可選為上場造型" }, skin); });
   var voyageConfig = {
     version: voyageVersion,
     title: "星海迷航",
@@ -518,7 +530,7 @@
     },
     // seasonSkin 保留舊版資料相容性；seasonSkins 只供角色培養頁預覽，取得改由大廳商店處理。
     seasonSkin: maveSummerSkin,
-    seasonSkins: [maveSummerSkin, harlowSummerSkin]
+    seasonSkins: [maveSummerSkin, harlowSummerSkin].concat(newSeasonSkins)
   };
 
   // 大廳商店使用帳號資源；迷航商站仍只使用當次航程的星海碎片。
@@ -531,7 +543,7 @@
     skins: [
       { id: maveSummerSkin.id, name: maveSummerSkin.name, characterId: maveSummerSkin.characterId, image: maveSummerSkin.previewImage, sandCost: 2400 },
       { id: harlowSummerSkin.id, name: harlowSummerSkin.name, characterId: harlowSummerSkin.characterId, image: harlowSummerSkin.previewImage, sandCost: 2400 }
-    ],
+    ].concat(newSeasonSkins.map(function (skin) { return { id: skin.id, name: skin.name, characterId: skin.characterId, image: skin.previewImage, sandCost: 2400 }; })),
     conversions: [
       { id: "sand-to-exp", costKey: "starSand", cost: 160, rewardKey: "characterExp", reward: 3000, limit: null },
       { id: "exp-to-sand", costKey: "characterExp", cost: 6000, rewardKey: "starSand", reward: 80, limit: 20 }

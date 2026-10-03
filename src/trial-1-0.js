@@ -70,15 +70,15 @@
       var monster = species[key];
       return {
         name: monster.name, image: monster.image,
-        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : id === 30 ? 1.1 : 1.3) : 1.5 * (id >= 21 ? 1.35 : id >= 2 && id <= 10 ? 1.18 : 1)) * (lateHpScale[id] || 1)),
-        attack: Math.round(attack * (boss && position === 0 ? 1.08 : 1)),
+        maxHp: Math.round(hp * (boss ? (position === 0 ? bossHp[id] : id === 30 ? 1.1 : 1.3) : 1.5 * (id >= 21 ? 1.35 : id >= 2 && id <= 10 ? 1.18 : 1)) * (lateHpScale[id] || 1) * (1 + index * 0.06)),
+        attack: Math.round(attack * (boss && position === 0 ? 1.08 : 1) * (1 + index * 0.045)),
         defense: Math.round(defense * (boss && position === 0 ? 1.12 : 1)),
         speed: monster.speed + Math.min(25, Math.floor(index / 3)), count: 1
       };
     });
     if (names[0] === names[1] && !boss) { enemies[0].count = 2; enemies.pop(); }
     return {
-      id: id, name: row[0], region: row[1], recommendedPower: Math.round(900 + index * 100 + Math.max(0, id - 20) * 10),
+      id: id, name: row[0], region: row[1], recommendedPower: Math.round(900 + index * 100 + Math.max(0, id - 10) * 300),
       environment: "圖鑑模擬場", environmentEffect: "此關為訓練模擬，不代表主線新增遭遇。",
       modifiers: { enemyAttack: id === 30 ? .65 : id === 29 ? .85 : id >= 21 ? (boss ? 1.09 : 1.07) : boss ? 1.04 : id >= 2 && id <= 10 ? 1.08 : 1, enemyDefense: boss ? 1.03 : 1 },
       enemyTrait: effects[row[2]][0], enemyTraitEffect: effects[row[2]][1], trialRule: row[2],

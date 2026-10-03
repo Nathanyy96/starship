@@ -48,7 +48,7 @@ test("special ending grants resources once and no longer grants a free skin", ()
   assert.equal(game.getState().resources.starSand, sand);
   assert.equal(game.getState().cosmetics.skins[newId], undefined);
   assert.equal(voyageConfig.seasonSkin.id, newId);
-  assert.deepEqual(voyageConfig.seasonSkins.map(s => s.id), [newId, "skin-harlow-summer-beach-party"]);
+  assert.deepEqual(voyageConfig.seasonSkins.map(s => s.id), [newId, "skin-harlow-summer-beach-party", "skin-celesia-fluffy-white-cat", "skin-chodan-qwer", "skin-magenta-qwer", "skin-hina-qwer", "skin-siyeon-qwer"]);
   for (const skin of voyageConfig.seasonSkins) assert.ok(fs.existsSync(path.resolve(__dirname, "..", skin.previewImage)));
   assert.equal(fs.existsSync(path.resolve(__dirname, "../assets/cards/skins/mave-luminous-archive.png")), false);
 });

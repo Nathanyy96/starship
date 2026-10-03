@@ -174,7 +174,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.routes.length, 3);
   assert.ok(voyageConfig.endingRewards.hidden && voyageConfig.endingRewards.special.starMarks);
   assert.equal(voyageConfig.endingRewards.special.skinId, undefined);
-  assert.equal(voyageConfig.seasonSkins.length, 2);
+  assert.equal(voyageConfig.seasonSkins.length, 7);
   assert.equal(voyageConfig.seasonSkins[0].id, "skin-mave-summer-beach-party");
   assert.equal(voyageConfig.seasonSkins[0].characterId, "mave");
   assert.equal(voyageConfig.seasonSkins[1].id, "skin-harlow-summer-beach-party");

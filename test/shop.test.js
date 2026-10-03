@@ -2,6 +2,8 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { GachaGame } = require("../src/gacha.js");
 const { banners, shopCatalog, voyageConfig } = require("../src/data.js");
 
@@ -54,4 +56,18 @@ test("unreleased character skin can be reserved without unlocking the character"
   assert.ok(game.getState().cosmetics.skins[skin.id]);
   assert.equal(game.getState().collection.harlow, undefined);
   assert.throws(() => game.equipSkin({ cardId: "harlow", skinId: skin.id }), /請先取得角色/);
+});
+
+test("five new catalog outfits have art, cost 2400 sand, and equip only on their owner", () => {
+  const ids = ["celesia", "chodan", "magenta", "hina", "siyeon"];
+  for (const characterId of ids) {
+    const skin = shopCatalog.skins.find((item) => item.characterId === characterId);
+    assert.ok(skin, characterId);
+    assert.equal(skin.sandCost, 2400);
+    assert.ok(fs.existsSync(path.resolve(__dirname, "..", skin.image)));
+    const game = makeGame({ resources: { starSand: 3000 }, collection: { [characterId]: 1 } });
+    game.shopAction({ kind: "skin", id: skin.id, payment: "starSand" });
+    game.equipSkin({ cardId: characterId, skinId: skin.id });
+    assert.equal(game.getState().cosmetics.equippedSkins[characterId], skin.id);
+  }
 });
