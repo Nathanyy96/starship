@@ -1029,6 +1029,15 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .character-variant img { display: block; width: min(100%, 320px); margin: 12px auto; border-radius: 9px; }
 .character-variant p { color: #aebcda; font-size: .72rem; }
 .character-variant [data-character-form][aria-pressed="true"] { border-color: #75ded1; background: rgba(83, 204, 190, .18); color: #e6fffb; }
+.constellation-details ol { display: grid; gap: 10px; margin: 12px 0 0; padding-left: 24px; }
+.constellation-details li { padding-left: 2px; color: #e8e5fa; font-size: .78rem; line-height: 1.55; }
+.constellation-tip { display: block; margin-top: 3px; color: #b9c9e7; font-size: .72rem; line-height: 1.6; }
+.constellation-tip strong { margin-right: 8px; color: #8ff4e7; font-weight: 700; }
+.detail-upgrade { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 11px 12px; border: 1px solid rgba(112,233,223,.24); border-radius: 12px; background: rgba(112,233,223,.055); }
+.detail-upgrade-actions { display: flex; flex: 1; flex-wrap: wrap; gap: 8px; }
+.detail-upgrade-actions button { flex: 1 1 180px; min-height: 40px; margin: 0; }
+.detail-upgrade small { flex: 0 0 auto; color: #b9d6d4; font-size: .69rem; }
+@media (max-width: 680px) { .detail-upgrade { align-items: stretch; flex-direction: column; } .detail-upgrade-actions button { flex: 1; } }
 
 /* The release summon controls stay on the left; the selected character owns the right. */
 .resource-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }

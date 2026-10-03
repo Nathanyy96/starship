@@ -30,6 +30,16 @@ test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {
   assert.equal(teamPower(["celesia", "reyn"], characterBattleStats), 926);
 });
 
+test("Chodan 合拍提示對應實際隊友技能觸發與戰報", () => {
+  const stage = { id: 1, name: "合拍測試", trialRule: "basic", enemies: [{ name: "測試敵人", maxHp: 5000, attack: 1, defense: 0, speed: 1, count: 1 }] };
+  const team = ["chodan", "reyn", "siyeon", "magenta"];
+  const stats = Object.fromEntries(team.map((id) => [id, { ...characterBattleStats[id], constellation: id === "chodan" ? 6 : 0 }]));
+  const battle = simulateBattle({ team, stats, stage, rng: () => 0.5, maxRounds: 60 });
+  assert.ok(battle.logs.some((line) => line.includes("防護合拍讓")), "治療技能應讓受益隊友獲得 C2 減傷");
+  assert.ok(battle.logs.some((line) => line.includes("首次合拍") && line.includes("冷卻縮短")), "C4 應在首次合拍時觸發");
+  assert.ok(battle.logs.some((line) => line.includes("三位不同隊友完成合拍")), "C6 應要求三位不同隊友技能");
+});
+
 test("星界試煉擴充為 30 關並維持逐關升難", () => {
   assert.equal(trialStages.length, 30);
   assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 30 }, (_, index) => index + 1));

@@ -256,7 +256,7 @@
   function heal(target, rawAmount) {
     if (combat && combat.activeActor && !combat.activeActor.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) {
       rawAmount *= 1 + combat.beat.bonus;
-      if (combat.beat.owner.constellation >= 2) addEffect(target, "damageTaken", .92, 2);
+      if (combat.beat.owner.constellation >= 2) { addEffect(target, "damageTaken", .92, 2); combat.logs.push(displayName(combat.beat.owner) + " 的防護合拍讓 " + displayName(target) + " 短暫減傷。"); }
     }
     var amount = Math.max(0, Math.round(rawAmount * effectValue(target, "healingMultiplier", 1)));
     var before = target.hp;
@@ -282,7 +282,7 @@
   function giveShield(unit, amount) {
     if (combat && combat.activeActor && !combat.activeActor.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) {
       amount *= 1 + combat.beat.bonus;
-      if (combat.beat.owner.constellation >= 2) addEffect(unit, "damageTaken", .92, 2);
+      if (combat.beat.owner.constellation >= 2) { addEffect(unit, "damageTaken", .92, 2); combat.logs.push(displayName(combat.beat.owner) + " 的防護合拍讓 " + displayName(unit) + " 短暫減傷。"); }
     }
     unit.shield = Math.min(Math.round(unit.maxHp * .28), Math.max(0, unit.shield || 0) + Math.round(amount));
   }
@@ -549,6 +549,7 @@
       enemy.speed = Math.max(1, Math.round(enemy.speed * modifiers.enemySpeed));
     });
     var logs = ["第 " + stage.id + " 關：「" + stage.name + "」自走棋戰鬥開始。", "環境：「" + (stage.environment || "一般試煉") + "」｜" + (stage.environmentEffect || "沒有額外環境效果。"), "敵方特性：「" + (stage.enemyTrait || "一般") + "」｜" + (stage.enemyTraitEffect || "沒有額外特性。"), "隊伍協同 " + Math.round(synergy * 100) + "%，本局變動 " + Math.round(luck * 100) + "%。"];
+    combat.logs = logs;
     applyStageOpening(stage, team, enemies, logs);
     var round = 0;
     // 50 回合對有護盾、治療或多階段首領的隊伍過於短，會把尚未結束的戰鬥誤報成失敗。
@@ -580,9 +581,8 @@
             if (isTeam && prospectiveTarget && prospectiveTarget.hp < beforeSkillHp) afterHit(actor, prospectiveTarget, true);
             if (beat) {
               beat.remaining -= 1; beat.used.push(actor.id);
-              if (beat.owner.constellation >= 2 && (!actor.signature || ["heal", "guard", "support"].includes(actor.signature.type))) addEffect(actor, "damageTaken", .92, 2);
-              if (beat.owner.constellation >= 4 && beat.used.length === 1 && !beat.owner.c4RefundUsed) { beat.owner.skillCooldown = Math.max(0, beat.owner.skillCooldown - 1); beat.owner.c4RefundUsed = true; }
-              if (beat.owner.constellation >= 6 && new Set(beat.used).size >= 3 && !beat.finalUsed) { beat.remaining += 1; beat.finalUsed = true; team.forEach(function (unit) { addEffect(unit, "speedMultiplier", 1.05, 2); }); }
+              if (beat.owner.constellation >= 4 && beat.used.length === 1 && !beat.owner.c4RefundUsed) { beat.owner.skillCooldown = Math.max(0, beat.owner.skillCooldown - 1); beat.owner.c4RefundUsed = true; logs.push(displayName(beat.owner) + " 首次合拍，月式鼓點冷卻縮短。"); }
+              if (beat.owner.constellation >= 6 && new Set(beat.used).size >= 3 && !beat.finalUsed) { beat.remaining += 1; beat.finalUsed = true; team.forEach(function (unit) { addEffect(unit, "speedMultiplier", 1.05, 2); }); logs.push("三位不同隊友完成合拍，追加一次合拍並提高全隊速度。"); }
             }
             actor.skillUses += 1;
             actor.skillCooldown = actor.skillCooldownMax;

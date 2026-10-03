@@ -867,12 +867,26 @@
       var breakthroughNote = requirement ? (progress.breakthrough ? "已完成 80 等突破，可繼續升到 90 等" : "建議 Boss｜" + escapeHtml((bossStageById(requirement.bossId) || {}).name || "未設定") + "　指定材料｜" + escapeHtml(requirement.materialName) + " " + materialAmount + "/" + requirement.cost + "　通用印記｜" + universalAmount + "（可替代）") : "突破材料設定尚未載入";
       var ascendedPreview = card.id === "isar" && data.isarAscended ? "<details class=\"character-variant\"><summary>查看伊薩爾 4★ 升格卡面（圖鑑預覽）</summary><img src=\"" + escapeHtml(data.isarAscended.portrait) + "\" alt=\"伊薩爾四星升格卡面\" loading=\"lazy\"><p>升格卡面與三星原稿分開保留，目前不加入召集池。</p></details>" : "";
       var formControls = card.id === "elorna" && copies ? "<section class=\"character-variant\"><h4>上場型態</h4><p>兩型態共享面板與命座；陸地偏測線，深水偏救援。</p><div class=\"detail-actions\"><button class=\"secondary-action\" data-character-form=\"land\" type=\"button\" aria-pressed=\"" + (progress.activeForm !== "deepwater") + "\">陸地／淺水</button><button class=\"secondary-action\" data-character-form=\"deepwater\" type=\"button\" aria-pressed=\"" + (progress.activeForm === "deepwater") + "\">深水魚尾</button></div></section>" : "";
-      var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant\"><summary>查看 C1–C6 命座效果</summary><ol>" + stats.constellations.map(function (effect) { return "<li>" + escapeHtml(effect) + "</li>"; }).join("") + "</ol></details>" : "";
-      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div><div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + developAction + breakthroughAction + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
+      var constellationTips = {
+        chodan: {
+          1: "Chodan 施放「月式鼓點」後，由其他隊友施放技能消耗合拍；普通攻擊不算。C1 可讓合拍從 2 次增加為 3 次。",
+          2: "讓莉亞、Siyeon 等治療角色，或能施放護盾的隊友，在合拍期間使用技能；接受治療或護盾的隊友會短暫減傷。",
+          4: "其他隊友首次使用合拍時，Chodan 的技能冷卻縮短 1；每場戰鬥只觸發一次。",
+          6: "要帶滿四人隊：Chodan 以外的 3 位不同隊友，須在合拍持續期間各施放一次技能；普通攻擊不計入。"
+        },
+        celesia: {
+          2: "讓兩位不同隊友命中「星痕」目標，第二位隊友會觸發追加傷害。",
+          6: "需要三位不同隊友接續命中同一個「星痕」目標；建議帶滿四人隊。"
+        },
+        hina: { 2: "讓其他隊友命中 Hina 已標記的敵人，才能觸發追擊。" },
+        magenta: { 6: "讓其他隊友命中 Magenta 降防中的敵人，才能觸發回響。" }
+      };
+      var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
+      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>";
+      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
-      detail.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-    function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); }
+    function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); byId("character-detail").scrollIntoView({ behavior: "smooth", block: "start" }); }
     function equipCharacterSkin(skinId) {
       var request = { cardId: currentCharacterId, skinId: skinId };
       function finish(result) { updateGameFromState(result.state); currentCharacterSkinId = ""; renderCharacters(); renderCharacterDetail(currentCharacterId); byId("character-skin-message").textContent = "上場立繪已更新，戰鬥圖片也會使用此造型。"; }
@@ -946,10 +960,14 @@
       if (chapterId === "main-1-0" && progress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed) state.recruitment.story10ChoiceAvailable = true;
       updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); renderCharacters(); showMessage(finalScene ? "版本獎勵：" + rewardText(storyReward) + "已儲存。" : "本幕已讀完；讀完第五幕可領版本獎勵。", false);
     }
-    function developCharacter(cardId) {
+    function focusDetailUpgrade() {
+      var button = byId("character-detail").querySelector("[data-detail-develop]:not([disabled]), [data-detail-breakthrough]:not([disabled])");
+      if (button) button.focus({ preventScroll: true });
+    }
+    function developCharacter(cardId, fromDetail) {
       currentCharacterId = cardId;
-      if (remoteMode) { apiRequest("/api/player/character-development", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderLobby(); showMessage("角色升級完成，進度已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
-      try { game.developCharacter({ cardId: cardId }); saveLocalState(); renderCharacters(); renderLobby(); showMessage("角色升級完成，進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
+      if (remoteMode) { apiRequest("/api/player/character-development", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage("角色升級完成，進度已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
+      try { game.developCharacter({ cardId: cardId }); saveLocalState(); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage("角色升級完成，進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
     }
     function breakthroughCharacter(cardId) {
       currentCharacterId = cardId;
@@ -1723,7 +1741,7 @@
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
        var skinButton = event.target.closest("[data-skin-preview]"); if (skinButton) { var skinId = skinButton.getAttribute("data-skin-preview"); currentCharacterSkinId = currentCharacterSkinId === skinId ? "" : skinId; renderCharacterDetail(currentCharacterId); return; }
        var equipButton = event.target.closest("[data-skin-equip]"); if (equipButton && !equipButton.disabled) { equipCharacterSkin(equipButton.getAttribute("data-skin-equip")); return; }
-       var developButton = event.target.closest("[data-detail-develop]"); if (developButton) { developCharacter(developButton.getAttribute("data-detail-develop")); return; }
+       var developButton = event.target.closest("[data-detail-develop]"); if (developButton) { developCharacter(developButton.getAttribute("data-detail-develop"), true); return; }
        var breakthroughButton = event.target.closest("[data-detail-breakthrough]"); if (breakthroughButton) { breakthroughCharacter(breakthroughButton.getAttribute("data-detail-breakthrough")); return; }
     });
     byId("close-character-animation").addEventListener("click", closeCharacterAnimation);
