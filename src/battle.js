@@ -135,7 +135,7 @@
   // 三星仍低於同定位四星；伊薩爾由資料層給較高的等級曲線。
   var CONSTELLATION_GROWTH = Object.freeze({
     threeStar: Object.freeze({ main: 0.035, defense: 0.035, speed: 0.004, skill: 0.018 }),
-    fourStar: Object.freeze({ main: 0.1, defense: 0.1, speed: 0.004, skill: 0.018 })
+    fourStar: Object.freeze({ main: 0.08, defense: 0.08, speed: 0.004, skill: 0.01 })
   });
 
   function constellationGrowthFor(rarity) {
@@ -298,7 +298,7 @@
     if (kit.type === "core") return useCoreSkill(actor, allies, enemies, logs);
     var c = actor.constellation || 0;
     var duration = kit.duration + (c >= 1 ? 1 : 0);
-    var stronger = c >= 3 ? 1.2 : 1;
+    var stronger = c >= 3 ? 1.08 : 1;
     var living = alive(allies);
     var target = chooseTarget(actor, enemies);
     var subject = weakest(living);
@@ -376,7 +376,7 @@
     var target = chooseTarget(actor, enemies), subject = weakest(allies), damage = 0;
     if (["star", "hunt", "bass", "string"].includes(kind) && !target) return false;
     if (kind === "star" || kind === "string") {
-      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (kind === "star" ? c >= 3 ? 1.7 : 1.4 : c >= 3 ? 1.8 : 1.5));
+      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (kind === "star" ? c >= 3 ? 1.55 : 1.4 : c >= 3 ? 1.65 : 1.5));
       target.coreMarks = target.coreMarks || {};
       target.coreMarks[actor.id] = { until: combat.round + (c >= 1 ? 3 : 2), allies: [] };
       addEffect(target, "damageTaken", kind === "star" && c >= 5 ? 1.12 : 1.08, c >= 1 ? 3 : 2);
@@ -401,17 +401,17 @@
       if (c >= 2) actor.huntCounterUntil = combat.round + 1;
       if (c >= 4 && actor.hp < actor.maxHp * .5) { addEffect(actor, "defenseMultiplier", 1.15, 2); addEffect(actor, "healingMultiplier", 1.1, 2); }
     } else if (kind === "beat") {
-      alive(allies).forEach(function (unit) { addEffect(unit, "speedMultiplier", c >= 3 ? 1.13 : 1.1, 2); });
+      alive(allies).forEach(function (unit) { addEffect(unit, "speedMultiplier", c >= 3 ? 1.11 : 1.1, 2); });
       combat.beat = { owner: actor, remaining: c >= 1 ? 3 : 2, used: [], bonus: c >= 5 ? .14 : .1, until: combat.round + 2 };
     } else if (kind === "bass") {
       var debuffed = (target.effects || []).some(function (effect) { return effect.value < 1 || effect.name === "damageTaken" || effect.name === "marked"; });
-      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 2.1 : 1.75) * (debuffed ? c >= 5 ? 1.3 : 1.2 : 1));
-      alive(enemies).filter(function (unit) { return unit !== target; }).forEach(function (unit) { hit(unit, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 1.25 : 1.1) + (debuffed && c >= 2 ? actor.attack * .35 : 0)); });
+      damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 1.9 : 1.75) * (debuffed ? c >= 5 ? 1.25 : 1.2 : 1));
+      alive(enemies).filter(function (unit) { return unit !== target; }).forEach(function (unit) { hit(unit, actor.attack * effectValue(actor, "attackMultiplier", 1) * (c >= 3 ? 1.18 : 1.1) + (debuffed && c >= 2 ? actor.attack * .25 : 0)); });
       addEffect(target, "defenseMultiplier", c >= 1 ? .85 : .88, 2);
       target.coreMarks = target.coreMarks || {}; target.coreMarks.magenta = { until: combat.round + 2 };
     } else if (kind === "echo") {
       alive(allies).sort(function (a, b) { return a.hp / a.maxHp - b.hp / b.maxHp; }).slice(0, 2).forEach(function (unit) {
-        heal(unit, actor.maxHp * (c >= 3 ? .11 : .08));
+        heal(unit, actor.maxHp * (c >= 3 ? .095 : .08));
         unit.echoRecord = { amount: 0, ratio: c >= 5 ? .4 : .3, cap: c >= 5 ? .2 : c >= 1 ? .18 : .14, settleRound: combat.round + 2 };
       });
     }
@@ -484,6 +484,7 @@
       if (rule === "finale" && actor.skillUses % 3 === 2) allies.forEach(function (unit) { addEffect(unit, "attackMultiplier", .82, 2); });
     }
     if (!target) return false;
+    if (rule === "finale" && target.shield > 0) target.shield = Math.round(target.shield * .65);
     if (rule === "guard") {
       actor.guard = .38;
       var boss = alive(enemies).filter(function (unit) { return unit.isBoss; })[0];
@@ -492,12 +493,12 @@
       return true;
     }
     damage = hit(target, actor.attack * (rule === "overload" ? 1.42 : 1.2));
-    if (rule === "corrosion") addEffect(target, "healingMultiplier", .72, 2);
+    if (rule === "corrosion" || rule === "finale") addEffect(target, "healingMultiplier", rule === "finale" ? .85 : .72, 2);
     if (rule === "noise") target.skillCooldown = Math.max(target.skillCooldown, 1) + 1;
     if (rule === "multi" || rule === "mark" || rule === "execute") addEffect(target, "marked", 1, 2);
     if (rule === "execute" && target.hp < target.maxHp * .35) damage += hit(target, actor.attack * .42);
     if (rule === "decay") addEffect(actor, "attackMultiplier", 1.08, 2);
-    logs.push(displayName(actor) + " 發動「" + actor.skillName + "」，對 " + displayName(target) + " 造成 " + damage + " 傷害。" + (rule === "corrosion" ? "附加潮蝕。" : ""));
+    logs.push(displayName(actor) + " 發動「" + actor.skillName + "」，對 " + displayName(target) + " 造成 " + damage + " 傷害。" + (rule === "corrosion" ? "附加潮蝕。" : rule === "finale" ? "壓低治療並削弱護盾。" : ""));
     return true;
   }
 
@@ -510,7 +511,7 @@
     if (rule === "ambush") enemies.forEach(function (enemy) { addEffect(enemy, "speedMultiplier", 1.16, 1); });
     if (rule === "noise") team.forEach(function (unit) { unit.skillCooldown = 1; });
     if (rule === "corrosion") team.forEach(function (unit) { addEffect(unit, "healingMultiplier", 1, 999); });
-    if (rule === "mark" || rule === "multi" || rule === "execute") enemies.forEach(function (enemy) { enemy.targetWeakest = true; });
+    if (rule === "mark" || rule === "multi" || rule === "execute" || rule === "finale") enemies.forEach(function (enemy) { enemy.targetWeakest = true; });
     if (rule === "decay") logs.push("邊緣崩解會隨回合增加敵方攻擊，請把握爆發窗口。");
   }
 
@@ -580,7 +581,7 @@
             if (beat) {
               beat.remaining -= 1; beat.used.push(actor.id);
               if (beat.owner.constellation >= 2 && (!actor.signature || ["heal", "guard", "support"].includes(actor.signature.type))) addEffect(actor, "damageTaken", .92, 2);
-              if (beat.owner.constellation >= 4 && beat.used.length === 1) beat.owner.skillCooldown = Math.max(0, beat.owner.skillCooldown - 1);
+              if (beat.owner.constellation >= 4 && beat.used.length === 1 && !beat.owner.c4RefundUsed) { beat.owner.skillCooldown = Math.max(0, beat.owner.skillCooldown - 1); beat.owner.c4RefundUsed = true; }
               if (beat.owner.constellation >= 6 && new Set(beat.used).size >= 3 && !beat.finalUsed) { beat.remaining += 1; beat.finalUsed = true; team.forEach(function (unit) { addEffect(unit, "speedMultiplier", 1.05, 2); }); }
             }
             actor.skillUses += 1;
@@ -594,7 +595,7 @@
         var damage = hit(target, actor.attack * attackMultiplier);
         if (isTeam) afterHit(actor, target, false);
         logs.push(displayName(actor) + " 使用「" + (actor.attackName || "基本攻擊") + "」攻擊 " + displayName(target) + "，造成 " + damage + " 傷害。" );
-        if (!isTeam && stage.trialRule === "corrosion") addEffect(target, "healingMultiplier", .72, 2);
+        if (!isTeam && (stage.trialRule === "corrosion" || stage.trialRule === "finale")) addEffect(target, "healingMultiplier", stage.trialRule === "finale" ? .85 : .72, 2);
         if (!isTeam && (stage.trialRule === "multi" || stage.trialRule === "mark")) addEffect(target, "marked", 1, 2);
         if (target.hp <= 0) logs.push(displayName(target) + " 已離場。" );
       });
