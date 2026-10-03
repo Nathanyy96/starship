@@ -255,6 +255,19 @@ test("命座讓三星維持可用、四星保有較高上限且舊版角色不�
   assert.ok(Math.max(...fourAt90C6) <= Math.max(...firstMajorAt90C6) * 1.02);
 });
 
+test("第一大版本三星滿命仍低於同定位四星上限，伊薩爾保留例外", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const ids = ["reyn", "ruida", "lia", "yuan", "cenwu", "rena", "isar", "harlow", "siyeon", "veyra", "hina", "magenta"];
+  const progress = Object.fromEntries(ids.map((id) => [id, { level: 90, constellation: characterBattleStats[id].rarity === 3 ? 6 : 0 }]));
+  const stats = buildEffectiveStats(characterBattleStats, { characterProgress: progress });
+  for (const [three, four] of [["reyn", "harlow"], ["ruida", "harlow"], ["lia", "siyeon"], ["yuan", "siyeon"], ["cenwu", "veyra"], ["rena", "hina"]]) {
+    assert.ok(teamPower([three], stats) < teamPower([four], stats), three + " / " + four);
+  }
+  assert.ok(teamPower(["isar"], stats) >= teamPower(["magenta"], stats));
+  assert.ok(characterBattleStats.harlow.signature.shield > characterBattleStats.ruida.signature.shield);
+  assert.ok(characterBattleStats.veyra.signature.markBonus > characterBattleStats.cenwu.signature.markBonus);
+});
+
 test("第一大版本18名角色均有專屬技能與六個命座，未開放版本仍維持鎖定", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
   const ids = ["celesia", "reyn", "lia", "isar", "chodan", "magenta", "hina", "siyeon", "cenwu", "ruida", "yuan", "veyra", "harlow", "rena", "elorna", "eda", "mave", "rovienne"];
