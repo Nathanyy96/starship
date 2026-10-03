@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { simulateBattle, teamPower } = require("../src/battle.js");
-const { characterBattleStats, trialStages, trialReward, trialMaxRewards, voyageBattleStages, voyageConfig } = require("../src/data.js");
+const { characterBattleStats, trialStages, trialReward, trialMaxRewards, bossStages, voyageBattleStages, voyageConfig } = require("../src/data.js");
 
 test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () => {
   const battle = simulateBattle({
@@ -145,6 +145,18 @@ test("第一大版本同職能替換在終關沒有異常快殺或正常輸出�
     assert.equal(result.won, true, id);
     assert.ok(result.rounds >= 30 && result.rounds <= 85, id + "：" + result.rounds);
   }
+});
+
+test("突破材料 Boss 隨高等成長調整且低階材料仍可取得", () => {
+  const { buildEffectiveStats } = require("../src/battle.js");
+  const team = ["celesia", "chodan", "magenta", "lia"];
+  const progress = Object.fromEntries(team.map((id) => [id, { level: 80, constellation: 2 }]));
+  const stats = buildEffectiveStats(characterBattleStats, { characterProgress: progress });
+  const results = bossStages.map((stage) => simulateBattle({ team, stats, stage, rng: () => .5 }));
+  assert.ok(results.every((result) => result.won && result.rounds < 180));
+  assert.ok(results[0].rounds >= 8 && results[0].rounds <= 20);
+  assert.ok(results.at(-1).rounds >= 20 && results.at(-1).rounds <= 45);
+  assert.ok(bossStages[0].recommendedPower < bossStages.at(-1).recommendedPower);
 });
 
 test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終幕", () => {

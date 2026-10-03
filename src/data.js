@@ -426,7 +426,11 @@
     var level = Math.min(3, Math.floor(index / 2) + 1);
     stage.bossLevel = level;
     stage.difficultyLabel = "Boss Lv." + level;
-    stage.recommendedPower = 1450 + (level - 1) * 140;
+    stage.recommendedPower = 4500 + level * 1000;
+    stage.enemies.forEach(function (enemy) {
+      enemy.maxHp = Math.round(enemy.maxHp * 2);
+      enemy.attack = Math.round(enemy.attack * 1.4);
+    });
     stage.reward = Object.assign({}, stage.reward, {
       amount: 1 + Math.floor((level - 1) / 2),
       characterExp: 420 + (level - 1) * 120,
