@@ -56,6 +56,18 @@
     copy: ["黑晶折射", "敵方開場護盾會吸收一次爆發。"],
     finale: ["多線回撤", "敵方同時護區與追擊，必須分配治療和輸出。"]
   };
+  // 建議戰力對應一般隊伍可合理通關的面板，並非進場門檻或 50 回合保證值。
+  // 以不同等級 C0 隊伍實測校準，避免中後段面板建議遠高於實際通關需求。
+  var powerAnchors = [[1, 900], [10, 2000], [15, 2500], [20, 3200], [25, 5500], [30, 7800]];
+  function recommendedPowerFor(id) {
+    for (var i = 1; i < powerAnchors.length; i += 1) {
+      if (id > powerAnchors[i][0]) continue;
+      var previous = powerAnchors[i - 1];
+      var next = powerAnchors[i];
+      return Math.round((previous[1] + (next[1] - previous[1]) * (id - previous[0]) / (next[0] - previous[0])) / 100) * 100;
+    }
+    return powerAnchors[powerAnchors.length - 1][1];
+  }
   return route.map(function (row, index) {
     var id = index + 1;
     var hp = Math.round((1300 + index * 160 + Math.max(0, 5 - index) * 120) * (1 + index * 0.01));
@@ -78,7 +90,7 @@
     });
     if (names[0] === names[1] && !boss) { enemies[0].count = 2; enemies.pop(); }
     return {
-      id: id, name: row[0], region: row[1], recommendedPower: Math.round(900 + index * 100 + Math.max(0, id - 10) * 300),
+      id: id, name: row[0], region: row[1], recommendedPower: recommendedPowerFor(id),
       environment: "圖鑑模擬場", environmentEffect: "此關為訓練模擬，不代表主線新增遭遇。",
       modifiers: { enemyAttack: id === 30 ? .65 : id === 29 ? .85 : id >= 21 ? (boss ? 1.09 : 1.07) : boss ? 1.04 : id >= 2 && id <= 10 ? 1.08 : 1, enemyDefense: boss ? 1.03 : 1 },
       enemyTrait: effects[row[2]][0], enemyTraitEffect: effects[row[2]][1], trialRule: row[2],

@@ -46,7 +46,14 @@ test("正式試煉 30 關以角色成長分段校準", () => {
     return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
   }
   assert.equal(trialStages[0].recommendedPower, 900);
-  assert.equal(trialStages[29].recommendedPower, 9800);
+  assert.equal(trialStages[9].recommendedPower, 2000);
+  assert.equal(trialStages[19].recommendedPower, 3200);
+  assert.equal(trialStages[24].recommendedPower, 5500);
+  assert.equal(trialStages[29].recommendedPower, 7800);
+  const stage20Team = ["celesia", "chodan", "magenta", "lia"];
+  const stage20Stats = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(stage20Team.map((id) => [id, { level: 20, constellation: 0 }])) });
+  assert.ok(teamPower(stage20Team, stage20Stats) < trialStages[19].recommendedPower);
+  assert.equal(simulateBattle({ team: stage20Team, stats: stage20Stats, stage: trialStages[19], rng: () => .5 }).won, true);
   assert.equal(run(1, trialStages[0]).rounds >= 8, true);
   assert.equal(run(60, trialStages[9]).rounds >= 15 && run(60, trialStages[9]).rounds <= 45, true);
   assert.equal(run(45, trialStages[9]).rounds <= 60, true);
