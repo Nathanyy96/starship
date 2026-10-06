@@ -25,10 +25,10 @@
       ["#residences", "居民區", 52, 61], ["#north-gate", "北門", 49, 9],
       ["#east-gate", "東門", 88, 45], ["#river", "河岸與橋梁", 77, 70]
     ] },
-    "C1-102": { name: "獸靈之村", level: 2, parent: "R1-000", image: "c1-102.png", note: "自治聚落；向西循商路兩日抵白鐘城東門。南驛山谷的開場位移不是常設道路。", points: [
-      ["#village", "中央聚落", 53, 39], ["#fire", "共用火場", 54, 46],
-      ["#heal", "療養所", 75, 31], ["#rangers", "巡林者據點", 31, 45],
-      ["#supplies", "物資倉與工坊", 75, 59], ["#road", "白鐘商路出口", 91, 44]
+    "C1-102": { name: "獸靈之村", level: 2, parent: "R1-000", image: "c1-102.png", imageVersion: "west-20261006", clean: true, note: "自治聚落；從西側出口循商路兩日抵白鐘城東門。南驛山谷的開場位移不是常設道路。", points: [
+      ["#village", "中央聚落", 50, 40], ["#fire", "共用火場", 58, 49],
+      ["#heal", "療養所", 80, 36], ["#rangers", "巡林者據點", 24, 39],
+      ["#supplies", "物資倉與工坊", 78, 67], ["#west-road", "西側白鐘商路出口", 9, 47]
     ] },
     "C1-103": { name: "霧橋鎮", level: 2, parent: "R1-000", image: "c1-103.png", clean: true, note: "南返白鐘約三日；經山腰驛站至迴音谷約一日；北斷橋為工程支路。", points: [
       ["#town", "鎮中心", 44, 53], ["#post", "霧橋驛站", 66, 52],
@@ -65,7 +65,7 @@
     "north-gate": "往霧橋鎮，正常山路步行三日。", "east-gate": "往獸靈之村，正常商路步行兩日。",
     river: "城內河岸與橋梁；沿河順流兩日到洛汀港。", village: "聚落的日常生活核心。",
     fire: "共同生活與集會的火場。", heal: "醫療與療養空間。", rangers: "巡林與採集的接應點。",
-    supplies: "公共物資、修繕與工坊。", road: "主要山路；依行程文件核對步程。",
+    supplies: "公共物資、修繕與工坊。", "west-road": "村西商路出口；向西步行兩日到白鐘城東門。", road: "主要山路；依行程文件核對步程。",
     town: "霧橋鎮中心。", post: "地方驛站與換班點。", south: "往南方生活圈的商路。",
     north: "往山路與遺構方向。", bridge: "通往北斷橋工區的支路。", fields: "農地與一般聚落。",
     forest: "通往獸靈森地的道路。", valley: "迴音谷與救援區域。", entrance: "遺構山路入口。",
@@ -87,10 +87,9 @@
     var localDescription = selected && selected[0].charAt(0) === "#" ? details[selected[0].slice(1)] : "";
     var nav = map.parent ? "<button type=\"button\" class=\"atlas-back\" data-map-go=\"" + map.parent + "\">← 返回上一層</button>" : "";
     var worldSwitch = id === "W-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"S6-001\">遠潮界｜獨立世界圖 ↗</button>" : id === "S6-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸</button>" : "";
-    var visual = map.image ? "<div class=\"atlas-image-wrap\"><img src=\"./assets/maps/" + map.image + "\" alt=\"" + escapeHtml(map.name) + "地圖\" loading=\"lazy\">" + dots + "</div>" : "<div class=\"atlas-pending\"><strong>地圖原圖待製作</strong><p>此區已有層級入口，詳細地圖尚未經地理核對與出圖。</p></div>";
+    var visual = map.image ? "<div class=\"atlas-image-wrap\"><img src=\"./assets/maps/" + map.image + (map.imageVersion ? "?v=" + map.imageVersion : "") + "\" alt=\"" + escapeHtml(map.name) + "地圖\" loading=\"lazy\">" + dots + "</div>" : "<div class=\"atlas-pending\"><strong>地圖原圖待製作</strong><p>此區已有層級入口，詳細地圖尚未經地理核對與出圖。</p></div>";
     var destinations = (map.points || []).map(function (point) { return "<button type=\"button\" data-map-go=\"" + escapeHtml(point[0]) + "\">" + escapeHtml(point[1]) + (maps[point[0]] && maps[point[0]].pending ? " · 待製作" : " →") + "</button>"; }).join("");
     return "<div class=\"atlas-heading\"><div><span class=\"eyebrow\">INTERACTIVE ATLAS / L" + map.level + "</span><h3 id=\"story-map-title\">" + escapeHtml(map.name) + "</h3></div><span class=\"story-map-version\">" + (map.pending ? "待製作" : map.clean ? "無字修正版" : "第一版原圖") + "</span></div><nav class=\"atlas-crumbs\" aria-label=\"地圖層級\">" + trail + "</nav><div class=\"atlas-controls\">" + nav + worldSwitch + "</div>" + visual + (destinations ? "<div class=\"atlas-destinations\" aria-label=\"地圖目的地\">" + destinations + "</div>" : "") + "<div class=\"atlas-foot\"><p>" + escapeHtml(localDescription || map.note || "後續區域的正式地圖與節點正在製作。") + "</p><small>" + (map.image ? (map.clean ? "圖像已替換為無字修正版；地名、行程與可通行狀態由互動標記和現行設定提供。" : "圖像為第一版概念原圖；地名、行程與可通行狀態以互動標記及現行設定為準。") : "詳細原圖尚未提供；此入口僅顯示規劃中的層級與區域名稱。") + "</small></div>";
   }
   return { maps: maps, lineage: lineage, render: render };
 }));
-
