@@ -23,6 +23,9 @@
     var currentStoryMapLocationId = "";
     var currentAtlasMapId = "W-001";
     var currentAtlasPointId = "";
+    var authorAtlasMapId = "W-001";
+    var authorAtlasPointId = "";
+    var authorAtlasVisited = new Set(["W-001"]);
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
     var currentBossStageId = "boss-star-warden";
@@ -129,7 +132,7 @@
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
-      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); }
+      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "shop-view") { renderShop(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -530,6 +533,13 @@
       byId("lobby-continue-title").textContent = (chapter.versionLabel || chapter.version) + "｜" + chapter.title;
       byId("lobby-continue-copy").textContent = chapter.summary;
       renderMilestoneRewards();
+    }
+    function renderAuthorMapPreview() {
+      var container = byId("author-preview-map");
+      if (!container) return;
+      if (!globalThis.StarshipInteractiveMap) { container.textContent = "互動地圖資料尚未載入。"; return; }
+      container.innerHTML = globalThis.StarshipInteractiveMap.render(authorAtlasMapId, authorAtlasPointId);
+      byId("author-preview-map-progress").textContent = "本次已查看 " + authorAtlasVisited.size + " 個地圖／地點 · 當前：" + globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].name + (authorAtlasPointId ? " · " + (globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].points || []).filter(function (point) { return point[0] === authorAtlasPointId; }).map(function (point) { return point[1]; })[0] : "");
     }
     function renderAuthorPreview(payload) {
       var progress = payload.progress;
@@ -1798,6 +1808,17 @@
     byId("open-author-preview").addEventListener("click", function () { showView("author-preview-view"); });
     byId("author-preview-task").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
     byId("author-preview-reset").addEventListener("click", function () { loadAuthorPreview("reset"); });
+    byId("author-preview-map-reset").addEventListener("click", function () { authorAtlasMapId = "W-001"; authorAtlasPointId = ""; renderAuthorMapPreview(); });
+    byId("author-preview-map").addEventListener("click", function (event) {
+      var target = event.target.closest("[data-map-go]");
+      if (!target || !globalThis.StarshipInteractiveMap) return;
+      var id = target.getAttribute("data-map-go");
+      if (id.charAt(0) === "#") authorAtlasPointId = id;
+      else if (globalThis.StarshipInteractiveMap.maps[id]) { authorAtlasMapId = id; authorAtlasPointId = ""; }
+      else return;
+      authorAtlasVisited.add(authorAtlasMapId + authorAtlasPointId);
+      renderAuthorMapPreview();
+    });
     byId("author-preview-2x-setup").addEventListener("click", function (event) { if (event.target.closest("#author-preview-2x-run")) runAuthorBattlePreview(); });
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
      byId("open-characters").addEventListener("click", function () { showView("character-view"); });

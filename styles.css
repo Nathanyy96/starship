@@ -466,6 +466,12 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .author-preview-choices button:hover, .author-preview-choices button:focus-visible { background:#435895; outline:2px solid #c7b6ff; outline-offset:2px; }
 .author-preview-feedback { min-height:28px; margin:20px 0; color:#c5f0da; font-size:1rem; line-height:1.6; }
 .author-preview-feedback.needs-retry { color:#ffd9a4; }
+.author-preview-map { margin-top:32px; padding:24px; border:1px solid rgba(112,233,223,.26); border-radius:16px; background:#151e37; }
+.author-preview-map-head { display:flex; justify-content:space-between; align-items:start; gap:16px; }
+.author-preview-map-head h3 { margin:0 0 8px; color:#f2fbff; }
+.author-preview-map-head p { margin:0; color:#b8c8df; line-height:1.6; }
+.author-preview-map-progress { color:#9be6de; font-size:.8rem; }
+.author-preview-map .story-world-map-panel { margin-bottom:0; }
 .author-preview-battle { margin-top:32px; padding:24px; border:1px solid rgba(112,233,223,.26); border-radius:16px; background:#151e37; }
 .author-preview-battle h3 { margin:0 0 8px; color:#f2fbff; }
 .author-preview-battle > p, .author-preview-battle #author-preview-2x-setup > p { color:#b8c8df; line-height:1.6; }
@@ -476,7 +482,7 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 #author-preview-2x-result { margin-top:16px; }
 #author-preview-2x-result details { margin-top:12px; color:#b9c8e2; }
 .trial-power-note { margin:12px 0 0; color:#c8d4ee; font-size:.86rem; line-height:1.55; }
-@media (max-width:640px) { .author-preview-entry { align-items:flex-start; flex-direction:column; } .author-preview-entry .primary-action { width:100%; } .author-preview-2x-controls { grid-template-columns:1fr; } }
+@media (max-width:640px) { .author-preview-entry { align-items:flex-start; flex-direction:column; } .author-preview-entry .primary-action { width:100%; } .author-preview-2x-controls { grid-template-columns:1fr; } .author-preview-map-head { flex-direction:column; } }
 .milestone-rewards { display: grid; gap: 12px; }
 .milestone-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 20px; border: 1px solid rgba(246,199,111,.38); border-radius: 18px; background: linear-gradient(105deg, rgba(82,59,39,.38), rgba(21,28,59,.78)); box-shadow: 0 14px 30px rgba(0,0,0,.16); }
 .milestone-card > div:first-child { min-width: 0; }.milestone-card strong { display: block; margin: 4px 0; color: #ffe7ae; font-size: .9rem; }.milestone-card p { color: #bdc7df; font-size: .73rem; }

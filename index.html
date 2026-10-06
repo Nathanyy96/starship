@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=author-preview-roster-20261005">
+  <link rel="stylesheet" href="./styles.css?v=author-map-20261006">
 </head>
 <body>
   <main class="page-shell">
@@ -94,6 +94,7 @@
       <div id="author-preview-task" class="author-preview-task" aria-live="polite"></div>
       <div id="author-preview-feedback" class="author-preview-feedback" role="status"></div>
       <button id="author-preview-reset" class="small-button" type="button">重新試玩</button>
+      <section class="author-preview-map panel" aria-labelledby="author-preview-map-title"><div class="author-preview-map-head"><div><h3 id="author-preview-map-title">互動地圖試玩</h3><p>點選世界、版本區域、城市與地點，檢查地理位置及路線說明。探索紀錄只保留在本次試玩。</p></div><button id="author-preview-map-reset" class="small-button" type="button">返回世界圖</button></div><p id="author-preview-map-progress" class="author-preview-map-progress" aria-live="polite"></p><div id="author-preview-map" class="story-world-map-panel"></div></section>
       <section class="author-preview-battle panel" aria-labelledby="author-preview-battle-title"><h3 id="author-preview-battle-title">1.0–2.5 角色隔離戰鬥</h3><p>可混編已建檔角色，測試站位、等級與 C0–C6。2.x 專屬技能仍屬草案；戰鬥不寫入正式帳號。</p><div id="author-preview-2x-setup">正在載入角色試玩……</div><div id="author-preview-2x-result" role="status" aria-live="polite"></div></section>
     </section>
 
@@ -333,12 +334,9 @@
   <script src="./src/data.js?v=author-preview-roster-20261005"></script>
   <script src="./src/battle.js?v=author-preview-roster-20261005"></script>
   <script src="./src/author-preview.js?v=20261005"></script>
-  <script src="./src/player-app.js?v=author-preview-roster-20261005"></script>
+  <script src="./src/player-app.js?v=author-map-20261006"></script>
 </body>
 </html>
-
-
-
 
 
 
