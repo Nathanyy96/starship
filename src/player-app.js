@@ -565,12 +565,12 @@
     }
     function authorPreviewBattleRequest(body) {
       if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/2-x-battle", body);
-      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("2.0–2.5 角色試玩目前只開放給作者帳號。"));
-      var cards = data.activeCards.concat(data.version2Cards);
+      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("1.0–2.5 角色試玩目前只開放給作者帳號。"));
+      var cards = data.authorPreviewCards;
       var allowed = new Set(cards.map(function (card) { return card.id; }));
       if (body.action !== "battle") return Promise.resolve({ ok: true, characters: cards.map(function (card) { return { id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : data.characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" }; }), stages: data.trialStages.map(function (stage) { return { id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower }; }), note: "本機隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
       var team = body.team, level = body.level, constellation = body.constellation, stageId = body.stageId;
-      if (!Array.isArray(team) || team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some(function (id) { return !allowed.has(id); })) return Promise.reject(new Error("試玩隊伍須由 1.0 或 2.0–2.5 的 1–4 名不同角色組成。"));
+      if (!Array.isArray(team) || team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some(function (id) { return !allowed.has(id); })) return Promise.reject(new Error("試玩隊伍須由 1.0–2.5 的 1–4 名不同角色組成。"));
       if (!Number.isInteger(stageId) || stageId < 1 || stageId > data.trialStages.length) return Promise.reject(new Error("請選擇有效的試煉關卡。"));
       if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) return Promise.reject(new Error("試玩等級須為 1–90、命座須為 C0–C6。"));
       var characterProgress = {};

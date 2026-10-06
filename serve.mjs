@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, activeCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, activeCards, authorPreviewCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -915,10 +915,10 @@ async function handleApi(request, response, requestUrl) {
     if (requestUrl.pathname === "/api/author-preview/2-x-battle") {
       const player = playerFromSession(database, body.token);
       if (player.key !== authorPreviewPlayerKey) {
-        sendJson(response, 403, { ok: false, error: "2.0–2.5 角色試玩目前只開放給作者帳號。" });
+        sendJson(response, 403, { ok: false, error: "1.0–2.5 角色試玩目前只開放給作者帳號。" });
         return;
       }
-      const previewCards = [...activeCards, ...version2Cards];
+      const previewCards = authorPreviewCards;
       const allowed = new Set(previewCards.map((card) => card.id));
       if (body.action !== "battle") {
         sendJson(response, 200, { ok: true, characters: previewCards.map((card) => ({ id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" })), stages: trialStages.map((stage) => ({ id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower })), note: "隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
@@ -928,7 +928,7 @@ async function handleApi(request, response, requestUrl) {
       const stageId = Number(body.stageId);
       const level = Number(body.level);
       const constellation = Number(body.constellation);
-      if (team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some((id) => !allowed.has(id))) throw new Error("試玩隊伍須由 1.0 或 2.0–2.5 的 1–4 名不同角色組成");
+      if (team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some((id) => !allowed.has(id))) throw new Error("試玩隊伍須由 1.0–2.5 的 1–4 名不同角色組成");
       if (!Number.isInteger(stageId) || stageId < 1 || stageId > trialStages.length) throw new Error("請選擇有效的試煉關卡");
       if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) throw new Error("試玩等級須為 1–90、命座須為 C0–C6");
       const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));

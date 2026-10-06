@@ -246,6 +246,7 @@
   })));
   var isarAscended = Object.freeze({ id: "isar-ascended", baseCharacterId: "isar", name: "伊薩爾｜四星升格", rarity: 4, element: "烈", portrait: "./assets/story-characters/isar-ascended.png", playable: false });
   var version2Cards = [cards.risan, cards.yaoze, cards.maro, cards.evelyn, cards.mirea, cards.ferye, cards.noreia, cards.orivelle];
+  var authorPreviewCards = Object.values(cards).filter(function (entry) { return Number(entry.releaseVersion) <= 2.5; });
   var version4Cards = [cards.aurelia, cards.kairen, cards.sorae, cards.talia, cards.neve, cards.kael, cards.elyra];
   var version5Cards = [cards.vestra, cards.brann, cards.eirin, cards.sava, cards.niela, cards.hervan, cards.daria];
 
@@ -2108,6 +2109,7 @@
     storyCharacters: storyCharacters,
     isarAscended: isarAscended,
     activeCards: activeCards,
+    authorPreviewCards: authorPreviewCards,
     futureCards: futureCards,
     futureCharacterPlan: futureCharacterPlan,
     futureCharacterReleasePlan: futureCharacterReleasePlan,
