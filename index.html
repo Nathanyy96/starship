@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=character-help-20261002">
+  <link rel="stylesheet" href="./styles.css?v=author-preview-web-20261005">
 </head>
 <body>
   <main class="page-shell">
@@ -57,6 +57,7 @@
         </div>
         <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
       </div>
+      <div id="author-preview-entry" class="author-preview-entry" hidden><div><strong>作者試玩｜1.1 劇情與 2.0–2.5 角色</strong><p>2.x 角色可在隔離戰鬥中測試，不取得角色、不消耗資源，也不影響正式進度。</p></div><button id="open-author-preview" class="primary-action" type="button">開始試玩</button></div>
       <div class="lobby-quick-actions" aria-label="快速入口">
         <button id="open-announcements" class="lobby-quick-card announcement-quick" type="button"><span class="quick-icon" aria-hidden="true">📣</span><span class="quick-copy"><strong>公告</strong><small id="announcement-quick-status">更新內容與獎勵</small></span><span class="quick-badge">NEW</span></button>
         <button id="open-shop" class="lobby-quick-card shop-quick" type="button"><span class="quick-icon" aria-hidden="true">✧</span><span class="quick-copy"><strong>商店</strong><small>材料、造型與資源轉換</small></span></button>
@@ -74,7 +75,6 @@
         <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
       </div>
       <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0 主線；後續版本尚在製作。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
-      <div id="author-preview-entry" class="author-preview-entry" hidden><div><strong>1.1 作者試玩</strong><p>五幕各一張決策卡的首輪試玩版，可選錯重試。進度另存，不發放正式獎勵。</p></div><button id="open-author-preview" class="primary-action" type="button">開始試玩</button></div>
       <div id="milestone-rewards" class="milestone-rewards"></div>
     </section>
 
@@ -94,6 +94,7 @@
       <div id="author-preview-task" class="author-preview-task" aria-live="polite"></div>
       <div id="author-preview-feedback" class="author-preview-feedback" role="status"></div>
       <button id="author-preview-reset" class="small-button" type="button">重新試玩</button>
+      <section class="author-preview-battle panel" aria-labelledby="author-preview-battle-title"><h3 id="author-preview-battle-title">2.0–2.5 角色隔離戰鬥</h3><p>可與 1.0 角色混編，測試站位、等級與 C0–C6。此處的 2.x 專屬技能仍屬草案；戰鬥不寫入正式帳號。</p><div id="author-preview-2x-setup">正在載入角色試玩……</div><div id="author-preview-2x-result" role="status" aria-live="polite"></div></section>
     </section>
 
     <section id="tutorial-view" class="game-view panel" hidden>
@@ -168,6 +169,7 @@
           <div id="trial-stage-details" class="trial-stage-details"></div>
           <div id="trial-enemy-intel" class="trial-enemy-intel"></div>
           <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>出戰編隊</h3></div><span id="trial-team-count">0 / 4</span></div>
+          <div id="trial-formation" class="formation-planner" aria-label="試煉前後排編隊"></div>
           <div id="trial-team-list" class="trial-team-list"></div>
           <button id="start-trial-battle" class="primary-action trial-start-button" type="button">開始自走棋戰鬥</button>
           <div id="trial-battle-result" class="trial-battle-result"></div>
@@ -187,6 +189,7 @@
           <div id="boss-stage-details" class="trial-stage-details"></div>
           <div id="boss-enemy-intel" class="trial-enemy-intel"></div>
           <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>Boss 出戰編隊</h3></div><span id="boss-team-count">0 / 4</span></div>
+          <div id="boss-formation" class="formation-planner" aria-label="Boss 前後排編隊"></div>
           <div id="boss-team-list" class="trial-team-list"></div>
           <button id="start-boss-battle" class="primary-action trial-start-button" type="button">開始 Boss 自走棋</button>
           <div id="boss-battle-result" class="trial-battle-result"></div>
@@ -195,7 +198,7 @@
     </section>
 
     <section id="dispatch-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>2.0–2.5 限時任務</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>1.0 本期任務</span></div>
       <div class="dispatch-layout">
         <aside class="dispatch-mission-rail">
           <div class="trial-rule"><span class="eyebrow">NEW GAMEPLAY</span><strong>每份委託每版本完成一次</strong><small>觀察敵人特性、組成適合的隊伍，完成後取得星砂與養成資源；下次大更新會重置。</small></div>
@@ -205,6 +208,7 @@
           <div id="dispatch-mission-details" class="trial-stage-details"></div>
           <div id="dispatch-enemy-intel" class="trial-enemy-intel"></div>
           <div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>派遣隊伍</h3></div><span id="dispatch-team-count">0 / 4</span></div>
+          <div id="dispatch-formation" class="formation-planner" aria-label="委託前後排編隊"></div>
           <div id="dispatch-team-list" class="trial-team-list"></div>
           <button id="start-dispatch" class="primary-action trial-start-button" type="button">執行星港委託</button>
           <div id="dispatch-result" class="trial-battle-result"></div>
@@ -232,7 +236,7 @@
         </div>
       </details>
       <div id="voyage-next-step" class="voyage-next-step" aria-live="polite"></div>
-      <div class="voyage-layout"><aside class="voyage-rail"><div class="trial-rule"><span class="eyebrow">ROGUELITE ROUTE</span><strong>每次航程都會留下不同選擇</strong><small>航程失敗可以重新開始；三種結局獎勵每期各領一次，版本更新後航線與獎勵重新輪換。</small></div><div id="voyage-route-list" class="voyage-route-list"></div><button id="start-voyage" class="primary-action" type="button">開始新的航程</button></aside><section class="voyage-arena"><div id="voyage-node-list" class="voyage-node-list"></div><div id="voyage-node-details" class="voyage-node-details"></div><div id="voyage-node-enemy" class="trial-enemy-intel"></div><div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>迷航出戰隊伍</h3></div><span id="voyage-team-count">0 / 4</span></div><div id="voyage-team-list" class="trial-team-list"></div><div id="voyage-node-actions" class="voyage-node-actions"></div><div id="voyage-result" class="trial-battle-result"></div></section></div>
+      <div class="voyage-layout"><aside class="voyage-rail"><div class="trial-rule"><span class="eyebrow">ROGUELITE ROUTE</span><strong>每次航程都會留下不同選擇</strong><small>航程失敗可以重新開始；三種結局獎勵每期各領一次，版本更新後航線與獎勵重新輪換。</small></div><div id="voyage-route-list" class="voyage-route-list"></div><button id="start-voyage" class="primary-action" type="button">開始新的航程</button></aside><section class="voyage-arena"><div id="voyage-node-list" class="voyage-node-list"></div><div id="voyage-node-details" class="voyage-node-details"></div><div id="voyage-node-enemy" class="trial-enemy-intel"></div><div class="trial-team-heading"><div><p class="eyebrow">FORMATION</p><h3>迷航出戰隊伍</h3></div><span id="voyage-team-count">0 / 4</span></div><div id="voyage-formation" class="formation-planner" aria-label="迷航前後排編隊"></div><div id="voyage-team-list" class="trial-team-list"></div><div id="voyage-node-actions" class="voyage-node-actions"></div><div id="voyage-result" class="trial-battle-result"></div></section></div>
     </section>
 
     <section id="pet-view" class="game-view panel pet-view" hidden>
@@ -321,13 +325,14 @@
   <script src="./src/story-source.js?v=pet-customization-20260920"></script>
   <script src="./src/story-1-0-current.js"></script>
   <script src="./src/story-1-0-images.js"></script>
-  <script src="./src/story-world-map-1-0.js?v=compass-20261001"></script>
-  <script src="./src/trial-1-0.js?v=balance-20261002i"></script>
-  <script src="./src/first-major-kits.js?v=20261001"></script>
-  <script src="./src/core-kits.js?v=balance-20261002"></script>
-  <script src="./src/data.js?v=balance-20261002e"></script>
-  <script src="./src/battle.js?v=character-help-20261002"></script>
-  <script src="./src/player-app.js?v=character-help-20261002"></script>
+  <script src="./src/story-world-map-1-0.js?v=author-preview-web-20261005"></script>
+  <script src="./src/trial-1-0.js?v=author-preview-web-20261005"></script>
+  <script src="./src/first-major-kits.js?v=author-preview-web-20261005"></script>
+  <script src="./src/core-kits.js?v=author-preview-web-20261005"></script>
+  <script src="./src/data.js?v=author-preview-web-20261005"></script>
+  <script src="./src/battle.js?v=author-preview-web-20261005"></script>
+  <script src="./src/author-preview.js?v=20261005"></script>
+  <script src="./src/player-app.js?v=author-preview-web-20261005"></script>
 </body>
 </html>
 

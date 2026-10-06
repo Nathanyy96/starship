@@ -51,13 +51,14 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     original.characterProgress.lia = { level: 21, affinity: 4, constellation: 1, constellationCore: 1, breakthrough: false };
     original.storyProgress.completedScenes["main-1-0:signal"] = { starSand: 100 };
     original.storyProgress.completedScenes["main-1-1:pickup"] = { starSand: 100 };
-    original.updateRewards.claimedVersions = { [updateVersion]: { starSand: 3200 } };
+    original.updateRewards.claimedVersions = { [updateVersion]: { starSand: 3200 }, "2026-10-01-official-1-0": { starSand: 3200, characterExp: 2200 } };
     original.trialProgress = { version: updateVersion, selectedTeam: ["lia"], clearedStages: [1, 10], attempts: { 1: 10 }, bestStage: 10, lastBattle: { won: true } };
     original.bossProgress = { version: updateVersion, selectedBossId: "boss-star-warden", selectedTeam: ["lia"], attempts: { "boss-star-warden": 10 }, lastBattle: { won: true } };
     original.dispatchProgress = { version: updateVersion, selectedTeam: ["lia"], claimed: { mission: true }, lastMission: "mission" };
     original.voyageProgress.version = updateVersion;
     original.voyageProgress.status = "active";
     original.voyageProgress.claimedRewards = { ending: true };
+    original.shopProgress = { version: updateVersion, purchases: { "universal-core": 6 }, conversions: { "exp-to-sand": 20 } };
     original.petProgress.version = "2.1-companion-workshop";
     original.petProgress.resources.petFood = 14;
     original.petProgress.exploreCount = 8;
@@ -67,10 +68,10 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     fs.writeFileSync(databasePath, JSON.stringify(database), "utf8");
 
     const first = (await post("/api/player/session", { token: registration.token })).state;
-    assert.equal(first.resources.starSand, 7400);
-    assert.equal(first.resources.starMarks, 17);
+    assert.equal(first.resources.starSand, 10200);
+    assert.equal(first.resources.starMarks, 20);
     assert.deepEqual(Object.keys(first.resources).sort(), ["characterExp", "starMarks", "starSand"]);
-    assert.equal(first.resources.characterExp, 12050);
+    assert.equal(first.resources.characterExp, 15850);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
@@ -78,7 +79,9 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     assert.ok(first.storyProgress.completedScenes[storySceneAliases["main-1-1:pickup"]]);
     assert.ok(first.storyProgress.completedScenes["main-1-1:pickup"]);
     assert.ok(first.updateRewards.claimedVersions[updateVersion]);
+    assert.ok(first.updateRewards.claimedVersions["2026-10-01-official-1-0"]);
     assert.ok(first.updateRewards.claimedVersions[updateCycle]);
+    assert.deepEqual({ starSand: first.updateRewards.claimedVersions[updateCycle].starSand, characterExp: first.updateRewards.claimedVersions[updateCycle].characterExp, starMarks: first.updateRewards.claimedVersions[updateCycle].starMarks }, { starSand: 6000, characterExp: 6000, starMarks: 3 });
     assert.deepEqual(first.trialProgress.clearedStages, []);
     assert.deepEqual(first.trialProgress.attempts, {});
     assert.equal(first.trialProgress.bestStage, 0);
@@ -86,8 +89,10 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     assert.deepEqual(first.dispatchProgress.claimed, {});
     assert.deepEqual(first.voyageProgress.claimedRewards, {});
     assert.equal(first.voyageProgress.status, "idle");
-    assert.equal(first.petProgress.exploreCount, 8);
-    assert.equal(first.petProgress.daily.challengeCount, 3);
+    assert.deepEqual(first.shopProgress.purchases, {});
+    assert.deepEqual(first.shopProgress.conversions, {});
+    assert.equal(first.petProgress.exploreCount, 0);
+    assert.equal(first.petProgress.daily.challengeCount, 0);
     assert.equal(first.petProgress.resources.petFood, 14);
     assert.equal(first.petProgress.pets["star-fox"].level, 4);
     assert.equal(first.petProgress.pets["star-fox"].bond, 11);

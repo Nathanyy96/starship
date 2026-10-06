@@ -318,7 +318,7 @@
     siyeon: { rarity: 4, role: "拾音", maxHp: 1080, attack: 145, defense: 120, speed: 110, range: 2, attackName: "回音脈衝", skillName: "回音採集", skillPower: 1.15, skillEffect: "回復一名受傷隊友" },
     mave: { rarity: 4, role: "仲裁", maxHp: 1120, attack: 165, defense: 130, speed: 102, range: 2, attackName: "索引裁切", skillName: "公共索引", skillPower: 1.3, skillEffect: "重新排列敵方目標並造成傷害" },
     risan: { rarity: 4, role: "支援", maxHp: 1100, attack: 175, defense: 115, speed: 102, range: 2, attackName: "潮圖切頁", skillName: "無地址索引", skillPower: 1.3, skillEffect: "讓隊伍下一輪攻擊更容易命中並整理敵方目標" },
-    yaoze: { rarity: 4, role: "重裝", maxHp: 1280, attack: 150, defense: 145, speed: 76, range: 2, attackName: "燈塔訊號", skillName: "白帆守望", skillPower: 1.12, skillEffect: "為隊伍架起護盾並降低敵方速度" },
+    yaoze: { rarity: 4, role: "重裝", maxHp: 1280, attack: 150, defense: 145, speed: 76, range: 2, attackName: "燈塔訊號", skillName: "白帆守望", skillPower: 1.12, skillEffect: "〔2.0 暫定戰鬥草案〕為最多 4 名隊友各提供曜澤最大生命 10% 的護盾（單人護盾總量上限為自身最大生命 28%）；所有敵人速度降低 10%，持續 2 輪；自身下一次受擊減少 40%。", signature: { type: "guard", shield: .1, guard: .4, slow: .9, targets: 4, escort: false, duration: 2, cooldown: 3 }, constellations: ["C1 護盾量再乘 1.08，敵方減速期限由 2 輪延為 3 輪。", "C2 施放時對首名敵人造成曜澤攻擊力 55% 的傷害。", "C3 護盾量再乘 1.08，與 C1 合計為曜澤最大生命 11.664%；仍受單人護盾 28% 上限限制。", "C4 施放後全隊受傷減少 6%，持續 1 輪。", "C5 敵方速度倍率由 0.9 降至 0.855（減速 14.5%）；C2 傷害由攻擊力 55% 提至 80%。", "C6 施放時若受盾者生命低於 35%，額外獲得曜澤最大生命 6% 的護盾；仍受單人護盾 28% 上限限制。"] },
     maro: { rarity: 3, role: "治療", maxHp: 820, attack: 86, defense: 92, speed: 104, range: 2, attackName: "地址藥包", skillName: "診所交接", skillPower: 1.1, skillEffect: "回復生命最低的隊友" },
     evelyn: { rarity: 4, role: "仲裁", maxHp: 1060, attack: 168, defense: 112, speed: 108, range: 2, attackName: "鏡潮譯讀", skillName: "保留原句", skillPower: 1.28, skillEffect: "清除一個敵方增益並保留未翻譯訊息" },
     mirea: { rarity: 4, role: "支援", maxHp: 1080, attack: 160, defense: 118, speed: 112, range: 3, attackName: "深潮定向", skillName: "潮線引航", skillPower: 1.24, skillEffect: "提升全隊速度並降低敵方防禦" },
@@ -380,7 +380,7 @@
       : { main: 0.026, defense: 0.026, speed: 0.003 };
   });
 
-  var updateCycle = "2026-10-01-official-1-0";
+  var updateCycle = "2026-10-05-major-combat-repair-1-0";
   var trialVersion = updateCycle;
   var trialMaxRewards = 20;
   // 試煉每次成功都提供角色經驗；每關每版本最多領 20 次，
@@ -401,8 +401,8 @@
   // 用 1.0–2.5 已取得角色穩定嘗試的範圍；高難度挑戰仍留在 trialStages。
   var voyageBattleStages = [
     { id: "voyage-combat-1", name: "碎光狹道", region: "星海迷航", recommendedPower: 1200, environment: "碎光航道", environmentEffect: "速度較快的角色容易先手，適合熟悉自走棋戰鬥", modifiers: { teamSpeed: 1.04, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "碎光擾動", enemyTraitEffect: "敵人數量較多但單體傷害較低，先處理高速單位即可", trialRule: "echo", enemies: [{ name: "碎光漂獸", maxHp: 1050, attack: 112, defense: 72, speed: 84, count: 2 }, { name: "碎光航標核", maxHp: 1500, attack: 118, defense: 90, speed: 58, count: 1 }], reward: {} },
-    { id: "voyage-combat-2", name: "折光風暴", region: "星海迷航", recommendedPower: 2100, environment: "折光風暴帶", environmentEffect: "敵方增益會短暫反射，安排技能順序即可拆解", modifiers: { teamAttack: 1.03, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "折光回聲", enemyTraitEffect: "首領第一次施放技能後獲得短暫護盾，破盾後會回到一般狀態", trialRule: "copy", enemies: [{ name: "折光拾荒獸", maxHp: 2850, attack: 188, defense: 132, speed: 105, count: 2 }, { name: "折光風暴核", maxHp: 4600, attack: 222, defense: 168, speed: 74, count: 1 }], reward: {} },
-    { id: "voyage-final", name: "星海終端守門者", region: "未命名終端", recommendedPower: 2600, recommendedPowerNote: "星海迷航終幕建議以約 2,600 面板戰力的完整隊伍挑戰；低於此值仍可透過治療、護盾與協同通關。", environment: "星海終端", environmentEffect: "守門者會輪換護盾與壓制，但不使用星界試煉終局的高傷害規則", modifiers: { teamAttack: 1.05, teamDefense: 1.03, enemyAttack: 0.86, enemyDefense: 0.92 }, enemyTrait: "終端守門", enemyTraitEffect: "護衛倒下後首領會短暫暴露弱點，先擊破護衛能降低終幕壓力", trialRule: "shield", finalStage: true, enemies: [{ name: "星海護航體", maxHp: 4200, attack: 250, defense: 178, speed: 118, count: 2 }, { name: "星海終端守門者", maxHp: 7200, attack: 302, defense: 228, speed: 82, count: 1 }], reward: {} }
+    { id: "voyage-combat-2", name: "折光風暴", region: "星海迷航", recommendedPower: 2100, environment: "折光風暴帶", environmentEffect: "敵方會重整護盾；首次施放技能時可複寫我方增益", modifiers: { teamAttack: 1.03, enemyAttack: 0.9, enemyDefense: 0.94 }, enemyTrait: "折光回聲", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次；若我方有攻擊、防禦或速度增益，敵方各複寫最強的一項，最多增加 20%，持續 2 輪", trialRule: "copy", enemies: [{ name: "折光拾荒獸", maxHp: 2850, attack: 188, defense: 132, speed: 105, count: 2 }, { name: "折光風暴核", maxHp: 4600, attack: 222, defense: 168, speed: 74, count: 1 }], reward: {} },
+    { id: "voyage-final", name: "星海終端守門者", region: "未命名終端", recommendedPower: 2600, recommendedPowerNote: "星海迷航終幕建議以約 2,600 面板戰力的完整隊伍挑戰；低於此值仍可透過治療、護盾與協同通關。", environment: "星海終端", environmentEffect: "敵方會重整護盾，但不使用星界試煉終局的高傷害規則", modifiers: { teamAttack: 1.05, teamDefense: 1.03, enemyAttack: 0.86, enemyDefense: 0.92 }, enemyTrait: "終端守門", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次；先擊破護航體可減少敵方行動次數", trialRule: "shield", finalStage: true, enemies: [{ name: "星海護航體", maxHp: 4200, attack: 250, defense: 178, speed: 118, count: 2 }, { name: "星海終端守門者", maxHp: 7200, attack: 302, defense: 228, speed: 82, count: 1 }], reward: {} }
   ];
 
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
@@ -411,12 +411,12 @@
   var bossVersion = updateCycle;
   var bossMaxRewards = 10;
   var bossStages = [
-    { id: "boss-star-warden", name: "星序守望者", region: "星序觀測環", description: "守望者以錯位星序建立護盾，指揮與減防角色能更快找到破口。", recommendedPower: 1500, environment: "錯位星序", environmentEffect: "敵方護盾重新排列，支援與破防效果更有價值", enemyTrait: "星序護盾", enemyTraitEffect: "首領首次施放技能會重建一次護盾", trialRule: "shield", modifiers: { enemyDefense: 1.06, teamAttack: 1.03 }, enemies: [{ name: "星序守衛", maxHp: 2700, attack: 190, defense: 145, speed: 82, count: 2 }, { name: "星序守望者", maxHp: 5200, attack: 260, defense: 215, speed: 96, count: 1 }], reward: { materialId: "star-crest", materialName: "星序碎晶", amount: 1, characterExp: 360 } },
+    { id: "boss-star-warden", name: "星序守望者", region: "星序觀測環", description: "守望者以錯位星序建立護盾，指揮與減防角色能更快找到破口。", recommendedPower: 1500, environment: "錯位星序", environmentEffect: "敵方護盾耗盡後可重整，持續輸出與破防較有價值", enemyTrait: "星序護盾", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次", trialRule: "shield", modifiers: { enemyDefense: 1.06, teamAttack: 1.03 }, enemies: [{ name: "星序守衛", maxHp: 2700, attack: 190, defense: 145, speed: 82, count: 2 }, { name: "星序守望者", maxHp: 5200, attack: 260, defense: 215, speed: 96, count: 1 }], reward: { materialId: "star-crest", materialName: "星序碎晶", amount: 1, characterExp: 360 } },
     { id: "boss-tide-archive", name: "潮眼書庫獸", region: "潮汐書庫深層", description: "潮眼把索引頁藏進寄生體的外殼，治療、修復與淨化能降低長線壓力。", recommendedPower: 1700, environment: "深潮索引", environmentEffect: "受到潮蝕的角色治療量降低，修復技能可清除部分效果", enemyTrait: "潮蝕寄生", enemyTraitEffect: "敵人命中後會降低受治療量", trialRule: "corrosion", modifiers: { healing: 0.84, enemyAttack: 1.05 }, enemies: [{ name: "潮眼寄生體", maxHp: 3300, attack: 220, defense: 160, speed: 112, count: 2 }, { name: "書庫潮核", maxHp: 6100, attack: 285, defense: 235, speed: 70, count: 1 }], reward: { materialId: "tide-crystal", materialName: "潮眼晶核", amount: 1, characterExp: 360 } },
-    { id: "boss-clock-sentinel", name: "逆時守鐘人", region: "彼岸鐘庭內庭", description: "守鐘人把行動順序切成不同時段，速度與防守輪轉比單純輸出更可靠。", recommendedPower: 1900, environment: "逆時鐘面", environmentEffect: "敵方每三回合重新取得先手，速度增益會延長一輪", enemyTrait: "逆時敲鐘", enemyTraitEffect: "首領技能週期縮短，不能只依賴一名輸出", trialRule: "time", modifiers: { enemySpeed: 1.1, teamSpeed: 1.05 }, enemies: [{ name: "逆時鐘影", maxHp: 3600, attack: 245, defense: 175, speed: 128, count: 2 }, { name: "守鐘人", maxHp: 6800, attack: 300, defense: 250, speed: 78, count: 1 }], reward: { materialId: "clock-core", materialName: "逆時鐘核", amount: 1, characterExp: 360 } },
-    { id: "boss-forge-colossus", name: "鍛路熔殼王", region: "鍛路鎮熱管區", description: "熔殼王會把傷害轉成高溫護甲，重裝與持續破防角色能穩定拆解它。", recommendedPower: 2150, environment: "熱管過載", environmentEffect: "爆發傷害提高，但首領每三回合強化下一次攻擊", enemyTrait: "熔殼過載", enemyTraitEffect: "首領攻擊會逐輪升溫，必須在護盾窗口完成輸出", trialRule: "overload", modifiers: { teamAttack: 1.06, enemyAttack: 1.1, enemyDefense: 1.08 }, enemies: [{ name: "熱管鎧獸", maxHp: 4300, attack: 290, defense: 230, speed: 76, count: 2 }, { name: "鍛路熔殼王", maxHp: 7600, attack: 360, defense: 295, speed: 68, count: 1 }], reward: { materialId: "forge-core", materialName: "熱管熔核", amount: 1, characterExp: 360 } },
+    { id: "boss-clock-sentinel", name: "逆時守鐘人", region: "彼岸鐘庭內庭", description: "敵方技能間隔較短；安排速度與防守輪轉以承接攻勢。", recommendedPower: 1900, environment: "逆時鐘面", environmentEffect: "敵方速度提高 10%，我方速度提高 5%", enemyTrait: "逆時敲鐘", enemyTraitEffect: "所有敵人技能冷卻由 3 輪縮短為 2 輪", trialRule: "time", modifiers: { enemySpeed: 1.1, teamSpeed: 1.05 }, enemies: [{ name: "逆時鐘影", maxHp: 3600, attack: 245, defense: 175, speed: 128, count: 2 }, { name: "守鐘人", maxHp: 6800, attack: 300, defense: 250, speed: 78, count: 1 }], reward: { materialId: "clock-core", materialName: "逆時鐘核", amount: 1, characterExp: 360 } },
+    { id: "boss-forge-colossus", name: "鍛路熔殼王", region: "鍛路鎮熱管區", description: "敵方技能造成較高傷害，防守與持續破防能穩定承接攻勢。", recommendedPower: 2150, environment: "熱管過載", environmentEffect: "我方攻擊提高 6%，敵方攻擊提高 10%、防禦提高 8%", enemyTrait: "熔殼過載", enemyTraitEffect: "所有敵人施放技能時，技能基礎倍率由 120% 提至 142%", trialRule: "overload", modifiers: { teamAttack: 1.06, enemyAttack: 1.1, enemyDefense: 1.08 }, enemies: [{ name: "熱管鎧獸", maxHp: 4300, attack: 290, defense: 230, speed: 76, count: 2 }, { name: "鍛路熔殼王", maxHp: 7600, attack: 360, defense: 295, speed: 68, count: 1 }], reward: { materialId: "forge-core", materialName: "熱管熔核", amount: 1, characterExp: 360 } },
     { id: "boss-wind-hunt", name: "風廊獵王", region: "北門風廊", description: "獵王會鎖定最脆弱的隊員，高速斥候與射手可以先處理獵影，替隊伍爭取回合。", recommendedPower: 2350, environment: "高空風廊", environmentEffect: "敵我速度波動變大，標記與先手控制更重要", enemyTrait: "獵王標記", enemyTraitEffect: "敵方集中攻擊生命比例最低的角色", trialRule: "mark", modifiers: { enemySpeed: 1.14, teamSpeed: 1.08, enemyAttack: 1.06 }, enemies: [{ name: "風廊獵影", maxHp: 4500, attack: 315, defense: 210, speed: 150, count: 2 }, { name: "風廊獵王", maxHp: 8200, attack: 340, defense: 270, speed: 104, count: 1 }], reward: { materialId: "wind-core", materialName: "風標獵核", amount: 1, characterExp: 360 } },
-    { id: "boss-mirror-arbiter", name: "霧鏡裁定核", region: "霧鏡議庭", description: "裁定核會複寫隊伍的增益，仲裁、校準與清除效果可以把鏡像變回弱點。", recommendedPower: 2600, environment: "霧鏡審理場", environmentEffect: "敵方第一次取得增益時會轉成護盾，清除後才會露出核心", enemyTrait: "鏡像裁定", enemyTraitEffect: "敵方技能會短暫複寫一個正面效果", trialRule: "copy", modifiers: { enemyAttack: 1.08, enemyDefense: 1.12, teamAttack: 1.04 }, enemies: [{ name: "霧鏡執行獸", maxHp: 5100, attack: 330, defense: 255, speed: 118, count: 2 }, { name: "霧鏡裁定核", maxHp: 9200, attack: 375, defense: 330, speed: 86, count: 1 }], reward: { materialId: "mirror-core", materialName: "霧鏡映核", amount: 1, characterExp: 360 } }
+    { id: "boss-mirror-arbiter", name: "霧鏡裁定核", region: "霧鏡議庭", description: "裁定核與執行獸能複寫我方增益並重整護盾，安排增益與輸出時機。", recommendedPower: 2600, environment: "霧鏡審理場", environmentEffect: "敵方開場持有護盾，護盾耗盡後仍可重整", enemyTrait: "鏡像裁定", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次；若我方有攻擊、防禦或速度增益，敵方各複寫最強的一項，最多增加 20%，持續 2 輪", trialRule: "copy", modifiers: { enemyAttack: 1.08, enemyDefense: 1.12, teamAttack: 1.04 }, enemies: [{ name: "霧鏡執行獸", maxHp: 5100, attack: 330, defense: 255, speed: 118, count: 2 }, { name: "霧鏡裁定核", maxHp: 9200, attack: 375, defense: 330, speed: 86, count: 1 }], reward: { materialId: "mirror-core", materialName: "霧鏡映核", amount: 1, characterExp: 360 } }
   ];
 
   // Boss 等級現在只代表 Lv.1–3 獎勵檔位，而不是角色能不能突破的硬門檻。
@@ -467,9 +467,9 @@
 
   var dispatchVersion = updateCycle;
   var dispatchMissions = [
-    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "速度較快的角色更容易連續行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1680 } },
-    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高，但治療效率略降", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊速度最高的角色", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
-    { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，清除與控場會帶來額外優勢。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方增益會短暫反射，爆發時機很重要", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "敵方首次施放技能後獲得一次性護盾", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
+    { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "我方速度提高 8%，更容易先於敵人行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1680 } },
+    { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高 8%，治療量降低 10%", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊生命比例最低的角色，能越過前排", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
+    { id: "dispatch-mirror", name: "鏡潮回收", region: "鏡潮島", description: "回收被折光分裂的回覆片段，持續輸出與破防可協助拆解護盾。", recommendedPower: 2550, environment: "鏡潮折光", environmentEffect: "敵方開場持有護盾，耗盡後仍可重整", modifiers: { enemyAttack: 1.08, enemyDefense: 1.06, teamAttack: 1.04 }, enemyTrait: "折光護盾", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次", trialRule: "shield", enemies: [{ name: "折光拾荒獸", maxHp: 3000, attack: 245, defense: 180, speed: 105, count: 2 }, { name: "鏡潮主核", maxHp: 3900, attack: 220, defense: 208, speed: 74, count: 1 }], reward: { starSand: 260, characterExp: 1800, starMarks: 1 } }
   ];
 
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
@@ -555,7 +555,7 @@
   };
 
   // 星伴培育完全使用獨立資源，不會消耗角色經驗、星砂或命座素材。
-  var petVersion = "2.1-companion-workshop";
+  var petVersion = updateCycle;
   var petDefinitions = [
     { id: "star-fox", name: "星絨狐", temperament: "好奇", icon: "✦", accent: "#c49bff", image: "./assets/pets/star-fox.png", maxLevel: 30, description: "會把沒有寄出的回覆藏在尾巴裡，喜歡追逐微小星屑。" },
     { id: "tide-otter", name: "潮泡獸", temperament: "親人", icon: "◌", accent: "#71d8dc", image: "./assets/pets/tide-otter-v2.png", maxLevel: 30, description: "在潮汐邊收集泡沫，靠近玩家時會發出細小的水聲。" },
@@ -632,7 +632,7 @@
   var tutorialSteps = Object.freeze([
     Object.freeze({ id: "account", icon: "✦", title: "先看懂你的星界帳號", copy: "進度會綁定遊戲名稱與密碼；登入後抽卡、資源、保底、角色與劇情完成狀態都會自動保存。" }),
     Object.freeze({ id: "lobby", icon: "◇", title: "從星界之律大廳出發", copy: "大廳的劇情、抽卡、角色培養、星界試煉、星港委託、公告與本教學都必須登入後才能使用。" }),
-    Object.freeze({ id: "story", icon: "◈", title: "閱讀劇情並取得養成資源", copy: "主線與支線 1.0–2.5 已開放。每幕首次完成可獲得 100 星砂與 650 角色經驗，長篇正文可在劇情頁直接閱讀。" }),
+    Object.freeze({ id: "story", icon: "◈", title: "閱讀劇情並取得養成資源", copy: "目前開放 1.0 主線。完成正式章節可領取一次故事獎勵；1.1 之後的章節仍在製作，尚未對一般玩家開放。" }),
     Object.freeze({ id: "gacha", icon: "✧", title: "了解回覆召集", copy: "限定 4★ 可先選目標；前 20 抽不出 4★，第 21 抽起機率逐步提高，第 50 抽必定出 4★。歪到其他 4★ 會有星砂補償。" }),
     Object.freeze({ id: "growth", icon: "⬡", title: "培養與戰力", copy: "角色培養會提升生命、攻擊、防禦、速度與戰力；重複角色會增加命座並留下該角色專用晶核。三星滿命滿等約接近一般四星 55 等，四星滿命也會提升技能倍率與面板。" }),
     Object.freeze({ id: "trial", icon: "✹", title: "星界試煉與隊伍協同", copy: "最多派出 4 名角色。每關會顯示推薦戰力、敵人數值與特性；總戰力只是參考，治療、護盾、減防、速度和技能搭配都會影響勝負。" }),
@@ -642,6 +642,12 @@
     Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
   ]);
   var announcements = Object.freeze([
+    Object.freeze({
+      id: "major-combat-repair-2026-10-05", badge: "重大修正・補償", date: "2026-10-05", title: "1.0 戰鬥機制優化與重大失誤補償",
+      copy: "先前敵方目標、前後排判定、護送、持續治療及部分技能效果與說明不一致，影響了編隊與養成判斷，對造成的困擾與可能浪費的資源致歉。本次修正後，公開內容仍為 1.0。原有角色、命座、等級、星砂、星痕、角色經驗、突破材料、造型及已完成劇情均保留，不扣除。",
+      reward: "每個帳號一次性補償：6,000 星砂、6,000 角色經驗、3 星痕；登入後自動發放，不需消耗原有資源。",
+      highlights: ["重置星界試煉通關與獎勵次數、Boss 獎勵次數、星港委託、星海迷航及商店本期購買／轉換次數，可重新挑戰並領取本期獎勵", "星伴的本期探索、挑戰與展示評分次數重置；已擁有的星伴、培育等級、飼料及裝扮保留", "前後排、敵方目標、護送與治療、增減益及關卡提示已依實戰機制修正", "2.0–2.5 角色僅供作者隔離試玩，不進入一般玩家卡池或正式存檔"]
+    }),
     Object.freeze({
       id: "release-1-0", badge: "版本公告", date: "1.0", title: "1.0 劇情與 QW 召集開放",
       copy: "目前開放 1.0 劇情與卡池。後續章節和角色仍在製作，開放時間另行公告。",
@@ -2156,7 +2162,7 @@
     announcements: announcements,
     updateVersion: "1.0",
     updateCycle: updateCycle,
-    updateReward: Object.freeze({ starSand: 3200, characterExp: 2200 })
+    updateReward: Object.freeze({ starSand: 6000, characterExp: 6000, starMarks: 3 })
   };
 }));
 

@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const { banners, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
+const { banners, activeCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
@@ -23,13 +23,7 @@ const currentUpdateVersion = updateCycle;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
 const authorPreviewPlayerKey = "happycow";
-const authorPreview11Tasks = [
-  { title: "第一幕｜行前核對", scene: "白鐘北門。瑟蕾雅傷臂仍需照看，隊伍核對藥、乾繩、三日商路宿營點與已寄出的南行工作說明。", question: "核對後，應選哪個宿營方式？", choices: ["走夜路趕進度，在崩沿旁停宿", "確認藥與乾繩來源，按已核對的安全點宿營，走滿三日", "缺少物資也直接出發，賭沿路有人可借"], answer: 1, success: "隊伍補足缺口，按正常路程走滿三日到霧橋。", retry: "雷恩指出夜路與崩沿的風險；缺物須先借用或購買，再選安全宿營點。" },
-  { title: "第二幕｜兩岸清點", scene: "谷口近岸已有Siyeon、已撤居民與同行者；遠岸仍有芮妲、腳傷榆安與兩名居民。兩岸能用燈號互認，但通道尚未承重測試。", question: "這份名冊應如何交給測線小隊？", choices: ["回聲聽得到，就記成已可安全渡過", "先讓榆安夜間帶人試渡，再補名冊", "分列兩岸人員、急用藥與替班，標示能互認但尚不能渡過"], answer: 2, success: "QWER已在近岸實際重聚；遠岸待援名冊與急用藥交給下一幕測線。", retry: "假回聲與未測負重都不能證明通道安全；夜間不開渡。" },
-  { title: "第三幕｜測線與停止演練", scene: "空載繩測試後，舊圖距離與現場不合。Hina看風線、雷恩查錨點、Siyeon與Magenta在近岸辨真聲，遠岸以燈號回應。", question: "如何產生可交給救援隊的短段救援卡？", choices: ["完成空載、輕載與撤回測試，複核兩岸停止信號；只標已測短段", "讓腳傷榆安先走一次，確認承重", "由聲音定位整座谷，省略撤回測試"], answer: 0, success: "救援卡標出已測短段、不可走區與停止信號；星式只暫定眼前短段十餘息。", retry: "傷者不能試路；聲音只作互認，承重須靠普通繩與已測踏點，並能撤回。" },
-  { title: "第四幕｜有限撤離", scene: "只有短暫且可撤回的窗口。風線變動時先叫停，退到已測踏點，重新核對燈號、人數與主錨。", question: "救援批次與受驚苔角行獸應如何處理？", choices: ["先運整台車，再讓傷者等下一次窗口", "先送水與固定腳踝材料；分批撤榆安、居民與急藥；最後芮妲撤離，暫停低音讓出獸徑", "先打倒苔角行獸，之後不必再測錨點"], answer: 1, success: "所有已確認的人撤到近岸；車身與部分樂器留在遠岸，危險接點封閉。", retry: "先停止並複核，再依批次撤人與急藥。魔物不需要擊殺，車物損失不能抹去。" },
-  { title: "第五幕｜善後與聯絡", scene: "人員撤回後仍有借物、車損、病患送藥與演出器材待處理。翌日只有斷橋告示和初步運糧表，完整北側驛報尚未到。", question: "要怎樣完成交班並接到下一版本？", choices: ["短演之後宣告道路與傷勢都已恢復，立即簽1.2踏查", "只記QWER演出，車費與藥品留給下一章再說", "岑霧補庫存、芮妲估修車與責任、榆安核藥、QWER留信確認；等完整驛報到齊"], answer: 2, success: "四位樂手重新合作，損失與後續責任仍被記錄；1.2待完整驛報到齊才正式接案。", retry: "短演不會治好傷、車或道路。責任須對回持有人，完整驛報未到不能提前接案。" }
-];
+const authorPreview11Tasks = require("./src/author-preview.js").tasks;
 const databaseBaselines = new WeakMap();
 function createGame(state) {
   return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges });
@@ -360,7 +354,8 @@ function ensurePlayerMilestones(currentState) {
   if (!state.updateRewards.claimedVersions[currentUpdateVersion]) {
     state.resources.starSand += updateReward.starSand;
     state.resources.characterExp += updateReward.characterExp;
-    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, grantedAt: new Date().toISOString() };
+    state.resources.starMarks += updateReward.starMarks || 0;
+    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, starMarks: updateReward.starMarks || 0, grantedAt: new Date().toISOString() };
   }
   if (state.trialProgress.version !== currentUpdateVersion) {
     state.trialProgress.version = currentUpdateVersion;
@@ -400,6 +395,12 @@ function ensurePlayerMilestones(currentState) {
     state.voyageProgress.claimedRewards = {};
     state.voyageProgress.lastBattle = null;
     state.voyageProgress.lastEnding = null;
+  }
+  state.shopProgress = state.shopProgress || { version: shopCatalog.version, purchases: {}, conversions: {} };
+  if (state.shopProgress.version !== shopCatalog.version) {
+    state.shopProgress.version = shopCatalog.version;
+    state.shopProgress.purchases = {};
+    state.shopProgress.conversions = {};
   }
   state.petProgress = state.petProgress || { version: petVersion, exploreCount: 0, ratedShowcases: {} };
   if (state.petProgress.version !== petVersion) {
@@ -911,6 +912,32 @@ async function handleApi(request, response, requestUrl) {
   const database = await readDatabase();
   databaseBaselines.set(database, cloneDatabase(database));
   try {
+    if (requestUrl.pathname === "/api/author-preview/2-x-battle") {
+      const player = playerFromSession(database, body.token);
+      if (player.key !== authorPreviewPlayerKey) {
+        sendJson(response, 403, { ok: false, error: "2.0–2.5 角色試玩目前只開放給作者帳號。" });
+        return;
+      }
+      const previewCards = [...activeCards, ...version2Cards];
+      const allowed = new Set(previewCards.map((card) => card.id));
+      if (body.action !== "battle") {
+        sendJson(response, 200, { ok: true, characters: previewCards.map((card) => ({ id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" })), stages: trialStages.map((stage) => ({ id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower })), note: "隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
+        return;
+      }
+      const team = Array.isArray(body.team) ? body.team : [];
+      const stageId = Number(body.stageId);
+      const level = Number(body.level);
+      const constellation = Number(body.constellation);
+      if (team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some((id) => !allowed.has(id))) throw new Error("試玩隊伍須由 1.0 或 2.0–2.5 的 1–4 名不同角色組成");
+      if (!Number.isInteger(stageId) || stageId < 1 || stageId > trialStages.length) throw new Error("請選擇有效的試煉關卡");
+      if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) throw new Error("試玩等級須為 1–90、命座須為 C0–C6");
+      const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));
+      const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
+      const battle = simulateBattle({ team, stats, stage: trialStages[stageId - 1] });
+      battle.reward = { starSand: 0, characterExp: 0 };
+      sendJson(response, 200, { ok: true, battle, note: "模擬結果不寫入正式帳號，也不發放獎勵。" });
+      return;
+    }
     if (requestUrl.pathname === "/api/author-preview/1-1") {
       const player = playerFromSession(database, body.token);
       if (player.key !== authorPreviewPlayerKey) {

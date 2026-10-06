@@ -127,7 +127,7 @@
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
-      if (viewId === "author-preview-view") { loadAuthorPreview(); }
+      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "shop-view") { renderShop(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -214,10 +214,11 @@
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
       state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
       if (!state.updateRewards.claimedVersions[updateVersion]) {
-        var releaseReward = data.updateReward || { starSand: 3200, characterExp: 2200 };
+        var releaseReward = data.updateReward || { starSand: 6000, characterExp: 6000, starMarks: 3 };
         state.resources.starSand += Number(releaseReward.starSand || 0);
         state.resources.characterExp += Number(releaseReward.characterExp || 0);
-        state.updateRewards.claimedVersions[updateVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, grantedAt: new Date().toISOString() };
+        state.resources.starMarks += Number(releaseReward.starMarks || 0);
+        state.updateRewards.claimedVersions[updateVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, starMarks: releaseReward.starMarks || 0, grantedAt: new Date().toISOString() };
       }
       if (state.trialProgress && state.trialProgress.version !== updateVersion) {
         state.trialProgress.version = updateVersion;
@@ -258,6 +259,13 @@
         state.voyageProgress.claimedRewards = {};
         state.voyageProgress.lastBattle = null;
         state.voyageProgress.lastEnding = null;
+      }
+      var shopVersion = data.shopCatalog && data.shopCatalog.version || updateVersion;
+      state.shopProgress = state.shopProgress || { version: shopVersion, purchases: {}, conversions: {} };
+      if (state.shopProgress.version !== shopVersion) {
+        state.shopProgress.version = shopVersion;
+        state.shopProgress.purchases = {};
+        state.shopProgress.conversions = {};
       }
       var petVersion = data.petVersion || updateVersion;
       state.petProgress = state.petProgress || { version: petVersion, exploreCount: 0, ratedShowcases: {} };
@@ -504,14 +512,14 @@
     }
     function renderLobby() {
       if (!game) return;
-      byId("author-preview-entry").hidden = !(remoteMode && playerKey(currentPlayerName) === "happycow");
+      byId("author-preview-entry").hidden = playerKey(currentPlayerName) !== "happycow";
       var state = game.getState(); var progress = storyProgress(state); var openChapters = data.storyChapters.filter(function (item) { return item.releaseOpen === true; }); var completed = openChapters.reduce(function (sum, item) { return sum + item.scenes.filter(function (scene) { return Boolean(progress.completedScenes[sceneKey(item.id, scene.id)]); }).length; }, 0); var total = openChapters.reduce(function (sum, chapter) { return sum + chapter.scenes.length; }, 0); var chapter = storyChapterById(progress.currentChapter) || data.storyChapters[0];
       if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
       byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
       var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
       var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
-      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = "更新獎勵 +" + Number(data.updateReward && data.updateReward.starSand || 3200).toLocaleString() + " 星砂" + (updateClaimed ? "（已發放）" : "");
+      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = "失誤補償 +" + Number(data.updateReward && data.updateReward.starSand || 6000).toLocaleString() + " 星砂、" + Number(data.updateReward && data.updateReward.starMarks || 3) + " 星痕" + (updateClaimed ? "（已發放）" : "");
       var tutorialDone = tutorialProgress(state).rewardClaimed === true;
       var tutorialQuick = byId("open-tutorial");
       if (tutorialQuick) tutorialQuick.classList.toggle("completed", tutorialDone);
@@ -533,11 +541,69 @@
       var task = payload.task;
       byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">" + escapeHtml(task.scene) + "</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
     }
+    function authorPreviewStoryRequest(action, choice) {
+      if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/1-1", { action: action, choice: choice });
+      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("這個試玩入口目前只開放給作者帳號。"));
+      var tasks = window.StarshipAuthorPreview && window.StarshipAuthorPreview.tasks;
+      if (!tasks) return Promise.reject(new Error("作者試玩任務資料尚未載入。"));
+      var storageKey = "starship-author-preview-1-1:" + encodeURIComponent(playerKey(currentPlayerName));
+      var progress = { step: 0, mistakes: 0 };
+      try { progress = Object.assign(progress, JSON.parse(window.localStorage.getItem(storageKey) || "{}")); } catch (error) { /* 保留可用的初始進度 */ }
+      if (action === "reset") progress = { step: 0, mistakes: 0 };
+      else if (action === "answer") {
+        var task = tasks[progress.step];
+        if (!task) return Promise.reject(new Error("已完成試玩；可選擇重新開始。"));
+        if (!Number.isInteger(choice) || choice < 0 || choice >= task.choices.length) return Promise.reject(new Error("請選擇一個有效選項。"));
+        progress = choice === task.answer
+          ? { step: progress.step + 1, mistakes: progress.mistakes, feedback: task.success, correct: true }
+          : { step: progress.step, mistakes: progress.mistakes + 1, feedback: task.retry, correct: false };
+      }
+      if (action === "reset" || action === "answer") {
+        try { window.localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (error) { /* 無法儲存時仍可當次試玩 */ }
+      }
+      return Promise.resolve({ ok: true, progress: { step: progress.step, total: tasks.length, mistakes: progress.mistakes, feedback: progress.feedback || "", correct: progress.correct }, task: tasks[progress.step] || null });
+    }
+    function authorPreviewBattleRequest(body) {
+      if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/2-x-battle", body);
+      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("2.0–2.5 角色試玩目前只開放給作者帳號。"));
+      var cards = data.activeCards.concat(data.version2Cards);
+      var allowed = new Set(cards.map(function (card) { return card.id; }));
+      if (body.action !== "battle") return Promise.resolve({ ok: true, characters: cards.map(function (card) { return { id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : data.characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" }; }), stages: data.trialStages.map(function (stage) { return { id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower }; }), note: "本機隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
+      var team = body.team, level = body.level, constellation = body.constellation, stageId = body.stageId;
+      if (!Array.isArray(team) || team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some(function (id) { return !allowed.has(id); })) return Promise.reject(new Error("試玩隊伍須由 1.0 或 2.0–2.5 的 1–4 名不同角色組成。"));
+      if (!Number.isInteger(stageId) || stageId < 1 || stageId > data.trialStages.length) return Promise.reject(new Error("請選擇有效的試煉關卡。"));
+      if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) return Promise.reject(new Error("試玩等級須為 1–90、命座須為 C0–C6。"));
+      var characterProgress = {};
+      team.forEach(function (id) { characterProgress[id] = { level: level, constellation: constellation }; });
+      var stats = window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, { characterProgress: characterProgress });
+      var battle = window.StarshipBattle.simulateBattle({ team: team, stats: stats, stage: data.trialStages[stageId - 1] });
+      battle.reward = { starSand: 0, characterExp: 0 };
+      return Promise.resolve({ ok: true, battle: battle, note: "本機模擬結果不寫入正式帳號，也不發放獎勵。" });
+    }
     function loadAuthorPreview(action, choice) {
       var requestId = ++authorPreviewRequestId;
       byId("author-preview-task").innerHTML = "<p>正在載入任務……</p>";
       byId("author-preview-reset").disabled = true;
-      apiRequest("/api/author-preview/1-1", { action: action || "view", choice: choice }).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) byId("author-preview-task").textContent = error.message; }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
+      authorPreviewStoryRequest(action || "view", choice).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) byId("author-preview-task").textContent = error.message; }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
+    }
+    function loadAuthorBattlePreview() {
+      authorPreviewBattleRequest({ action: "view" }).then(function (payload) {
+        var cards = payload.characters || [];
+        var defaults = cards.filter(function (card) { return Number(card.version) >= 2; }).slice(0, 4).map(function (card) { return card.id; });
+        var option = function (selected) { return "<option value=\"\">空位</option>" + cards.map(function (card) { return "<option value=\"" + escapeHtml(card.id) + "\"" + (selected === card.id ? " selected" : "") + ">" + escapeHtml(card.name + " · " + card.version + " · " + card.status) + "</option>"; }).join(""); };
+        byId("author-preview-2x-setup").innerHTML = "<p>" + escapeHtml(payload.note) + "</p><div class=\"author-preview-2x-controls\">" + [0,1,2,3].map(function (index) { return "<label>" + (index < 2 ? "前排 " : "後排 ") + (index + 1) + "<select data-author-2x-slot=\"" + index + "\">" + option(defaults[index]) + "</select></label>"; }).join("") + "<label>關卡<select id=\"author-preview-2x-stage\">" + payload.stages.map(function (stage) { return "<option value=\"" + stage.id + "\"" + (stage.id === 25 ? " selected" : "") + ">第 " + stage.id + " 關｜" + escapeHtml(stage.name) + "（建議戰力 " + number(stage.recommendedPower) + "）</option>"; }).join("") + "</select></label><label>等級<input id=\"author-preview-2x-level\" type=\"number\" min=\"1\" max=\"90\" value=\"90\"></label><label>命座<input id=\"author-preview-2x-constellation\" type=\"number\" min=\"0\" max=\"6\" value=\"2\"></label><button id=\"author-preview-2x-run\" class=\"primary-action\" type=\"button\">開始模擬戰鬥</button></div>";
+      }).catch(function (error) { byId("author-preview-2x-setup").textContent = error.message; });
+    }
+    function runAuthorBattlePreview() {
+      var team = Array.from(document.querySelectorAll("[data-author-2x-slot]")).map(function (select) { return select.value; }).filter(Boolean);
+      var result = byId("author-preview-2x-result");
+      result.textContent = "正在演算……";
+      authorPreviewBattleRequest({ action: "battle", team: team, stageId: Number(byId("author-preview-2x-stage").value), level: Number(byId("author-preview-2x-level").value), constellation: Number(byId("author-preview-2x-constellation").value) }).then(function (payload) {
+        var battle = payload.battle;
+        var teamMarkup = battle.team.map(function (unit) { return "<p>" + escapeHtml(unit.row === "front" ? "前排 " : "後排 ") + escapeHtml((data.cards[unit.id] && data.cards[unit.id].name) || unit.id) + "：HP " + number(unit.hp) + "/" + number(unit.maxHp) + "；技能 " + unit.skillUses + " 次</p>"; }).join("");
+        var enemyMarkup = battle.enemies.map(function (unit) { return "<p>敵方 " + escapeHtml(unit.name) + "：HP " + number(unit.hp) + "/" + number(unit.maxHp) + "</p>"; }).join("");
+        result.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : battle.timedOut ? "timeout" : "lost") + "\"><div><strong>" + (battle.won ? "通關" : battle.timedOut ? "超時" : "未通關") + " · 第 " + battle.stageId + " 關 · " + battle.rounds + " 回合</strong><small>隊伍戰力 " + number(battle.teamPower) + "；建議戰力 " + number(battle.recommendedPower) + "。" + escapeHtml(payload.note) + "</small></div></div><div class=\"battle-log\">" + teamMarkup + enemyMarkup + "</div><details><summary>查看戰鬥紀錄</summary><div class=\"battle-log\">" + battle.logs.map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
+      }).catch(function (error) { result.textContent = error.message; });
     }
     function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
     function storyBodyMarkup(text, className, actNumber) {
@@ -597,6 +663,7 @@
       if (currentStoryMapFilter === "all") return true;
       var start = storyMapVersionStart(location.versionRange);
       if (currentStoryMapFilter === "live") return start <= 1.0;
+      if (currentStoryMapFilter === "next") return start >= 1.1 && start <= 1.3;
       if (currentStoryMapFilter === "3") return start >= 3 && start < 4;
       if (currentStoryMapFilter === "4") return start >= 4 && start < 5;
       if (currentStoryMapFilter === "5") return start >= 5;
@@ -644,7 +711,9 @@
       var container = byId("story-world-map"); var map = data.storyWorldMap;
       if (!container || !map) return;
       var chapterLocations = storyMapChapterLocationIds(chapter);
-      if (!currentStoryMapLocationId || !storyMapLocationById(currentStoryMapLocationId) || (chapterLocations.length && chapterLocations.indexOf(currentStoryMapLocationId) < 0) || (!chapterLocations.length && currentStoryMapLocationId)) currentStoryMapLocationId = chapterLocations[0] || (map.locations[0] && map.locations[0].id);
+      if (!currentStoryMapLocationId || !storyMapLocationById(currentStoryMapLocationId) || !storyMapFilterMatches(storyMapLocationById(currentStoryMapLocationId))) {
+        currentStoryMapLocationId = chapterLocations.filter(function (id) { return storyMapFilterMatches(storyMapLocationById(id)); })[0] || (map.locations.filter(storyMapFilterMatches)[0] || map.locations[0]).id;
+      }
       var selected = storyMapLocationById(currentStoryMapLocationId) || map.locations[0];
       var visibleIds = {};
       map.locations.filter(storyMapFilterMatches).forEach(function (location) { visibleIds[location.id] = true; });
@@ -654,7 +723,8 @@
       }).join("");
       var routes = (map.routes || []).map(function (route) {
         var visible = visibleIds[route.from] && visibleIds[route.to];
-        return "<path class=\"story-map-route" + (visible ? "" : " muted") + "\" d=\"" + escapeHtml(storyMapRoutePath(route)) + "\"><title>" + escapeHtml(route.label + "｜" + route.direction) + "</title></path>";
+        var planned = !storyMapLocationIsOpen(storyMapLocationById(route.from)) || !storyMapLocationIsOpen(storyMapLocationById(route.to));
+        return "<path class=\"story-map-route" + (visible ? "" : " muted") + (planned ? " planned" : "") + (route.kind === "rift" ? " rift" : "") + "\" d=\"" + escapeHtml(storyMapRoutePath(route)) + "\"><title>" + escapeHtml(route.label + "｜" + route.direction) + "</title></path>";
       }).join("");
       var labels = (map.regions || []).map(storyMapRegionLabelMarkup).join("");
       var nodes = map.locations.map(function (location) {
@@ -666,11 +736,12 @@
       }).join("");
       var selectedRegion = storyMapRegionById(selected && selected.regionId) || {};
       var selectedChapters = storyMapChapterMarkup(selected || map.locations[0]);
-      var filters = [["all", "1.0 已開放路線"]].map(function (item) {
+      var filters = [["all", "全部地點"], ["live", "1.0 已開放"], ["next", "1.1–1.3 建檔"]].map(function (item) {
         return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
       }).join("");
       var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
-      container.innerHTML = "<div class=\"story-map-heading\"><div><span class=\"eyebrow\">STAR-LAW / WORLD ATLAS</span><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">正式版 · 1.0</span></div><div class=\"story-map-filters\" role=\"tablist\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-line\"></i>故事航線</span></div></div><aside class=\"story-map-details\"><span class=\"eyebrow\">SELECTED LOCATION</span><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p><div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>閱讀方位提示</strong> 此圖只標已定相對方位，非比例地圖。南驛山谷位於獸靈森地南緣；界痕位移不能視為步行路線，也無法倒推精確羅盤方向。離村後西行兩日到白鐘，再從北門北行。</p>";
+      var localSites = (selected.localSites || []).map(function (site) { return "<li>" + escapeHtml(site) + "</li>"; }).join("");
+      container.innerHTML = "<div class=\"story-map-heading\"><div><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">1.0 開放 · 後續建檔</span></div><div class=\"story-map-filters\" role=\"group\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-dot planned\"></i>後續建檔</span><span><i class=\"legend-line\"></i>步行／水路</span><span><i class=\"legend-line rift\"></i>界痕位移</span></div></div><aside class=\"story-map-details\"><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p>" + (localSites ? "<div class=\"story-map-local-sites\"><strong>1.2 現地分區</strong><ul>" + localSites + "</ul></div>" : "") + "<div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>方位與行程</strong> 此圖只標已定的相對方位，非比例地圖。界痕位移不是日常道路；獸靈之村向西兩日到白鐘，白鐘向北三日到霧橋。霧橋到洛汀須先南返白鐘三日，再順流兩日；洛汀相對白鐘的精確羅盤角與斷橋局部幾何仍待核定。</p>";
     }
     function renderStoryReader(state, chapter) {
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
@@ -881,9 +952,21 @@
         hina: { 2: "讓其他隊友命中 Hina 已標記的敵人，才能觸發追擊。" },
         magenta: { 6: "讓其他隊友命中 Magenta 降防中的敵人，才能觸發回響。" }
       };
-      var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
+      var growthNote = card.rarity === 4 ? "每解鎖 1 命，等級成長後的生命、攻擊、防禦各增加 8%；速度按基礎值增加 0.4%，技能面板倍率按基礎值增加 1%。" : "每解鎖 1 命，等級成長後的生命、攻擊、防禦各增加 3.5%；速度按基礎值增加 0.4%，技能面板倍率按基礎值增加 1.8%。";
+      var futurePrototype = Number(card.releaseVersion) >= 2 && !stats.signature;
+      var prototypeEffect = "";
+      if (futurePrototype) {
+        var role = stats.role;
+        if (["治療", "拾音"].includes(role)) prototypeEffect = "目前試玩：僅在隊友受傷時，治療生命比例最低者；回復量為自身最大生命 18% ＋自身攻擊力 45%。";
+        else if (role === "修復") prototypeEffect = "目前試玩：僅在隊友受傷時，治療最多 3 人，各回復自身最大生命 12% ＋自身攻擊力 45%；移除受療者的治療降低效果，並使其受傷減少 12% 共 2 輪。";
+        else if (["守衛", "重裝", "守門"].includes(role)) prototypeEffect = "目前試玩：下一次自身受擊減傷 " + (role === "守門" ? "54%" : "46%") + "；全隊防禦提高約 " + (role === "守門" ? "16.3%" : "11.1%") + " 共 2 輪。" + (role === "守門" ? "另清除敵方攻擊與易傷增益。" : "");
+        else if (["指揮", "支援", "節奏"].includes(role)) prototypeEffect = "目前試玩：全隊" + (role === "指揮" ? "攻擊提高 13%" : role === "節奏" ? "速度提高 16%" : "防禦提高約 13.6%") + "，持續 2 輪。";
+        else prototypeEffect = "目前試玩：對一名敵人造成自身攻擊力 × 技能倍率的傷害。" + (["校準", "測量", "編譯", "仲裁"].includes(role) ? "目標防禦降低 22% 共 2 輪。" : role === "鍛路" ? "目標攻擊降低 26% 共 2 輪。" : ["射手", "斥候", "獵人"].includes(role) ? "附加一次易傷標記，使下一次受擊傷害提高 18%。" : role === "爆發" ? "另一名敵人另受主技能原始倍率 45% 的傷害。" : "");
+      }
+      var skillDescription = futurePrototype ? prototypeEffect + " 未來專屬設計方向：" + (stats.skillEffect || "待定") + "（尚未實作，數值待定）。" : stats.skillEffect || "尚未登錄";
+      var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><p class=\"constellation-growth-note\">共通面板成長｜" + escapeHtml(growthNote) + "各命效果累積生效；生命、攻擊、防禦與速度最終取整數。技能面板倍率是展示數值，實戰依下列技能公式計算；護盾最多累積至受盾者最大生命的 28%。</p><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
       var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>";
-      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(stats.skillEffect || "尚未登錄") + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
+      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(skillDescription) + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
     }
     function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); byId("character-detail").scrollIntoView({ behavior: "smooth", block: "start" }); }
@@ -1006,6 +1089,30 @@
     function trialUnlocked(state, stageId) { return Number(stageId) === 1 || trialProgress(state).clearedStages.indexOf(Number(stageId) - 1) >= 0; }
     function effectiveBattleStats(state) { return window.StarshipBattle && window.StarshipBattle.buildEffectiveStats ? window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, state) : data.characterBattleStats; }
     function trialPower(team, state) { return window.StarshipBattle ? window.StarshipBattle.teamPower(team, effectiveBattleStats(state)) : 0; }
+    function renderFormation(mode, team, state, stage) {
+      var target = byId(mode + "-formation");
+      if (!target) return;
+      var locksWeakest = stage && ["mark", "multi", "execute", "finale"].indexOf(stage.trialRule) >= 0;
+      var rule = locksWeakest ? "本關敵人鎖定生命比例最低的角色，能越過前排；生命比例相同時依格位順序選目標。" : "一般敵人先攻擊前排；前排全退場後才攻擊後排，同排依格位順序選目標。";
+      target.innerHTML = "<p class=\"formation-rule\">" + escapeHtml(rule) + "點下方角色加入，再用格位按鈕換位。</p><div class=\"formation-slots\">" + [0, 1, 2, 3].map(function (index) {
+        var card = team[index] && data.cards[team[index]]; var row = index < 2 ? "前排" : "後排";
+        var portrait = card && characterPortraitSource(card, state, true);
+        return "<div class=\"formation-slot " + (card ? "occupied" : "empty") + "\"><span class=\"formation-slot-position\">" + row + " " + (index + 1) + "</span>" + (card ? "<img src=\"" + escapeHtml(portrait || "") + "\" alt=\"\" loading=\"lazy\"><strong>" + escapeHtml(card.name) + "</strong><div class=\"formation-slot-actions\"><button type=\"button\" data-formation-move=\"" + mode + "\" data-formation-index=\"" + index + "\" data-formation-direction=\"-1\" aria-label=\"將" + escapeHtml(card.name) + "往前換一格\"" + (index === 0 ? " disabled" : "") + ">前移</button><button type=\"button\" data-formation-move=\"" + mode + "\" data-formation-index=\"" + index + "\" data-formation-direction=\"1\" aria-label=\"將" + escapeHtml(card.name) + "往後換一格\"" + (index >= team.length - 1 ? " disabled" : "") + ">後移</button></div>" : "<small>尚未編入</small>") + "</div>";
+      }).join("") + "</div>";
+    }
+    function moveFormationMember(mode, index, direction) {
+      var teams = { trial: currentTrialTeam, boss: currentBossTeam, dispatch: currentDispatchTeam, voyage: currentVoyageTeam };
+      var team = teams[mode], next = index + direction;
+      if (!team || !Number.isInteger(index) || !Number.isInteger(direction) || Math.abs(direction) !== 1 || index < 0 || next < 0 || next >= team.length) return;
+      var current = team[index]; team[index] = team[next]; team[next] = current;
+      var state = game.getState();
+      if (mode === "trial") trialProgress(state).selectedTeam = team.slice();
+      else if (mode === "boss") bossProgress(state).selectedTeam = team.slice();
+      else if (mode === "dispatch") dispatchProgress(state).selectedTeam = team.slice();
+      else voyageProgress(state).selectedTeam = team.slice();
+      updateGameFromState(state); saveLocalState();
+      ({ trial: renderTrial, boss: renderBoss, dispatch: renderDispatch, voyage: renderVoyage })[mode]();
+    }
     function enemyArtFor(enemy) {
       var approvedMonsterArt = {
         "黑晶異變巨獸": "./assets/enemies/black-crystal-beast.webp",
@@ -1057,15 +1164,15 @@
       });
       return text;
     }
-    function battleUnitMarkup(unit, state, isEnemy) {
-      var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state, true); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var detail = isEnemy ? "敵方單位" : card ? (card.note || "已編入戰鬥") : "已編入戰鬥"; var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
+    function battleUnitMarkup(unit, state, isEnemy, index) {
+      var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state, true); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var slot = Number(unit.slot || index + 1); var row = slot <= 2 ? "前排" : "後排"; var detail = isEnemy ? "敵方單位" : row + " " + slot + " · " + (card ? card.note || "已編入戰鬥" : "已編入戰鬥"); var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
       return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><button class=\"battle-unit-visual\" type=\"button\" data-battle-art=\"" + escapeHtml(image || "") + "\" data-battle-name=\"" + escapeHtml(name) + "\" aria-label=\"放大查看 " + escapeHtml(name) + " 立繪\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></button><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
     }
     function battleSceneMarkup(battle, state, stage, mode) {
       if (!battle) return "";
       var timedOut = battle.status === "timeout" || battle.timedOut === true; var resultClass = battle.won ? "battle-clear" : timedOut ? "battle-timeout" : "battle-failed"; var team = Array.isArray(battle.team) ? battle.team : []; var enemies = Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗|上限|超時/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
       var title = stage && stage.name ? stage.name : battle.stageName || "自走棋戰鬥"; var environment = battle.environment || stage && stage.environment || "一般戰鬥"; var rule = battle.enemyTrait || stage && stage.enemyTrait || "一般特性";
-      return "<section class=\"battle-scene " + resultClass + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit) { return battleUnitMarkup(unit, state, false); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit) { return battleUnitMarkup(unit, state, true); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
+      return "<section class=\"battle-scene " + resultClass + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit, index) { return battleUnitMarkup(unit, state, false, index); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit, index) { return battleUnitMarkup(unit, state, true, index); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
     }
     function decorateTrialMythic(stage) {
       if (!stage || !stage.mythicTheme) return;
@@ -1123,6 +1230,7 @@
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
+      renderFormation("trial", currentTrialTeam, state, current);
       byId("trial-team-list").innerHTML = owned.length ? owned.map(function (card) {
         var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentTrialTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : "");
         return "<button class=\"trial-team-card " + (selected ? "selected" : "") + "\" data-trial-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small><small>技能｜" + escapeHtml(stats.skillName || "—") + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>";
@@ -1192,6 +1300,7 @@
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentBossTeam = currentBossTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("boss-team-count").textContent = currentBossTeam.length + " / 4 · 戰力 " + number(trialPower(currentBossTeam, state));
+      renderFormation("boss", currentBossTeam, state, current);
       byId("boss-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentBossTeam.indexOf(card.id) >= 0; var requirement = data.characterBreakthroughs[card.id]; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card boss-team-card " + (selected ? "selected" : "") + "\" data-boss-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>需要：" + escapeHtml(requirement ? requirement.materialName : "未設定") + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可挑戰 Boss 的角色。</div>";
       var startButton = byId("start-boss-battle"); startButton.disabled = !currentBossTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 10 次" : "開始 Boss 自走棋";
       renderBossBattleResult(state);
@@ -1248,6 +1357,7 @@
       byId("dispatch-mission-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>DISPATCH</span><span>" + escapeHtml(current.region) + "</span>" + (claimed ? "<span>CLAIMED</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>" + escapeHtml(current.description) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般委託") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>建議面板戰力 <b>" + number(current.recommendedPower) + "</b></span><span>完成獎勵 <b>" + escapeHtml(rewardText(current.reward || {})) + "</b></span><span>版本完成度 <b>" + (claimed ? "已領取" : "未領取") + "</b></span></div>";
       if (byId("dispatch-enemy-intel")) byId("dispatch-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>每份委託的敵人特性不同，編隊不只看總戰力</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       byId("dispatch-team-count").textContent = currentDispatchTeam.length + " / 4 · 戰力 " + number(trialPower(currentDispatchTeam, state));
+      renderFormation("dispatch", currentDispatchTeam, state, current);
       byId("dispatch-team-list").innerHTML = owned.length ? owned.map(function (card) { var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentDispatchTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card dispatch-team-card " + (selected ? "selected" : "") + "\" data-dispatch-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可執行委託的角色。</div>";
       var startButton = byId("start-dispatch"); startButton.disabled = claimed || !currentDispatchTeam.length; startButton.textContent = claimed ? "本版本委託已完成" : "執行星港委託";
       renderDispatchBattleResult(state);
@@ -1386,6 +1496,7 @@
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
       currentVoyageTeam = currentVoyageTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
       byId("voyage-team-count").textContent = currentVoyageTeam.length + " / 4 · 戰力 " + number(trialPower(currentVoyageTeam, state));
+      renderFormation("voyage", currentVoyageTeam, state, currentStage);
       byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
       renderVoyageGuide(state, progress, currentNode, currentStage);
       renderVoyageResult(state);
@@ -1681,6 +1792,7 @@
     byId("open-author-preview").addEventListener("click", function () { showView("author-preview-view"); });
     byId("author-preview-task").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
     byId("author-preview-reset").addEventListener("click", function () { loadAuthorPreview("reset"); });
+    byId("author-preview-2x-setup").addEventListener("click", function (event) { if (event.target.closest("#author-preview-2x-run")) runAuthorBattlePreview(); });
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
      byId("open-characters").addEventListener("click", function () { showView("character-view"); });
     byId("open-trial").addEventListener("click", function () { showView("trial-view"); });
@@ -1750,6 +1862,12 @@
     byId("milestone-rewards").addEventListener("click", function (event) { var button = event.target.closest("[data-reward-key]"); if (button) claimCharacterChoice(button.getAttribute("data-reward-key"), button.getAttribute("data-card-id")); });
      byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
      byId("trial-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-character]"); if (button) toggleTrialTeam(button.getAttribute("data-trial-character")); });
+     ["trial", "boss", "dispatch", "voyage"].forEach(function (mode) {
+       byId(mode + "-formation").addEventListener("click", function (event) {
+         var button = event.target.closest("[data-formation-move]");
+         if (button && !button.disabled) moveFormationMember(mode, Number(button.getAttribute("data-formation-index")), Number(button.getAttribute("data-formation-direction")));
+       });
+     });
      byId("start-trial-battle").addEventListener("click", runTrialBattle);
      byId("boss-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-stage]"); if (button) { currentBossStageId = button.getAttribute("data-boss-stage"); currentBossTeam = []; var state = game.getState(); var progress = bossProgress(state); progress.selectedBossId = currentBossStageId; progress.selectedTeam = []; updateGameFromState(state); saveLocalState(); renderBoss(); } });
      byId("boss-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-character]"); if (button) toggleBossTeam(button.getAttribute("data-boss-character")); });

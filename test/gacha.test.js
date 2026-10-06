@@ -14,7 +14,7 @@ test("正式版只開放 1.0 角色與 QW 卡池", () => {
   assert.equal(banners.find((banner) => banner.id === "limited-2-0-to-2-5").active, false);
   assert.equal(banners.find((banner) => banner.id === "rerun-1-0-to-2-0").active, false);
   assert.equal(version2Cards.length, 8);
-  assert.equal(updateReward.starSand, 3200);
+  assert.deepEqual(updateReward, { starSand: 6000, characterExp: 6000, starMarks: 3 });
 });
 
 test("後續角色都有完整立繪來源，但不會混入現行卡池", () => {
@@ -126,11 +126,17 @@ test("1.0 主線開放，其餘章節保持鎖定", () => {
   assert.equal(storyChapters.filter((chapter) => chapter.id !== "main-1-0").every((chapter) => chapter.releaseOpen === false), true);
 });
 
-test("正式遊戲地圖只呈現 1.0 路線", () => {
-  assert.equal(storyWorldMap.locations.length, 4);
-  assert.deepEqual(Object.keys(storyWorldMap.chapterLocations), ["main-1-0"]);
-  assert.equal(storyWorldMap.routes.length, 3);
-  assert.equal(storyWorldMap.chapterLocations["main-1-0"].includes("beast-village"), true);
+test("旅程地圖區分已開放 1.0 與後續建檔路線", () => {
+  const locations = Object.fromEntries(storyWorldMap.locations.map((location) => [location.id, location]));
+  assert.equal(storyWorldMap.locations.filter((location) => location.versionRange === "1.0").length, 4);
+  assert.deepEqual(storyWorldMap.chapterLocations["main-1-0"], ["south-valley", "beast-village", "whitebell-city", "north-road"]);
+  assert.deepEqual(storyWorldMap.chapterLocations["main-1-2"], ["mistbridge", "north-bridge"]);
+  assert.equal(locations["north-bridge"].versionRange, "1.2");
+  assert.equal(locations["north-bridge"].localSites.length, 4);
+  assert.equal(storyWorldMap.routes.every((route) => locations[route.from] && locations[route.to]), true);
+  assert.equal(storyWorldMap.routes.find((route) => route.from === "south-valley").kind, "rift");
+  assert.equal(locations["beast-village"].x > locations["whitebell-city"].x, true);
+  assert.equal(locations["mistbridge"].y < locations["whitebell-city"].y, true);
 });
 
 test("星港委託提供額外玩法與非抽卡獎勵", () => {
@@ -231,7 +237,8 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.length >= 7, true);
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
   assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
-  assert.equal(announcements.length, 1);
+  assert.equal(announcements.length, 2);
+  assert.equal(announcements[0].id, "major-combat-repair-2026-10-05");
   assert.equal(announcements.some((item) => item.id === "release-1-0"), true);
   const gacha = game();
   const before = gacha.getState().resources;
