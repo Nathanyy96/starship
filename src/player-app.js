@@ -21,6 +21,8 @@
     var currentStoryTab = "main";
     var currentStoryMapFilter = "all";
     var currentStoryMapLocationId = "";
+    var currentAtlasMapId = "W-001";
+    var currentAtlasPointId = "";
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
     var currentBossStageId = "boss-star-warden";
@@ -710,6 +712,10 @@
     function renderStoryWorldMap(chapter) {
       var container = byId("story-world-map"); var map = data.storyWorldMap;
       if (!container || !map) return;
+      if (globalThis.StarshipInteractiveMap) {
+        container.innerHTML = globalThis.StarshipInteractiveMap.render(currentAtlasMapId, currentAtlasPointId);
+        return;
+      }
       var chapterLocations = storyMapChapterLocationIds(chapter);
       if (!currentStoryMapLocationId || !storyMapLocationById(currentStoryMapLocationId) || !storyMapFilterMatches(storyMapLocationById(currentStoryMapLocationId))) {
         currentStoryMapLocationId = chapterLocations.filter(function (id) { return storyMapFilterMatches(storyMapLocationById(id)); })[0] || (map.locations.filter(storyMapFilterMatches)[0] || map.locations[0]).id;
@@ -1826,6 +1832,14 @@
     byId("story-chapters").addEventListener("click", function (event) { var button = event.target.closest("[data-story-id]"); if (button) updateStorySelection(button.getAttribute("data-story-id")); });
     byId("story-reader").addEventListener("click", function (event) { var sceneButton = event.target.closest("[data-scene-id]"); if (sceneButton) { currentStorySceneId = sceneButton.getAttribute("data-scene-id"); renderStory(); return; } var completeButton = event.target.closest("[data-complete-scene]"); if (completeButton) completeStoryScene(currentStoryChapterId, completeButton.getAttribute("data-complete-scene")); });
     byId("story-world-map").addEventListener("click", function (event) {
+      var atlasTarget = event.target.closest("[data-map-go]");
+      if (atlasTarget && globalThis.StarshipInteractiveMap) {
+        var atlasId = atlasTarget.getAttribute("data-map-go");
+        if (atlasId.charAt(0) === "#") currentAtlasPointId = atlasId;
+        else { currentAtlasMapId = atlasId; currentAtlasPointId = ""; }
+        renderStoryWorldMap(storyChapterById(currentStoryChapterId));
+        return;
+      }
       var filter = event.target.closest("[data-map-filter]");
       if (filter) { currentStoryMapFilter = filter.getAttribute("data-map-filter") || "all"; renderStoryWorldMap(storyChapterById(currentStoryChapterId)); return; }
       var location = event.target.closest("[data-map-location]");
