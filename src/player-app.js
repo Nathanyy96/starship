@@ -538,7 +538,7 @@
       var container = byId("author-preview-map");
       if (!container) return;
       if (!globalThis.StarshipInteractiveMap) { container.textContent = "互動地圖資料尚未載入。"; return; }
-      container.innerHTML = globalThis.StarshipInteractiveMap.render(authorAtlasMapId, authorAtlasPointId);
+      container.innerHTML = globalThis.StarshipInteractiveMap.render(authorAtlasMapId, authorAtlasPointId, { authorPreview: true });
       byId("author-preview-map-progress").textContent = "本次已查看 " + authorAtlasVisited.size + " 個地圖／地點 · 當前：" + globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].name + (authorAtlasPointId ? " · " + (globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].points || []).filter(function (point) { return point[0] === authorAtlasPointId; }).map(function (point) { return point[1]; })[0] : "");
     }
     function renderAuthorPreview(payload) {
