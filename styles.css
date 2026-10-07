@@ -711,8 +711,10 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .atlas-pin { position:absolute; z-index:1; transform:translate(-50%,-50%); min-width:22px; min-height:22px; padding:0; border:2px solid #fff0b9; border-radius:50%; background:#143b5e; box-shadow:0 0 0 4px rgba(8,25,46,.6),0 0 16px rgba(255,234,161,.8); cursor:pointer; }
 .atlas-pin span { display:none; position:absolute; left:50%; bottom:calc(100% + 5px); transform:translateX(-50%); width:max-content; max-width:170px; padding:4px 7px; border:1px solid #ebd49f; border-radius:5px; color:#fff8de; background:rgba(8,21,35,.94); font-size:clamp(.52rem,.85vw,.72rem); line-height:1.3; white-space:normal; pointer-events:none; }
 .atlas-pin:hover span, .atlas-pin:focus-visible span, .atlas-pin.active span { display:block; }
-.atlas-level-0 .atlas-pin span, .atlas-concept .atlas-pin span { display:block; font-weight:700; }
+.atlas-concept .atlas-pin span { display:block; font-weight:700; }
 .atlas-level-0 .atlas-pin span { max-width:145px; text-align:center; }
+.atlas-level-0 .atlas-pin:hover span, .atlas-level-0 .atlas-pin:focus-visible span, .atlas-level-0 .atlas-pin.active span { display:block; }
+.atlas-landmark { position:absolute; z-index:1; transform:translate(-50%,-50%); padding:3px 6px; border-radius:4px; color:#fff9e7; background:rgba(7,28,44,.8); font-size:clamp(.56rem,1vw,.8rem); font-weight:700; white-space:nowrap; pointer-events:none; text-shadow:0 1px 2px #092038; }
 .atlas-concept .atlas-pin span { max-width:130px; text-align:center; }
 .atlas-pin:hover, .atlas-pin:focus-visible, .atlas-pin.active { z-index:3; outline:2px solid #fff; background:#51c5c9; }
 .atlas-pin.pending { border-color:#abb5c7; background:#39455b; box-shadow:0 0 0 4px rgba(8,25,46,.6); }

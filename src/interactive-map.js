@@ -8,11 +8,13 @@
   // Map art comes from 01M. Corrected maps use unlabelled replacement art;
   // navigation labels and travel facts follow the current 01 world/itinerary document.
   var maps = {
-    "W-001": { name: "艾珥汀大陸", level: 0, image: "w-001.png", imageVersion: "regions-20261007", clean: true, note: "南部內陸、洛汀灣、中部山河、北境沿岸與根冠高地分屬不同生活圈；帷海由鏡潮群島向東南外航，遠潮界另用獨立世界圖。", points: [
-      ["R1-000", "第一大版本｜南部內陸", 47, 70], ["R2-000", "第二大版本｜洛汀灣", 83, 73],
-      ["R3-000", "第三大版本｜星井內陸", 43, 43], ["R4-000", "第四大版本｜新曙沿岸", 67, 31],
-      ["R5-000", "第五大版本｜根冠高地", 63, 15], ["R6-000", "第六大版本｜帷海外航", 88, 90]
-    ] },
+    "W-001": { name: "艾珥汀大陸", level: 0, image: "w-001.png", imageVersion: "mainland-20261007", clean: true, note: "北方在上。大陸圖只呈現本土：南部內陸、洛汀灣、中部山河、北境沿岸與根冠高地。鏡潮群島由洛汀灣區域圖呈現；帷海從群島東南外航，遠潮界另用獨立世界圖。", landmarks: [
+      ["白鐘城", 43, 66], ["獸靈森地", 56, 70], ["洛汀灣", 68, 72], ["星井盆地", 31, 44], ["根冠高地", 45, 18]
+    ], points: [
+      ["R1-000", "第一大版本｜南部內陸", 36, 73], ["R2-000", "第二大版本｜洛汀灣與鏡潮群島", 68, 78],
+      ["R3-000", "第三大版本｜星井內陸", 38, 49], ["R4-000", "第四大版本｜新曙沿岸", 67, 26],
+      ["R5-000", "第五大版本｜根冠高地", 49, 22]
+    ], offMap: [["R6-000", "第六大版本｜東南外航至帷海"]] },
     "R1-000": { name: "第一大版本｜南部內陸生活圈", level: 1, parent: "W-001", image: "r1-000.png", note: "白鐘城是內陸核心；獸靈之村在東，霧橋在北，南驛山谷在南。鐘庭採特殊連結。", points: [
       ["C1-101", "白鐘城", 40, 69], ["C1-102", "獸靈之村", 78, 68],
       ["C1-103", "霧橋鎮", 48, 44], ["C1-104", "南驛山谷", 61, 88],
@@ -104,8 +106,9 @@
     var localDescription = selected && selected[0].charAt(0) === "#" ? (map.pointNotes && map.pointNotes[selected[0].slice(1)]) || details[selected[0].slice(1)] : "";
     var nav = map.parent ? "<button type=\"button\" class=\"atlas-back\" data-map-go=\"" + map.parent + "\">← 返回上一層</button>" : "";
     var worldSwitch = id === "W-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"S6-001\">遠潮界｜獨立世界圖 ↗</button>" : id === "S6-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸</button>" : "";
-    var visual = map.image && !locked ? "<div class=\"atlas-image-wrap atlas-level-" + map.level + (map.concept ? " atlas-concept" : "") + "\"><img src=\"./assets/maps/" + map.image + (map.imageVersion ? "?v=" + map.imageVersion : "") + "\" alt=\"" + escapeHtml(map.name) + "地圖\" loading=\"lazy\">" + dots + "</div>" : "<div class=\"atlas-pending\"><strong>" + (locked ? "作者試玩概略圖" : "地圖原圖待製作") + "</strong><p>" + (locked ? "此大版本尚未向一般玩家開放；作者試玩可查看第一層區域概略圖。" : "此區已有層級入口，詳細地圖尚未經地理核對與出圖。") + "</p></div>";
-    var destinations = (locked ? [] : map.points || []).map(function (point) { return "<button type=\"button\" data-map-go=\"" + escapeHtml(point[0]) + "\">" + escapeHtml(point[1]) + (maps[point[0]] && maps[point[0]].pending ? " · 待製作" : " →") + "</button>"; }).join("");
+    var landmarks = (map.landmarks || []).map(function (place) { return "<span class=\"atlas-landmark\" style=\"left:" + place[1] + "%;top:" + place[2] + "%\">" + escapeHtml(place[0]) + "</span>"; }).join("");
+    var visual = map.image && !locked ? "<div class=\"atlas-image-wrap atlas-level-" + map.level + (map.concept ? " atlas-concept" : "") + "\"><img src=\"./assets/maps/" + map.image + (map.imageVersion ? "?v=" + map.imageVersion : "") + "\" alt=\"" + escapeHtml(map.name) + "地圖\" loading=\"lazy\">" + landmarks + dots + "</div>" : "<div class=\"atlas-pending\"><strong>" + (locked ? "作者試玩概略圖" : "地圖原圖待製作") + "</strong><p>" + (locked ? "此大版本尚未向一般玩家開放；作者試玩可查看第一層區域概略圖。" : "此區已有層級入口，詳細地圖尚未經地理核對與出圖。") + "</p></div>";
+    var destinations = (locked ? [] : (map.points || []).concat(map.offMap || [])).map(function (point) { return "<button type=\"button\" data-map-go=\"" + escapeHtml(point[0]) + "\">" + escapeHtml(point[1]) + (maps[point[0]] && maps[point[0]].pending ? " · 待製作" : " →") + "</button>"; }).join("");
     return "<div class=\"atlas-heading\"><div><span class=\"eyebrow\">INTERACTIVE ATLAS / L" + map.level + "</span><h3 id=\"story-map-title\">" + escapeHtml(map.name) + "</h3></div><span class=\"story-map-version\">" + (locked ? "作者試玩" : map.pending ? "待製作" : map.concept ? "區域概略圖" : map.clean ? "無字修正版" : "第一版原圖") + "</span></div><nav class=\"atlas-crumbs\" aria-label=\"地圖層級\">" + trail + "</nav><div class=\"atlas-controls\">" + nav + worldSwitch + "</div>" + visual + (destinations ? "<div class=\"atlas-destinations\" aria-label=\"地圖目的地\">" + destinations + "</div>" : "") + "<div class=\"atlas-foot\"><p>" + escapeHtml(localDescription || map.note || "後續區域的正式地圖與節點正在製作。") + "</p><small>" + (locked ? "尚未正式開放。" : map.concept ? "僅供作者校對第一層地形與路線；地名由互動標記顯示，第二層子地圖尚未製作。" : map.image ? (map.clean ? "地名、行程與可通行狀態由互動標記和現行設定提供。" : "圖像為第一版概念原圖；地名、行程與可通行狀態以互動標記及現行設定為準。") : "詳細原圖尚未提供；此入口僅顯示規劃中的層級與區域名稱。") + "</small></div>";
   }
   return { maps: maps, lineage: lineage, render: render };
