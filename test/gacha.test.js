@@ -60,10 +60,22 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCharacterReleasePlan.length, 3);
   assert.equal(futureCharacterReleasePlan.every((plan) => plan.fourStarIds.length >= 2 && plan.fourStarIds.length <= 3), true);
   assert.deepEqual(futureCharacterReleasePlan.map((plan) => plan.fourStarIds.length), [3, 3, 3]);
-  assert.equal(futureCharacterReleasePlan.every((plan) => plan.focus.length >= 30), true);
+  const relationshipDocument = fs.readFileSync(path.join(__dirname, "../docs/future-character-relationships.md"), "utf8");
+  futureCharacterReleasePlan.forEach((plan) => assert.ok(relationshipDocument.includes("- " + plan.majorVersion + "：")));
   const plannedIds = futureCharacterReleasePlan.flatMap((plan) => plan.fourStarIds.concat(plan.threeStarIds, plan.storyOnlyIds));
   assert.equal(new Set(plannedIds).size, futureCards.length);
-  assert.equal(futureCards.every((card) => card.storyRelationship.length >= 20), true);
+  const relationshipRows = relationshipDocument.split("\n").filter((line) => /^\| [a-z]+ \|/.test(line));
+  const relationships = new Map(relationshipRows.map((line) => {
+    const [, id, name, plannedVersion, description] = line.split("|").map((value) => value.trim());
+    return [id, { name, plannedVersion, description }];
+  }));
+  assert.equal(relationships.size, futureCards.length);
+  futureCards.forEach((card) => {
+    const saved = relationships.get(card.id);
+    assert.ok(saved && saved.description.length >= 20, `缺少 ${card.id} 的角色關係文件`);
+    assert.equal(saved.name, card.name);
+    assert.equal(saved.plannedVersion, card.plannedGachaVersion || "未定");
+  });
   assert.equal(futureCards.filter((card) => card.plannedGachaVersion === null).length, 9);
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });

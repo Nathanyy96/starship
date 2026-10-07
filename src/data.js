@@ -108,30 +108,29 @@
   if (!storyWorldMap && typeof globalThis !== "undefined") storyWorldMap = globalThis.StarshipStoryWorldMap || null;
 
   // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
-  // 這份規劃刻意把「故事初登場」和「預計可抽版本」分開，避免為了卡池節奏
-  // 讓每個小版本都硬塞一名新四星，導致角色關係只剩下快速報到。
+  // 劇情關係全文保存在 docs/future-character-relationships.md；執行時只需要可抽版本。
   var futureCharacterPlan = {
-    jiera: { plannedGachaVersion: "3.0", storyRelationship: "瑟蕾雅在 3.0 第一次把測線決定權交給霽羅；她不是導師，而是提醒瑟蕾雅也可以退回隊伍裡的人。" },
-    rotea: { plannedGachaVersion: "3.2", storyRelationship: "蘿堤亞與瑟蕾雅從格式爭論走到信任；她敢刪掉瑟蕾雅的預設聲紋，兩人建立不替彼此代答的默契。" },
-    sumine: { plannedGachaVersion: null, storyRelationship: "澄音用輪班、照護與慢修復承接 3.2 的代價；她讓瑟蕾雅看見修復不是英雄獨白，後續會以水路守護者身分回到隊伍。" },
-    cenya: { plannedGachaVersion: "3.2", storyRelationship: "岑芽是瑟蕾雅第一次正式帶著做學徒工作的年輕夥伴；她的笨拙問題讓瑟蕾雅學會說明，而不是只示範答案。" },
-    lorne: { plannedGachaVersion: "3.5", storyRelationship: "洛恩與瑟蕾雅在 3.3–3.5 共同拆解集中供能；他把『我能做到』改問成『誰能按停』，是火路上的互相尊重。" },
-    norell: { plannedGachaVersion: null, storyRelationship: "諾嵐不追隨瑟蕾雅的方向，而是把每條路的退回點畫給她；兩人從測量合作變成能互相喊停的信任。" },
-    aster: { plannedGachaVersion: null, storyRelationship: "艾斯特以門衛身分拒絕瑟蕾雅直接進入終端；他們在沉默與看火中建立不靠崇拜維持的夥伴關係。" },
-    aurelia: { plannedGachaVersion: "4.0", storyRelationship: "奧蕾雅與瑟蕾雅從天文台的觀測爭論開始；她把光的解釋權拆開，讓瑟蕾雅第一次被當成共同研究者而非預言。" },
-    kairen: { plannedGachaVersion: "4.2", storyRelationship: "凱嵐不接受瑟蕾雅替工坊承擔全部責任；兩人以輪值和停爐權互相試探，最後成為能把脆弱交出去的搭檔。" },
-    sorae: { plannedGachaVersion: null, storyRelationship: "索萊與瑟蕾雅共享遠距離回覆的孤獨；他們不急著把熟悉聲音當邀請，關係建立在一起等待。" },
-    talia: { plannedGachaVersion: "4.2", storyRelationship: "塔莉亞是瑟蕾雅身邊不怕問笨問題的見習者；瑟蕾雅在她身上補回與獸靈之村學徒們失去的平常相處。" },
-    neve: { plannedGachaVersion: null, storyRelationship: "涅芙不替瑟蕾雅修復記憶，只把選擇權與缺頁放回她手中；兩人形成安靜但深的互信。" },
-    kael: { plannedGachaVersion: null, storyRelationship: "凱爾與瑟蕾雅對『勇敢是否等於下潛』有根本分歧；他是第一個把她從母親線前拉回水面的人。" },
-    elyra: { plannedGachaVersion: "4.5", storyRelationship: "伊萊拉與瑟蕾雅共同寫第二條律；她們不是師徒，而是兩個都願意修改自己的共同起草人。" },
-    vestra: { plannedGachaVersion: "5.0", storyRelationship: "維斯妲在根冠教瑟蕾雅尊重空位；她不急著回答母親線索，卻陪她承受沒有答案的季節。" },
-    brann: { plannedGachaVersion: null, storyRelationship: "布蘭把霜火工作拆成可交班的步驟，和瑟蕾雅在急於救人的衝動中互相拉住，讓信任變成具體流程。" },
-    eirin: { plannedGachaVersion: "5.2", storyRelationship: "伊芮恩與瑟蕾雅在虹橋兩端守望；她把跨界相遇從浪漫邀請改成雙方都能說不的約定。" },
-    sava: { plannedGachaVersion: null, storyRelationship: "薩芙理解瑟蕾雅害怕三種未來同時是真的；她不替她剪線，只陪她把選擇還給每條線的主人。" },
-    niela: { plannedGachaVersion: "5.3", storyRelationship: "妮拉是織庭裡最早敢質疑瑟蕾雅的人；她的學習讓瑟蕾雅知道被依賴也不能取代別人思考。" },
-    hervan: { plannedGachaVersion: null, storyRelationship: "赫爾凡在深海把第四把鑰匙交給瑟蕾雅又收回；兩人以安全與回返建立比英雄式犧牲更長久的情誼。" },
-    daria: { plannedGachaVersion: "5.5", storyRelationship: "達莉雅在 5.5 陪瑟蕾雅把終端寫成可交班的見證；她讓瑟蕾雅把母親的私人回信與公共世界分開。" }
+    jiera: { plannedGachaVersion: "3.0" },
+    rotea: { plannedGachaVersion: "3.2" },
+    sumine: { plannedGachaVersion: null },
+    cenya: { plannedGachaVersion: "3.2" },
+    lorne: { plannedGachaVersion: "3.5" },
+    norell: { plannedGachaVersion: null },
+    aster: { plannedGachaVersion: null },
+    aurelia: { plannedGachaVersion: "4.0" },
+    kairen: { plannedGachaVersion: "4.2" },
+    sorae: { plannedGachaVersion: null },
+    talia: { plannedGachaVersion: "4.2" },
+    neve: { plannedGachaVersion: null },
+    kael: { plannedGachaVersion: null },
+    elyra: { plannedGachaVersion: "4.5" },
+    vestra: { plannedGachaVersion: "5.0" },
+    brann: { plannedGachaVersion: null },
+    eirin: { plannedGachaVersion: "5.2" },
+    sava: { plannedGachaVersion: null },
+    niela: { plannedGachaVersion: "5.3" },
+    hervan: { plannedGachaVersion: null },
+    daria: { plannedGachaVersion: "5.5" }
   };
 
   function card(id, name, romanizedName, rarity, element, accent, releaseVersion, note, image, backgroundImage) {
@@ -146,7 +145,6 @@
       releaseVersion: releaseVersion,
       storyDebutVersion: releaseVersion,
       plannedGachaVersion: Object.prototype.hasOwnProperty.call(futurePlan, "plannedGachaVersion") ? futurePlan.plannedGachaVersion : releaseVersion,
-      storyRelationship: futurePlan.storyRelationship || "",
       note: note || "",
       image: image || null,
       backgroundImage: backgroundImage || image || null,
@@ -270,22 +268,19 @@
       majorVersion: "3.0–3.5",
       fourStarIds: ["jiera", "rotea", "lorne"],
       threeStarIds: ["cenya"],
-      storyOnlyIds: ["sumine", "norell", "aster"],
-      focus: "從獸靈之村的共同生活延伸到不讓任何人永遠成為唯一中心；霽羅、蘿堤亞與洛恩各自代表測線、聲音與火路的不同選擇。"
+      storyOnlyIds: ["sumine", "norell", "aster"]
     }),
     Object.freeze({
       majorVersion: "4.0–4.5",
       fourStarIds: ["aurelia", "kairen", "elyra"],
       threeStarIds: ["talia"],
-      storyOnlyIds: ["sorae", "neve", "kael"],
-      focus: "北境神話意象從傳說變成生活規則；奧蕾雅、凱嵐與伊萊拉分別把光、火與律法寫成可共同修改的制度。"
+      storyOnlyIds: ["sorae", "neve", "kael"]
     }),
     Object.freeze({
       majorVersion: "5.0–5.5",
       fourStarIds: ["vestra", "eirin", "daria"],
       threeStarIds: ["niela"],
-      storyOnlyIds: ["brann", "sava", "hervan"],
-      focus: "瑟蕾雅面對母親與世界中心的最後選擇；維斯妲、伊芮恩與達莉雅讓空位、通路和交班成為她真正能留下的答案。"
+      storyOnlyIds: ["brann", "sava", "hervan"]
     })
   ]);
 
