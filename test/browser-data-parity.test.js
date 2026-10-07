@@ -26,6 +26,11 @@ function publishedSignature(data) {
   return Array.from(data.storyChapters, (chapter) => ({
     id: chapter.id,
     title: chapter.title,
+    region: chapter.region,
+    summary: chapter.summary,
+    characters: Array.from(chapter.characters || []),
+    sourceStatus: chapter.sourceStatus,
+    fullBodyHash: crypto.createHash("sha256").update(String(chapter.fullBody || "")).digest("hex"),
     scenes: Array.from(chapter.scenes, (scene) => ({
       id: scene.id,
       textHash: crypto.createHash("sha256").update(String(scene.body || "")).digest("hex")
