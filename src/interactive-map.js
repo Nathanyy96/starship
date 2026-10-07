@@ -65,10 +65,9 @@
       ["#new-dawn", "新曙港", 42, 34], ["#workshops", "碎星工坊", 23, 69], ["#watchtower", "遠望塔", 69, 30],
       ["#white-night", "白夜航路", 76, 7], ["#trench", "回覆海溝", 89, 57]
     ], pointNotes: { "new-dawn": "星井北門後沿北河與山路下行約七至十日抵達的北境港城。", workshops: "新曙港向內陸約兩日的工坊區。", watchtower: "新曙港沿東北岸約三日到遠望塔生活圈。", "white-night": "遠望塔以北的季節沿海航路；可通狀態由劇情另行標示。", trench: "遠望塔港出船約三日的外海深水區，不貼在岸邊。" } },
-    "R5-000": { name: "第五大版本｜根冠高地與北境特殊連結", level: 1, parent: "W-001", image: "r5-000.png", previewOnly: true, concept: true, note: "根冠與霜火谷位於北境內陸；虹徑外環是本世界特殊落點，不能畫成遠望塔旁的普通城市。", points: [
+    "R5-000": { name: "第五大版本｜根冠高地與北境特殊連結", level: 1, parent: "W-001", image: "r5-000.png", imageVersion: "terrain-20261007", previewOnly: true, concept: true, note: "根冠與霜火谷位於北境內陸；補給路下行至新曙沿岸。虹徑外環須經已測窗口，不在此地形圖上畫成相鄰島城。", points: [
       ["#root-crown", "根冠高地", 48, 17], ["#frostfire", "霜火谷", 43, 48], ["#coast-link", "新曙補給路", 81, 79],
-      ["#rainbow", "虹徑外環｜特殊連結", 86, 12]
-    ], pointNotes: { "root-crown": "新曙港向北約五日山路；高地的根林、長冬與地方守望塑造第五季生活。", frostfire: "根冠下行約一日山路的霜火谷與鍛環。", "coast-link": "沿岸藥物、器具與糧種上高地，木材、熱源材料與季節勞力下港口。", rainbow: "4.2先在遠望塔測到短窗口，只到落點附近；5.2再實際深入外環與織庭。兩端都可拒絕通行，落點至織庭約一日。" } },
+    ], offMap: [["#rainbow", "虹徑外環｜經已測窗口進入"]], pointNotes: { "root-crown": "新曙港向北約五日山路；高地的根林、長冬與地方守望塑造第五季生活。", frostfire: "根冠下行約一日山路的霜火谷與鍛環；地熱只集中於谷底，不貫穿整座高地。", "coast-link": "沿岸藥物、器具與糧種上高地，木材、熱源材料與季節勞力下港口；雪季通行受山口狀態限制。", rainbow: "4.2先在遠望塔測到短窗口，只到落點附近；5.2再實際深入外環與織庭。兩端都可拒絕通行，落點至織庭約一日。此入口表示特殊轉接，不是高地旁的步行道路。" } },
     "R6-000": { name: "第六大版本｜帷海外航與照汐城生活圈", level: 1, parent: "W-001", image: "r6-000.png", previewOnly: true, concept: true, note: "從鏡潮群島向東南遠航到帷海諸邦；照汐城不與新曙港或根冠高地直接相鄰。", points: [
       ["#supply-isles", "鏡潮群島補給", 18, 11], ["#outer-route", "帷海外航", 48, 49], ["#choashi", "照汐城", 86, 77],
       ["#outer-shore", "照汐外岸接點", 72, 88]
@@ -102,7 +101,7 @@
       var target = maps[point[0]], unavailable = target && target.pending;
       return "<button type=\"button\" class=\"atlas-pin" + (selectedPoint === point[0] ? " active" : "") + (unavailable ? " pending" : "") + "\" style=\"left:" + point[2] + "%;top:" + point[3] + "%\" data-map-go=\"" + escapeHtml(point[0]) + "\" aria-label=\"查看" + escapeHtml(point[1]) + (unavailable ? "，地圖待製作" : "") + "\"><span>" + escapeHtml(point[1]) + "</span></button>";
     }).join("");
-    var selected = (map.points || []).find(function (p) { return p[0] === selectedPoint; });
+    var selected = (map.points || []).concat(map.offMap || []).find(function (p) { return p[0] === selectedPoint; });
     var localDescription = selected && selected[0].charAt(0) === "#" ? (map.pointNotes && map.pointNotes[selected[0].slice(1)]) || details[selected[0].slice(1)] : "";
     var nav = map.parent ? "<button type=\"button\" class=\"atlas-back\" data-map-go=\"" + map.parent + "\">← 返回上一層</button>" : "";
     var worldSwitch = id === "W-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"S6-001\">遠潮界｜獨立世界圖 ↗</button>" : id === "S6-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸</button>" : "";
