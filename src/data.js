@@ -10,103 +10,30 @@
   var firstMajorKits = typeof require === "function" ? require("./first-major-kits.js") : globalThis.StarshipFirstMajorKits;
   var coreKits = typeof require === "function" ? require("./core-kits.js") : globalThis.StarshipCoreKits;
 
-  // 長篇劇情以獨立生成檔載入，避免把 20 萬字正文塞進規則與角色資料同一段。
-  // Node 測試透過 require 載入；瀏覽器則由 index.html / test.html 先載入全域物件。
-  var storySource = null;
-  if (typeof require === "function") {
-    try { storySource = require("./story-source.js"); } catch (error) { storySource = null; }
+  // Node 端必須完整載入已納入資料合併的劇情檔；缺檔或語法錯誤應直接讓啟動與測試失敗。
+  // 瀏覽器目前只預載公開版所需來源，未預載的未開放擴充稿保持 null。
+  function loadStoryModule(modulePath, globalName) {
+    if (typeof require === "function") return require(modulePath);
+    return typeof globalThis !== "undefined" ? globalThis[globalName] || null : null;
   }
-  if (!storySource && typeof globalThis !== "undefined") storySource = globalThis.StarshipStorySource || null;
-  var currentStory10 = null;
-  if (typeof require === "function") {
-    try { currentStory10 = require("./story-1-0-current.js"); } catch (error) { currentStory10 = null; }
-  }
-  if (!currentStory10 && typeof globalThis !== "undefined") currentStory10 = globalThis.StarshipStory10Current || null;
-
-  // 舊版未開放草稿仍保留供追溯；實際故事從 1.1 起由 story-replan.js 統一重編。
-  var futureStoryRevision = null;
-  if (typeof require === "function") {
-    try { futureStoryRevision = require("./future-story-revision.js"); } catch (error) { futureStoryRevision = null; }
-  }
-  if (!futureStoryRevision && typeof globalThis !== "undefined") futureStoryRevision = globalThis.StarshipFutureStoryRevision || null;
-
-  var storyReplan = null;
-  if (typeof require === "function") {
-    try { storyReplan = require("./story-replan.js"); } catch (error) { storyReplan = null; }
-  }
-  if (!storyReplan && typeof globalThis !== "undefined") storyReplan = globalThis.StarshipStoryReplan || null;
-  var storyExpansion = null;
-  if (typeof require === "function") {
-    try { storyExpansion = require("./story-expansion-2x.js"); } catch (error) { storyExpansion = null; }
-  }
-  if (!storyExpansion && typeof globalThis !== "undefined") storyExpansion = globalThis.StarshipStoryExpansion2x || null;
-  var storyExpansionExtra = null;
-  if (typeof require === "function") {
-    try { storyExpansionExtra = require("./story-expansion-2x-extra.js"); } catch (error) { storyExpansionExtra = null; }
-  }
-  if (!storyExpansionExtra && typeof globalThis !== "undefined") storyExpansionExtra = globalThis.StarshipStoryExpansion2xExtra || null;
-  var storyExpansionPart2 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart2 = require("./story-expansion-2x-part2.js"); } catch (error) { storyExpansionPart2 = null; }
-  }
-  if (!storyExpansionPart2 && typeof globalThis !== "undefined") storyExpansionPart2 = globalThis.StarshipStoryExpansion2xPart2 || null;
-  var storyExpansionPart3 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart3 = require("./story-expansion-2x-part3.js"); } catch (error) { storyExpansionPart3 = null; }
-  }
-  if (!storyExpansionPart3 && typeof globalThis !== "undefined") storyExpansionPart3 = globalThis.StarshipStoryExpansion2xPart3 || null;
-  var storyExpansionPart4 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart4 = require("./story-expansion-2x-part4.js"); } catch (error) { storyExpansionPart4 = null; }
-  }
-  if (!storyExpansionPart4 && typeof globalThis !== "undefined") storyExpansionPart4 = globalThis.StarshipStoryExpansion2xPart4 || null;
-  var storyExpansionPart5 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart5 = require("./story-expansion-2x-part5.js"); } catch (error) { storyExpansionPart5 = null; }
-  }
-  if (!storyExpansionPart5 && typeof globalThis !== "undefined") storyExpansionPart5 = globalThis.StarshipStoryExpansion2xPart5 || null;
-  var storyExpansionPart6 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart6 = require("./story-expansion-2x-part6.js"); } catch (error) { storyExpansionPart6 = null; }
-  }
-  if (!storyExpansionPart6 && typeof globalThis !== "undefined") storyExpansionPart6 = globalThis.StarshipStoryExpansion2xPart6 || null;
-  var storyExpansionPart7 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart7 = require("./story-expansion-2x-part7.js"); } catch (error) { storyExpansionPart7 = null; }
-  }
-  if (!storyExpansionPart7 && typeof globalThis !== "undefined") storyExpansionPart7 = globalThis.StarshipStoryExpansion2xPart7 || null;
-  var storyExpansionPart8 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart8 = require("./story-expansion-2x-part8.js"); } catch (error) { storyExpansionPart8 = null; }
-  }
-  if (!storyExpansionPart8 && typeof globalThis !== "undefined") storyExpansionPart8 = globalThis.StarshipStoryExpansion2xPart8 || null;
-  var storyExpansionPart9 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart9 = require("./story-expansion-2x-part9.js"); } catch (error) { storyExpansionPart9 = null; }
-  }
-  if (!storyExpansionPart9 && typeof globalThis !== "undefined") storyExpansionPart9 = globalThis.StarshipStoryExpansion2xPart9 || null;
-  var storyExpansionPart10 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart10 = require("./story-expansion-2x-part10.js"); } catch (error) { storyExpansionPart10 = null; }
-  }
-  if (!storyExpansionPart10 && typeof globalThis !== "undefined") storyExpansionPart10 = globalThis.StarshipStoryExpansion2xPart10 || null;
-  var storyExpansionPart11 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart11 = require("./story-expansion-2x-part11.js"); } catch (error) { storyExpansionPart11 = null; }
-  }
-  if (!storyExpansionPart11 && typeof globalThis !== "undefined") storyExpansionPart11 = globalThis.StarshipStoryExpansion2xPart11 || null;
-  var storyExpansionPart12 = null;
-  if (typeof require === "function") {
-    try { storyExpansionPart12 = require("./story-expansion-2x-part12.js"); } catch (error) { storyExpansionPart12 = null; }
-  }
-  if (!storyExpansionPart12 && typeof globalThis !== "undefined") storyExpansionPart12 = globalThis.StarshipStoryExpansion2xPart12 || null;
-
-  var storyWorldMap = null;
-  if (typeof require === "function") {
-    try { storyWorldMap = require("./story-world-map-1-0.js"); } catch (error) { storyWorldMap = null; }
-  }
-  if (!storyWorldMap && typeof globalThis !== "undefined") storyWorldMap = globalThis.StarshipStoryWorldMap || null;
-
+  var storySource = loadStoryModule("./story-source.js", "StarshipStorySource");
+  var currentStory10 = loadStoryModule("./story-1-0-current.js", "StarshipStory10Current");
+  var futureStoryRevision = loadStoryModule("./future-story-revision.js", "StarshipFutureStoryRevision");
+  var storyReplan = loadStoryModule("./story-replan.js", "StarshipStoryReplan");
+  var storyExpansion = loadStoryModule("./story-expansion-2x.js", "StarshipStoryExpansion2x");
+  var storyExpansionExtra = loadStoryModule("./story-expansion-2x-extra.js", "StarshipStoryExpansion2xExtra");
+  var storyExpansionPart2 = loadStoryModule("./story-expansion-2x-part2.js", "StarshipStoryExpansion2xPart2");
+  var storyExpansionPart3 = loadStoryModule("./story-expansion-2x-part3.js", "StarshipStoryExpansion2xPart3");
+  var storyExpansionPart4 = loadStoryModule("./story-expansion-2x-part4.js", "StarshipStoryExpansion2xPart4");
+  var storyExpansionPart5 = loadStoryModule("./story-expansion-2x-part5.js", "StarshipStoryExpansion2xPart5");
+  var storyExpansionPart6 = loadStoryModule("./story-expansion-2x-part6.js", "StarshipStoryExpansion2xPart6");
+  var storyExpansionPart7 = loadStoryModule("./story-expansion-2x-part7.js", "StarshipStoryExpansion2xPart7");
+  var storyExpansionPart8 = loadStoryModule("./story-expansion-2x-part8.js", "StarshipStoryExpansion2xPart8");
+  var storyExpansionPart9 = loadStoryModule("./story-expansion-2x-part9.js", "StarshipStoryExpansion2xPart9");
+  var storyExpansionPart10 = loadStoryModule("./story-expansion-2x-part10.js", "StarshipStoryExpansion2xPart10");
+  var storyExpansionPart11 = loadStoryModule("./story-expansion-2x-part11.js", "StarshipStoryExpansion2xPart11");
+  var storyExpansionPart12 = loadStoryModule("./story-expansion-2x-part12.js", "StarshipStoryExpansion2xPart12");
+  var storyWorldMap = loadStoryModule("./story-world-map-1-0.js", "StarshipStoryWorldMap");
   // 後續角色可以先在劇情中登場，再於更適合的版本進入卡池。
   // 劇情關係全文保存在 docs/future-character-relationships.md；執行時只需要可抽版本。
   var futureCharacterPlan = {

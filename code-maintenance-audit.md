@@ -7,7 +7,9 @@
 - `package.json` 原本沒有把 `test/shop.test.js` 納入 `npm test`；已補入。標準測試現為 100 項，全部通過。
 - `src/data.js` 會把文件匯入正文、1.0 現行正文、未開放劇情草稿、重編稿與 2.x 多份擴充稿依序合併。這些不是可以按檔名直接刪掉的「多餘程式」；它們可能影響章節、作者試玩與舊存檔場景別名。
 - Node 端 `data.js` 以 `require()` 嘗試載入 `future-story-revision.js`、`story-replan.js` 與 `story-expansion-2x*.js`；正式 `index.html` 只事先載入 `story-source.js`、`story-1-0-current.js` 等部分檔案。瀏覽器會把未載入的可選模組當成 `null`。因此作者試玩劇情可能與 Node 測試／伺服器資料不同；需做雙環境章節與場景對照，不能只依 Node 測試認定一致。
+- 後續修正：Node 劇情來源改由單一 `loadStoryModule` 載入，模組缺失或執行失敗會直接中止啟動，避免靜默遺失內容。新加入 `test/browser-data-parity.test.js`，依正式 `index.html` 的腳本順序模擬瀏覽器，核對已公開的 1.0 角色、章節幕次及正文雜湊與 Node 一致。標準測試現為 101 項，全部通過。未開放劇情模組仍未預載於正式瀏覽器，不能把此測試解讀為所有未來草稿也已一致。
 - `src/app.js` 未被目前 HTML 載入；`src/story-world-map.js` 只在 README 中作為現行地圖被提及，實際程式使用 `story-world-map-1-0.js`。它們是**疑似舊版檔案**，還不能只憑搜尋結果刪除。README 的地圖檔名應在下一次文件清理時更正。
+- 後續修正：README 的地圖段落已改為現行 `interactive-map.js` 與 `story-world-map-1-0.js`，移除過時的五區 SVG 與舊檔名說明。疑似舊版檔案仍保留待確認。
 - `serve.mjs` 內有玩家持有角色、培養、劇情及寵物進度的連續性檢查；清理後端資料結構前必須保持這些保護及既有帳號的相容性。
 
 ## 建議分段整理
