@@ -18,6 +18,7 @@
   }
   var storySource = loadStoryModule("./story-source.js", "StarshipStorySource");
   var currentStory10 = loadStoryModule("./story-1-0-current.js", "StarshipStory10Current");
+  var currentStory11 = loadStoryModule("./story-1-1-current.js", "StarshipStory11Current");
   var futureStoryRevision = loadStoryModule("./future-story-revision.js", "StarshipFutureStoryRevision");
   var storyReplan = loadStoryModule("./story-replan.js", "StarshipStoryReplan");
   var storyExpansion = loadStoryModule("./story-expansion-2x.js", "StarshipStoryExpansion2x");
@@ -2013,6 +2014,14 @@
         title: currentStory10.title,
         scenes: currentStory10.scenes,
         fullBody: currentStory10.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
+        sourceStatus: "document"
+      });
+    }
+    if (chapter.id === "main-1-1" && currentStory11) {
+      chapter = Object.assign({}, chapter, {
+        title: currentStory11.title,
+        scenes: currentStory11.scenes,
+        fullBody: currentStory11.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
         sourceStatus: "document"
       });
     }
