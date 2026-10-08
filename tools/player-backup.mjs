@@ -13,11 +13,20 @@ export function validateDatabase(database) {
   return database;
 }
 
-export function seal(database, key, source) {
+export function projectDatabase(database) {
+  validateDatabase(database);
+  const projected = JSON.parse(JSON.stringify(database));
+  for (const record of Object.values(projected.players)) {
+    if (record.state.trialProgress) delete record.state.trialProgress.lastBattle;
+  }
+  return projected;
+}
+
+export function seal(database, key, source, originalSavedAt) {
   validateDatabase(database);
   if (key.length !== 32) throw new Error("備份金鑰必須為 32 位元組");
-  const savedAt = new Date().toISOString();
-  const payload = Buffer.from(JSON.stringify({ savedAt, source, database }));
+  const savedAt = originalSavedAt || new Date().toISOString();
+  const payload = Buffer.from(JSON.stringify({ savedAt, source, policy: "no-trial-battle-report-v1", database: projectDatabase(database) }));
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
   cipher.setAAD(Buffer.from("starship-player-backup-v1"));
@@ -122,6 +131,7 @@ export async function main(argv) {
       if (!response.ok) throw new Error("線上備份拒絕或失敗（HTTP " + response.status + "）");
       database = validateDatabase((await response.json()).database);
     }
+    database = projectDatabase(database);
     const envelope = seal(database, key, options.source);
     if (JSON.stringify(unseal(envelope, key).database) !== JSON.stringify(database)) throw new Error("備份驗證不一致");
     fs.mkdirSync(directory, { recursive: true });

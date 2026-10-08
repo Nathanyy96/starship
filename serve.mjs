@@ -917,7 +917,8 @@ async function handleApi(request, response, requestUrl) {
       sendJson(response, 403, { ok: false, error: "備份入口未啟用或權限不足" });
       return;
     }
-    const database = await readDatabase();
+    const { projectDatabase } = await import("./tools/player-backup.mjs");
+    const database = projectDatabase(await readDatabase());
     sendJson(response, 200, { ok: true, exportedAt: new Date().toISOString(), database });
     return;
   }

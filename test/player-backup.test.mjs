@@ -8,7 +8,7 @@ import net from "node:net";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
-import { seal, unseal, restoreFile, restorePostgres, validateDatabase } from "../tools/player-backup.mjs";
+import { seal, unseal, restoreFile, restorePostgres, validateDatabase, projectDatabase } from "../tools/player-backup.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const database = { version: 2, players: { tester: { name: "備份測試玩家", passwordHash: "hash-for-login",
@@ -32,6 +32,19 @@ test("加密快照完整保留登入、資源、命座與未知欄位；不洩�
   damaged.encrypted = ciphertext.toString("base64");
   assert.throws(() => unseal(damaged, key));
   assert.throws(() => validateDatabase({ version: 2, players: { broken: {} } }));
+});
+
+test("備份移除試煉詳細戰報，保留資源、角色、通關與領獎次數且不修改來源", () => {
+  const input = structuredClone(database);
+  input.players.tester.state.trialProgress = { version: "cycle", bestStage: 27, clearedStages: [1, 2, 27],
+    attempts: { 27: 2 }, selectedTeam: ["hina"], lastBattle: { rounds: 120, log: ["detailed combat"], won: true } };
+  const before = structuredClone(input);
+  const expected = structuredClone(input);
+  delete expected.players.tester.state.trialProgress.lastBattle;
+  assert.deepEqual(projectDatabase(input), expected);
+  const key = crypto.randomBytes(32);
+  assert.deepEqual(unseal(seal(input, key, "remote"), key).database, expected);
+  assert.deepEqual(input, before);
 });
 
 test("檔案還原保持完整存檔，並拒絕覆蓋現有玩家", () => {
@@ -92,7 +105,9 @@ test("線上備份入口要求獨立 token、未授權拒絕、唯讀且完整�
   const port = listener.address().port;
   await new Promise(resolve => listener.close(resolve));
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "starship-backup-api-"));
-  fs.writeFileSync(path.join(directory, "players.json"), JSON.stringify(database));
+  const apiDatabase = structuredClone(database);
+  apiDatabase.players.tester.state.trialProgress.lastBattle = { log: ["private detailed combat"], won: true };
+  fs.writeFileSync(path.join(directory, "players.json"), JSON.stringify(apiDatabase));
   const source = fs.readFileSync(path.join(directory, "players.json"), "utf8");
   const server = spawn(process.execPath, ["serve.mjs"], { cwd: root, env: { ...process.env,
     DATABASE_URL: "", STARSHIP_DATA_DIR: directory, PORT: String(port), HOST: "127.0.0.1",
@@ -112,7 +127,7 @@ test("線上備份入口要求獨立 token、未授權拒絕、唯讀且完整�
     const response = await request("test-read-only-token");
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("cache-control"), "no-store");
-    assert.deepEqual((await response.json()).database, database);
+    assert.deepEqual((await response.json()).database, projectDatabase(apiDatabase));
     assert.equal(fs.readFileSync(path.join(directory, "players.json"), "utf8"), source);
   } finally {
     const exited = new Promise(resolve => server.once("exit", resolve));
