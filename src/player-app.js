@@ -639,10 +639,10 @@
       var target11 = byId("author-preview-story-scenes");
       if (!target10 || !target11 || !source10 || !source11) return;
       if (!target10.children.length) target10.innerHTML = source10.scenes.map(function (scene, index) {
-        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small>點按展開／收合</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-0") + (index === source10.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.0 版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-10\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.0\">試按領取 1.0 劇情獎勵</button><small>版面試用：不領取、不更改正式進度或資源。</small></div>" : "") + "</details>";
+        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small>點按展開／收合</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-0", { authorPreview: true }) + (index === source10.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.0 版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-10\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.0\">試按領取 1.0 劇情獎勵</button><small>版面試用：不領取、不更改正式進度或資源。</small></div>" : "") + "</details>";
       }).join("");
       if (!target11.children.length) target11.innerHTML = source11.scenes.map(function (scene, index) {
-        return "<details class=\"author-preview-story-scene\" data-author-act=\"" + index + "\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small data-author-scene-status>載入互動進度中</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1") + "<div data-author-mission-slot=\"" + index + "\" class=\"author-preview-mission-slot\"></div>" + (index === source11.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.1 暫定版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-11\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.1\" disabled>完成五幕互動後可試按領獎</button><small>作者試用只檢查按鈕位置和流程，不發放正式獎勵。</small></div>" : "") + "</details>";
+        return "<details class=\"author-preview-story-scene\" data-author-act=\"" + index + "\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small data-author-scene-status>載入互動進度中</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1", { authorPreview: true }) + "<div data-author-mission-slot=\"" + index + "\" class=\"author-preview-mission-slot\"></div>" + (index === source11.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.1 暫定版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-11\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.1\" disabled>完成五幕互動後可試按領獎</button><small>作者試用只檢查按鈕位置和流程，不發放正式獎勵。</small></div>" : "") + "</details>";
       }).join("");
     }
     function showAuthorStoryVersion(version) {
@@ -652,17 +652,27 @@
       byId("author-story-tab-10").setAttribute("aria-selected", String(is10));
       byId("author-story-tab-11").setAttribute("aria-selected", String(!is10));
     }
-    function storyBodyMarkup(text, className, actNumber, chapterId) {
+    function storyBodyMarkup(text, className, actNumber, chapterId, options) {
       var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
       var bodyClass = className || "story-body";
       var imageSet = chapterId === "main-1-1" ? window.StarshipStory11Images : chapterId === "main-1-0" ? window.StarshipStory10Images : [];
+      var review = options && options.authorPreview && window.StarshipStoryVisualReview;
+      if (review) imageSet = review.imagesFor(chapterId, imageSet);
       var images = actNumber ? (imageSet || []).filter(function (item) { return item.act === actNumber; }) : [];
+      var portraits = review ? review.portraits.filter(function (item) { return item.chapter === chapterId && item.act === actNumber; }) : [];
       var used = {};
+      var shownPortraits = {};
       var html = blocks.map(function (block) {
         var timeline = /^【時間線|^章節定位/.test(block);
         var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; } return ""; }).join("");
-        if (/^〔章節CG草稿・待作者確認〕/.test(block)) return art;
-        return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>" + art;
+        var people = portraits.map(function (item) {
+          if (shownPortraits[item.id] || block.indexOf(item.anchor) < 0) return "";
+          shownPortraits[item.id] = true;
+          return '<figure class="story-person-intro" data-story-person="' + escapeHtml(item.id) + '"><img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.name + '的正式角色立繪') + '" loading="lazy"><figcaption><strong>' + escapeHtml(item.name) + '</strong><span>' + escapeHtml(item.role) + '</span></figcaption></figure>';
+        }).join("");
+        if (people) people = '<div class="story-person-intros" aria-label="本段出場人物">' + people + '</div>';
+        if (/^〔章節CG草稿・待作者確認〕/.test(block)) return people + art;
+        return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>" + people + art;
       }).join("");
       html += images.map(function (item, index) { return used[index] ? "" : "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; }).join("");
       return "<div class=\"" + bodyClass + "\">" + html + "</div>";

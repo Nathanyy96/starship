@@ -4,7 +4,7 @@
   "private": true,
   "description": "星界之律｜回覆召集的可測試抽卡核心與瀏覽器試玩介面",
   "scripts": {
-    "test": "node --test test/gacha.test.js test/battle.test.js test/first-major-mechanics.test.js test/maintenance.test.mjs test/skin-migration.test.js test/author-preview.test.mjs test/shop.test.js test/browser-data-parity.test.js test/map-integrity.test.js test/release-1-1-prep.test.js test/story-1-1-missions.test.js",
+    "test": "node --test test/gacha.test.js test/battle.test.js test/first-major-mechanics.test.js test/maintenance.test.mjs test/skin-migration.test.js test/author-preview.test.mjs test/shop.test.js test/browser-data-parity.test.js test/map-integrity.test.js test/release-1-1-prep.test.js test/story-1-1-missions.test.js test/story-visual-review.test.js",
     "serve": "node serve.mjs",
     "start": "node serve.mjs"
   },

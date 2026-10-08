@@ -471,6 +471,13 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .author-preview-story-scene .story-body { max-width:68ch; font-size:1.1rem; line-height:1.9; }
 .author-preview-story-scene .story-body p { line-height:inherit; }
 .author-preview-story-scene .story-body .story-timeline { font-size:.92rem; line-height:1.75; }
+.author-preview-story-scene .story-person-intros { display:flex; flex-wrap:wrap; gap:1rem; margin:1.2rem 0 1.8rem; }
+.author-preview-story-scene .story-person-intro { width:min(220px,100%); margin:0; background:#18253b; border:1px solid #577187; border-radius:12px; overflow:hidden; }
+.author-preview-story-scene .story-person-intro img { display:block; width:100%; height:300px; object-fit:contain; background:#f5f3ee; }
+.author-preview-story-scene .story-person-intro figcaption { display:grid; gap:.3rem; padding:.8rem 1rem; line-height:1.6; }
+.author-preview-story-scene .story-person-intro strong { color:#f0f5ff; font-size:1.1rem; }
+.author-preview-story-scene .story-person-intro span { color:#c3d7e5; font-size:.92rem; }
+@media (max-width:480px) { .author-preview-story-scene .story-person-intro { width:100%; max-width:240px; } }
 .author-preview-mission-slot { margin:1.8rem 0; }
 .author-preview-mission-state { padding:1rem 1.2rem; border:1px solid #4f6882; border-radius:10px; color:#c6ddec; line-height:1.7; }
 .author-preview-reward { display:grid; gap:.7rem; margin:2rem 0 .6rem; padding:1.3rem; border:1px solid #6da99f; border-radius:12px; background:#1b3443; }
