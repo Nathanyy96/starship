@@ -23,7 +23,7 @@ const currentUpdateVersion = updateCycle;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
 const authorPreviewPlayerKey = "happycow";
-const authorPreview11Tasks = require("./src/author-preview.js").tasks;
+const story11Missions = require("./src/story-1-1-missions.js");
 const databaseBaselines = new WeakMap();
 function createGame(state) {
   return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges });
@@ -945,23 +945,19 @@ async function handleApi(request, response, requestUrl) {
         return;
       }
       player.record.state.storyProgress = player.record.state.storyProgress || {};
-      let progress = player.record.state.storyProgress.authorPreview11 || player.record.authorPreview11 || { step: 0, mistakes: 0 };
-      if (body.action === "reset") progress = { step: 0, mistakes: 0 };
+      let progress = story11Missions.normalize(player.record.state.storyProgress.authorPreview11 || player.record.authorPreview11);
+      let result = null;
+      if (body.action === "reset") progress = story11Missions.normalize();
       else if (body.action === "answer") {
-        const task = authorPreview11Tasks[progress.step];
-        if (!task) throw new Error("已完成試玩；可選擇重新開始。");
-        if (!Number.isInteger(body.choice) || body.choice < 0 || body.choice >= task.choices.length) throw new Error("請選擇一個有效選項。");
-        if (body.choice === task.answer) {
-          progress = { ...progress, step: progress.step + 1, feedback: task.success, correct: true };
-        } else {
-          progress = { ...progress, mistakes: progress.mistakes + 1, feedback: task.retry, correct: false };
-        }
+        result = story11Missions.advance(progress, body.choice);
+        progress = result.progress;
       }
       player.record.state.storyProgress.authorPreview11 = progress;
       delete player.record.authorPreview11;
       if (body.action === "reset" || body.action === "answer") await writeDatabase(database);
-      const task = authorPreview11Tasks[progress.step];
-      sendJson(response, 200, { ok: true, progress: { step: progress.step, total: authorPreview11Tasks.length, mistakes: progress.mistakes, feedback: progress.feedback || "", correct: progress.correct }, task: task ? { title: task.title, scene: task.scene, question: task.question, choices: task.choices } : null });
+      const act = story11Missions.acts[progress.act];
+      const step = act && act.steps[progress.step];
+      sendJson(response, 200, { ok: true, progress: { act: progress.act, step: progress.step, total: story11Missions.acts.length, mistakes: progress.mistakes, facts: progress.facts, feedback: result ? result.feedback : "", correct: result ? result.correct : null }, task: step ? { title: act.title, question: step.prompt, choices: step.choices } : null });
       return;
     }
     if (requestUrl.pathname === "/api/player/register") {

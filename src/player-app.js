@@ -543,7 +543,7 @@
     }
     function renderAuthorPreview(payload) {
       var progress = payload.progress;
-      byId("author-preview-progress").textContent = progress.step >= progress.total ? "試玩完成" : "任務 " + (progress.step + 1) + " / " + progress.total;
+      byId("author-preview-progress").textContent = progress.act >= progress.total ? "試玩完成" : "第 " + (progress.act + 1) + " 幕 / " + progress.total + " · 檢查 " + (progress.step + 1);
       byId("author-preview-feedback").textContent = progress.correct === false ? "此選項未通過安全檢查，留在本關重試。" + (progress.feedback || "") : progress.feedback || "";
       byId("author-preview-feedback").classList.toggle("needs-retry", progress.correct === false);
       if (!payload.task) {
@@ -551,29 +551,27 @@
         return;
       }
       var task = payload.task;
-      byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">" + escapeHtml(task.scene) + "</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
+      byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">已確認 " + (progress.facts || []).length + " 項；錯選不清除已確認步驟。</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
     }
     function authorPreviewStoryRequest(action, choice) {
       if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/1-1", { action: action, choice: choice });
       if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("這個試玩入口目前只開放給作者帳號。"));
-      var tasks = window.StarshipAuthorPreview && window.StarshipAuthorPreview.tasks;
-      if (!tasks) return Promise.reject(new Error("作者試玩任務資料尚未載入。"));
+      var missions = window.StarshipStory11Missions;
+      if (!missions) return Promise.reject(new Error("作者試玩任務資料尚未載入。"));
       var storageKey = "starship-author-preview-1-1:" + encodeURIComponent(playerKey(currentPlayerName));
-      var progress = { step: 0, mistakes: 0 };
-      try { progress = Object.assign(progress, JSON.parse(window.localStorage.getItem(storageKey) || "{}")); } catch (error) { /* 保留可用的初始進度 */ }
-      if (action === "reset") progress = { step: 0, mistakes: 0 };
+      var progress = missions.normalize();
+      try { progress = missions.normalize(JSON.parse(window.localStorage.getItem(storageKey) || "{}")); } catch (error) { /* 保留可用的初始進度 */ }
+      var result = null;
+      if (action === "reset") progress = missions.normalize();
       else if (action === "answer") {
-        var task = tasks[progress.step];
-        if (!task) return Promise.reject(new Error("已完成試玩；可選擇重新開始。"));
-        if (!Number.isInteger(choice) || choice < 0 || choice >= task.choices.length) return Promise.reject(new Error("請選擇一個有效選項。"));
-        progress = choice === task.answer
-          ? { step: progress.step + 1, mistakes: progress.mistakes, feedback: task.success, correct: true }
-          : { step: progress.step, mistakes: progress.mistakes + 1, feedback: task.retry, correct: false };
+        try { result = missions.advance(progress, choice); progress = result.progress; } catch (error) { return Promise.reject(error); }
       }
       if (action === "reset" || action === "answer") {
         try { window.localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (error) { /* 無法儲存時仍可當次試玩 */ }
       }
-      return Promise.resolve({ ok: true, progress: { step: progress.step, total: tasks.length, mistakes: progress.mistakes, feedback: progress.feedback || "", correct: progress.correct }, task: tasks[progress.step] || null });
+      var act = missions.acts[progress.act];
+      var step = act && act.steps[progress.step];
+      return Promise.resolve({ ok: true, progress: { act: progress.act, step: progress.step, total: missions.acts.length, mistakes: progress.mistakes, facts: progress.facts, feedback: result ? result.feedback : "", correct: result ? result.correct : null }, task: step ? { title: act.title, question: step.prompt, choices: step.choices } : null });
     }
     function authorPreviewBattleRequest(body) {
       if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/2-x-battle", body);
