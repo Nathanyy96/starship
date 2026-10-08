@@ -457,6 +457,11 @@ select:focus, input:focus { outline: 2px solid rgba(112, 233, 223, .55); outline
 .author-preview-entry .primary-action { width:auto; min-width:130px; }
 .author-preview-view { max-width:980px; margin-inline:auto; }
 .author-preview-note { color:#d3daf0; font-size:1rem; line-height:1.7; max-width:70ch; margin:24px 0 30px; }
+.author-preview-story { margin: 2rem 0; padding: 1.3rem; }
+.author-preview-story > p { color: #c9d7eb; line-height: 1.65; }
+.author-preview-story-scene { border-top: 1px solid rgba(180,205,230,.25); padding: .7rem 0; }
+.author-preview-story-scene summary { cursor: pointer; font-weight: 700; padding: .4rem 0; }
+.author-preview-story-scene .story-body { max-width: 74ch; }
 .author-preview-task { padding:clamp(24px, 4vw, 50px); background:#171d3b; border-radius:16px; color:#f6f6ff; }
 .author-preview-task h3 { font-size:clamp(1.65rem, 3vw, 2.5rem); margin:0 0 20px; }
 .author-preview-task p { font-size:1.08rem; line-height:1.8; max-width:68ch; }

@@ -132,7 +132,7 @@
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
-      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); }
+      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); renderAuthorStoryPreview(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "shop-view") { renderShop(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -616,17 +616,27 @@
       }).catch(function (error) { result.textContent = error.message; });
     }
     function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
-    function storyBodyMarkup(text, className, actNumber) {
+    function renderAuthorStoryPreview() {
+      var target = byId("author-preview-story-scenes");
+      var source = window.StarshipStory11Current;
+      if (!target || !source || !Array.isArray(source.scenes)) return;
+      target.innerHTML = source.scenes.map(function (scene, index) {
+        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary>" + escapeHtml(scene.title) + "</summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1") + "</details>";
+      }).join("");
+    }
+    function storyBodyMarkup(text, className, actNumber, chapterId) {
       var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
       var bodyClass = className || "story-body";
-      var images = actNumber ? (window.StarshipStory10Images || []).filter(function (item) { return item.act === actNumber; }) : [];
+      var imageSet = chapterId === "main-1-1" ? window.StarshipStory11Images : chapterId === "main-1-0" ? window.StarshipStory10Images : [];
+      var images = actNumber ? (imageSet || []).filter(function (item) { return item.act === actNumber; }) : [];
       var used = {};
       var html = blocks.map(function (block) {
         var timeline = /^【時間線|^章節定位/.test(block);
-        var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"第 " + actNumber + " 幕劇情插圖\" loading=\"lazy\"><figcaption>第 " + actNumber + " 幕・文件原稿插圖</figcaption></figure>"; } return ""; }).join("");
+        var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; } return ""; }).join("");
+        if (/^〔章節CG草稿・待作者確認〕/.test(block)) return art;
         return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>" + art;
       }).join("");
-      html += images.map(function (item, index) { return used[index] ? "" : "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"第 " + actNumber + " 幕劇情插圖\" loading=\"lazy\"><figcaption>第 " + actNumber + " 幕・文件原稿插圖</figcaption></figure>"; }).join("");
+      html += images.map(function (item, index) { return used[index] ? "" : "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; }).join("");
       return "<div class=\"" + bodyClass + "\">" + html + "</div>";
     }
     function chineseActNumber(value) {
@@ -768,7 +778,7 @@
       var sceneTitle = storySceneDisplayTitle(chapter, scene, sceneIndex);
       var sceneButtons = chapter.scenes.map(function (item, index) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</span><small>" + (index === chapter.scenes.length - 1 ? (versionClaimed ? "1.0 版本獎勵已領取" : "讀完五幕可領 1.0 版本獎勵") : (sceneClaimed(state, chapter.id, item.id) ? "已讀完" : "尚未讀完")) + "</small></button>"; }).join("");
       var fullChapter = chapter.scenes.map(function (item, index) {
-        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body", index + 1) + "</article>";
+        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body", index + 1, chapter.id) + "</article>";
       }).join("");
       var chapterBody = chapter.scenes.map(function (item) { return item.body || ""; }).join("\n");
       var npcCount = Object.keys(data.storyCharacters || {}).filter(function (id) { return chapterBody.includes(data.storyCharacters[id].name); }).length;
@@ -781,7 +791,7 @@
         var source = characterPortraitSource(entry, game && game.getState());
         return "<figure class=\"story-portrait\"><img src=\"" + escapeHtml(source) + "\" alt=\"" + escapeHtml(entry.name + " 角色立繪") + "\" loading=\"lazy\"><figcaption><strong>" + escapeHtml(entry.name) + "</strong><small>" + escapeHtml(entry.romanizedName || "") + "</small></figcaption></figure>";
       }).join("");
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + (scenePortraits ? "<div class=\"story-portraits\" aria-label=\"本幕登場角色\">" + scenePortraits + "</div>" : "") + storyBodyMarkup(scene.body, "story-body", sceneIndex + 1) + "<div class=\"story-reward-bar\"><span>1.0 版本獎勵・五幕完成領取一次</span><strong>+1,600 星砂・+3,600 角色經驗・+1 星痕</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + ((finalScene ? versionClaimed || !priorScenesComplete : claimed) ? " disabled" : "") + ">" + (finalScene ? (versionClaimed ? "版本獎勵已領取" : "完成第五幕並領取版本獎勵") : (claimed ? "已讀完" : "標記本幕已讀完")) + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>" + (needsLongDraft ? "目前收錄的劇情" : "本章完整劇情") + "</span><small>" + (needsLongDraft ? "現存原稿尚未達長篇篇幅；以下顯示目前收錄的所有幕次" : "所有幕次內容都會顯示") + "</small></div><div>" + fullChapter + "</div></section>";
+      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + (scenePortraits ? "<div class=\"story-portraits\" aria-label=\"本幕登場角色\">" + scenePortraits + "</div>" : "") + storyBodyMarkup(scene.body, "story-body", sceneIndex + 1, chapter.id) + "<div class=\"story-reward-bar\"><span>1.0 版本獎勵・五幕完成領取一次</span><strong>+1,600 星砂・+3,600 角色經驗・+1 星痕</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + ((finalScene ? versionClaimed || !priorScenesComplete : claimed) ? " disabled" : "") + ">" + (finalScene ? (versionClaimed ? "版本獎勵已領取" : "完成第五幕並領取版本獎勵") : (claimed ? "已讀完" : "標記本幕已讀完")) + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>" + (needsLongDraft ? "目前收錄的劇情" : "本章完整劇情") + "</span><small>" + (needsLongDraft ? "現存原稿尚未達長篇篇幅；以下顯示目前收錄的所有幕次" : "所有幕次內容都會顯示") + "</small></div><div>" + fullChapter + "</div></section>";
     }
     function moveStoryPlotToTop() {
       var reader = byId("story-reader");

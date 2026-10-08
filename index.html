@@ -90,10 +90,11 @@
 
     <section id="author-preview-view" class="game-view panel author-preview-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><h2>1.1 作者試玩</h2></div><span id="author-preview-progress">載入中</span></div>
-      <p class="author-preview-note">這是五幕救援任務的多步安全檢查試玩。錯選可重試，已確認的內容會保留；正式正文、劇情圖片及獎勵尚未開放。</p>
+      <p class="author-preview-note">這是五幕救援任務的多步安全檢查試玩。錯選可重試，已確認的內容會保留；下方可審核候選正文與劇情插圖，正式劇情與獎勵尚未開放。</p>
       <div id="author-preview-task" class="author-preview-task" aria-live="polite"></div>
       <div id="author-preview-feedback" class="author-preview-feedback" role="status"></div>
       <button id="author-preview-reset" class="small-button" type="button">重新試玩</button>
+      <section class="author-preview-story panel" aria-labelledby="author-preview-story-title"><h3 id="author-preview-story-title">1.1 正文與劇情插圖｜待作者終審</h3><p>五幕正文依照現行主線文件同步；插圖放在對應事件後，請逐幕核對人物、兩岸位置與救援次序。</p><div id="author-preview-story-scenes"></div></section>
       <section class="author-preview-map panel" aria-labelledby="author-preview-map-title"><div class="author-preview-map-head"><div><h3 id="author-preview-map-title">互動地圖試玩</h3><p>點選世界、版本區域、城市與地點，檢查地理位置及路線說明。探索紀錄只保留在本次試玩。</p></div><button id="author-preview-map-reset" class="small-button" type="button">返回世界圖</button></div><p id="author-preview-map-progress" class="author-preview-map-progress" aria-live="polite"></p><div id="author-preview-map" class="story-world-map-panel"></div></section>
       <section class="author-preview-battle panel" aria-labelledby="author-preview-battle-title"><h3 id="author-preview-battle-title">1.0–2.5 角色隔離戰鬥</h3><p>可混編已建檔角色，測試站位、等級與 C0–C6。2.x 專屬技能仍屬草案；戰鬥不寫入正式帳號。</p><div id="author-preview-2x-setup">正在載入角色試玩……</div><div id="author-preview-2x-result" role="status" aria-live="polite"></div></section>
     </section>
@@ -325,6 +326,8 @@
   <script src="./src/gacha.js?v=lobby-shop-20261002"></script>
   <script src="./src/story-1-0-current.js"></script>
   <script src="./src/story-1-0-images.js"></script>
+  <script src="./src/story-1-1-current.js?v=20261007"></script>
+  <script src="./src/story-1-1-images.js?v=20261007"></script>
   <script src="./src/story-world-map-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/interactive-map.js?v=regions-20261007"></script>
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
