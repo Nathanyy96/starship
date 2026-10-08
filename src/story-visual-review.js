@@ -18,6 +18,7 @@
     { chapter: "main-1-1", act: 2, anchor: "扭傷腳踝的藥師榆安", id: "yuan", name: "榆安", role: "隨車藥師｜此時仍在遠岸", src: "./assets/cards/yuan.png" }
   ];
   var corrections = {
+    "./assets/story/1-0-20.webp": { src: "./assets/story/review/1-0-20-mila-v2.webp", caption: "米菈沿梁面爬向搬運台；保留正式立繪的赤褐辮髮、青綠工作圍裙與短披肩。" },
     "./assets/story/1-0-16.webp": { src: "./assets/story/review/1-0-16-kailin-v2.webp", caption: "凱琳在警戒繩外帶路；米菈與老瓦克在後方工坊工作。" },
     "./assets/story/1-1-03.webp": { src: "./assets/story/review/1-1-03-shared-map-v2.webp", caption: "近岸重新攤圖；芮妲與榆安仍在窄水對面的遠岸等候。" },
     "./assets/story/1-1-04.webp": { src: "./assets/story/review/1-1-04-medicine-v2.webp", caption: "榆安已到近岸，將急用藥交給同岸驛員；芮妲與車仍在遠岸。" },
