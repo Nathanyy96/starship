@@ -722,6 +722,14 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .atlas-destinations { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
 .atlas-destinations button { padding:7px 9px; border:1px solid rgba(196,220,224,.28); border-radius:8px; color:#dcebf3; background:#172e4b; cursor:pointer; font-size:.67rem; }
 .atlas-destinations button:hover, .atlas-destinations button:focus-visible { border-color:#f0dfa8; color:#fff5ce; }
+.atlas-route-plan { margin-top:10px; padding:10px 12px; border:1px solid rgba(126,224,220,.24); border-radius:10px; background:rgba(12,34,56,.75); color:#dcebf3; font-size:.73rem; line-height:1.6; }
+.atlas-route-plan strong { color:#8be9e2; }
+.atlas-route-plan ul { margin:5px 0 0; padding-left:1.3em; }
+.atlas-route-plan li + li { margin-top:3px; }
+.atlas-diagram { min-height:220px; padding:24px 16px; border:1px solid rgba(126,224,220,.3); border-radius:12px; background:radial-gradient(circle at 50% 45%,#213d5a,#0d1931); display:flex; flex-direction:column; justify-content:center; align-items:center; gap:24px; color:#c9dce9; }
+.atlas-diagram > div { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; }
+.atlas-diagram button { padding:12px; border:1px solid #8be9e2; border-radius:9px; background:#183954; color:#f3fbff; cursor:pointer; }
+.atlas-diagram button:hover,.atlas-diagram button:focus-visible { background:#245772; }
 .atlas-foot { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 22px; margin-top:10px; padding:10px 12px; border-left:3px solid #66d5ca; background:rgba(4,16,34,.65); }
 .atlas-foot p { flex:1 1 320px; margin:0; color:#e5eef4; font-size:.74rem; line-height:1.6; }
 .atlas-foot small { flex:1 1 280px; color:#a9b9cc; font-size:.64rem; line-height:1.6; }
