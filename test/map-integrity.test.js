@@ -28,3 +28,16 @@ test('off-map special connections and author-only maps keep their boundaries', (
   assert.match(atlas.render('R6-000', '', {authorPreview: true}), /舊連結永久關閉/);
   assert.match(atlas.render('S5-201', '', {authorPreview: true}), /非地理比例/);
 });
+
+test('world map exposes the offshore route and both bell-court review paths', () => {
+  const world = atlas.render('W-001', '', {authorPreview: true});
+  assert.ok(atlas.maps['W-001'].points.some(point => point[0] === 'R6-000' && point[2] > 80));
+  assert.match(world, /class="atlas-pin offshore"/);
+  assert.match(world, /東側近海/);
+  assert.match(world, /無曉高原｜後續規劃/);
+  assert.match(world, /data-map-go="S1-201"/);
+  assert.ok(atlas.maps['A1-106'].offMap.some(point => point[0] === 'S1-201'));
+  assert.match(atlas.render('R6-000', '', {authorPreview: true}), /西北方圖外是艾珥汀本土/);
+  assert.ok(atlas.maps['R6-000'].offMap.some(point => point[0] === 'S6-001'));
+  assert.ok(atlas.maps['R4-000'].offMap.some(point => point[0] === 'S5-201'));
+});

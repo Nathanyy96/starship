@@ -8,13 +8,13 @@
   // Map art comes from 01M. Corrected maps use unlabelled replacement art;
   // navigation labels and travel facts follow the current 01 world/itinerary document.
   var maps = {
-    "W-001": { name: "艾珥汀大陸", level: 0, image: "w-001.png", imageVersion: "mainland-20261007", clean: true, note: "北方在上。大陸圖只呈現本土：南部內陸、洛汀灣、中部山河、北境沿岸與根冠高地。鏡潮群島由洛汀灣區域圖呈現；帷海從群島東南外航，遠潮界另用獨立世界圖。", landmarks: [
-      ["白鐘城", 43, 66], ["獸靈森地", 56, 70], ["洛汀灣", 68, 72], ["星井盆地", 31, 44], ["根冠高地", 45, 18]
+    "W-001": { name: "艾珥汀大陸", level: 0, image: "w-001.png", imageVersion: "mainland-20261007", clean: true, orientation: "北方在上。右側藍色海域是本土東側近海；「東海」尚不是正式地名。鏡潮群島在洛汀灣以東，帷海在群島東南外航的另一張區域圖。", note: "大陸圖只呈現艾珥汀本土。西北黃土為無曉高原，保留給第六大版本之後，並非第五大版本的根冠高地。彼岸鐘庭與遠潮界是特殊連結，圖上按鈕只供查閱地圖，不表示目前可以直接通行。", landmarks: [
+      ["白鐘城", 43, 66], ["獸靈森地", 56, 70], ["洛汀灣", 68, 72], ["星井盆地", 31, 44], ["根冠高地", 45, 18], ["無曉高原｜後續規劃", 17, 18], ["東側近海", 84, 52]
     ], points: [
       ["R1-000", "第一大版本｜南部內陸", 36, 73], ["R2-000", "第二大版本｜洛汀灣與鏡潮群島", 68, 78],
       ["R3-000", "第三大版本｜星井內陸", 38, 49], ["R4-000", "第四大版本｜新曙沿岸", 67, 26],
-      ["R5-000", "第五大版本｜根冠高地", 49, 22]
-    ], offMap: [["R6-000", "第六大版本｜東南外航至帷海"]] },
+      ["R5-000", "第五大版本｜根冠高地", 49, 22], ["R6-000", "第六大版本｜群島東南外航至帷海", 97, 91]
+    ] },
     "R1-000": { name: "第一大版本｜南部內陸生活圈", level: 1, parent: "W-001", image: "r1-000.png", note: "白鐘城是內陸核心；獸靈之村在東，霧橋在北，南驛山谷在南。鐘庭採特殊連結。", points: [
       ["C1-101", "白鐘城", 40, 69], ["C1-102", "獸靈之村", 78, 68],
       ["C1-103", "霧橋鎮", 48, 44], ["C1-104", "南驛山谷", 61, 88],
@@ -61,17 +61,17 @@
       ["#corridor", "霽光廊", 74, 70], ["#basin", "星井盆地", 31, 42], ["#elm-river", "白榆河", 53, 45],
       ["#forge-road", "鍛路鎮", 37, 23], ["#north-gate", "星井北門", 14, 12], ["#north-river", "北河走廊", 84, 16]
     ], pointNotes: { corridor: "霧橋向西北進入的山河門檻；白石驛站與岑光聚落位於此段。", basin: "中央山地盆地與地下遺構群，第三季的主要內陸生活圈。", "elm-river": "盆地東側的白榆河；改道前後兩岸仍需局部圖核對。", "forge-road": "盆地北側山脊上的鍛路鎮，接往北門。", "north-gate": "越山入口；星井終端位於附近山腹，並非另一座城市。", "north-river": "越山後沿北河向北境海岸下行。" } },
-    "R4-000": { name: "第四大版本｜新曙沿岸", level: 1, parent: "W-001", image: "r4-000.png", previewOnly: true, concept: true, note: "新曙港與內陸工坊、東北遠望塔、北方白夜航路和外海回覆海溝是不同尺度的地點。", points: [
+    "R4-000": { name: "第四大版本｜新曙沿岸", level: 1, parent: "W-001", image: "r4-000.png", previewOnly: true, concept: true, note: "新曙港與內陸工坊、東北遠望塔、北方白夜航路和外海回覆海溝是不同尺度的地點。虹徑外環須經遠望塔已測窗口，4.2 僅能測試落點附近。", points: [
       ["#new-dawn", "新曙港", 42, 34], ["#workshops", "碎星工坊", 23, 69], ["#watchtower", "遠望塔", 69, 30],
       ["#white-night", "白夜航路", 76, 7], ["#trench", "回覆海溝", 89, 57]
-    ], pointNotes: { "new-dawn": "星井北門後沿北河與山路下行約七至十日抵達的北境港城。", workshops: "新曙港向內陸約兩日的工坊區。", watchtower: "新曙港沿東北岸約三日到遠望塔生活圈。", "white-night": "遠望塔以北的季節沿海航路；可通狀態由劇情另行標示。", trench: "遠望塔港出船約三日的外海深水區，不貼在岸邊。" } },
-    "R5-000": { name: "第五大版本｜根冠高地與北境特殊連結", level: 1, parent: "W-001", image: "r5-000.png", imageVersion: "terrain-20261007", previewOnly: true, concept: true, note: "根冠與霜火谷位於北境內陸；補給路下行至新曙沿岸。虹徑外環須經已測窗口，不在此地形圖上畫成相鄰島城。", points: [
+    ], offMap: [["S5-201", "虹徑外環｜遠望塔特殊連結示意"]], pointNotes: { "new-dawn": "星井北門後沿北河與山路下行約七至十日抵達的北境港城。", workshops: "新曙港向內陸約兩日的工坊區。", watchtower: "新曙港沿東北岸約三日到遠望塔生活圈。", "white-night": "遠望塔以北的季節沿海航路；可通狀態由劇情另行標示。", trench: "遠望塔港出船約三日的外海深水區，不貼在岸邊。" } },
+    "R5-000": { name: "第五大版本｜根冠高地與北境特殊連結", level: 1, parent: "W-001", image: "r5-000.png", imageVersion: "snow-grove-20261007", previewOnly: true, concept: true, orientation: "北側連續雪山與第四版西側雪線相接；根林只佔避風高地一隅，霜火谷地熱集中在下層，東南補給路通新曙沿岸。西北無曉高原不屬本圖。", note: "根冠與霜火谷位於北境內陸；補給路下行至新曙沿岸。虹徑外環須經遠望塔已測窗口，不在此地形圖上畫成相鄰島城。", points: [
       ["#root-crown", "根冠高地", 48, 17], ["#frostfire", "霜火谷", 43, 48], ["#coast-link", "新曙補給路", 81, 79],
     ], offMap: [["S5-201", "虹徑外環｜特殊連結示意"]], pointNotes: { "root-crown": "新曙港向北約五日山路；高地的根林、長冬與地方守望塑造第五季生活。", frostfire: "根冠下行約一日山路的霜火谷與鍛環；地熱只集中於谷底，不貫穿整座高地。", "coast-link": "沿岸藥物、器具與糧種上高地，木材、熱源材料與季節勞力下港口；雪季通行受山口狀態限制。" } },
-    "R6-000": { name: "第六大版本｜帷海外航與照汐城生活圈", level: 1, parent: "W-001", image: "r6-000.png", previewOnly: true, concept: true, note: "從鏡潮群島向東南遠航到帷海諸邦；照汐城不與新曙港或根冠高地直接相鄰。", points: [
+    "R6-000": { name: "第六大版本｜帷海外航與照汐城生活圈", level: 1, parent: "W-001", image: "r6-000.png", previewOnly: true, concept: true, orientation: "西北方圖外是艾珥汀本土：從洛汀灣東航至鏡潮群島，再沿本圖由左上往右下東南外航，抵達帷海照汐城。", note: "照汐城不與新曙港或根冠高地直接相鄰。從照汐外岸到遠潮界須等跨界接點驗證，6.3 舊線永久關閉，6.6 另建新線有限通行。", points: [
       ["#supply-isles", "鏡潮群島補給", 18, 11], ["#outer-route", "帷海外航", 48, 49], ["#choashi", "照汐城", 86, 77],
       ["#outer-shore", "照汐外岸接點", 72, 88]
-    ], pointNotes: { "supply-isles": "在既有群島補給後依季風東南外航。", "outer-route": "鏡潮群島至照汐城暫採順季風五至七日、逆風八至十日；替代港與危險海域仍待海圖。", choashi: "帷海諸邦的主要落腳城市，用具體社會逐步帶出諸邦。", "outer-shore": "通往遠潮界的已驗證外岸接點；兩界仍分圖，不能把遠潮界畫成帷海島嶼。" } },
+    ], offMap: [["S6-001", "遠潮界｜照汐外岸特殊連結示意"]], pointNotes: { "supply-isles": "在既有群島補給後依季風東南外航。", "outer-route": "鏡潮群島至照汐城暫採順季風五至七日、逆風八至十日；替代港與危險海域仍待海圖。", choashi: "帷海諸邦的主要落腳城市，用具體社會逐步帶出諸邦。", "outer-shore": "通往遠潮界的已驗證外岸接點；兩界仍分圖，不能把遠潮界畫成帷海島嶼。" } },
     "S6-001": { name: "遠潮界｜繫舟盆地", level: 0, image: "s6-001.png", imageVersion: "basin-20261007", previewOnly: true, concept: true, note: "獨立世界圖。照汐外岸的已驗證連結落在盆地西緣石岸；6.3舊連結永久關閉，6.6另建受季節與載重限制的新線。", points: [
       ["#west-shore", "西緣石岸", 20, 55], ["#tether-city", "繫舟城", 47, 43], ["#qingxi", "青汐臺地", 78, 24], ["#water", "供水區", 86, 37]
     ], pointNotes: { "west-shore": "照汐外岸已驗證連結的落點；從此至繫舟城步行約一日。", "tether-city": "盆地主要城市；至青汐臺地約半日至一日。", qingxi: "盆地東北的臺地生活圈。", water: "供水區；6.3事件中的傷者集合點與強制裝載地另列，不合併成同一處。" } },
@@ -124,19 +124,19 @@
     var trail = lineage(id).map(function (key, i, all) { return key === id ? "<span>" + escapeHtml(maps[key].name) + "</span>" : "<button type=\"button\" data-map-go=\"" + key + "\">" + escapeHtml(maps[key].name) + "</button><span aria-hidden=\"true\">›</span>"; }).join("");
     var dots = (locked ? [] : map.points || []).map(function (point) {
       var target = maps[point[0]], unavailable = target && target.pending;
-      return "<button type=\"button\" class=\"atlas-pin" + (selectedPoint === point[0] ? " active" : "") + (unavailable ? " pending" : "") + "\" style=\"left:" + point[2] + "%;top:" + point[3] + "%\" data-map-go=\"" + escapeHtml(point[0]) + "\" aria-label=\"查看" + escapeHtml(point[1]) + (unavailable ? "，地圖待製作" : "") + "\"><span>" + escapeHtml(point[1]) + "</span></button>";
+      return "<button type=\"button\" class=\"atlas-pin" + (point[0] === "R6-000" && id === "W-001" ? " offshore" : "") + (selectedPoint === point[0] ? " active" : "") + (unavailable ? " pending" : "") + "\" style=\"left:" + point[2] + "%;top:" + point[3] + "%\" data-map-go=\"" + escapeHtml(point[0]) + "\" aria-label=\"查看" + escapeHtml(point[1]) + (unavailable ? "，地圖待製作" : "") + "\"><span>" + escapeHtml(point[0] === "R6-000" && id === "W-001" ? "第六版｜帷海外航" : point[1]) + "</span></button>";
     }).join("");
     var selected = (map.points || []).concat(map.offMap || []).find(function (p) { return p[0] === selectedPoint; });
     var localDescription = selected && selected[0].charAt(0) === "#" ? (map.pointNotes && map.pointNotes[selected[0].slice(1)]) || details[selected[0].slice(1)] : "";
     var nav = map.parent ? "<button type=\"button\" class=\"atlas-back\" data-map-go=\"" + map.parent + "\">← 返回上一層</button>" : "";
-    var worldSwitch = id === "W-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"S6-001\">遠潮界｜獨立世界圖 ↗</button>" : id === "S6-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸</button>" : "";
+    var worldSwitch = id === "W-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"S6-001\">遠潮界｜跨界地圖 ↗</button><button type=\"button\" class=\"atlas-switch\" data-map-go=\"S1-201\">彼岸鐘庭｜遺構特殊連結 ↗</button>" : id === "S6-001" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"R6-000\">查看帷海外岸入口</button><button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸</button>" : id === "S1-201" ? "<button type=\"button\" class=\"atlas-switch\" data-map-go=\"W-001\">返回艾珥汀大陸總圖</button>" : "";
     var landmarks = (map.landmarks || []).map(function (place) { return "<span class=\"atlas-landmark\" style=\"left:" + place[1] + "%;top:" + place[2] + "%\">" + escapeHtml(place[0]) + "</span>"; }).join("");
     var diagram = map.diagram && !locked ? "<div class=\"atlas-diagram\" aria-label=\"特殊連結拓樸示意\"><small>連結次序示意｜非地理比例或羅盤方位</small><div>" + (map.points || []).map(function (point, i) { return (i ? "<span aria-hidden=\"true\">→</span>" : "") + "<button type=\"button\" data-map-go=\"" + escapeHtml(point[0]) + "\">" + escapeHtml(point[1]) + "</button>"; }).join("") + "</div></div>" : "";
     var visual = diagram || (map.image && !locked ? "<div class=\"atlas-image-wrap atlas-level-" + map.level + (map.concept ? " atlas-concept" : "") + "\"><img src=\"./assets/maps/" + map.image + (map.imageVersion ? "?v=" + map.imageVersion : "") + "\" alt=\"" + escapeHtml(map.name) + "地圖\" loading=\"lazy\">" + landmarks + dots + "</div>" : "<div class=\"atlas-pending\"><strong>" + (locked ? "作者試玩概略圖" : "地圖原圖待製作") + "</strong><p>" + (locked ? "此大版本尚未向一般玩家開放；作者試玩可查看第一層區域概略圖。" : "此區已有層級入口，詳細地圖尚未經地理核對與出圖。") + "</p></div>");
     var destinations = (locked ? [] : (map.points || []).concat(map.offMap || [])).map(function (point) { return "<button type=\"button\" data-map-go=\"" + escapeHtml(point[0]) + "\">" + escapeHtml(point[1]) + (maps[point[0]] && maps[point[0]].pending ? " · 待製作" : " →") + "</button>"; }).join("");
     var routes = canPreview && routePlans[id] ? "<section class=\"atlas-route-plan\"><strong>航路核對</strong><ul>" + routePlans[id].map(function (line) { return "<li>" + escapeHtml(line) + "</li>"; }).join("") + "</ul></section>" : "";
     var phases = canPreview && phaseStates[id] ? "<section class=\"atlas-route-plan\"><strong>劇情通行狀態</strong><ul>" + phaseStates[id].map(function (phase) { return "<li><b>" + escapeHtml(phase[0]) + "：</b>" + escapeHtml(phase[1]) + "</li>"; }).join("") + "</ul></section>" : "";
-    return "<div class=\"atlas-heading\"><div><span class=\"eyebrow\">INTERACTIVE ATLAS / L" + map.level + "</span><h3 id=\"story-map-title\">" + escapeHtml(map.name) + "</h3></div><span class=\"story-map-version\">" + (locked ? "作者試玩" : map.pending ? "待製作" : map.concept ? "區域概略圖" : map.clean ? "無字修正版" : "第一版原圖") + "</span></div><nav class=\"atlas-crumbs\" aria-label=\"地圖層級\">" + trail + "</nav><div class=\"atlas-controls\">" + nav + worldSwitch + "</div>" + visual + (destinations ? "<div class=\"atlas-destinations\" aria-label=\"地圖目的地\">" + destinations + "</div>" : "") + routes + phases + "<div class=\"atlas-foot\"><p>" + escapeHtml(localDescription || map.note || "後續區域的正式地圖與節點正在製作。") + "</p><small>" + (locked ? "尚未正式開放。" : map.concept ? "僅供作者校對地形與路線；未標定的距離、方位和第二層局部場景仍待核定。" : map.image ? (map.clean ? "地名、行程與可通行狀態由互動標記和現行設定提供。" : "圖像為第一版概念原圖；地名、行程與可通行狀態以互動標記及現行設定為準。") : "詳細原圖尚未提供；此入口僅顯示規劃中的層級與區域名稱。") + "</small></div>";
+    return "<div class=\"atlas-heading\"><div><span class=\"eyebrow\">INTERACTIVE ATLAS / L" + map.level + "</span><h3 id=\"story-map-title\">" + escapeHtml(map.name) + "</h3></div><span class=\"story-map-version\">" + (locked ? "作者試玩" : map.pending ? "待製作" : map.concept ? "區域概略圖" : map.clean ? "無字修正版" : "第一版原圖") + "</span></div><nav class=\"atlas-crumbs\" aria-label=\"地圖層級\">" + trail + "</nav><div class=\"atlas-controls\">" + nav + worldSwitch + "</div>" + (map.orientation ? "<p class=\"atlas-orientation\">" + escapeHtml(map.orientation) + "</p>" : "") + visual + (destinations ? "<div class=\"atlas-destinations\" aria-label=\"地圖目的地\">" + destinations + "</div>" : "") + routes + phases + "<div class=\"atlas-foot\"><p>" + escapeHtml(localDescription || map.note || "後續區域的正式地圖與節點正在製作。") + "</p><small>" + (locked ? "尚未正式開放。" : map.concept ? "僅供作者校對地形與路線；未標定的距離、方位和第二層局部場景仍待核定。" : map.image ? (map.clean ? "地名、行程與可通行狀態由互動標記和現行設定提供。" : "圖像為第一版概念原圖；地名、行程與可通行狀態以互動標記及現行設定為準。") : "詳細原圖尚未提供；此入口僅顯示規劃中的層級與區域名稱。") + "</small></div>";
   }
   return { maps: maps, lineage: lineage, render: render };
 }));
