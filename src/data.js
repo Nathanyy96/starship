@@ -469,8 +469,8 @@
       return { id: material.materialId, name: material.materialName, sandCost: 480, expCost: 12000, limit: 6 };
     }).concat([{ id: universalBreakthroughMaterial.materialId, name: universalBreakthroughMaterial.materialName, sandCost: 640, expCost: 16000, limit: 6 }]),
     skins: [
-      { id: maveSummerSkin.id, name: maveSummerSkin.name, characterId: maveSummerSkin.characterId, image: maveSummerSkin.previewImage, sandCost: 2400 },
-      { id: harlowSummerSkin.id, name: harlowSummerSkin.name, characterId: harlowSummerSkin.characterId, image: harlowSummerSkin.previewImage, sandCost: 2400 }
+      { id: maveSummerSkin.id, name: maveSummerSkin.name, characterId: maveSummerSkin.characterId, image: maveSummerSkin.previewImage, sandCost: 2400, forSale: false },
+      { id: harlowSummerSkin.id, name: harlowSummerSkin.name, characterId: harlowSummerSkin.characterId, image: harlowSummerSkin.previewImage, sandCost: 2400, forSale: false }
     ].concat(newSeasonSkins.map(function (skin) { return { id: skin.id, name: skin.name, characterId: skin.characterId, image: skin.previewImage, sandCost: 2400 }; })),
     conversions: [
       { id: "sand-to-exp", costKey: "starSand", cost: 160, rewardKey: "characterExp", reward: 3000, limit: null },

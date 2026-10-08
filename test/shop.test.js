@@ -8,7 +8,7 @@ const { GachaGame } = require("../src/gacha.js");
 const { banners, shopCatalog, voyageConfig } = require("../src/data.js");
 
 const makeGame = (state, catalog = shopCatalog) => new GachaGame({ banners, state, shopCatalog: catalog, voyageConfig });
-const richState = () => ({ resources: { starSand: 10000, starMarks: 0, characterExp: 150000 }, collection: { mave: 1 } });
+const richState = () => ({ resources: { starSand: 10000, starMarks: 0, characterExp: 150000 }, collection: { mave: 1, celesia: 1 } });
 
 test("shop material supports either payment, tracks inventory and enforces a shared seasonal limit", () => {
   const game = makeGame(richState());
@@ -37,25 +37,35 @@ test("shop conversion loses value in a round trip and exp-to-sand has a seasonal
 
 test("skin is bought once, stays owned, and only its character may equip it", () => {
   const game = makeGame(richState());
-  const id = shopCatalog.skins[0].id;
-  assert.throws(() => game.equipSkin({ cardId: "mave", skinId: id }), /尚未擁有/);
+  const id = shopCatalog.skins.find(item => item.characterId === "celesia").id;
+  assert.throws(() => game.equipSkin({ cardId: "celesia", skinId: id }), /尚未擁有/);
   game.shopAction({ kind: "skin", id, payment: "starSand" });
   assert.equal(game.getState().resources.starSand, 7600);
   assert.throws(() => game.shopAction({ kind: "skin", id, payment: "starSand" }), /已擁有/);
   assert.throws(() => game.equipSkin({ cardId: "reyn", skinId: id }), /請先取得角色/);
-  game.equipSkin({ cardId: "mave", skinId: id });
-  assert.equal(makeGame(game.getState()).getState().cosmetics.equippedSkins.mave, id);
-  game.equipSkin({ cardId: "mave", skinId: "" });
-  assert.equal(game.getState().cosmetics.equippedSkins.mave, undefined);
+  game.equipSkin({ cardId: "celesia", skinId: id });
+  assert.equal(makeGame(game.getState()).getState().cosmetics.equippedSkins.celesia, id);
+  game.equipSkin({ cardId: "celesia", skinId: "" });
+  assert.equal(game.getState().cosmetics.equippedSkins.celesia, undefined);
 });
 
-test("unreleased character skin can be reserved without unlocking the character", () => {
+test("Mave and Harlow skins cannot be purchased; existing unlocks remain usable", () => {
   const game = makeGame(richState());
-  const skin = shopCatalog.skins.find((item) => item.characterId === "harlow");
-  game.shopAction({ kind: "skin", id: skin.id, payment: "starSand" });
-  assert.ok(game.getState().cosmetics.skins[skin.id]);
-  assert.equal(game.getState().collection.harlow, undefined);
-  assert.throws(() => game.equipSkin({ cardId: "harlow", skinId: skin.id }), /請先取得角色/);
+  const before = game.getState();
+  for (const characterId of ["mave", "harlow"]) {
+    const skin = shopCatalog.skins.find(item => item.characterId === characterId);
+    assert.equal(skin.forSale, false);
+    assert.throws(() => game.shopAction({ kind: "skin", id: skin.id, payment: "starSand" }), /尚未開放販售/);
+  }
+  assert.deepEqual(game.getState().resources, before.resources);
+  assert.deepEqual(game.getState().cosmetics, before.cosmetics);
+  const owned = richState();
+  const id = shopCatalog.skins.find(item => item.characterId === "mave").id;
+  owned.cosmetics = { skins: { [id]: { source: "previous-purchase" } } };
+  const legacy = makeGame(owned);
+  legacy.equipSkin({ cardId: "mave", skinId: id });
+  assert.ok(legacy.getState().cosmetics.skins[id]);
+  assert.equal(legacy.getState().cosmetics.equippedSkins.mave, id);
 });
 
 test("five new catalog outfits have art, cost 2400 sand, and equip only on their owner", () => {

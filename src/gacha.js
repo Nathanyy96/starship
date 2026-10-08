@@ -554,6 +554,7 @@
     } else if (kind === "skin") {
       item = (catalog.skins || []).find(function (entry) { return entry.id === id; });
       assert(item, "找不到可購買的特殊造型");
+      assert(item.forSale !== false, "此角色造型尚未開放販售");
       assert(payment === "starSand", "特殊造型只能使用星砂購買");
       assert(!this.state.cosmetics.skins[id], "已擁有這款角色造型");
       costKey = "starSand";
