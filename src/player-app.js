@@ -14,6 +14,8 @@
     var currentPlayerName = "";
     var currentPlayerToken = "";
     var authorPreviewRequestId = 0;
+    var authorPreviewLastAct = null;
+    var authorPreviewRewardDemo = { "1.0": false, "1.1": false };
     var authMode = "login";
     var selectedBannerId = (data.banners.find(function (banner) { return banner.active !== false; }) || data.banners[0]).id;
     var currentStoryChapterId = "main-1-0";
@@ -544,14 +546,28 @@
     function renderAuthorPreview(payload) {
       var progress = payload.progress;
       byId("author-preview-progress").textContent = progress.act >= progress.total ? "試玩完成" : "第 " + (progress.act + 1) + " 幕 / " + progress.total + " · 檢查 " + (progress.step + 1);
-      byId("author-preview-feedback").textContent = progress.correct === false ? "此選項未通過安全檢查，留在本關重試。" + (progress.feedback || "") : progress.feedback || "";
-      byId("author-preview-feedback").classList.toggle("needs-retry", progress.correct === false);
-      if (!payload.task) {
-        byId("author-preview-task").innerHTML = "<h3>已完成本輪試玩</h3><p>你已走完五段任務。請回報哪個選擇不合理、哪個提示不清楚，以及整體節奏是否適合 1.1。</p><p>這次試玩不會領取星砂或改動正式劇情進度。</p>";
-        return;
+      var target = byId("author-preview-story-scenes");
+      var scenes = target.querySelectorAll("[data-author-act]");
+      scenes.forEach(function (scene, index) {
+        var status = scene.querySelector("[data-author-scene-status]");
+        var slot = scene.querySelector("[data-author-mission-slot]");
+        status.textContent = index < progress.act ? "互動已完成" : index === progress.act ? "目前幕次 · 檢查 " + (progress.step + 1) : "可先閱讀 · 互動待解鎖";
+        if (index < progress.act) slot.innerHTML = "<p class=\"author-preview-mission-state\">本幕互動已完成。正文與插圖可隨時重新展開閱讀。</p>";
+        else if (index > progress.act) slot.innerHTML = "<p class=\"author-preview-mission-state\">先完成前一幕互動，即可在這裡操作本幕選項。</p>";
+        else if (payload.task) {
+          var task = payload.task;
+          slot.innerHTML = "<section class=\"author-preview-task\" aria-label=\"本幕互動\"><h4>本幕互動｜" + escapeHtml(task.title) + "</h4><p>已確認 " + (progress.facts || []).length + " 項；錯選不清除已完成步驟。</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, choiceIndex) { return "<button type=\"button\" data-author-choice=\"" + choiceIndex + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div><p class=\"author-preview-feedback" + (progress.correct === false ? " needs-retry" : "") + "\" role=\"status\">" + escapeHtml(progress.correct === false ? "此選項未通過安全檢查，留在本幕重試。" + (progress.feedback || "") : progress.feedback || "") + "</p></section>";
+        } else slot.innerHTML = "<p class=\"author-preview-mission-state\">五幕互動已完成。可在本幕末尾試按領獎位置；試用不會發放資源。</p>";
+      });
+      var claim = byId("author-preview-claim-11");
+      claim.disabled = progress.act < progress.total || authorPreviewRewardDemo["1.1"];
+      claim.textContent = authorPreviewRewardDemo["1.1"] ? "已試按領獎位置" : progress.act >= progress.total ? "試按領取 1.1 劇情獎勵" : "完成五幕互動後可試按領獎";
+      if (authorPreviewLastAct === null || progress.act < authorPreviewLastAct) scenes.forEach(function (scene, index) { scene.open = index === Math.min(progress.act, scenes.length - 1); });
+      else if (progress.act > authorPreviewLastAct) {
+        var next = scenes[Math.min(progress.act, scenes.length - 1)];
+        if (next) { next.open = true; if (!target.hidden) window.requestAnimationFrame(function () { next.scrollIntoView({ behavior: "smooth", block: "start" }); }); }
       }
-      var task = payload.task;
-      byId("author-preview-task").innerHTML = "<h3>" + escapeHtml(task.title) + "</h3><p class=\"author-preview-scene\">已確認 " + (progress.facts || []).length + " 項；錯選不清除已確認步驟。</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, index) { return "<button type=\"button\" data-author-choice=\"" + index + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div>";
+      authorPreviewLastAct = progress.act;
     }
     function authorPreviewStoryRequest(action, choice) {
       if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/1-1", { action: action, choice: choice });
@@ -592,9 +608,9 @@
     }
     function loadAuthorPreview(action, choice) {
       var requestId = ++authorPreviewRequestId;
-      byId("author-preview-task").innerHTML = "<p>正在載入任務……</p>";
       byId("author-preview-reset").disabled = true;
-      authorPreviewStoryRequest(action || "view", choice).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) byId("author-preview-task").textContent = error.message; }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
+      byId("author-preview-story-scenes").querySelectorAll("[data-author-choice]").forEach(function (button) { button.disabled = true; });
+      authorPreviewStoryRequest(action || "view", choice).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) { var slot = byId("author-preview-story-scenes").querySelector("[data-author-act]:open [data-author-mission-slot]"); if (slot) slot.innerHTML = "<p class=\"author-preview-feedback needs-retry\" role=\"alert\">" + escapeHtml(error.message) + "</p>"; } }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
     }
     function loadAuthorBattlePreview() {
       authorPreviewBattleRequest({ action: "view" }).then(function (payload) {
@@ -617,12 +633,24 @@
     }
     function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
     function renderAuthorStoryPreview() {
-      var target = byId("author-preview-story-scenes");
-      var source = window.StarshipStory11Current;
-      if (!target || !source || !Array.isArray(source.scenes)) return;
-      target.innerHTML = source.scenes.map(function (scene, index) {
-        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary>" + escapeHtml(scene.title) + "</summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1") + "</details>";
+      var source10 = window.StarshipStory10Current;
+      var source11 = window.StarshipStory11Current;
+      var target10 = byId("author-preview-story-scenes-10");
+      var target11 = byId("author-preview-story-scenes");
+      if (!target10 || !target11 || !source10 || !source11) return;
+      if (!target10.children.length) target10.innerHTML = source10.scenes.map(function (scene, index) {
+        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small>點按展開／收合</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-0") + (index === source10.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.0 版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-10\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.0\">試按領取 1.0 劇情獎勵</button><small>版面試用：不領取、不更改正式進度或資源。</small></div>" : "") + "</details>";
       }).join("");
+      if (!target11.children.length) target11.innerHTML = source11.scenes.map(function (scene, index) {
+        return "<details class=\"author-preview-story-scene\" data-author-act=\"" + index + "\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small data-author-scene-status>載入互動進度中</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1") + "<div data-author-mission-slot=\"" + index + "\" class=\"author-preview-mission-slot\"></div>" + (index === source11.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.1 暫定版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-11\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.1\" disabled>完成五幕互動後可試按領獎</button><small>作者試用只檢查按鈕位置和流程，不發放正式獎勵。</small></div>" : "") + "</details>";
+      }).join("");
+    }
+    function showAuthorStoryVersion(version) {
+      var is10 = version === "1.0";
+      byId("author-preview-story-scenes-10").hidden = !is10;
+      byId("author-preview-story-scenes").hidden = is10;
+      byId("author-story-tab-10").setAttribute("aria-selected", String(is10));
+      byId("author-story-tab-11").setAttribute("aria-selected", String(!is10));
     }
     function storyBodyMarkup(text, className, actNumber, chapterId) {
       var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
@@ -1814,8 +1842,19 @@
     });
     byId("open-story").addEventListener("click", function () { showView("story-view"); });
     byId("open-author-preview").addEventListener("click", function () { showView("author-preview-view"); });
-    byId("author-preview-task").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
-    byId("author-preview-reset").addEventListener("click", function () { loadAuthorPreview("reset"); });
+    byId("author-preview-story-scenes").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button && !button.disabled) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
+    document.querySelector(".author-preview-story-tabs").addEventListener("click", function (event) { var button = event.target.closest("[data-author-story-version]"); if (button) showAuthorStoryVersion(button.getAttribute("data-author-story-version")); });
+    document.querySelector(".author-preview-story").addEventListener("click", function (event) {
+      var button = event.target.closest("[data-author-preview-claim]");
+      if (!button || button.disabled) return;
+      var version = button.getAttribute("data-author-preview-claim");
+      authorPreviewRewardDemo[version] = true;
+      button.disabled = true;
+      button.textContent = "已試按領獎位置";
+      var note = button.parentElement.querySelector("small");
+      if (note) note.textContent = "版面試用完成；正式角色、進度與資源均未變動。";
+    });
+    byId("author-preview-reset").addEventListener("click", function () { authorPreviewLastAct = null; authorPreviewRewardDemo["1.1"] = false; loadAuthorPreview("reset"); });
     byId("author-preview-map-reset").addEventListener("click", function () { authorAtlasMapId = "W-001"; authorAtlasPointId = ""; renderAuthorMapPreview(); });
     byId("author-preview-map").addEventListener("click", function (event) {
       var target = event.target.closest("[data-map-go]");

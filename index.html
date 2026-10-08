@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星界之律｜遊戲大廳</title>
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
-  <link rel="stylesheet" href="./styles.css?v=regions-20261007">
+  <link rel="stylesheet" href="./styles.css?v=author-story-reader-20261007">
 </head>
 <body>
   <main class="page-shell">
@@ -90,11 +90,8 @@
 
     <section id="author-preview-view" class="game-view panel author-preview-view" hidden>
       <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><h2>1.1 作者試玩</h2></div><span id="author-preview-progress">載入中</span></div>
-      <p class="author-preview-note">這是五幕救援任務的多步安全檢查試玩。錯選可重試，已確認的內容會保留；下方可審核候選正文與劇情插圖，正式劇情與獎勵尚未開放。</p>
-      <div id="author-preview-task" class="author-preview-task" aria-live="polite"></div>
-      <div id="author-preview-feedback" class="author-preview-feedback" role="status"></div>
-      <button id="author-preview-reset" class="small-button" type="button">重新試玩</button>
-      <section class="author-preview-story panel" aria-labelledby="author-preview-story-title"><h3 id="author-preview-story-title">1.1 正文與劇情插圖｜待作者終審</h3><p>五幕正文依照現行主線文件同步；插圖放在對應事件後，請逐幕核對人物、兩岸位置與救援次序。</p><div id="author-preview-story-scenes"></div></section>
+      <p class="author-preview-note">展開幕次即可在原位閱讀正文、查看插圖並完成該幕互動；讀完可以收合，進度會保留。這是 1.1 閱讀方式的作者試用，尚不影響正式劇情或資源。</p>
+      <section class="author-preview-story panel" aria-labelledby="author-preview-story-title"><div class="author-preview-story-heading"><div><h3 id="author-preview-story-title">劇情閱讀方式｜作者試用</h3><p>比較 1.0 已開放正文與 1.1 候選正文；逐幕展開、收合與試按獎勵都只在此預覽。</p></div><button id="author-preview-reset" class="small-button" type="button">重設 1.1 互動</button></div><div class="author-preview-story-tabs" role="tablist" aria-label="試用劇情版本"><button id="author-story-tab-10" type="button" role="tab" data-author-story-version="1.0" aria-controls="author-preview-story-scenes-10" aria-selected="false">1.0 現行正文｜新版面預覽</button><button id="author-story-tab-11" type="button" role="tab" data-author-story-version="1.1" aria-controls="author-preview-story-scenes" aria-selected="true">1.1 候選正文｜逐幕互動</button></div><div id="author-preview-story-scenes-10" role="tabpanel" aria-labelledby="author-story-tab-10" hidden></div><div id="author-preview-story-scenes" role="tabpanel" aria-labelledby="author-story-tab-11"></div></section>
       <section class="author-preview-map panel" aria-labelledby="author-preview-map-title"><div class="author-preview-map-head"><div><h3 id="author-preview-map-title">互動地圖試玩</h3><p>點選世界、版本區域、城市與地點，檢查地理位置及路線說明。探索紀錄只保留在本次試玩。</p></div><button id="author-preview-map-reset" class="small-button" type="button">返回世界圖</button></div><p id="author-preview-map-progress" class="author-preview-map-progress" aria-live="polite"></p><div id="author-preview-map" class="story-world-map-panel"></div></section>
       <section class="author-preview-battle panel" aria-labelledby="author-preview-battle-title"><h3 id="author-preview-battle-title">1.0–2.5 角色隔離戰鬥</h3><p>可混編已建檔角色，測試站位、等級與 C0–C6。2.x 專屬技能仍屬草案；戰鬥不寫入正式帳號。</p><div id="author-preview-2x-setup">正在載入角色試玩……</div><div id="author-preview-2x-result" role="status" aria-live="polite"></div></section>
     </section>
@@ -337,6 +334,6 @@
   <script src="./src/battle.js?v=author-preview-roster-20261005"></script>
   <script src="./src/author-preview.js?v=20261005"></script>
   <script src="./src/story-1-1-missions.js?v=20261007"></script>
-  <script src="./src/player-app.js?v=regions-20261007"></script>
+  <script src="./src/player-app.js?v=author-story-reader-20261007"></script>
 </body>
 </html>
