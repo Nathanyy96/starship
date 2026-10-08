@@ -19,8 +19,8 @@ test('review portraits and illustrations have exact prose anchors and real asset
 
 test('review keeps the published image manifests intact and separates named people', () => {
   const before = JSON.stringify(images);
-  assert.equal(review.imagesFor('main-1-0', images['main-1-0']).length, 39);
-  assert.equal(review.imagesFor('main-1-1', images['main-1-1']).length, 7);
+  assert.equal(review.imagesFor('main-1-0', images['main-1-0']).length, 40);
+  assert.equal(review.imagesFor('main-1-1', images['main-1-1']).length, 12);
   assert.equal(JSON.stringify(images), before);
   assert.equal(review.portraits.length, 11);
   assert.equal(new Set(review.portraits.map(p => p.id)).size, 11);

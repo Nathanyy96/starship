@@ -18,6 +18,7 @@
     { chapter: "main-1-1", act: 2, anchor: "扭傷腳踝的藥師榆安", id: "yuan", name: "榆安", role: "隨車藥師｜此時仍在遠岸", src: "./assets/cards/yuan.png" }
   ];
   var corrections = {
+    "./assets/story/1-0-08.webp": { src: "./assets/story/review/1-0-08-retreat-v2.webp", caption: "雷恩拉住後襟，兩人退到翻倒木車後；先重新約定站位，再接應引獸。" },
     "./assets/story/1-0-20.webp": { src: "./assets/story/review/1-0-20-mila-v2.webp", caption: "米菈沿梁面爬向搬運台；保留正式立繪的赤褐辮髮、青綠工作圍裙與短披肩。" },
     "./assets/story/1-0-16.webp": { src: "./assets/story/review/1-0-16-kailin-v2.webp", caption: "凱琳在警戒繩外帶路；米菈與老瓦克在後方工坊工作。" },
     "./assets/story/1-1-03.webp": { src: "./assets/story/review/1-1-03-shared-map-v2.webp", caption: "近岸重新攤圖；芮妲與榆安仍在窄水對面的遠岸等候。" },
@@ -25,6 +26,12 @@
     "./assets/story/1-1-05.webp": { src: "./assets/story/review/1-1-05-stop-v2.webp", caption: "Hina 舉起紅片停手；苔角行獸擾動遠岸輔錨後，兩岸重新複核。" }
   };
   var additions = [
+{"chapter":"main-1-0","act":2,"anchor":"伊薩爾站在主路的窄口","src":"./assets/story/review/1-0-defense-layout.webp","caption":"村口防守｜伊薩爾守主路，村民退往住屋；菜圃缺口與空圍場另在側邊。"},
+{"chapter":"main-1-1","act":3,"anchor":"繩子在眾人眼前被拉成奇怪的弧線","src":"./assets/story/review/1-1-rescue-rope.webp","caption":"錯線試送｜只試空載繩；水面倒影錯位，繩線斷裂，雷恩攔住瑟蕾雅再次落標。"},
+{"chapter":"main-1-1","act":3,"anchor":"每個位置都先以空載繩、燈號和兩岸口頭複核","src":"./assets/story/review/1-1-rescue-survey.webp","caption":"重新測線｜先加固錨點、試空繩與回燈；芮妲指出遠岸雜草下的舊側階。"},
+{"chapter":"main-1-1","act":4,"anchor":"榆安與兩名居民分批過到近岸","src":"./assets/story/review/1-1-rescue-yuan.webp","caption":"分批撤傷者｜兩名救援員扶榆安走已複核的石階；居民分批等候，急用藥隨人帶過。"},
+{"chapter":"main-1-1","act":4,"anchor":"牠撞鬆輔繩，車廂傾斜","src":"./assets/story/review/1-1-rescue-anchor.webp","caption":"輔錨受撞｜苔角行獸撞鬆遠岸輔繩，車廂傾斜、兩箱滑落；主錨另在近岸。"},
+{"chapter":"main-1-1","act":4,"anchor":"最後一名救援員踏上石階時","src":"./assets/story/review/1-1-rescue-last.webp","caption":"最後接應｜芮妲帶器材抵近岸，最後救援員沿三階濕石撤回；行獸轉向林坡。"},
     {"chapter":"main-1-0","act":4,"anchor":"卸貨廊原本從外側吊架直通地面內廊","src":"./assets/story/review/1-0-rescue-01.webp","caption":"救援動作 01｜外側吊架、中央搬運台與內側受困平台；側道與翹起的踏板已不可靠。","sequence":1},
     {"chapter":"main-1-0","act":4,"anchor":"右手抓住牆邊凸起的鐵件","src":"./assets/story/review/1-0-rescue-02.webp","caption":"救援動作 02｜側道突然閉合，瑟蕾雅抓住鐵件；星標只能暫時穩住一個磚角。","sequence":2},
     {"chapter":"main-1-0","act":4,"anchor":"用力把人拽出","src":"./assets/story/review/1-0-rescue-03.webp","caption":"救援動作 03｜雷恩送繩接應，Chodan 抓住手腕，合力將瑟蕾雅拉回外側。","sequence":3},

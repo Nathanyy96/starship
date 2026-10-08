@@ -1,0 +1,100 @@
+{
+  "mode": "built-in imagegen",
+  "rawOutputDirectory": "C:/starship/story-art/coverage-20261008",
+  "entries": [
+    {
+      "id": "1-0-defense-layout",
+      "chapter": "main-1-0",
+      "act": 2,
+      "anchor": "伊薩爾站在主路的窄口",
+      "caption": "村口防守｜伊薩爾守主路，村民退往住屋；菜圃缺口與空圍場另在側邊。",
+      "refs": [
+        "assets/story/1-0-09.webp"
+      ],
+      "prompt": "New wide elevated establishing CG of same forest village as reference. Show understandable spatial arrangement before tactical fight: tall older grey furry wolf Isaar at narrow main road holding long hunting pole against one black-crystal shoulder wild boar, residents retreat behind him toward wooden houses at left. Vegetable garden and broken wooden wall at center, EMPTY fenced paddock at right with a blocked side gate leading into forest slope. No other named heroes needed. Do not reuse little Reyn as Isaar; Isaar tall grey wolf hunter navy coat, mature muzzle. Natural fantasy anime, no labels/text/arrows, no modern items.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-bc1a6b6f-fe09-4a83-9bc5-fab65f49d340.png"
+    },
+    {
+      "id": "1-0-08-retreat-v2",
+      "replace": "./assets/story/1-0-08.webp",
+      "refs": [
+        "assets/story/1-0-08.webp",
+        "assets/cards/reyn.png",
+        "assets/cards/celesia.png"
+      ],
+      "prompt": "Replace action in image1 with canonical narrative: silver-haired Celesia and small fully furry wolf Reyn reference2/3 BOTH crouched together BEHIND overturned wooden cargo cart for cover. Cart solid bottom between them and attacking black-crystal wild boar on other side. Reyn grabs back of Celesia cloak to pull her down, bow lowered, NOT drawing arrow through her. Celesia sword lowered, injured LEFT arm bandaged faint red stain. They discuss positions rather than attack. Preserve exact formal faces/clothes, Reyn truly wolf muzzle and small chibi stature. Forest vegetable garden, broken fence. No other characters. Landscape anime CG no text.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-9fb7ecdb-0af4-4b8c-99c9-26bae4a30848.png"
+    },
+    {
+      "id": "1-1-rescue-rope",
+      "chapter": "main-1-1",
+      "act": 3,
+      "anchor": "繩子在眾人眼前被拉成奇怪的弧線",
+      "caption": "錯線試送｜只試空載繩；水面倒影錯位，繩線斷裂，雷恩攔住瑟蕾雅再次落標。",
+      "refs": [
+        "assets/cards/celesia.png",
+        "assets/cards/reyn.png",
+        "assets/story/review/1-1-04-medicine-v2.webp"
+      ],
+      "prompt": "New anime fantasy story CG narrow shallow creek of reference3, no huge ravine. Near bank foreground Celesia canonical ref1 kneels startled beside wet rock, broken EMPTY rope recoils over water, small furry wolf Reyn ref2 holding her wrist stopping another magical mark. Only tiny light beside nearbank stones, no whole-valley magic. Farbank unoccupied in crop, no people crossing or suspended in rope. Water reflects misaligned ghost stone steps, showing failed unloaded trial, not explosion. Formal costumes faces exact. Landscape no text.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-fe9d9ac4-7434-44aa-af96-9e646814a3a1.png"
+    },
+    {
+      "id": "1-1-rescue-survey",
+      "chapter": "main-1-1",
+      "act": 3,
+      "anchor": "每個位置都先以空載繩、燈號和兩岸口頭複核",
+      "caption": "重新測線｜先加固錨點、試空繩與回燈；芮妲指出遠岸雜草下的舊側階。",
+      "refs": [
+        "assets/cards/reyn.png",
+        "assets/cards/ruida.png",
+        "assets/story/review/1-1-04-medicine-v2.webp"
+      ],
+      "prompt": "New elevated wide anime CG same narrow creek geometry ref3. Nearbank foreground small furry wolf Reyn ref1 checks THREE separate anchored rope points with two anonymous rescue workers in plain practical clothing. Farbank Ruida ref2 red scarf olivecoat brown skirt points to old shallow STONE SIDE STEPS exposed from grass beside wooden cargo horse cart; no person crossing water. One farbank shaded lantern raised confirming signal, EMPTY trial guide rope across narrow water. Mainrope anchorednearbank, auxiliary farbank anchor separate. No cliff abyss, no bridge, no text or arrows. Formal identities.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-e60a7cad-520e-4d55-b6d5-6eb726f3c1e6.png"
+    },
+    {
+      "id": "1-1-rescue-yuan",
+      "chapter": "main-1-1",
+      "act": 4,
+      "anchor": "榆安與兩名居民分批過到近岸",
+      "caption": "分批撤傷者｜兩名救援員扶榆安走已複核的石階；居民分批等候，急用藥隨人帶過。",
+      "refs": [
+        "assets/cards/yuan.png",
+        "assets/cards/ruida.png",
+        "assets/story/review/1-1-04-medicine-v2.webp"
+      ],
+      "prompt": "New wide anime CG on narrow shallow creek same ref3. Yuan ref1 shortbrown bob greenribbon cream sage dress injured ankle wrapped, carefully supported on BOTH sides by exactly TWO anonymous rescue workers as she walks 3 wet stepping stones toward foreground nearbank. Medicinecase carried with her by worker. Not hanging off rope/not floating/no leaps. Farbank Ruida ref2 red scarf stands beside wooden cart and TWO waiting residents, waiting their separate turn. Modest hand guide rope, short water crossing less10steps. No giant magicalbridge, no giantgorge, no text. Focus safe assisted crossing.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-d8882642-3de8-4955-bd06-e73378dbde8b.png"
+    },
+    {
+      "id": "1-1-rescue-anchor",
+      "chapter": "main-1-1",
+      "act": 4,
+      "anchor": "牠撞鬆輔繩，車廂傾斜",
+      "caption": "輔錨受撞｜苔角行獸撞鬆遠岸輔繩，車廂傾斜、兩箱滑落；主錨另在近岸。",
+      "refs": [
+        "assets/story/review/1-1-05-stop-v2.webp",
+        "assets/cards/ruida.png"
+      ],
+      "prompt": "New close wide action anime CG zoom on FAR bank of reference1. Injured moss-antler grazing beast mossy ivorygrey fur antlers, LEFT HIND FOOT with mild blood grazes, emerges from bushes colliding ONLY auxiliary rope stake. Wooden cargo cart tilts, TWO wooden instrumentcases sliding toward narrow water foreground. Ruida ref2 red scarf olivecoat brownskirt and two anonymous rescuers crouch on stable farbank well clear. Beast stressed, NOT attackingpeople, NOT blackcrystal giant. Mainnearbank anchor out of frame. No Hina/Chodan/Reyn here, no horse dangerouslycolliding ifnotnecessary. Landscape no text, clear cause and consequence.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-2dbb3247-72ae-4e7a-8843-dc12c8f0ca24.png",
+      "finalEditPrompt": "Precise object edit ONLY. Preserve all people, identities, injured moss-antler beast, cart, creek, camera and costumes. Current image has too many fallen cases. Show EXACTLY TWO instrument cases OUTSIDE cart: one dark case already in foreground water, ONE brown case sliding at water's edge. Remove every other fallen case from grassy slope and bank; cases safely INSIDE cart may remain. Also tilt auxiliary anchor metal stake beside beast slightly loose with disturbed soil and visibly slack rope, not a fully firm taut stake. No other changes, no new people/objects/text."
+    },
+    {
+      "id": "1-1-rescue-last",
+      "chapter": "main-1-1",
+      "act": 4,
+      "anchor": "最後一名救援員踏上石階時",
+      "caption": "最後接應｜芮妲帶器材抵近岸，最後救援員沿三階濕石撤回；行獸轉向林坡。",
+      "refs": [
+        "assets/cards/ruida.png",
+        "assets/cards/hina.png",
+        "assets/story/review/1-1-05-stop-v2.webp"
+      ],
+      "prompt": "New wide anime CG narrow creek same reference3. FOREGROUND nearbank Ruida ref1 olivejacketredscarf carrying one instrumentbox stepping off LAST of three wet steppingstones, Hina ref2 longblackbluehair whiteblueflowing jacket gestures precise foothold using thin windline. One anonymous LAST rescueworker following on middle stone toward nearbank. Background FAR bank moss-antler beast turns AWAY into empty forest slope, no other trappedhumans onfarbank/cart abandoned. Tiny local star light on THREE stones only, no giantmagic path. Nearbankfarbank clearly separated by narrow water, no gorge. Exact formal identities. No text.",
+      "path": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-2c7ad42a-0bbc-426d-980a-241a7d03dd12.png",
+      "finalEditPrompt": "Precise positioning edit. Keep Ruida redscarf woman already arriving foreground nearbank with onebox, final male rescue worker behind on steppingstones, moss-antler beast retreating farbank, exact anime faces/costumes and same creek. Move ONLY Hina longblackbluehair woman in whitebluejacket OFF the water stepping stone and onto solid grassy FOREGROUND NEAR BANK beside Ruida, both feet on dry grass/shore rock connected to the bank. Hina points back to footholds using thin blue wind guide, she does not cross water. Exactly three wet steppingstones with tiny separate local star lights remain, no broad magic. Preserve all other placements, no additional people, no text."
+    }
+  ]
+}
