@@ -1,0 +1,136 @@
+{
+  "mode": "built-in imagegen",
+  "rawOutputDirectory": "C:/starship/story-art/rescue-20261008",
+  "entries": [
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "卸貨廊原本從外側吊架直通地面內廊",
+      "src": "./assets/story/review/1-0-rescue-01.webp",
+      "caption": "救援動作 01｜外側吊架、中央搬運台與內側受困平台；側道與翹起的踏板已不可靠。",
+      "sequence": 1,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-3b72e9f5-34be-43a7-a7df-cfbbca445d03.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nEdit target image1. Preserve the three characters Oun, Mila, Vark in current positions. Remove ALL crates and cargo FROM CENTRAL wheeled platform so it is an empty FLAT cargo deck with low side lip, no box cart walls. Outside LEFT, central empty platform, inner raised landing RIGHT. Narrow the small gaps to single-step spans; shallow machinery trough no deep abyss. Keep left tilted footboard and supporting temporary rope."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "右手抓住牆邊凸起的鐵件",
+      "src": "./assets/story/review/1-0-rescue-02.webp",
+      "caption": "救援動作 02｜側道突然閉合，瑟蕾雅抓住鐵件；星標只能暫時穩住一個磚角。",
+      "sequence": 2,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-8c7e49ee-a0e4-4c93-9558-ab4d24039b34.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: New replacement drawing, close rear THREE-QUARTER view of Celesia ONLY. Camera behind her so HER RIGHT is clearly image RIGHT. Silver-haired woman bandage visibly on LEFT forearm at image LEFT, LEFT hand points sword down onto one crumbling brick corner with tiny star light. HER RIGHT hand at image RIGHT grips old rusty wall hook at shoulder height. Right boot struggles on crumbling ledge. In cramped side passage with grey doubled wall edges closing, no main rope yet, no abyss, frightened focused profile. Anatomical arm sides are crucial. No mirrored front-facing pose."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "用力把人拽出",
+      "src": "./assets/story/review/1-0-rescue-03.webp",
+      "caption": "救援動作 03｜雷恩送繩接應，Chodan 抓住手腕，合力將瑟蕾雅拉回外側。",
+      "sequence": 3,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-bae700cb-8224-4962-aae9-6d9984be0108.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nEdit target image1. Remove all four background spectator figures to RIGHT (pink woman, auburn woman, brown man, old man); replace that background with cramped plain grey masonry side passage. Exactly THREE characters remain: wolf Reyn left pulling waist rope, black-haired Chodan centerleft reaching into crack, silver Celesia right being extracted. Celesia RELEASES rusty hook now, her free hand no longer grips it. Avoid deep drop, narrow cramped gap."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "將能固定的齒輪先卡住",
+      "src": "./assets/story/review/1-0-rescue-04.webp",
+      "caption": "救援動作 04｜奧恩與工人以長柄、止動楔控制機輪，不能直接拆掉承重機座。",
+      "sequence": 4,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-5746df25-4838-4bc5-b0e9-e3a436c62771.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nEdit target image1. Remove ALL figures on the RIGHT side behind the gear including trapped Mila and Vark and four heroes. Replace with quiet plain empty corridor and timber mechanism. Keep only Oun at manual handle, purple-haired Noyas beside brass dial, and the two plain workmen helping at gear. Main action is gear stop wedge at foreground, NOT rescuing people yet. Keep faces of Oun and Noyas."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "米菈敲回兩下。",
+      "src": "./assets/story/review/1-0-rescue-05.webp",
+      "caption": "救援動作 05｜先確認訊號：兩下短音可以動，一下長音停下抓牢；米菈回敲確認。",
+      "sequence": 5,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-bbdb8499-caff-468c-9b9e-92a2eafce4fa.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nEdit target image1. Remove all crates and cargo FROM CENTRAL platform, keep an empty FLAT wheeled deck without high box walls. Mila is anxious and serious, NOT cheerfully smiling, remains on RIGHT INNER landing tapping response. Chodan on LEFT outer railing taps signal. Vark RIGHT remains seated against crate on INNER landing, his right leg splinted. Keep three characters only. Narrow mechanical gaps, no deep chasm."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "第二次拉緊，柱邊的繩形才穩住",
+      "src": "./assets/story/review/1-0-rescue-06.webp",
+      "caption": "救援動作 06｜箭繩送引繩，粗繩繞內柱承重；外側主繩固定於吊架，另加石座保險繩。",
+      "sequence": 6,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-59c2523a-cca6-42f6-bf48-fca7c5ec31a9.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly TWO characters. Wolf beast-person Reyn LEFT OUTSIDE threads and tests thick main rope around intact gantry timber; secondary safety rope separately wraps solid outside stone base. Thin arrow guide-line extends to iron ring RIGHT INNER and Mila ON INNER landing wraps the REAL thick load rope around intact inner column. Side view clear two anchor points, no beam bridge installed yet. Reyn furry white wolf muzzle, tiny stature green cape; Mila auburn braid teal apron. Draw simple rope paths; no floating ropes."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "奧恩試過受力，才讓所有人退開",
+      "src": "./assets/story/review/1-0-rescue-07.webp",
+      "caption": "救援動作 07｜兩根橫木接住搬運台邊，跨過一步多寬的空槽；檢查受力後才准通行。",
+      "sequence": 7,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-51edcdc4-cfd1-48b0-8803-fe566cf0903e.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly Oun plus TWO plain workers at outside LEFT. They push TWO intact timber beams parallel side-by-side across a SINGLE STEP WIDE gap, from left safe gantry stone edge to center flat cargo platform edge, both endpoints contact solid ledges. Thick main rope above the beams at reachable waist height. Oun inspects bearing point before anyone crosses. Empty cargo deck, no boxes. This is modest short temporary bridge, no massive chasm, no magical bridge. Close view emphasizing both timber supports."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "眼看一道牆影從兩步外掠過",
+      "src": "./assets/story/review/1-0-rescue-08.webp",
+      "caption": "救援動作 08｜聽到長音，米菈抓牢粗繩、瑟蕾雅伏低，等牆影移過才繼續。",
+      "sequence": 8,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-fe9c37df-ce75-4f8b-bab5-55fc89bfa863.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly Celesia and Mila. Mila auburn braid teal apron crawling RIGHT INNER narrow beam toward CENTER flat platform; both suddenly STOP. Mila grips thick fixed rope with both hands, Celesia silver-haired on center platform crouches low with one hand rope and waits, DOES NOT pull Mila. A grey doubled wall edge passes just beyond them, dust falling. Both serious focused. Modest gaps and flat cargo deck. Show paused movement not falling."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "沒有為了求快拆掉那塊夾板",
+      "src": "./assets/story/review/1-0-rescue-09.webp",
+      "caption": "救援動作 09｜繩帶從老瓦克背後穿過，分擔重量；保留右腿夾板，不能硬彎傷腿。",
+      "sequence": 9,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-43894f9c-0d7e-48fd-8f39-8b72f465ce4d.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly Celesia, Chodan, Vark on intact RIGHT inner landing beside wooden crate. Old man semi-upright with rigid wooden splint along his RIGHT leg, not bending knee. Celesia silver hair at his leg checks splint, Chodan black ponytail on other side threads wide woven rope sling BEHIND his back and seat. Both women kneeling, preparing shared support, not pulling him by limbs. Leg extended readable. No Reyn, no Mila."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "替瑟蕾雅與Chodan接過繩帶",
+      "src": "./assets/story/review/1-0-rescue-10.webp",
+      "caption": "救援動作 10｜工人將搬運台分段靠近內側，雷恩接過繩帶，老瓦克慢慢移上台面。",
+      "sequence": 10,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-13bd5fee-f9da-4ede-9f24-fb94ac81f9f1.png",
+      "prompt": "Edit target image only. Correct Vark's injured limb: wooden splint and bandages belong to HIS ANATOMICAL RIGHT LEG (viewer LEFT when looking at his front). Swap support legs if needed so right leg stays straight in splint, left leg unbandaged. Keep all four identities and handoff. No other changes."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "定住將要翻起的木條",
+      "src": "./assets/story/review/1-0-rescue-11.webp",
+      "caption": "救援動作 11｜平台傾斜時先交出老人重量、換邊；外側分擔拉力，星標只穩住木條接點。",
+      "sequence": 11,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-5e939bb6-2ade-4d22-80cf-e8d2419f330d.png",
+      "prompt": "Edit image1 into a tighter horizontal close-up focused ONLY on the team handing over the supporting rope and the ONE star-lit timber contact. Frame/crop Vark at chest and waist so BOTH HIS LEGS ARE COMPLETELY OUT OF FRAME, not visible at all. Celesia crouches left touching LOW loose horizontal timber, small star point at contact. Reyn small wolf braces feet and pulls rope toward left offscreen outer helpers. Chodan right steadies Vark shoulder. No overhead hanging sling. Platform gently tilting, simple dusk background. Preserve all four identities. NO Vark leg or bandage anywhere in this image."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "她的手轉了方向，抓住他的肩帶",
+      "src": "./assets/story/review/1-0-rescue-12.webp",
+      "caption": "救援動作 12｜橫木被扯歪，瑟蕾雅改抓雷恩的肩帶，放棄滑向台邊的量測工具箱。",
+      "sequence": 12,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-6d084b87-28cf-4b52-85ba-fe06f2540f88.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly three characters. Final escape close-up: LEFT outside solid stone with Chodan black ponytail reaching to help. CENTER Reyn small white furry wolf stepping across short cracked timber edge toward outside, turns back and reaches Celesia wrist. RIGHT Celesia silver-haired catches Reyn SHOULDER STRAP, choosing him instead of measurement toolbox falling at lower right into SHALLOW machinery water trough. Her other arm drawn back from box. Simple readable shoulder-strap grip, box open scattered paper and thin metal pieces, falling flat platform behind. No Vark, no Mila, no additional faces. Dusk light. No magic bridge."
+    },
+    {
+      "chapter": "main-1-0",
+      "act": 4,
+      "anchor": "「明天先睡。」",
+      "src": "./assets/story/review/1-0-rescue-13.webp",
+      "caption": "救援動作 13｜撤到警戒線外，老瓦克安置於鋪布的門板上，奧恩扶住疲憊的米菈。",
+      "sequence": 13,
+      "sourcePng": "C:\\Users\\natha\\.codex\\generated_images\\01a10603-84b4-7361-b318-c96da2f79630\\exec-318002a5-1c3a-4094-ad21-b4c2c90ae1b6.png",
+      "prompt": "Use case: illustration-story. Asset type: 1.0 act 4 sequential rescue illustration for fantasy anime game. Landscape 3:2, refined 2D anime illustration, clear simple action staging, clean readable silhouettes, restrained workshop background and props. White stone city workshop, timber loading gantry, short-rail flat wooden cargo platform above a shallow broken stone machinery trough, unstable grey doubled wall edges (not huge crystals, not a canyon). When showing wide scene, spatial order: outside safe gantry LEFT, cargo platform MIDDLE, inner corridor RIGHT. Match ONLY characters named in scene and supplied portraits, no additional named characters. No text, watermark, labels. Local star mark can stabilize one timber contact briefly, never bridge or large barrier. No gore.\nScene: Exactly Mila, Vark, Oun in safe zone AFTER full evacuation, evening. Vark lies supported on plain door-board stretcher covered with cloth on SOLID outside stone ground, his RIGHT leg in splint. Mila teal apron exhausted sits beside stretcher clutching cloth edge; Oun rust coat crouches supports her shoulder. Background simple closed rope barrier and lantern, no active bridge, no dramatic chasm. Warm quiet relief, no cheerful celebration, no extra characters."
+    }
+  ]
+}
