@@ -909,6 +909,18 @@ async function handleApi(request, response, requestUrl) {
   }
 
   const body = await readBody(request);
+  if (requestUrl.pathname === "/api/admin/player-backup") {
+    const configuredToken = process.env.STARSHIP_BACKUP_TOKEN || "";
+    const suppliedToken = String(request.headers.authorization || "").replace(/^Bearer /, "");
+    const digest = value => crypto.createHash("sha256").update(value).digest();
+    if (!configuredToken || !crypto.timingSafeEqual(digest(configuredToken), digest(suppliedToken))) {
+      sendJson(response, 403, { ok: false, error: "備份入口未啟用或權限不足" });
+      return;
+    }
+    const database = await readDatabase();
+    sendJson(response, 200, { ok: true, exportedAt: new Date().toISOString(), database });
+    return;
+  }
   const database = await readDatabase();
   databaseBaselines.set(database, cloneDatabase(database));
   try {
