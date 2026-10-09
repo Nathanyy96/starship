@@ -4,7 +4,7 @@ const path = require('node:path');
 const data = require('../src/data.js');
 
 const battlePath = path.resolve(__dirname, '../src/battle.js');
-let source = fs.readFileSync(battlePath, 'utf8');
+let source = fs.readFileSync(battlePath, 'utf8').replace(/\r\n/g, '\n');
 if (!source.includes('var living = alive(targets);\n    if (!living.length) return null;')) throw new Error('Targeting instrumentation point moved');
 source = source.replace('var living = alive(targets);\n    if (!living.length) return null;',
   'var living = alive(targets);\n    if (actor.isEnemy && living.some(function (unit) { return unit.isEnemy; })) throw new Error("enemy targeted enemy");\n    if (!actor.isEnemy && living.some(function (unit) { return !unit.isEnemy; })) throw new Error("player targeted player");\n    if (!living.length) return null;');

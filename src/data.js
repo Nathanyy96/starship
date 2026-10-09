@@ -9,6 +9,7 @@
 
   var firstMajorKits = typeof require === "function" ? require("./first-major-kits.js") : globalThis.StarshipFirstMajorKits;
   var coreKits = typeof require === "function" ? require("./core-kits.js") : globalThis.StarshipCoreKits;
+  var replacementKits = typeof require === "function" ? require("./replacement-kits.js") : globalThis.StarshipReplacementKits;
   var release = typeof require === "function" ? require("./release-config.js") : globalThis.StarshipReleaseConfig;
 
   // Node 端必須完整載入已納入資料合併的劇情檔；缺檔或語法錯誤應直接讓啟動與測試失敗。
@@ -278,6 +279,21 @@
   });
   Object.keys(coreKits).forEach(function (id) {
     characterBattleStats[id] = Object.assign({}, coreKits[id], { element: cards[id].element, growthModel: "first-major" });
+  });
+  Object.keys(replacementKits).forEach(function (id) {
+    // The 2.x/3.x entries are design metadata until their own release gate.
+    // Only the already released first-major roster changes on this patch.
+    if (Number(cards[id].releaseVersion) >= 2) return;
+    var kit = replacementKits[id];
+    var stats = characterBattleStats[id];
+    characterBattleStats[id] = Object.assign({}, stats, kit, {
+      element: cards[id].element,
+      role: id === "lorne" ? "治療" : id === "reyn" ? "輔助" : id === "chodan" ? "守衛" : id === "rovienne" ? "爆發" : id === "mave" ? "爆發" : stats.role,
+      maxHp: id === "rovienne" ? 1220 : stats.maxHp,
+      attack: id === "rovienne" ? 230 : id === "mave" ? 205 : stats.attack,
+      defense: id === "rovienne" ? 145 : stats.defense,
+      signature: { type: "replacement", cooldown: id === "hina" || id === "rena" ? 2 : 3 }
+    });
   });
 
   // 四星滿等回到可感知的約 3000 戰力成長帶；三星維持較低上限，伊薩爾例外。
