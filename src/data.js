@@ -374,10 +374,10 @@
   };
   var characterBreakthroughGroups = {
     "boss-star-warden": ["celesia", "eda", "noreia", "aurelia", "elyra"],
-    "boss-tide-archive": ["lia", "rena", "elorna", "risan", "mirea", "maro", "orivelle", "sumine", "cenya", "talia"],
+    "boss-tide-archive": ["lia", "yuan", "rena", "elorna", "risan", "mirea", "maro", "orivelle", "sumine", "cenya", "talia"],
     "boss-clock-sentinel": ["reyn", "chodan", "siyeon"],
-    "boss-forge-colossus": ["isar", "harlow", "magenta", "yaoze", "lorne", "kairen", "aster", "kael"],
-    "boss-wind-hunt": ["hina", "ferye", "norell", "sorae"],
+    "boss-forge-colossus": ["isar", "ruida", "harlow", "magenta", "yaoze", "lorne", "kairen", "aster", "kael"],
+    "boss-wind-hunt": ["hina", "cenwu", "ferye", "norell", "sorae"],
     "boss-mirror-arbiter": ["veyra", "mave", "evelyn", "jiera", "rotea", "neve"]
   };
   var characterBreakthroughs = {};

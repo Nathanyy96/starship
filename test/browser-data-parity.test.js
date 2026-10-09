@@ -42,5 +42,5 @@ test("正式網頁與伺服器的 1.0 角色及劇情正文一致", () => {
   const browser = browserData();
   assert.deepEqual(Array.from(browser.activeCards, (card) => card.id), serverData.activeCards.map((card) => card.id));
   assert.deepEqual(publishedSignature(browser), publishedSignature(serverData));
-  assert.deepEqual(serverData.storyChapters.map((chapter) => chapter.id), ["main-1-0"]);
+  assert.deepEqual(serverData.storyChapters.map((chapter) => chapter.id), serverData.releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
 });

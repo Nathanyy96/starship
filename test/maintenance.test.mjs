@@ -9,7 +9,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { updateCycle, updateVersion, storySceneAliases, storyChapters } = (await import("../src/data.js")).default;
+const { updateCycle, compensationCycle, updateVersion, storySceneAliases, storyChapters } = (await import("../src/data.js")).default;
 
 async function freePort() {
   const listener = net.createServer();
@@ -80,8 +80,8 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     assert.ok(first.storyProgress.completedScenes["main-1-1:pickup"]);
     assert.ok(first.updateRewards.claimedVersions[updateVersion]);
     assert.ok(first.updateRewards.claimedVersions["2026-10-01-official-1-0"]);
-    assert.ok(first.updateRewards.claimedVersions[updateCycle]);
-    assert.deepEqual({ starSand: first.updateRewards.claimedVersions[updateCycle].starSand, characterExp: first.updateRewards.claimedVersions[updateCycle].characterExp, starMarks: first.updateRewards.claimedVersions[updateCycle].starMarks }, { starSand: 6000, characterExp: 6000, starMarks: 3 });
+    assert.ok(first.updateRewards.claimedVersions[compensationCycle]);
+    assert.deepEqual({ starSand: first.updateRewards.claimedVersions[compensationCycle].starSand, characterExp: first.updateRewards.claimedVersions[compensationCycle].characterExp, starMarks: first.updateRewards.claimedVersions[compensationCycle].starMarks }, { starSand: 6000, characterExp: 6000, starMarks: 3 });
     assert.deepEqual(first.trialProgress.clearedStages, []);
     assert.deepEqual(first.trialProgress.attempts, {});
     assert.equal(first.trialProgress.bestStage, 0);

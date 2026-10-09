@@ -5,12 +5,16 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
+const releaseConfig = require("../src/release-config.js");
+const limitedId = releaseConfig.open11 ? "limited-1-1" : "limited-1-0-to-2-0";
+const firstFeatured = releaseConfig.open11 ? "hina" : "chodan";
+const secondFeatured = releaseConfig.open11 ? "siyeon" : "magenta";
 const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storyWorldMap, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("正式版只開放 1.0 角色與 QW 卡池", () => {
-  assert.deepEqual(activeCards.map((card) => card.id), ["celesia", "reyn", "lia", "isar", "chodan", "magenta"]);
-  assert.deepEqual(banners[0].featured4Stars.map((card) => card.id), ["chodan", "magenta"]);
-  assert.deepEqual(banners[0].standard3Stars.map((card) => card.id), ["reyn", "lia", "isar"]);
+  assert.deepEqual(activeCards.map((card) => card.id), Object.values(cards).filter(card => Number(card.releaseVersion) <= Number(releaseConfig.version)).map(card => card.id));
+  assert.deepEqual(banners[0].featured4Stars.map((card) => card.id), [firstFeatured, secondFeatured]);
+  assert.deepEqual(banners[0].standard3Stars.map((card) => card.id), releaseConfig.open11 ? ["reyn", "lia", "isar", "cenwu", "ruida", "yuan"] : ["reyn", "lia", "isar"]);
   assert.equal(banners.find((banner) => banner.id === "limited-2-0-to-2-5").active, false);
   assert.equal(banners.find((banner) => banner.id === "rerun-1-0-to-2-0").active, false);
   assert.equal(version2Cards.length, 8);
@@ -34,7 +38,7 @@ test("第一大版本十八名規劃可玩角色全部入圖鑑但只開放 1.0"
   for (const id of ["cenwu", "ruida", "yuan", "elorna", "rovienne"]) {
     assert.ok(season.some((card) => card.id === id));
     assert.ok(fs.existsSync(path.join(__dirname, "..", cards[id].image)));
-    assert.equal(activeCards.some((card) => card.id === id), false);
+    assert.equal(activeCards.some((card) => card.id === id), Number(cards[id].releaseVersion) <= Number(releaseConfig.version));
   }
 });
 
@@ -81,7 +85,7 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
 });
 
 test("正式遊戲只載入 1.0 完整正文", () => {
-  assert.deepEqual(storyChapters.map((chapter) => chapter.id), ["main-1-0"]);
+  assert.deepEqual(storyChapters.map((chapter) => chapter.id), releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
   assert.equal(storyChapters[0].scenes.length, 5);
   assert.equal(storyChapters[0].fullBody.length > 20000, true);
   assert.equal(storyChapters[0].sourceStatus, "document");
@@ -129,13 +133,13 @@ test("角色介面不會回退到舊式 labeled-png", () => {
 
 test("1.0 主線開放，其餘章節保持鎖定", () => {
   const liveStory = storyChapters.filter((chapter) => chapter.releaseOpen === true);
-  assert.deepEqual(liveStory.map((chapter) => chapter.id), ["main-1-0"]);
+  assert.deepEqual(liveStory.map((chapter) => chapter.id), releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
   assert.deepEqual(liveStory[0].scenes.map((scene) => scene.title), [
     "第一幕｜她本來只想趕上晚餐", "第二幕｜開始記得這裡的人",
     "第三幕｜有人送別，也有人同行", "第四幕｜把後背交給別人的那一步",
     "第五幕｜這一次，她說自己想一起走"
   ]);
-  assert.equal(storyChapters.filter((chapter) => chapter.id !== "main-1-0").every((chapter) => chapter.releaseOpen === false), true);
+  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) > Number(releaseConfig.version)).every((chapter) => chapter.releaseOpen === false), true);
 });
 
 test("旅程地圖區分已開放 1.0 與後續建檔路線", () => {
@@ -170,6 +174,20 @@ test("Boss 依角色分組提供 80 等突破材料，現行上限是 90 並預�
   assert.deepEqual(bossStages.map((stage) => stage.bossLevel), [1, 1, 2, 2, 3, 3]);
   assert.equal(Math.max(...bossStages.map((stage) => stage.bossLevel)), 3);
   assert.ok(bossStages.every((stage) => stage.reward.universalAmount >= 1));
+});
+
+test("1.1 三星角色都有指定材料並可實際突破至 81 等", () => {
+  for (const id of ["cenwu", "ruida", "yuan"]) {
+    const requirement = characterBreakthroughs[id];
+    assert.equal(requirement.cost, 3);
+    assert.ok(bossStages.some(stage => stage.id === requirement.bossId && stage.reward.materialId === requirement.materialId));
+    const player = game({ banners: [{ ...banners[0], standard3Stars: [cards[id]] }], breakthroughRequirements: characterBreakthroughs,
+      state: state({ resources: { starSand: 100000, starMarks: 0, characterExp: 100000 }, collection: { [id]: 1 },
+        characterProgress: { [id]: { level: 80, breakthrough: false } }, breakthroughMaterials: { [requirement.materialId]: 3 } }) });
+    assert.equal(player.breakthroughCharacter({ cardId: id }).progress.breakthrough, true);
+    assert.equal(player.getState().breakthroughMaterials[requirement.materialId], 0);
+    assert.equal(player.developCharacter({ cardId: id }).progress.level, 81);
+  }
 });
 
 test("通用突破印記可以讓玩家不用被指定高難度 Boss 卡住", () => {
@@ -249,8 +267,8 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.length >= 7, true);
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
   assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
-  assert.equal(announcements.length, 2);
-  assert.equal(announcements[0].id, "major-combat-repair-2026-10-05");
+  assert.equal(announcements.length, releaseConfig.open11 ? 3 : 2);
+  assert.equal(announcements[0].id, releaseConfig.open11 ? "release-1-1" : "major-combat-repair-2026-10-05");
   assert.equal(announcements.some((item) => item.id === "release-1-0"), true);
   const gacha = game();
   const before = gacha.getState().resources;
@@ -363,12 +381,12 @@ test("現行保底機率分段固定並在 41–49 抽指數成長", () => {
 
 test("三星與一般回響共用非 4★ 結果，不另開三星卡池", () => {
   const threeStar = game({ rng: () => 0 });
-  const threeStarOutcome = threeStar.pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const threeStarOutcome = threeStar.pull({ bannerId: limitedId, count: 1 });
   assert.equal(threeStarOutcome.results[0].rarity, 3);
   assert.equal(Number(threeStarOutcome.results[0].card.releaseVersion) <= 1.5, true);
 
   const resource = game({ rng: () => 0.999999 });
-  const resourceOutcome = resource.pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const resourceOutcome = resource.pull({ bannerId: limitedId, count: 1 });
   assert.equal(resourceOutcome.results[0].kind, "resource");
   assert.equal(resourceOutcome.results[0].rarity, 0);
   assert.equal(resourceOutcome.results[0].resourceReward.characterExp, 120);
@@ -378,12 +396,12 @@ test("三星與一般回響共用非 4★ 結果，不另開三星卡池", () =>
 test("前 20 抽不會出 4★，第 21 抽才開始判定", () => {
   const gacha = game({ rng: () => 0 });
   for (let i = 0; i < 2; i += 1) {
-    const outcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 10 });
+    const outcome = gacha.pull({ bannerId: limitedId, count: 10 });
     assert.equal(outcome.summary.fourStar, 0);
   }
-  assert.equal(gacha.getPityStatus("limited-1-0-to-2-0").pullsSince4Star, 20);
+  assert.equal(gacha.getPityStatus(limitedId).pullsSince4Star, 20);
 
-  const outcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const outcome = gacha.pull({ bannerId: limitedId, count: 1 });
   assert.equal(outcome.results[0].rarity, 4);
   assert.equal(outcome.results[0].pityPullNumber, 21);
   assert.equal(outcome.results[0].fourStarRate, 0.15);
@@ -393,9 +411,9 @@ test("前 20 抽不會出 4★，第 21 抽才開始判定", () => {
 test("連續壓低隨機值時，第 50 抽仍然是硬保底", () => {
   const gacha = game({ rng: () => 0.999999 });
   for (let i = 0; i < 4; i += 1) {
-    gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 10 });
+    gacha.pull({ bannerId: limitedId, count: 10 });
   }
-  const finalTen = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 10 });
+  const finalTen = gacha.pull({ bannerId: limitedId, count: 10 });
   assert.equal(finalTen.results.slice(0, 9).every((item) => item.kind === "resource"), true);
   assert.equal(finalTen.results[9].rarity, 4);
   assert.equal(finalTen.results[9].isHardPity, true);
@@ -406,7 +424,7 @@ test("連續壓低隨機值時，第 50 抽仍然是硬保底", () => {
 test("十連逐格抽取，4★ 可以出現在第 1 格而不是被藏到最後", () => {
   const initial = state({ pity: { limited: { pullsSince4Star: 20, guaranteedFeatured: false } } });
   const gacha = game({ state: initial, rng: () => 0 });
-  const outcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 10 });
+  const outcome = gacha.pull({ bannerId: limitedId, count: 10 });
   assert.equal(outcome.results[0].rarity, 4);
   assert.equal(outcome.results[0].pityPullNumber, 21);
   assert.equal(outcome.summary.fourStar, 1);
@@ -420,7 +438,7 @@ test("復刻尚未開放，限定與常駐仍各自保留計數", () => {
     }
   });
   const gacha = game({ state: initial });
-  assert.equal(gacha.getPityStatus("limited-1-0-to-2-0").pullsSince4Star, 17);
+  assert.equal(gacha.getPityStatus(limitedId).pullsSince4Star, 17);
   assert.throws(() => gacha.getPityStatus("rerun-1-0-to-2-0"), /未開放/);
   assert.equal(gacha.getPityStatus("standard-echo").pullsSince4Star, 4);
 });
@@ -429,17 +447,17 @@ test("限定池歪掉後，下一張 4★ 必定是精選", () => {
   const first = game({
     state: state({ pity: { limited: { pullsSince4Star: 49, guaranteedFeatured: false } } }),
     rng: () => 0.99
-  }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(first.results[0].rarity, 4);
   assert.equal(first.results[0].featured, false);
   assert.equal(first.state.pity.limited.guaranteedFeatured, true);
 
   const savedForNextFourStar = first.state;
   savedForNextFourStar.pity.limited.pullsSince4Star = 49;
-  const next = game({ state: savedForNextFourStar, rng: () => 0 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const next = game({ state: savedForNextFourStar, rng: () => 0 }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(next.results[0].rarity, 4);
   assert.equal(next.results[0].featured, true);
-  assert.equal(next.results[0].card.id, "chodan");
+  assert.equal(next.results[0].card.id, firstFeatured);
   assert.equal(next.state.pity.limited.guaranteedFeatured, false);
 });
 
@@ -447,18 +465,18 @@ test("重複角色轉換成文件指定的資源", () => {
   const first = game({
     state: state({ pity: { limited: { pullsSince4Star: 20, guaranteedFeatured: false } } }),
     rng: () => 0
-  }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(first.results[0].isFirstAcquisition, true);
 
   const secondState = first.state;
   secondState.pity.limited.pullsSince4Star = 20;
-  const second = game({ state: secondState, rng: () => 0 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const second = game({ state: secondState, rng: () => 0 }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(second.results[0].isFirstAcquisition, false);
   assert.deepEqual(second.results[0].duplicateReward, { starSand: 50, starMarks: 1, characterExp: 240, constellationCore: 1, petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, skinId: null });
   assert.equal(second.state.resources.starMarks, 1);
   assert.equal(second.state.resources.starSand, 100000 - 160 * 2 + 50);
-  assert.equal(second.state.characterProgress.chodan.constellation, 1);
-  assert.equal(second.state.characterProgress.chodan.constellationCore, 1);
+  assert.equal(second.state.characterProgress[firstFeatured].constellation, 1);
+  assert.equal(second.state.characterProgress[firstFeatured].constellationCore, 1);
 });
 
 test("舊存檔的五次莉亞會還原為四命，且可用個人晶核繼續提升", () => {
@@ -485,35 +503,35 @@ test("抽卡只使用星砂，並保留星痕兌換與保底紀錄", () => {
   });
   assert.equal(gacha.getState().resources.starSand, 160);
   assert.deepEqual(Object.keys(gacha.getState().resources).sort(), ["characterExp", "starMarks", "starSand"]);
-  const before = gacha.getPityStatus("limited-1-0-to-2-0");
-  const sandOutcome = gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "starSand" });
+  const before = gacha.getPityStatus(limitedId);
+  const sandOutcome = gacha.pull({ bannerId: limitedId, count: 1, payment: "starSand" });
   assert.equal(sandOutcome.state.resources.starSand, 0);
-  assert.throws(() => gacha.pull({ bannerId: "limited-1-0-to-2-0", count: 1, payment: "ticket" }), /只使用星砂/);
+  assert.throws(() => gacha.pull({ bannerId: limitedId, count: 1, payment: "ticket" }), /只使用星砂/);
 
-  const exchanged = gacha.exchangeFeatured({ bannerId: "limited-1-0-to-2-0" });
-  assert.equal(exchanged.card.id, "chodan");
+  const exchanged = gacha.exchangeFeatured({ bannerId: limitedId });
+  assert.equal(exchanged.card.id, firstFeatured);
   assert.equal(exchanged.state.resources.starMarks, 0);
-  const after = gacha.getPityStatus("limited-1-0-to-2-0");
-  assert.equal(after.bannerId, "limited-1-0-to-2-0");
+  const after = gacha.getPityStatus(limitedId);
+  assert.equal(after.bannerId, limitedId);
   assert.equal(after.pullsSince4Star, before.pullsSince4Star + 1);
   assert.equal(after.currentFourStarRate, getFourStarRate(before.nextPullNumber + 1));
   assert.equal(after.currentFourStarRateText, "0%");
   assert.equal(after.pullsUntilHardPity, 49);
   assert.equal(after.guaranteedFeatured, false);
-  assert.equal(after.selectedFeaturedId, "chodan");
-  assert.throws(() => gacha.exchangeFeatured({ bannerId: "limited-1-0-to-2-0" }), /已使用/);
+  assert.equal(after.selectedFeaturedId, firstFeatured);
+  assert.throws(() => gacha.exchangeFeatured({ bannerId: limitedId }), /已使用/);
 });
 
 test("可從文件既有的 4★ 中選一隻，選中率是 55%", () => {
   const gacha = game({ rng: () => 0.54 });
-  const selected = gacha.selectFeatured({ bannerId: "limited-1-0-to-2-0", cardId: "magenta" });
-  assert.equal(selected.card.id, "magenta");
-  assert.equal(gacha.getPityStatus("limited-1-0-to-2-0").selectedFeaturedId, "magenta");
+  const selected = gacha.selectFeatured({ bannerId: limitedId, cardId: secondFeatured });
+  assert.equal(selected.card.id, secondFeatured);
+  assert.equal(gacha.getPityStatus(limitedId).selectedFeaturedId, secondFeatured);
 
   const saved = gacha.getState();
   saved.pity.limited.pullsSince4Star = 49;
-  const selectedHit = game({ state: saved, rng: () => 0.54 }).pull({ bannerId: "limited-1-0-to-2-0", count: 1 });
+  const selectedHit = game({ state: saved, rng: () => 0.54 }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(selectedHit.results[0].rarity, 4);
   assert.equal(selectedHit.results[0].featured, true);
-  assert.equal(selectedHit.results[0].card.id, "magenta");
+  assert.equal(selectedHit.results[0].card.id, secondFeatured);
 });

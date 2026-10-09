@@ -6,7 +6,7 @@ const data = require('../src/data.js');
 const current11 = require('../src/story-1-1-current.js');
 const images11 = require('../src/story-1-1-images.js');
 
-test('1.1 candidate uses the current five-act story and remains closed', () => {
+test('1.1 candidate uses the current five-act story and follows the release gate', () => {
   assert.equal(current11.scenes.length, 5);
   assert.deepEqual(current11.scenes.map(scene => scene.title), [
     '第一幕｜缺兩個人的早餐',
@@ -18,8 +18,8 @@ test('1.1 candidate uses the current five-act story and remains closed', () => {
   assert.ok(current11.scenes.map(scene => scene.body).join('').length > 10000);
   assert.match(current11.scenes[1].body, /Siyeon/);
   assert.match(current11.scenes[4].body, /岑霧/);
-  assert.deepEqual(data.storyChapters.map(chapter => chapter.id), ['main-1-0']);
-  assert.equal(data.updateVersion, '1.0');
+  assert.deepEqual(data.storyChapters.map(chapter => chapter.id), data.releaseConfig.open11 ? ['main-1-0', 'main-1-1'] : ['main-1-0']);
+  assert.equal(data.updateVersion, data.releaseConfig.open11 ? '1.1' : '1.0');
 });
 
 test('1.1 illustrations cover each act and anchor to its actual prose', () => {
@@ -36,6 +36,6 @@ test('1.1 character portraits exist without entering the public pool', () => {
   for (const id of ids) {
     const card = data.cards[id];
     assert.ok(fs.existsSync(path.resolve(__dirname, '..', card.image)), `${id} portrait`);
-    assert.ok(!data.activeCards.some(active => active.id === id), `${id} public lock`);
+    assert.equal(data.activeCards.some(active => active.id === id), data.releaseConfig.open11, `${id} public release gate`);
   }
 });

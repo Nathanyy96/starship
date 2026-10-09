@@ -33,7 +33,7 @@ test("正式環境不能用測試旗標提前開放 1.1", () => {
   const result = spawnSync(process.execPath, ["-e", "const d=require('./src/data.js');console.log(d.updateVersion);"], {
     cwd: root, env: { ...process.env, NODE_ENV: "production", STARSHIP_RELEASE_11_TEST: "true" }, encoding: "utf8" });
   assert.equal(result.status, 0);
-  assert.equal(result.stdout.trim(), "1.0");
+  assert.equal(result.stdout.trim(), data.releaseConfig.approved11 ? "1.1" : "1.0");
 });
 
 test("本機正式五幕逐步解鎖、錯選重試、保留作者試玩與獨立一次性領獎", () => {
