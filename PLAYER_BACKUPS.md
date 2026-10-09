@@ -55,6 +55,8 @@ node tools/player-backup.mjs restore-postgres --input C:\starship-player-backups
 
 ### 2026-10-08 最終驗證狀態
 
+1.1 正式發布前及部署後，各取得全部 4 個線上帳號的新加密快照並驗證。發布前另完成全新檔案還原演練；部署後快照為 `players-2026-10-09T05-33-02-238Z-ac88a7.enc.json`，保存在上述私人資料夾，時間戳為 UTC。此次未覆寫線上玩家資料庫。
+
 已取得 Render 線上全部 4 個帳號的加密快照，來源為授權唯讀 remote API；最新保存時間 2026-10-09T00:13:04.753Z（UTC），並完成檔案還原演練。備份保存於私人專案外資料夾 C:\starship-player-backups，包含資源、角色、命座及進度，排除試煉詳細戰報。6 項備份測試通過。自動排程尚未啟用，真實 PostgreSQL 空庫還原仍未執行。下段為當日較早的初次驗證歷史。
 
 ### 初次驗證歷史
