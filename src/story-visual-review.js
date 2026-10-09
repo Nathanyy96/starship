@@ -26,6 +26,17 @@
     "./assets/story/1-1-05.webp": { src: "./assets/story/review/1-1-05-stop-v2.webp", caption: "Hina 舉起紅片停手；苔角行獸擾動遠岸輔錨後，兩岸重新複核。" }
   };
   var additions = [
+    {"chapter":"main-1-1","act":1,"anchor":"Chodan拿帳篷布遮住屋簷缺口","src":"./assets/story/review/1-1-road-shelter.webp","caption":"商路雨棚｜Chodan 遮住漏雨屋簷，Magenta 翻麵粉袋；瑟蕾雅收起行程表，一起搬袋。"},
+    {"chapter":"main-1-1","act":1,"anchor":"紙條寫的是：山腰驛站風標失準","src":"./assets/story/review/1-1-mistbridge-letter.webp","caption":"霧橋鎮｜雨暮讀到 Hina 留信；通往山腰的路沿已崩，當晚先留宿。"},
+    {"chapter":"main-1-1","act":1,"anchor":"樹梢向北，腳邊的草卻向南倒","src":"./assets/story/review/1-1-opposing-wind.webp","caption":"上山途中｜樹梢與腳邊草向相反方向倒；雷恩用短枝觀察，瑟蕾雅暫留地圖空白。"},
+    {"chapter":"main-1-1","act":2,"anchor":"牠沒有吼，也沒有追人","src":"./assets/story/review/1-1-blackcrystal-detour.webp","caption":"坡背岔路｜黑晶巨獸在兩條石道間試探後退回林裡；眾人留在背風處，沒有追擊。"},
+    {"chapter":"main-1-1","act":2,"anchor":"天黑後，兩岸用燈與短聲清點人數","src":"./assets/story/review/1-1-banks-night.webp","caption":"當晚兩岸全貌｜近岸棚照看撤出居民；遠岸芮妲、榆安與兩名居民回燈，南側另有接應隊，當晚不渡。"},
+    {"chapter":"main-1-1","act":3,"anchor":"上游有兩塊老渡台石墩","src":"./assets/story/review/1-1-upstream-layout.webp","caption":"上游路線｜近岸三個承重錨點與兩座老石墩；遠岸雜草下的側階先測線，尚不運送傷者。"},
+    {"chapter":"main-1-1","act":4,"anchor":"讓救援員拆下可帶走的器材","src":"./assets/story/review/1-1-unload-wagon.webp","caption":"遠岸拆車｜傷者已撤；芮妲鬆開車轅固定帶，兩名救援員卸鼓與拾音架，先依承重取回器材。"},
+    {"chapter":"main-1-1","act":4,"anchor":"雷恩確認主錨仍能承重","src":"./assets/story/review/1-1-recheck-mainrope.webp","caption":"重新接應｜近岸壓住主繩、核對風線與回燈；遠岸沿側階準備撤，先確認再前進。"},
+    {"chapter":"main-1-1","act":5,"anchor":"回霧橋的路走得很慢","src":"./assets/story/review/1-1-return-rest.webp","caption":"普通山路返鎮｜救援後休整一夜再出發；榆安腳傷需停歇，Hina 坐下休息，眾人慢行。"},
+    {"chapter":"main-1-1","act":5,"anchor":"Chodan把鼓棒放到了桌上","src":"./assets/story/review/1-1-rehearsal-stop.webp","caption":"旅店後廳｜排練失序後先停下；放下鼓棒、晾開濕接頭，聽彼此說完，不急著恢復原樣。"},
+    {"chapter":"main-1-1","act":5,"anchor":"鎮口貼出一張斷橋告示","src":"./assets/story/review/1-1-bridge-notice.webp","caption":"翌晨鎮口｜斷橋告示只確認封路與臨時繞行；橋北消息仍待驛報，瑟蕾雅不先畫安全線。"},
 {"chapter":"main-1-0","act":2,"anchor":"伊薩爾站在主路的窄口","src":"./assets/story/review/1-0-defense-layout.webp","caption":"村口防守｜伊薩爾守主路，村民退往住屋；菜圃缺口與空圍場另在側邊。"},
 {"chapter":"main-1-1","act":3,"anchor":"繩子在眾人眼前被拉成奇怪的弧線","src":"./assets/story/review/1-1-rescue-rope.webp","caption":"錯線試送｜只試空載繩；水面倒影錯位，繩線斷裂，雷恩攔住瑟蕾雅再次落標。"},
 {"chapter":"main-1-1","act":3,"anchor":"每個位置都先以空載繩、燈號和兩岸口頭複核","src":"./assets/story/review/1-1-rescue-survey.webp","caption":"重新測線｜先加固錨點、試空繩與回燈；芮妲指出遠岸雜草下的舊側階。"},
