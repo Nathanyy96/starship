@@ -5,7 +5,7 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   // Change only after the author approves the final story, artwork and release notice.
-  var approved11 = false;
+  var approved11 = true;
   var test11 = typeof process !== "undefined" && process.env.NODE_ENV === "test" && process.env.STARSHIP_RELEASE_11_TEST === "true";
   var open11 = approved11 || test11;
   return Object.freeze({
