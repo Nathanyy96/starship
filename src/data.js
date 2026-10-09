@@ -9,6 +9,7 @@
 
   var firstMajorKits = typeof require === "function" ? require("./first-major-kits.js") : globalThis.StarshipFirstMajorKits;
   var coreKits = typeof require === "function" ? require("./core-kits.js") : globalThis.StarshipCoreKits;
+  var release = typeof require === "function" ? require("./release-config.js") : globalThis.StarshipReleaseConfig;
 
   // Node 端必須完整載入已納入資料合併的劇情檔；缺檔或語法錯誤應直接讓啟動與測試失敗。
   // 瀏覽器目前只預載公開版所需來源，未預載的未開放擴充稿保持 null。
@@ -177,9 +178,9 @@
   var version5Cards = [cards.vestra, cards.brann, cards.eirin, cards.sava, cards.niela, cards.hervan, cards.daria];
 
   // 正式版首期只開放 1.0；舊帳號已取得的角色仍由存檔保留。
-  var releasedVersion = "1.0";
+  var releasedVersion = release.version;
   var storyVersionReward = Object.freeze({ version: "1.0", starSand: 1600, characterExp: 3600, starMarks: 1 });
-  var activeCards = Object.values(cards).filter(function (entry) { return entry.releaseVersion === releasedVersion; });
+  var activeCards = Object.values(cards).filter(function (entry) { return Number(entry.releaseVersion) <= Number(releasedVersion); });
   var legacyFour = legacyCards.filter(function (item) { return item.rarity === 4; });
   var legacyThree = legacyCards.filter(function (item) { return item.rarity === 3; });
   var activeFour = activeCards.filter(function (item) { return item.rarity === 4; });
@@ -304,7 +305,7 @@
       : { main: 0.026, defense: 0.026, speed: 0.003 };
   });
 
-  var updateCycle = "2026-10-05-major-combat-repair-1-0";
+  var updateCycle = release.cycle;
   var trialVersion = updateCycle;
   var trialMaxRewards = 20;
   // 試煉每次成功都提供角色經驗；每關每版本最多領 20 次，
@@ -579,6 +580,12 @@
       highlights: ["1.0 限定角色：Chodan、Magenta", "1.0 三星角色：雷恩、莉亞、伊薩爾", "未開放角色不進入卡池", "既有角色、資源與培養進度保留"]
     })
   ]);
+  if (release.open11) announcements = Object.freeze([Object.freeze({
+    id: "release-1-1", badge: "版本公告", date: "1.1", title: "1.1｜四個人的合奏",
+    copy: "開放 1.1 五幕主線、逐幕收合閱讀、幕內互動與新增劇情插圖。完成 1.0 後可繼續 1.1；原有帳號、角色、命座、資源、保底、造型與劇情紀錄保留。",
+    reward: "1.1 五幕閱讀及十二步互動完成後，可在最後一幕領取一次 1,600 星砂、3,600 角色經驗、1 星痕；先前重大修正補償不會重複發放。",
+    highlights: ["新增 Hina、Siyeon、岑霧、芮妲、榆安；限定池承接原有保底", "試煉、Boss、委託、迷航及商店本期次數重置；星伴培育與已擁有資產保留", "梅芙、赫洛造型暫停售；既有收藏保留", "雙隊切磋暫緩，未納入本次更新；2.x 仍只供作者試玩"]
+  })].concat(announcements));
   var storyChapters = [
     {
       id: "main-1-0", type: "main", version: "1.0", title: "界痕初響", region: "獸靈之村",
@@ -1141,13 +1148,13 @@
   // 限定池的精選候選就是文件中的既有 4★；玩家選一隻後，其他 4★ 合計為 45%。
   var banners = [
     {
-      id: "limited-1-0-to-2-0",
-      name: "限定｜1.0 QW 回覆召集",
+      id: release.open11 ? "limited-1-1" : "limited-1-0-to-2-0",
+      name: release.open11 ? "限定｜1.1 QWER 合奏召集" : "限定｜1.0 QW 回覆召集",
       type: "limited",
       poolKey: "limited",
-      defaultFeaturedId: "chodan",
-      description: "1.0 限定池；Chodan、Magenta 為當期 4★。",
-      featured4Stars: [cards.chodan, cards.magenta],
+      defaultFeaturedId: release.open11 ? "hina" : "chodan",
+      description: release.open11 ? "1.1 限定池；Hina、Siyeon 為當期 4★，承接原有限定池保底。" : "1.0 限定池；Chodan、Magenta 為當期 4★。",
+      featured4Stars: release.open11 ? [cards.hina, cards.siyeon] : [cards.chodan, cards.magenta],
       standard4Stars: [cards.chodan, cards.magenta],
       standard3Stars: activeThree
     },
@@ -1177,7 +1184,7 @@
     },
     {
       id: "standard-echo",
-      name: "常駐｜回音召集（1.0）",
+      name: "常駐｜回音召集（" + release.version + "）",
       type: "standard",
       poolKey: "standard",
       description: "常駐池獨立計數；只收錄目前已開放的 1.0 角色，沒有精選保證。",
@@ -2025,7 +2032,7 @@
         sourceStatus: "document"
       });
     }
-    return Object.assign({}, chapter, { releaseOpen: chapter.id === "main-1-0" });
+    return Object.assign({}, chapter, { releaseOpen: chapter.id === "main-1-0" || (release.open11 && chapter.id === "main-1-1") });
   });
   var liveStoryChapters = allStoryChapters.filter(function (chapter) { return chapter.releaseOpen; });
   var storyChapterAliases = groupedStory.aliases;
@@ -2093,7 +2100,9 @@
     tutorialReward: tutorialReward,
     tutorialSteps: tutorialSteps,
     announcements: announcements,
-    updateVersion: "1.0",
+    updateVersion: release.version,
+    releaseConfig: release,
+    compensationCycle: release.compensationCycle,
     updateCycle: updateCycle,
     updateReward: Object.freeze({ starSand: 6000, characterExp: 6000, starMarks: 3 })
   };

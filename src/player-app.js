@@ -7,6 +7,8 @@
     if (!api || !data) {
       throw new Error("抽卡核心尚未載入");
     }
+    var releaseVersionLabel = document.getElementById("live-release-version");
+    if (releaseVersionLabel) releaseVersionLabel.textContent = data.updateVersion || "1.0";
 
     var serverCandidate = window.location.protocol !== "file:" && typeof window.fetch === "function";
     var remoteMode = false;
@@ -218,14 +220,15 @@
       state.recruitment.story10ChoiceAvailable = Boolean(state.storyProgress && state.storyProgress.claimedVersions && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed);
       if (state.trialProgress && state.trialProgress.clearedStages && state.trialProgress.clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) { state.recruitment.trial10ChoiceAvailable = true; }
       var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
+      var compensationVersion = data.compensationCycle || updateVersion;
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
       state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
-      if (!state.updateRewards.claimedVersions[updateVersion]) {
+      if (!state.updateRewards.claimedVersions[compensationVersion]) {
         var releaseReward = data.updateReward || { starSand: 6000, characterExp: 6000, starMarks: 3 };
         state.resources.starSand += Number(releaseReward.starSand || 0);
         state.resources.characterExp += Number(releaseReward.characterExp || 0);
         state.resources.starMarks += Number(releaseReward.starMarks || 0);
-        state.updateRewards.claimedVersions[updateVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, starMarks: releaseReward.starMarks || 0, grantedAt: new Date().toISOString() };
+        state.updateRewards.claimedVersions[compensationVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, starMarks: releaseReward.starMarks || 0, grantedAt: new Date().toISOString() };
       }
       if (state.trialProgress && state.trialProgress.version !== updateVersion) {
         state.trialProgress.version = updateVersion;
@@ -525,7 +528,7 @@
       byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
       byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
       var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
-      var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[updateVersion];
+      var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[data.compensationCycle || updateVersion];
       if (byId("lobby-update-label")) byId("lobby-update-label").textContent = "失誤補償 +" + Number(data.updateReward && data.updateReward.starSand || 6000).toLocaleString() + " 星砂、" + Number(data.updateReward && data.updateReward.starMarks || 3) + " 星痕" + (updateClaimed ? "（已發放）" : "");
       var tutorialDone = tutorialProgress(state).rewardClaimed === true;
       var tutorialQuick = byId("open-tutorial");
@@ -806,6 +809,12 @@
       container.innerHTML = "<div class=\"story-map-heading\"><div><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">1.0 開放 · 後續建檔</span></div><div class=\"story-map-filters\" role=\"group\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-dot planned\"></i>後續建檔</span><span><i class=\"legend-line\"></i>步行／水路</span><span><i class=\"legend-line rift\"></i>界痕位移</span></div></div><aside class=\"story-map-details\"><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p>" + (localSites ? "<div class=\"story-map-local-sites\"><strong>1.2 現地分區</strong><ul>" + localSites + "</ul></div>" : "") + "<div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>方位與行程</strong> 此圖只標已定的相對方位，非比例地圖。界痕位移不是日常道路；獸靈之村向西兩日到白鐘，白鐘向北三日到霧橋。霧橋到洛汀須先南返白鐘三日，再順流兩日；洛汀相對白鐘的精確羅盤角與斷橋局部幾何仍待核定。</p>";
     }
     function renderStoryReader(state, chapter) {
+      if (data.releaseConfig && data.releaseConfig.open11 && window.StarshipStoryReader && chapter) {
+        window.StarshipStoryReader.render({ container: byId("story-reader"), state: state, chapter: chapter,
+          bodyMarkup: function (scene, index) { return storyBodyMarkup(scene.body, "story-body", index + 1, chapter.id, { authorPreview: true }); },
+          onAction: performLiveStoryAction });
+        return;
+      }
       var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
       currentStorySceneId = scene.id;
       var claimed = sceneClaimed(state, chapter.id, scene.id);
@@ -1077,6 +1086,22 @@
       var state = game.getState(); storyProgress(state).currentChapter = chapterId;
       if (remoteMode) { apiRequest("/api/player/story-progress", { action: "select", chapterId: chapterId }).then(function (payload) { updateGameFromState(payload.state); renderStory(); renderLobby(); }).catch(function () { renderStory(); }); }
       else { updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); }
+    }
+    function performLiveStoryAction(body) {
+      var session = currentPlayerToken;
+      var operation;
+      if (remoteMode) operation = apiRequest("/api/player/story-progress", body);
+      else {
+        try { operation = Promise.resolve(window.StarshipStoryReleaseProgress.apply(game.getState(), storyChapterById(body.chapterId), body)); }
+        catch (error) { operation = Promise.reject(error); }
+      }
+      return operation.then(function (payload) {
+        if (session !== currentPlayerToken) throw new Error("登入帳號已變更，請重新載入劇情");
+        updateGameFromState(payload.state);
+        if (!remoteMode) saveLocalState();
+        renderStory(); renderLobby(); renderCharacters();
+        return payload;
+      });
     }
     function completeStoryScene(chapterId, sceneId) {
       if (remoteMode) {

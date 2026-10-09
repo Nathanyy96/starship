@@ -1,3 +1,13 @@
+/* Formal 1.1 reader preserves the approved author-preview reading layout. */
+.released-story-reader .author-preview-story-scene .story-body { font-size: 20px; line-height: 1.9; }
+.released-story-content { padding: 16px 20px 24px; }
+.released-story-reader summary { overflow-wrap: anywhere; }
+.released-story-reader .story-reward-bar { flex-wrap: wrap; }
+.released-story-reader button { white-space: normal; }
+@media (max-width: 600px) {
+  .released-story-content { padding: 12px 12px 20px; }
+  .released-story-reader .author-preview-story-scene .story-body { font-size: 19px; }
+}
 :root {
   color-scheme: dark;
   --bg: #0b1020;

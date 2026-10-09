@@ -24,6 +24,8 @@ const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 300000
 const sessions = new Map();
 const authorPreviewPlayerKey = "happycow";
 const story11Missions = require("./src/story-1-1-missions.js");
+const releaseConfig = require("./src/release-config.js");
+const storyReleaseProgress = require("./src/story-release-progress.js");
 const databaseBaselines = new WeakMap();
 function createGame(state) {
   return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges });
@@ -351,11 +353,11 @@ function ensurePlayerMilestones(currentState) {
   }
   state.updateRewards = state.updateRewards || { claimedVersions: {} };
   state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
-  if (!state.updateRewards.claimedVersions[currentUpdateVersion]) {
+  if (!state.updateRewards.claimedVersions[releaseConfig.compensationCycle]) {
     state.resources.starSand += updateReward.starSand;
     state.resources.characterExp += updateReward.characterExp;
     state.resources.starMarks += updateReward.starMarks || 0;
-    state.updateRewards.claimedVersions[currentUpdateVersion] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, starMarks: updateReward.starMarks || 0, grantedAt: new Date().toISOString() };
+    state.updateRewards.claimedVersions[releaseConfig.compensationCycle] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, starMarks: updateReward.starMarks || 0, grantedAt: new Date().toISOString() };
   }
   if (state.trialProgress.version !== currentUpdateVersion) {
     state.trialProgress.version = currentUpdateVersion;
@@ -611,6 +613,10 @@ function completeStoryScene(currentState, body) {
     return { state: createGame(state).getState(), alreadyClaimed: false, reward: { starSand: 0 }, chapter, scene: null };
   }
   const scene = storySceneById(chapter, body.sceneId);
+  if (chapter.id === "main-1-1") {
+    const result = storyReleaseProgress.apply(state, chapter, body);
+    return Object.assign({}, result, { state: createGame(result.state).getState(), chapter, scene });
+  }
   const key = chapter.id + ":" + scene.id;
   const storyReward = { starSand: 0, characterExp: 0, starMarks: 0 };
   state.storyProgress = state.storyProgress || { currentChapter: chapter.id, completedScenes: {} };
@@ -632,7 +638,7 @@ function completeStoryScene(currentState, body) {
     state.resources.starMarks += storyReward.starMarks;
     state.storyProgress.claimedVersions[storyVersionReward.version] = { claimedAt: new Date().toISOString(), reward: storyReward };
   }
-  if (chapter.id === "main-1-0" && !state.recruitment.story10ChoiceClaimed) {
+  if (chapter.id === "main-1-0" && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed) {
     state.recruitment.story10ChoiceAvailable = true;
   }
   return { state: createGame(state).getState(), alreadyClaimed: wasCompleted && !Object.values(storyReward).some(Boolean), reward: storyReward, chapter, scene };
@@ -894,6 +900,7 @@ async function handleApi(request, response, requestUrl) {
       ok: true,
       service: "starship-gacha",
       persistence: usePostgres ? "postgres" : "file",
+      maintenance: process.env.STARSHIP_MAINTENANCE === "true",
       testRewardsEnabled: testRewardsEnabled()
     });
     return;
@@ -1020,7 +1027,7 @@ async function handleApi(request, response, requestUrl) {
       player.record.state = completed.state;
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);
-      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: completed.alreadyClaimed, reward: completed.reward, chapter: { id: completed.chapter.id, title: completed.chapter.title }, scene: completed.scene ? { id: completed.scene.id, title: completed.scene.title } : null });
+      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: completed.alreadyClaimed, reward: completed.reward, correct: completed.correct, feedback: completed.feedback, chapter: { id: completed.chapter.id, title: completed.chapter.title }, scene: completed.scene ? { id: completed.scene.id, title: completed.scene.title } : null });
       return;
     }
 
@@ -1215,10 +1222,38 @@ async function handleApi(request, response, requestUrl) {
   }
 }
 
+let apiWriteQueue = Promise.resolve();
+async function serializedApi(request, response, requestUrl) {
+  let lockClient;
+  try {
+    if (usePostgres) {
+      lockClient = await getPostgresPool().connect();
+      await lockClient.query("SELECT pg_advisory_lock(173112026)");
+    }
+    await handleApi(request, response, requestUrl);
+  } finally {
+    if (lockClient) {
+      try { await lockClient.query("SELECT pg_advisory_unlock(173112026)"); } finally { lockClient.release(); }
+    }
+  }
+}
 const server = http.createServer((request, response) => {
   const requestUrl = new URL(request.url || "/", "http://localhost");
   if (requestUrl.pathname.startsWith("/api/")) {
-    handleApi(request, response, requestUrl).catch((error) => sendJson(response, 500, { ok: false, error: error.message || "伺服器錯誤" }));
+    if (request.method === "POST" && process.env.STARSHIP_MAINTENANCE === "true" && requestUrl.pathname !== "/api/admin/player-backup") {
+      sendJson(response, 503, { ok: false, error: "遊戲正在維護，請稍後再試；帳號資料會保留" });
+      return;
+    }
+    if (request.method === "POST") {
+      apiWriteQueue = apiWriteQueue.then(() => serializedApi(request, response, requestUrl)).catch(() => {
+        if (!response.headersSent) sendJson(response, 500, { ok: false, error: "操作暫時失敗，請重新載入後重試" });
+      });
+    } else handleApi(request, response, requestUrl).catch((error) => sendJson(response, 500, { ok: false, error: error.message || "伺服器錯誤" }));
+    return;
+  }
+  if (requestUrl.pathname === "/src/release-config.js") {
+    response.writeHead(200, { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-store" });
+    response.end("globalThis.StarshipReleaseConfig = " + JSON.stringify(releaseConfig) + ";");
     return;
   }
   const relativePath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
