@@ -369,11 +369,16 @@ test("角色到 80 等後必須消耗指定 Boss 材料，突破後才能升到 
 test("現行保底機率分段固定並在 41–49 抽指數成長", () => {
   assert.equal(getFourStarRate(1), 0);
   assert.equal(getFourStarRate(20), 0);
-  assert.equal(getFourStarRate(21), 0.15);
-  assert.equal(getFourStarRate(30), 0.15);
-  assert.equal(getFourStarRate(31), 0.25);
-  assert.equal(getFourStarRate(40), 0.25);
-  assert.equal(getFourStarRate(41) > 0.25, true);
+  assert.equal(getFourStarRate(21), releaseConfig.open11 ? 0.10 : 0.15);
+  assert.equal(getFourStarRate(30), releaseConfig.open11 ? 0.10 : 0.15);
+  assert.equal(getFourStarRate(31), releaseConfig.open11 ? 0.15 : 0.25);
+  assert.equal(getFourStarRate(40), releaseConfig.open11 ? 0.15 : 0.25);
+  const baseRate = releaseConfig.open11 ? 0.15 : 0.25;
+  for (let n = 41; n <= 49; n++) {
+    assert.equal(getFourStarRate(n), baseRate + (1 - baseRate) * (Math.pow(2, (n - 40) / 10) - 1));
+    assert.ok(getFourStarRate(n) > getFourStarRate(n - 1));
+    assert.ok(getFourStarRate(n) < 1);
+  }
   assert.equal(getFourStarRate(49) > getFourStarRate(48), true);
   assert.equal(getFourStarRate(50), 1);
   assert.equal(getFourStarRate(99), 1);
@@ -404,7 +409,7 @@ test("前 20 抽不會出 4★，第 21 抽才開始判定", () => {
   const outcome = gacha.pull({ bannerId: limitedId, count: 1 });
   assert.equal(outcome.results[0].rarity, 4);
   assert.equal(outcome.results[0].pityPullNumber, 21);
-  assert.equal(outcome.results[0].fourStarRate, 0.15);
+  assert.equal(outcome.results[0].fourStarRate, releaseConfig.open11 ? 0.10 : 0.15);
   assert.equal(outcome.pity.pullsSince4Star, 0);
 });
 

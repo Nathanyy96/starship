@@ -7,6 +7,10 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 
+  var release = typeof module === "object" && module.exports ? require("./release-config.js") : rootRelease();
+  function rootRelease() { return typeof globalThis !== "undefined" ? globalThis.StarshipReleaseConfig : null; }
+  var revisedRates = Boolean(release && release.open11);
+
   /**
    * 星界之律｜回覆召集的現行規則。
    *
@@ -17,7 +21,7 @@
     hardPity: 50,
     noEarlyFourStarPulls: 20,
     pityStartPull: 21,
-    pityStartRate: 0.15,
+    pityStartRate: revisedRates ? 0.10 : 0.15,
     pityStep: 0,
     featuredRate: 0.55,
     threeStarRate: 0.20,
@@ -98,7 +102,8 @@
   /**
    * 取得「本次是該保底循環第幾抽」的 4★ 機率。
    *
-   * 第 1–20 抽固定為 0%；第 21 抽為 10%；之後每抽增加 4 個百分點；
+   * 第 1–20 抽固定為 0%；1.1 第 21–30 抽為 10%，31–40 抽為 15%；
+   * 第 41–49 抽以指數提高。1.0 保留原有 15%／25% 分段至 1.1 發布。
    * 第 50 抽直接硬保底。這個函式不依賴隨機數，方便 UI 顯示與測試。
    */
   function getFourStarRate(pullNumber, customRules) {
@@ -114,11 +119,13 @@
 
     // 保留一格真正的硬保底：前一抽不會因為機率先到 100% 而被誤標成硬保底。
     // 第 50 抽由 _rollOne 的 isHardPity 直接保證，讓 UI 能清楚區分軟保底與硬保底。
-    if (pullNumber <= 30) return 0.15;
-    if (pullNumber <= 40) return 0.25;
+    var earlyRate = revisedRates ? 0.10 : 0.15;
+    var middleRate = revisedRates ? 0.15 : 0.25;
+    if (pullNumber <= 30) return earlyRate;
+    if (pullNumber <= 40) return middleRate;
     // 41–49 抽以指數曲線加速；第 50 抽仍由硬保底保證。
     var progress = (pullNumber - 40) / (rules.hardPity - 40);
-    var rate = 0.25 + 0.75 * (Math.pow(2, progress) - 1);
+    var rate = middleRate + (1 - middleRate) * (Math.pow(2, progress) - 1);
     return Math.min(0.99, Math.max(0, rate));
   }
 
