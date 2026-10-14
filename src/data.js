@@ -2035,6 +2035,7 @@
     if (chapter.id === "main-1-0" && currentStory10) {
       chapter = Object.assign({}, chapter, {
         title: currentStory10.title,
+        summary: "瑟蕾雅在南驛遇上裂隙巨獸，落到獸靈之村。她與雷恩同行到白鐘，在魔物災害中被同伴救回，也面對沒能救回的人。",
         scenes: currentStory10.scenes,
         fullBody: currentStory10.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
         sourceStatus: "document"
@@ -2043,6 +2044,8 @@
     if (chapter.id === "main-1-1" && currentStory11) {
       chapter = Object.assign({}, chapter, {
         title: currentStory11.title,
+        summary: "六人在迴音谷重聚。受困者被錯位道路隔在遠岸，村外幼獸的痕跡帶他們找到空間魔物；眾人合力擊敗源頭，再接傷者撤離。",
+        narrativeGuide: { focus: "尋回同伴，追查村外線索，合力對抗製造假路的魔物。", hook: "遠岸的人仍活著，但撤離通路被魔物的錯位能力阻斷。", payoff: "擊敗源頭後救人撤離，留下器材損失與善後；下一段踏查仍等完整驛報。" },
         scenes: currentStory11.scenes,
         fullBody: currentStory11.scenes.map(function (scene) { return scene.title + "\n" + scene.body; }).join("\n\n"),
         sourceStatus: "document"

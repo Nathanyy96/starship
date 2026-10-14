@@ -27,6 +27,10 @@
     var currentStoryMapLocationId = "";
     var currentAtlasMapId = "W-001";
     var currentAtlasPointId = "";
+    var mapReturnViewId = "game-lobby";
+    var exploration = null;
+    var firstMajorWorld = null;
+    var firstActGame = null;
     var authorAtlasMapId = "W-001";
     var authorAtlasPointId = "";
     var authorAtlasVisited = new Set(["W-001"]);
@@ -50,6 +54,11 @@
     var characterSearchTerm = "";
     var characterListFilter = "all";
     var game = null;
+    var authorNarration = window.StarshipStoryNarration && window.StarshipStoryNarration.create({
+      synth: window.speechSynthesis,
+      Utterance: window.SpeechSynthesisUtterance,
+      onChange: updateAuthorNarrationControls
+    });
 
     function rosterCards() {
       var owned = game ? game.getState().collection : {};
@@ -123,9 +132,13 @@
     }
     function hideGameViews() {
       closeCharacterAnimation();
-      ["game-lobby", "shop-view", "story-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
+      ["game-lobby", "shop-view", "story-view", "first-act-view", "map-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
     }
     function showView(viewId) {
+      if (viewId !== "author-preview-view" && authorNarration) authorNarration.stop();
+      if (viewId !== "map-view" && exploration) { exploration.close(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; }
+      if (viewId !== "map-view" && firstMajorWorld) { firstMajorWorld.close(); byId("first-major-panel").hidden = true; byId("first-major-entry").hidden = false; byId("story-world-map").hidden = false; }
+      if (viewId !== "first-act-view" && firstActGame) firstActGame.close();
       if (!currentPlayerName || !game) {
         showGate();
         return;
@@ -136,7 +149,8 @@
       if (viewId === "tutorial-view") { renderTutorial(); }
       if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
       if (viewId === "story-view") { renderStory(); }
-      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); renderAuthorStoryPreview(); }
+      if (viewId === "map-view") { renderStoryWorldMap(storyChapterById(currentStoryChapterId)); }
+      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); renderAuthorStoryPreview(); prepareAuthorNarrationControls(); }
       if (viewId === "character-view") { renderCharacters(); }
       if (viewId === "shop-view") { renderShop(); }
       if (viewId === "trial-view") { renderTrial(); }
@@ -145,6 +159,7 @@
       if (viewId === "voyage-view") { renderVoyage(); }
       if (viewId === "pet-view") { renderPets(); loadPetShowcases(); }
       if (viewId === "gacha-hall") { render(); }
+      refreshWorldEntries();
       byId(viewId).scrollIntoView({ behavior: "smooth", block: "start" });
     }
     function setHallVisible(visible) {
@@ -172,6 +187,8 @@
       byId("player-name-input").focus();
     }
     function showGate() {
+      if (authorNarration) authorNarration.stop();
+      if (firstMajorWorld) firstMajorWorld.close();
       currentPlayerName = "";
       currentPlayerToken = "";
       game = null;
@@ -647,8 +664,54 @@
       if (!target11.children.length) target11.innerHTML = source11.scenes.map(function (scene, index) {
         return "<details class=\"author-preview-story-scene\" data-author-act=\"" + index + "\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small data-author-scene-status>載入互動進度中</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1", { authorPreview: true }) + "<div data-author-mission-slot=\"" + index + "\" class=\"author-preview-mission-slot\"></div>" + (index === source11.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.1 暫定版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-11\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.1\" disabled>完成五幕互動後可試按領獎</button><small>作者試用只檢查按鈕位置和流程，不發放正式獎勵。</small></div>" : "") + "</details>";
       }).join("");
+      if (window.StarshipStoryMonsterCatalog && !target11.querySelector("[data-author-monster-catalog]")) target11.insertAdjacentHTML("beforeend", '<details data-author-monster-catalog><summary>作者查看魔物完整設定（含 1.1 劇透）</summary>' + window.StarshipStoryMonsterCatalog.render(true) + '</details>');
+    }
+    function authorNarrationMarkup(version, index) {
+      return '<div class="author-narration" data-narration-key="' + version + ':' + index + '"><div class="author-narration-actions" role="group" aria-label="本幕語音控制"><button class="small-button" type="button" data-narration-action="play">▶ 語音朗讀</button><button class="small-button" type="button" data-narration-action="pause" disabled>暫停</button><button class="small-button" type="button" data-narration-action="stop" disabled>停止</button><label>聲音 <select data-narration-voice aria-label="本幕朗讀聲音"></select></label><label>語速 <select data-narration-rate aria-label="本幕朗讀語速"><option value="0.85">0.85×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option><option value="1.3">1.3×</option></select></label></div><p data-narration-status role="status" aria-live="polite"></p></div>';
+    }
+    function prepareAuthorNarrationControls() {
+      ["1.0", "1.1"].forEach(function (version) {
+        var container = byId(version === "1.0" ? "author-preview-story-scenes-10" : "author-preview-story-scenes");
+        container.querySelectorAll(".author-preview-story-scene").forEach(function (scene, index) {
+          if (!scene.querySelector(".author-narration")) scene.querySelector("summary").insertAdjacentHTML("afterend", authorNarrationMarkup(version, index));
+        });
+      });
+      refreshAuthorNarrationVoices();
+    }
+    function refreshAuthorNarrationVoices() {
+      var voices = authorNarration ? authorNarration.voices() : [];
+      document.querySelectorAll("[data-narration-voice]").forEach(function (select) {
+        var previous = select.value;
+        select.innerHTML = voices.length ? voices.map(function (voice) { return '<option value="' + escapeHtml(voice.voiceURI) + '">' + escapeHtml(voice.name + "（" + voice.lang + "）") + '</option>'; }).join("") : '<option value="">未找到中文聲音</option>';
+        if (voices.some(function (voice) { return voice.voiceURI === previous; })) select.value = previous;
+      });
+      updateAuthorNarrationControls();
+    }
+    function updateAuthorNarrationControls() {
+      var state = authorNarration ? authorNarration.getState() : { key: "", status: "idle" };
+      var supported = authorNarration && authorNarration.supported;
+      var hasVoice = supported && authorNarration.voices().length > 0;
+      document.querySelectorAll("[data-narration-key]").forEach(function (toolbar) {
+        var active = toolbar.getAttribute("data-narration-key") === state.key;
+        var busy = active && (state.status === "playing" || state.status === "paused");
+        var play = toolbar.querySelector('[data-narration-action="play"]');
+        play.disabled = !hasVoice;
+        play.textContent = busy ? "↻ 重新朗讀" : "▶ 語音朗讀";
+        var pause = toolbar.querySelector('[data-narration-action="pause"]');
+        pause.disabled = !busy;
+        pause.textContent = active && state.status === "paused" ? "繼續" : "暫停";
+        toolbar.querySelector('[data-narration-action="stop"]').disabled = !busy;
+        toolbar.querySelector("[data-narration-voice]").disabled = busy || !hasVoice;
+        toolbar.querySelector("[data-narration-rate]").disabled = busy || !hasVoice;
+        var status = !supported ? "此瀏覽器不支援語音朗讀，請改用支援的瀏覽器。" : !hasVoice ? "未找到中文聲音；請安裝裝置的中文語音後重新開啟。" : "瀏覽器中文語音試聽；Qwen 說書人尚未接入。";
+        if (active && state.status === "error") status = state.message;
+        else if (active && state.status === "ended") status = "本幕朗讀完畢。";
+        else if (busy) status = (state.status === "paused" ? "已暫停" : "正在朗讀") + " · 第 " + Math.min(state.index + 1, state.total) + " / " + state.total + " 段";
+        toolbar.querySelector("[data-narration-status]").textContent = status;
+      });
     }
     function showAuthorStoryVersion(version) {
+      if (authorNarration) authorNarration.stop();
       var is10 = version === "1.0";
       byId("author-preview-story-scenes-10").hidden = !is10;
       byId("author-preview-story-scenes").hidden = is10;
@@ -659,15 +722,23 @@
       var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
       var bodyClass = className || "story-body";
       var imageSet = chapterId === "main-1-1" ? window.StarshipStory11Images : chapterId === "main-1-0" ? window.StarshipStory10Images : [];
-      var review = options && options.authorPreview && window.StarshipStoryVisualReview;
-      if (review) imageSet = review.imagesFor(chapterId, imageSet);
+      var visualReview = window.StarshipStoryVisualReview;
+      if (visualReview) imageSet = visualReview.imagesFor(chapterId, imageSet);
       var images = actNumber ? (imageSet || []).filter(function (item) { return item.act === actNumber; }) : [];
-      var portraits = review ? review.portraits.filter(function (item) { return item.chapter === chapterId && item.act === actNumber; }) : [];
+      var portraits = options && options.authorPreview && visualReview ? visualReview.portraits.filter(function (item) { return item.chapter === chapterId && item.act === actNumber; }) : [];
       var used = {};
       var shownPortraits = {};
+      function sceneArt(item) {
+        var figure = '<figure class="story-scene-art"><img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + '" loading="lazy"><figcaption>' + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + '</figcaption></figure>';
+        if (item.sequence && !item.essential && item.sequence !== 1 && item.sequence !== 3 && item.sequence !== 12 && item.sequence !== 13) {
+          var label = String(item.caption || "救援細節").split("｜").slice(1).join("｜");
+          return '<details class="story-art-detail"><summary>查看救援細節：' + escapeHtml(label) + '</summary>' + figure + '</details>';
+        }
+        return figure;
+      }
       var html = blocks.map(function (block) {
         var timeline = /^【時間線|^章節定位/.test(block);
-        var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; } return ""; }).join("");
+        var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return sceneArt(item); } return ""; }).join("");
         var people = portraits.map(function (item) {
           if (shownPortraits[item.id] || block.indexOf(item.anchor) < 0) return "";
           shownPortraits[item.id] = true;
@@ -675,9 +746,10 @@
         }).join("");
         if (people) people = '<div class="story-person-intros" aria-label="本段出場人物">' + people + '</div>';
         if (/^〔章節CG草稿・待作者確認〕/.test(block)) return people + art;
+        if (/^【[^】]+】$/.test(block)) return '<h4 class="story-location-heading">' + escapeHtml(block.slice(1, -1)) + '</h4>' + people + art;
         return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>" + people + art;
       }).join("");
-      html += images.map(function (item, index) { return used[index] ? "" : "<figure class=\"story-scene-art\"><img src=\"" + escapeHtml(item.src) + "\" alt=\"" + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + "\" loading=\"lazy\"><figcaption>" + escapeHtml(item.caption || ("第 " + actNumber + " 幕・文件原稿插圖")) + "</figcaption></figure>"; }).join("");
+      html += images.map(function (item, index) { return used[index] ? "" : sceneArt(item); }).join("");
       return "<div class=\"" + bodyClass + "\">" + html + "</div>";
     }
     function chineseActNumber(value) {
@@ -809,6 +881,11 @@
       container.innerHTML = "<div class=\"story-map-heading\"><div><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">1.0 開放 · 後續建檔</span></div><div class=\"story-map-filters\" role=\"group\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-dot planned\"></i>後續建檔</span><span><i class=\"legend-line\"></i>步行／水路</span><span><i class=\"legend-line rift\"></i>界痕位移</span></div></div><aside class=\"story-map-details\"><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p>" + (localSites ? "<div class=\"story-map-local-sites\"><strong>1.2 現地分區</strong><ul>" + localSites + "</ul></div>" : "") + "<div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>方位與行程</strong> 此圖只標已定的相對方位，非比例地圖。界痕位移不是日常道路；獸靈之村向西兩日到白鐘，白鐘向北三日到霧橋。霧橋到洛汀須先南返白鐘三日，再順流兩日；洛汀相對白鐘的精確羅盤角與斷橋局部幾何仍待核定。</p>";
     }
     function renderStoryReader(state, chapter) {
+      if (byId("story-monster-catalog") && window.StarshipStoryMonsterCatalog) {
+        var scene11 = window.StarshipStory11Current && window.StarshipStory11Current.scenes[2];
+        var learned = Boolean(scene11 && state.storyProgress && state.storyProgress.completedScenes && state.storyProgress.completedScenes["main-1-1:" + scene11.id]);
+        byId("story-monster-catalog").innerHTML = window.StarshipStoryMonsterCatalog.render(learned);
+      }
       if (data.releaseConfig && data.releaseConfig.open11 && window.StarshipStoryReader && chapter) {
         window.StarshipStoryReader.render({ container: byId("story-reader"), state: state, chapter: chapter,
           bodyMarkup: function (scene, index) { return storyBodyMarkup(scene.body, "story-body", index + 1, chapter.id, { authorPreview: true }); },
@@ -884,7 +961,6 @@
       if (!chapters.length) {
         byId("story-chapters").innerHTML = "<div class=\"empty\">這類劇情尚未開放。</div>";
         byId("story-reader").innerHTML = "<div class=\"empty\">目前可閱讀 1.0 主線；支線仍在製作。</div>";
-        if (byId("story-world-map")) byId("story-world-map").innerHTML = "";
         return;
       }
       if (!current || current.type !== currentStoryTab || current.releaseOpen === false) { current = chapters[0]; currentStoryChapterId = current.id; currentStorySceneId = current.scenes[0].id; }
@@ -894,7 +970,6 @@
       byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
       decorateStoryRoadmap();
       byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0 已開放｜後續章節籌備中" : "支線籌備中";
-      renderStoryWorldMap(current);
       renderStoryReader(state, current);
       decorateStoryMythic(current);
       moveStoryPlotToTop();
@@ -1880,6 +1955,22 @@
     byId("author-preview-story-scenes").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button && !button.disabled) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
     document.querySelector(".author-preview-story-tabs").addEventListener("click", function (event) { var button = event.target.closest("[data-author-story-version]"); if (button) showAuthorStoryVersion(button.getAttribute("data-author-story-version")); });
     document.querySelector(".author-preview-story").addEventListener("click", function (event) {
+      var narrationButton = event.target.closest("[data-narration-action]");
+      if (narrationButton) {
+        if (!authorNarration || narrationButton.disabled || playerKey(currentPlayerName) !== "happycow") return;
+        var toolbar = narrationButton.closest("[data-narration-key]");
+        var key = toolbar.getAttribute("data-narration-key");
+        var action = narrationButton.getAttribute("data-narration-action");
+        if (action === "stop") authorNarration.stop();
+        else if (action === "pause") authorNarration.togglePause();
+        else {
+          var parts = key.split(":");
+          var source = parts[0] === "1.0" ? window.StarshipStory10Current : window.StarshipStory11Current;
+          var scene = source && source.scenes[Number(parts[1])];
+          if (scene) authorNarration.play(key, scene.title + "。\n" + scene.body, toolbar.querySelector("[data-narration-voice]").value, toolbar.querySelector("[data-narration-rate]").value);
+        }
+        return;
+      }
       var button = event.target.closest("[data-author-preview-claim]");
       if (!button || button.disabled) return;
       var version = button.getAttribute("data-author-preview-claim");
@@ -1889,7 +1980,9 @@
       var note = button.parentElement.querySelector("small");
       if (note) note.textContent = "版面試用完成；正式角色、進度與資源均未變動。";
     });
-    byId("author-preview-reset").addEventListener("click", function () { authorPreviewLastAct = null; authorPreviewRewardDemo["1.1"] = false; loadAuthorPreview("reset"); });
+    byId("author-preview-reset").addEventListener("click", function () { if (authorNarration) authorNarration.stop(); authorPreviewLastAct = null; authorPreviewRewardDemo["1.1"] = false; loadAuthorPreview("reset"); });
+    if (window.speechSynthesis && typeof window.speechSynthesis.addEventListener === "function") window.speechSynthesis.addEventListener("voiceschanged", refreshAuthorNarrationVoices);
+    window.addEventListener("pagehide", function () { if (authorNarration) authorNarration.stop(); });
     byId("author-preview-map-reset").addEventListener("click", function () { authorAtlasMapId = "W-001"; authorAtlasPointId = ""; renderAuthorMapPreview(); });
     byId("author-preview-map").addEventListener("click", function (event) {
       var target = event.target.closest("[data-map-go]");
@@ -1900,6 +1993,7 @@
       else return;
       authorAtlasVisited.add(authorAtlasMapId + authorAtlasPointId);
       renderAuthorMapPreview();
+      if (event.detail === 0 && id.charAt(0) === "#") { var authorFocus = Array.from(byId("author-preview-map").querySelectorAll("[data-map-go]")).find(function (button) { return button.getAttribute("data-map-go") === id; }); if (authorFocus) authorFocus.focus(); }
     });
     byId("author-preview-2x-setup").addEventListener("click", function (event) { if (event.target.closest("#author-preview-2x-run")) runAuthorBattlePreview(); });
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
@@ -1928,6 +2022,52 @@
     byId("open-star-law-test").addEventListener("click", function () { setStarLawTestPanelVisible(!starLawTestPanelOpen); });
     byId("claim-star-law-test-reward").addEventListener("click", claimStarLawTestReward);
     byId("continue-story").addEventListener("click", function () { showView("story-view"); });
+    function firstActKey() { return "starship-first-act-game-v2:" + encodeURIComponent(playerKey(currentPlayerName)); }
+    function loadFirstAct() { try { return JSON.parse(window.localStorage.getItem(firstActKey())); } catch (error) { return null; } }
+    function saveFirstAct(value) { try { window.localStorage.setItem(firstActKey(), JSON.stringify(value)); } catch (error) { /* local game checkpoint is optional */ } }
+    byId("play-first-act").addEventListener("click", function () {
+      if (!firstActGame) firstActGame = window.StarshipFirstActGame.create({ canvas: byId("first-act-canvas"), panel: byId("first-act-panel"), zone: byId("first-act-zone"), objective: byId("first-act-objective"), distance: byId("first-act-distance"), interact: byId("first-act-interact"), dialog: byId("first-act-dialog"), dialogTitle: byId("first-act-dialog-title"), dialogText: byId("first-act-dialog-text"), dialogNext: byId("first-act-dialog-next"), reset: byId("first-act-reset"), enter: byId("first-act-enter-village"), pad: byId("first-act-panel"), load: loadFirstAct, save: saveFirstAct, onRestart: function () { var village = window.StarshipExploration.normalize(loadExploration()); village.arrived = false; village.storyStep = 0; saveExploration(village); if (exploration) exploration.reload(); } });
+      showView("first-act-view"); firstActGame.open();
+    });
+    byId("first-act-back").addEventListener("click", function () { showView("story-view"); byId("play-first-act").focus({ preventScroll: true }); });
+    byId("first-act-enter-village").addEventListener("click", function () { if (firstActGame && firstActGame.state().index >= window.StarshipFirstActGame.steps.length) showVillageExploration(true); });
+    function openWorldMap(fromViewId) { mapReturnViewId = fromViewId; byId("map-view-back").textContent = fromViewId === "story-view" ? "← 回到劇情" : "← 回到遊戲大廳"; showView("map-view"); byId("map-view-back").focus({ preventScroll: true }); }
+    function explorationKey() { return "starship-exploration-test-v1:" + encodeURIComponent(playerKey(currentPlayerName)); }
+    function loadExploration() { try { return JSON.parse(window.localStorage.getItem(explorationKey())); } catch (error) { return null; } }
+    function saveExploration(state) { try { window.localStorage.setItem(explorationKey(), JSON.stringify(state)); } catch (error) { /* optional test save */ } }
+    function showVillageExploration(fromStory) {
+      if (firstMajorWorld) firstMajorWorld.close();
+      byId("first-major-panel").hidden = true;
+      byId("first-major-entry").hidden = false;
+      if (fromStory) { mapReturnViewId = "story-view"; byId("map-view-back").textContent = "← 回到劇情"; showView("map-view"); }
+      if (!exploration) exploration = window.StarshipExploration.create({ canvas: byId("exploration-canvas"), panel: byId("exploration-panel"), status: byId("exploration-status"), position: byId("exploration-position"), discoveries: byId("exploration-discoveries"), objective: byId("exploration-objective"), distance: byId("exploration-distance"), interact: byId("exploration-interact"), reset: byId("exploration-reset"), dialog: byId("exploration-dialog"), dialogTitle: byId("exploration-dialog-title"), dialogText: byId("exploration-dialog-text"), dialogNext: byId("exploration-dialog-next"), read: byId("exploration-story-read"), pad: byId("exploration-panel"), load: loadExploration, save: saveExploration, onStoryComplete: function () { completeStoryScene("main-1-0", "signal"); } });
+      exploration.reload(); if (fromStory) exploration.enterStory();
+      byId("story-world-map").hidden = true; byId("exploration-panel").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = true; exploration.open();
+    }
+    byId("open-exploration").addEventListener("click", function () { showVillageExploration(false); });
+    byId("exploration-continue-act-2").addEventListener("click",function(){showFirstMajorWorld(2);});
+    function canStartWorldAct(act) { return !!game && sceneClaimed(game.getState(), "main-1-0", act === 3 ? "village" : "signal"); }
+    function refreshWorldEntries() {
+      [2,3].forEach(function (act) { var button=byId("open-world-act-"+act); if(button){button.disabled=!canStartWorldAct(act);button.title=button.disabled?"先完成第"+(act-1)+"幕主線":"進入第"+act+"幕可探索場景";} });
+      if(byId("exploration-continue-act-2"))byId("exploration-continue-act-2").disabled=!canStartWorldAct(2);
+    }
+    function worldSaveKey(act) { return "starship-first-major-world-v1:" + encodeURIComponent(playerKey(currentPlayerName)) + ":" + act; }
+    function loadFirstMajorWorld(act) { try { return JSON.parse(window.localStorage.getItem(worldSaveKey(act || 2))); } catch(error) { return null; } }
+    function saveFirstMajorWorld(state) { try { window.localStorage.setItem(worldSaveKey(state.act), JSON.stringify(state)); } catch(error) { byId("first-major-status").textContent="瀏覽器未能保存探索位置，離開後可能需要重走此段。"; } }
+    function showFirstMajorWorld(act) {
+      if(!canStartWorldAct(act)) return;
+      if(exploration) exploration.close();
+      showView("map-view");
+      if(!firstMajorWorld) firstMajorWorld=window.StarshipFirstMajorWorld.create({canvas:byId("first-major-canvas"),panel:byId("first-major-panel"),zone:byId("first-major-zone"),status:byId("first-major-status"),objective:byId("first-major-objective"),distance:byId("first-major-distance"),position:byId("first-major-position"),interact:byId("first-major-interact"),dialog:byId("first-major-dialog"),dialogTitle:byId("first-major-dialog-title"),dialogText:byId("first-major-dialog-text"),dialogNext:byId("first-major-dialog-next"),reset:byId("first-major-reset"),sync:byId("first-major-sync"),next:byId("first-major-next"),pad:byId("first-major-panel"),load:loadFirstMajorWorld,save:saveFirstMajorWorld,canStart:canStartWorldAct,onComplete:function(act){return performLiveStoryAction({action:"complete",chapterId:"main-1-0",sceneId:act===3?"north":"village"}).then(function(payload){refreshWorldEntries();return payload;});}});
+      byId("exploration-panel").hidden=true;byId("story-world-map").hidden=true;byId("open-exploration").closest(".explore-entry").hidden=true;byId("first-major-entry").hidden=true;byId("first-major-panel").hidden=false;
+      firstMajorWorld.open(act);
+    }
+    [2,3].forEach(function(act){byId("open-world-act-"+act).addEventListener("click",function(){showFirstMajorWorld(act);});});
+    byId("close-first-major").addEventListener("click",function(){if(firstMajorWorld)firstMajorWorld.close();byId("first-major-panel").hidden=true;byId("first-major-entry").hidden=false;byId("story-world-map").hidden=false;byId("open-exploration").closest(".explore-entry").hidden=false;refreshWorldEntries();byId("open-world-act-2").focus({preventScroll:true});});
+    byId("close-exploration").addEventListener("click", function () { if (exploration) exploration.close(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; byId("open-exploration").focus({ preventScroll: true }); });
+    byId("open-world-map").addEventListener("click", function () { openWorldMap("game-lobby"); });
+    byId("story-open-world-map").addEventListener("click", function () { openWorldMap("story-view"); });
+    byId("map-view-back").addEventListener("click", function () { var returnViewId = mapReturnViewId; showView(returnViewId); byId(returnViewId === "story-view" ? "story-open-world-map" : "open-world-map").focus({ preventScroll: true }); });
     byId("tutorial-reward").addEventListener("click", function (event) { if (event.target.closest("#complete-tutorial")) completeTutorial(); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });
     byId("story-main-tab").addEventListener("click", function () { currentStoryTab = "main"; currentStoryChapterId = "main-1-0"; currentStorySceneId = ""; renderStory(); });
@@ -1941,6 +2081,7 @@
         if (atlasId.charAt(0) === "#") currentAtlasPointId = atlasId;
         else { currentAtlasMapId = atlasId; currentAtlasPointId = ""; }
         renderStoryWorldMap(storyChapterById(currentStoryChapterId));
+        if (event.detail === 0 && atlasId.charAt(0) === "#") { var mapFocus = Array.from(byId("story-world-map").querySelectorAll("[data-map-go]")).find(function (button) { return button.getAttribute("data-map-go") === atlasId; }); if (mapFocus) mapFocus.focus(); }
         return;
       }
       var filter = event.target.closest("[data-map-filter]");

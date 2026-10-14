@@ -12,7 +12,7 @@ test('1.1 candidate uses the current five-act story and follows the release gate
     '第一幕｜缺兩個人的早餐',
     '第二幕｜近岸的第四個人',
     '第三幕｜把圖攤開',
-    '第四幕｜第五個空拍',
+    '第四幕｜擊碎假路的合奏',
     '第五幕｜借來的舞台'
   ]);
   assert.ok(current11.scenes.map(scene => scene.body).join('').length > 10000);

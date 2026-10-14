@@ -1,10 +1,4 @@
-/* Scene images imported from the 1.0 prose tab of the author document. */
-(function (root, factory) {
-  if (typeof module === "object" && module.exports) module.exports = factory();
-  else root.StarshipStory10Images = factory();
-}(typeof globalThis !== "undefined" ? globalThis : this, function () {
-  "use strict";
-  return [
+(function(root,factory){if(typeof module === "object" && module.exports)module.exports=factory();else root.StarshipStory10Images=factory();}(typeof globalThis !== "undefined" ? globalThis : this,function(){"use strict";return [
   {
     "act": 1,
     "anchor": "巨獸落在祭壇上。",
@@ -42,13 +36,9 @@
   },
   {
     "act": 2,
-    "anchor": "雷恩拉住她後襟，兩人一起退到一張翻倒的木車後。獸",
-    "src": "./assets/story/1-0-08.webp"
-  },
-  {
-    "act": 2,
-    "anchor": "門外沒有人聲，只有直通林下的斜坡。先前不斷打轉的",
-    "src": "./assets/story/1-0-09.webp"
+    "anchor": "三隻膝高的小魔物沿溪溝衝來",
+    "src": "./assets/story/review/1-0-village-spawn-fight.webp",
+    "caption": "村外小獸戰｜伊薩爾守住主路，瑟蕾雅與雷恩把裂棘幼獸引離住屋；村民只看見幼獸與局部錯位。"
   },
   {
     "act": 3,
@@ -87,33 +77,33 @@
   },
   {
     "act": 4,
-    "anchor": "她話音沒落，已重新翻下木車。瑟蕾雅跟著換位，劍鋒",
-    "src": "./assets/story/1-0-17.webp"
+    "anchor": "她話音沒落，已重新翻下木車",
+    "src": "./assets/story/1-0-17.webp",
+    "caption": "街口交戰｜三人守住居民一側，將獸逼向已清空的街道。"
   },
   {
     "act": 4,
-    "anchor": "米菈與老瓦克困在內廊一處較高的平台上。瑟蕾雅透過",
-    "src": "./assets/story/1-0-18.webp"
+    "anchor": "卸貨廊原本是一條可以推車通過的平路",
+    "src": "./assets/story/review/1-0-fissure-overview.webp",
+    "caption": "卸貨廊斷裂｜原本連續的地板被深淵截開；米菈與腿傷的老瓦克困在對面，靠牆處的斷口較窄。"
   },
   {
     "act": 4,
-    "anchor": "Chodan把她拖到吊架旁。她們剛離開，原本寬些",
-    "src": "./assets/story/1-0-19.webp"
+    "anchor": "用力把人拽出",
+    "src": "./assets/story/review/1-0-fissure-pull.webp",
+    "caption": "第一次接近受阻｜雷恩送繩，Chodan抓住手腕，與工人合力把瑟蕾雅拉回完整地面。"
   },
   {
     "act": 4,
-    "anchor": "她踏上橫木，右手沿主繩移動。到台邊時，鬆動的落腳",
-    "src": "./assets/story/1-0-20.webp"
+    "anchor": "她的手轉了方向，抓住他的肩帶",
+    "src": "./assets/story/review/1-0-fissure-choice.webp",
+    "caption": "最後接應｜雷恩腳下的木板裂開；瑟蕾雅放棄工具箱，抓住同伴，後方一起拉繩。"
   },
   {
     "act": 4,
-    "anchor": "Chodan收住原要追擊的步子，改擋內廊。兩人各",
-    "src": "./assets/story/1-0-21.webp"
-  },
-  {
-    "act": 4,
-    "anchor": "工具箱墜下去，撞上機座，蓋子翻開，紙與細金屬件散",
-    "src": "./assets/story/1-0-22.webp"
+    "anchor": "「明天先睡。」",
+    "src": "./assets/story/review/1-0-rescue-13.webp",
+    "caption": "警戒線外｜老瓦克交給照護者，奧恩扶住米菈；其他失蹤者仍在搜索。"
   },
   {
     "act": 5,
@@ -130,5 +120,4 @@
     "anchor": "這次，她把圖攤在路邊一塊平整的石面上，讓四人都看",
     "src": "./assets/story/1-0-25.webp"
   }
-];
-}));
+];}));

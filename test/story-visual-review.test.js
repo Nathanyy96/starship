@@ -12,6 +12,7 @@ test('review portraits and illustrations have exact prose anchors and real asset
     for (const entry of entries) {
       const body = stories[chapter].scenes[entry.act - 1].body;
       assert.equal(body.split(entry.anchor).length - 1, 1, entry.src + ' must appear at one matching paragraph');
+      assert.ok(body.replace(/\r\n/g, '\n').split(/\n{2,}/).some(block => block.includes(entry.anchor)), entry.src + ' anchor stays in one rendered paragraph');
       assert.ok(fs.existsSync(path.resolve(__dirname, '..', entry.src)), entry.src + ' exists');
     }
   }
@@ -19,11 +20,11 @@ test('review portraits and illustrations have exact prose anchors and real asset
 
 test('review keeps the published image manifests intact and separates named people', () => {
   const before = JSON.stringify(images);
-  assert.equal(review.imagesFor('main-1-0', images['main-1-0']).length, 40);
-  assert.equal(review.imagesFor('main-1-1', images['main-1-1']).length, 23);
+  assert.equal(review.imagesFor('main-1-0', images['main-1-0']).length, 28);
+  assert.equal(review.imagesFor('main-1-1', images['main-1-1']).length, 16);
   assert.equal(JSON.stringify(images), before);
   assert.equal(review.portraits.length, 11);
   assert.equal(new Set(review.portraits.map(p => p.id)).size, 11);
   assert.notEqual(review.portraits.find(p => p.id === 'kailin').src, review.portraits.find(p => p.id === 'mila').src);
-  assert.equal(review.status, 'author-review-for-1.1');
+  assert.equal(review.status, 'approved-current-story');
 });

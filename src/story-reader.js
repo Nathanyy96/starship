@@ -32,7 +32,7 @@
             claimed || (is11 ? p.act !== missions.acts.length || !done : !chapter.scenes.slice(0, -1).every(function (s) { return progress.completedScenes[chapter.id + ":" + s.id]; }))) + "</div>";
       }
       var open = Object.prototype.hasOwnProperty.call(openScenes, key) ? openScenes[key] : unlocked && !done;
-      return '<details class="author-preview-story-scene" data-live-details="' + escape(key) + '"' + (open ? " open" : "") + '><summary><strong>第 ' + (index + 1) + " 幕｜" + escape(scene.title) + "</strong><span>" + (done ? "已讀" : unlocked ? "可閱讀" : "待解鎖") + '</span></summary><div class="released-story-content">' + content + "</div></details>";
+      return '<details class="author-preview-story-scene" data-live-details="' + escape(key) + '"' + (open ? " open" : "") + '><summary><strong>' + escape(scene.title) + "</strong><span>" + (done ? "已讀" : unlocked ? "可閱讀" : "待解鎖") + '</span></summary><div class="released-story-content">' + content + "</div></details>";
     }).join("") + "</section>";
     config.container.onclick = function (event) {
       var target = event.target.closest("[data-live-action]");
