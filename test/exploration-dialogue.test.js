@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 function harness() {
   const context = vm.createContext({ window: { addEventListener() {} }, Image: class {}, HTMLInputElement: class {}, performance: { now: () => 0 }, requestAnimationFrame: () => 1, cancelAnimationFrame() {} });
-  for (const file of ['story-1-0-current', 'first-act-scenes', 'exploration', 'first-act-game']) {
+  for (const file of ['story-1-0-current', 'first-act-scenes', 'exploration-renderer', 'exploration', 'first-act-game']) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'src', file + '.js'), 'utf8'), context);
   }
   function element() {

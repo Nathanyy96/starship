@@ -59,7 +59,7 @@ test('old or invalid saved positions recover and second act cannot resume in the
 
 function controllerHarness() {
   const context=vm.createContext({window:{addEventListener(){}},Image:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
-  for(const name of ['story-1-0-current','first-act-scenes','exploration','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+  for(const name of ['story-1-0-current','first-act-scenes','exploration-renderer','exploration','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
   function element(){const handlers={};return {hidden:false,textContent:'',addEventListener(k,f){handlers[k]=f;},click(){handlers.click?.({});},focus(){},querySelectorAll:()=>[]};}
   const options={load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};
   for(const key of ['canvas','panel','zone','status','objective','distance','position','interact','dialog','dialogTitle','dialogText','dialogNext','reset','sync','next','pad'])options[key]=element();

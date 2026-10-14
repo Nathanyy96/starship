@@ -824,7 +824,19 @@ body:has(#game-lobby:not([hidden])) { background: linear-gradient(180deg, rgba(3
 .first-act-guide span { color:#fff7e9; }
 .first-act-guide small { color:#d9e8e1; }
 .first-act-stage { position:relative; max-width:960px; margin:auto; overflow:hidden; border-radius:12px; background:#3b7759; }
-#first-act-canvas { display:block; width:100%; aspect-ratio:5/3; image-rendering:pixelated; outline:none; }
+#first-act-canvas { display:block; width:100%; aspect-ratio:5/3; outline:none; }
+#first-act-canvas, #exploration-canvas, #first-major-canvas { image-rendering:auto; touch-action:none; }
+body:has(#first-act-view:not([hidden])) .topbar,
+body:has(#exploration-panel:not([hidden])) .topbar,
+body:has(#first-major-panel:not([hidden])) .topbar { display:none; }
+body:has(#first-act-view:not([hidden])) .page-shell,
+body:has(#exploration-panel:not([hidden])) .page-shell,
+body:has(#first-major-panel:not([hidden])) .page-shell { padding-top:12px; }
+.first-act-stage, .exploration-stage { max-width:1120px; }
+.map-view:has(#exploration-panel:not([hidden])) #first-major-entry { display:none; }
+.first-act-view .view-toolbar { padding-bottom:10px; }
+.first-act-view .view-toolbar h2 { font-size:1.15rem; }
+@media (max-width:600px) { #first-act-canvas, #exploration-canvas, #first-major-canvas { aspect-ratio:4/5; } .first-act-view, .map-view { padding:12px; } }
 #first-act-canvas:focus-visible, .first-act-view button:focus-visible { outline:3px solid #f5cf75; outline-offset:3px; }
 .first-act-dialog { margin:14px 0; padding:15px 18px; border-radius:12px; background:#263d50; color:#f4eee3; }
 .first-act-dialog[hidden], #first-act-enter-village[hidden], #exploration-story-read[hidden] { display:none; }

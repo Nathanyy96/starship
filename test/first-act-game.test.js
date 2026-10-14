@@ -63,3 +63,16 @@ test('map conversations retain the complete published first act in order', () =>
   assert.equal(dialogue.all.flat().map(line => line[1]).join('').replace(/\s/g, ''), body.replace(/\s/g, ''));
   assert.ok(dialogue.all.flat().some(line => line[0] === '伊薩爾'));
 });
+
+test('illustrated scenes keep the river and cliffs blocked and scenic stops reachable', () => {
+  for (const image of Object.values(game.backgrounds)) {
+    const data=fs.readFileSync(path.join(__dirname,'..',image));
+    assert.ok(data.readUInt32BE(16)>=1536);
+  }
+  assert.equal(game.passable('forest',18,21),false);
+  assert.equal(game.passable('valley',3,20),false);
+  for (const place of game.lookouts) {
+    assert.equal(game.passable(place.zone,place.x,place.y),true);
+    assert.equal(game.nearLookout({...game.initial(),zone:place.zone,x:place.x,y:place.y}).title,place.title);
+  }
+});

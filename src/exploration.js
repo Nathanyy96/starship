@@ -4,6 +4,7 @@
   root.StarshipExploration = api;
 }(typeof globalThis !== "undefined" ? globalThis : this, function (dialogue) {
   "use strict";
+  var renderer = typeof module === "object" && module.exports ? require("./exploration-renderer.js") : globalThis.StarshipExplorationRenderer;
   // Coordinates and corridors are traced against the existing C1-102 illustration.
   var WIDTH = 1672, HEIGHT = 939, NAV = 16;
   var mapImage = "./assets/maps/c1-102.png";
@@ -124,16 +125,11 @@
     extraActors.forEach(function (actor) { loadCharacter(actor.id); });
     function save() { options.save(state); }
     function sprite(id, x, y, height, flip, bob) {
-      var image = images[id]; if (!image) return;
-      var width = height * image.naturalWidth / image.naturalHeight;
-      ctx.save(); ctx.translate(x, y); if (flip) ctx.scale(-1, 1);
-      ctx.drawImage(image, -width / 2, -height + 10 + bob, width, height); ctx.restore();
+      renderer.sprite(ctx, images[id], x, y, height, flip, bob);
     }
     function draw() {
-      var cameraX = Math.max(0, Math.min(WIDTH - canvas.width, state.x - canvas.width / 2));
-      var cameraY = Math.max(0, Math.min(HEIGHT - canvas.height, state.y - canvas.height / 2));
-      ctx.setTransform(1, 0, 0, 1, -cameraX, -cameraY);
-      ctx.fillStyle = "#315842"; ctx.fillRect(cameraX, cameraY, canvas.width, canvas.height);
+      var view = renderer.begin(canvas, ctx, WIDTH, HEIGHT, state.x, state.y);
+      ctx.fillStyle = "#315842"; ctx.fillRect(view.x, view.y, view.width, view.height);
       if (images.map) ctx.drawImage(images.map, 0, 0, WIDTH, HEIGHT);
       var target = objective(state), key = Math.floor(state.x / NAV) + ":" + Math.floor(state.y / NAV) + ":" + (target ? target.id : "done");
       if (key !== routeKey) { currentRoute = route(state, target); routeKey = key; }
@@ -148,13 +144,13 @@
         ctx.fillStyle = state.discovered.includes(site.id) ? "#f5cf75" : "#f8f0d5";
         ctx.beginPath(); ctx.arc(site.x, site.y, 7, 0, Math.PI * 2); ctx.fill();
       });
-      sprite("reyn", 355, 399, 76, false, 0);
-      sprite("isar", 1335, 467, 84, false, 0);
-      sprite("lia", 1425, 472, 78, false, 0);
+      sprite("reyn", 355, 399, 100, false, 0);
+      sprite("isar", 1335, 467, 112, false, 0);
+      sprite("lia", 1425, 472, 102, false, 0);
       extraActors.forEach(function (actor) { sprite(actor.id, actor.x, actor.y, actor.height || 78, false, 0); });
       ctx.fillStyle = "rgba(10,26,27,.4)"; ctx.beginPath(); ctx.ellipse(state.x, state.y + 10, 15, 6, 0, 0, Math.PI * 2); ctx.fill();
-      sprite("hero", state.x, state.y, 82, pressed.has("left"), pressed.size ? Math.sin(performance.now() / 95) * 2 : 0);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      sprite("hero", state.x, state.y, 104, pressed.has("left"), pressed.size ? Math.sin(performance.now() / 95) * 2 : 0);
+      renderer.end(ctx);
       var near = nearby(state);
       options.position.textContent = "位置：" + (near ? near.value.name || near.value.title : "獸靈之村");
       options.discoveries.textContent = "已發現 " + state.discovered.length + " / " + sites.length;
@@ -200,7 +196,7 @@
       if (!active || options.panel.hidden) return;
       if (sceneIndex >= 0) { if (down && (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") && !e.repeat) { e.preventDefault(); nextLine(); } return; }
       var keys = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
-      if (keys[e.code] && !(e.target instanceof HTMLInputElement)) { e.preventDefault(); if (down) pressed.add(keys[e.code]); else pressed.delete(keys[e.code]); }
+      if (keys[e.code] && !(e.target instanceof HTMLInputElement) && !(e.target.closest && e.target.closest('select,textarea'))) { e.preventDefault(); if (down) pressed.add(keys[e.code]); else pressed.delete(keys[e.code]); }
       if (down && e.code === "KeyE" && !e.repeat) { e.preventDefault(); doInteract(); }
     }
     window.addEventListener("keydown", function (e) { onKey(e, true); }); window.addEventListener("keyup", function (e) { onKey(e, false); });
