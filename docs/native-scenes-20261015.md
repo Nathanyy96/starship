@@ -25,3 +25,5 @@
 - 全套199項：190通過、9既有跳過、0失敗。
 
 素材及提示詞記錄：native-scene-assets-20261015.json。素材位於assets/exploration/native/。
+
+正式上線：46176c1，Render顯示Deploy succeeded｜Live，部署1分55秒。線上原生場景再次實際鍵盤完成工坊、醫療屋、南驛門口、南行河橋、港內橋，屋頂阻擋及五場景桌機／手機驗證全部通過。

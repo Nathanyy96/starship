@@ -152,7 +152,7 @@
         ctx.beginPath(); ctx.arc(site.x, site.y, 7, 0, Math.PI * 2); ctx.fill();
       });
       var cast=[{id:'reyn',x:355,y:399},{id:'isar',x:1335,y:467},{id:'lia',x:1425,y:472},{id:'hero',x:state.x,y:state.y,hero:true}].concat(extraActors);
-      if(model)globalThis.StarshipNativeTerrain.objects(model.nativeTerrain).forEach(function(o){cast.push({native:o,x:(o.x+o.w/2)/visualScale,y:(o.door?o.door[1]-12:o.y+o.h*.9)/visualScale});});
+      if(model)globalThis.StarshipNativeTerrain.objects(model.nativeTerrain).forEach(function(o){cast.push({native:o,x:(o.x+o.w/2)/visualScale,y:(globalThis.StarshipNativeTerrain.depth(o))/visualScale});});
       cast.sort(function(a,b){return a.y-b.y;}).forEach(function(p){if(p.native){ctx.save();ctx.scale(1/visualScale,1/visualScale);globalThis.StarshipNativeTerrain.drawObject(ctx,p.native);ctx.restore();return;}sprite(p.id,p.x,p.y,44,p.hero&&pressed.has('left'),p.hero&&pressed.size?Math.sin(performance.now()/95)*2:0);});
       renderer.end(ctx);
       var near = nearby(state);

@@ -59,3 +59,14 @@
 @media(max-width:600px){.world-tools:has(.world-atlas){width:calc(100% - 24px);max-width:calc(100% - 24px);max-height:80%;padding:10px;right:12px}.world-atlas .atlas-heading{align-items:flex-start;gap:8px}.world-atlas .atlas-heading strong{font-size:11px;line-height:1.7}.world-atlas .atlas-sheet>img{min-height:280px}.world-atlas .atlas-pin{width:29px;height:29px;min-height:29px;font-size:18px}.world-atlas .atlas-pin small{font-size:9px;max-width:80px;top:28px}}
 .world-atlas .atlas-sheet>canvas{display:block;width:100%;height:auto;max-height:510px}.world-atlas .atlas-pin>svg{display:block;margin:auto;pointer-events:none}.world-atlas .atlas-pin small{pointer-events:none}
 @media(max-width:600px){.world-atlas .atlas-sheet>canvas{min-height:280px}}
+
+/* Leave the forward view clear on a phone; free exploration has no quest to track. */
+@media(max-width:600px){
+ .world-scene{min-height:440px}
+ .world-game[data-explore-mode="free"] .world-quest{display:none}
+ .world-quest{top:76px;width:calc(100% - 126px);padding:7px 9px}
+ .world-quest-type{display:none}
+ .world-quest strong{line-height:1.4}
+ .world-quest>span:last-child{margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .world-minimap{top:76px;width:88px}
+}

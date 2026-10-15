@@ -59,6 +59,8 @@
 
     cache[token]=sheet;return sheet;
   }
+  // Sort at the solid facade, so a person standing on the front steps stays visible.
+  function depth(p){return p.y+p.h*(p.sheet==='nature'? .92:p.door?.8:.88);}
   function objects(p){return p.structures.concat((p.trees||[]).map(function(t){return structure(t[2]===3?'harbor':'nature',t[2]===3?3:t[2],t[0],t[1],t[3]*.95,t[3]);}));}
-  return {install:install,paint:paint,files:files,ready:function(p){return needed(p).every(function(id){return Boolean(images[id]);});},failed:function(){return failed.slice();},objects:objects,drawObject:drawObject,version:function(){return version;}};
+  return {install:install,paint:paint,files:files,ready:function(p){return needed(p).every(function(id){return Boolean(images[id]);});},failed:function(){return failed.slice();},objects:objects,depth:depth,drawObject:drawObject,version:function(){return version;}};
 }));

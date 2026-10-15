@@ -30,7 +30,7 @@
   }
   // The visible ground is sampled from the same walkability function as movement.
   // Preserve the original scenery around broad walkable corridors. Scenery never changes collision.
-  var sceneryImages={},sceneryRequests={},terrainCache={},tileArt=null,objectArt=null,interiorArt=null,artVersion=0;
+  var sceneryImages={},sceneryRequests={},sceneryFailures={},terrainCache={},tileArt=null,objectArt=null,interiorArt=null,artVersion=0;
   if(typeof Image!=='undefined'){
     var tiles=new Image();tiles.onload=function(){tileArt=tiles;terrainCache={};artVersion++;};tiles.src='./assets/exploration/terrain-ground-atlas-v1.png';
     var objects=new Image();objects.onload=function(){objectArt=objects;terrainCache={};artVersion++;};objects.src='./assets/exploration/terrain-objects-atlas-v1.png';
@@ -41,7 +41,7 @@
     if(typeof document==='undefined')return null;
     settings=settings||{};
     if(settings.native&&nativeTerrain)return nativeTerrain.paint(key,width,height,passable,settings);
-    var scenery=null;if(settings.image&&!settings.furniture&&typeof Image!=='undefined'){scenery=sceneryImages[settings.image];if(!sceneryRequests[settings.image]){sceneryRequests[settings.image]=true;var original=new Image();original.onload=function(){sceneryImages[settings.image]=original;terrainCache={};artVersion++;};original.src=settings.image;}}
+    var scenery=null;if(settings.image&&!settings.furniture&&typeof Image!=='undefined'){scenery=sceneryImages[settings.image];if(!sceneryRequests[settings.image]){sceneryRequests[settings.image]=true;var original=new Image();original.onload=function(){delete sceneryFailures[settings.image];sceneryImages[settings.image]=original;terrainCache={};artVersion++;};original.onerror=function(){sceneryFailures[settings.image]=true;artVersion++;};original.src=settings.image;}if(!scenery)return null;}
     var cacheKey=key+':'+width+'x'+height+':'+(settings.image||'');if(terrainCache[cacheKey])return terrainCache[cacheKey];
     settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=Boolean(settings.furniture)||/Inn|factory|recovery|clinic|observatory|station/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
     if(scenery){c.drawImage(scenery,0,0,width,height);terrainCache[cacheKey]=sheet;return sheet;}
@@ -75,5 +75,5 @@
 
     terrainCache[cacheKey]=sheet;return sheet;
   }
-  return { begin: begin, end: end, sprite: sprite, terrain:terrain, terrainVersion:function(){return artVersion+(nativeTerrain?nativeTerrain.version():0);} };
+  return { begin: begin, end: end, sprite: sprite, terrain:terrain, terrainFailed:function(src){return Boolean(sceneryFailures[src]);},terrainVersion:function(){return artVersion+(nativeTerrain?nativeTerrain.version():0);} };
 }));

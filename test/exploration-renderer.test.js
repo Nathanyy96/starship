@@ -35,3 +35,15 @@ test('hero atlas uses direction, travelled distance and safe source rectangles',
 });
 
 test('illustrated scenery replaces procedural scenery and remains cached at the actual region size',()=>{const vm=require('node:vm'),fs=require('node:fs'),pending=[],draws=[],contexts=[];class Img{constructor(){pending.push(this);}}const context={module:{exports:{}},Image:Img,document:{createElement(){const ctx={fillRect(){},clearRect(){},drawImage(...v){draws.push(v);}};contexts.push(ctx);return {getContext:()=>ctx};}}};vm.runInNewContext(fs.readFileSync(require.resolve('../src/exploration-renderer'),'utf8'),context);const r=context.module.exports;r.terrain('port',16,16,()=>true,{image:'original-port.png'});const source=pending.find(i=>i.src==='original-port.png');assert.ok(source);source.onload();draws.length=0;const first=r.terrain('port',16,16,()=>true,{image:'original-port.png'});assert.equal(draws.length,1);assert.equal(draws[0][0],source);assert.equal(r.terrain('port',16,16,()=>true,{image:'original-port.png'}),first);assert.notEqual(r.terrain('port',32,32,()=>true,{image:'original-port.png'}),first);});
+
+test('a pending scenic image never reveals fallback tiles or enables a false ready state',()=>{
+ const vm=require('node:vm'),fs=require('node:fs'),loaded=[],calls=[];
+ const context={globalThis:{},Image:class{constructor(){loaded.push(this);}},document:{createElement(){return {getContext(){return {drawImage(){calls.push('image');}};}};}}};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../src/exploration-renderer.js'),'utf8'),context);
+ const r=context.globalThis.StarshipExplorationRenderer,settings={image:'scene.png'};
+ assert.equal(r.terrain('scene',200,200,()=>true,settings),null);
+ const pending=loaded.find(i=>i.src==='scene.png');assert.ok(pending);
+ pending.onerror();assert.equal(r.terrainFailed('scene.png'),true);
+ assert.equal(r.terrain('scene',200,200,()=>true,settings),null);
+ pending.onload();assert.ok(r.terrain('scene',200,200,()=>true,settings));assert.deepEqual(calls,['image']);
+});
