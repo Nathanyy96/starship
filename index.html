@@ -26,7 +26,7 @@
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
   <link rel="apple-touch-icon" href="./assets/ui/game-icon.png">
   <link rel="stylesheet" href="./styles.css?v=exploration-art-v2-20261014">
-<link rel="stylesheet" href="./world-game.css?v=world-life-20261014"></head>
+<link rel="stylesheet" href="./world-game.css?v=world-motion-20261015"></head>
 <body>
   <main class="page-shell">
     <header class="topbar">
@@ -173,8 +173,8 @@
     <div id="first-major-banner" class="world-region-banner" aria-live="polite" hidden></div>
     <div id="first-major-loading" class="world-loading" role="status">正在展開旅途…</div>
     <div class="exploration-dpad world-dpad" aria-label="觸控移動"><button data-world-move="up" aria-label="往上移動">↑</button><button data-world-move="left" aria-label="往左移動">←</button><button data-world-move="down" aria-label="往下移動">↓</button><button data-world-move="right" aria-label="往右移動">→</button></div>
-    <div class="world-movement"><button id="first-major-sprint" type="button" aria-pressed="false">跑步</button><small>WASD 移動 · Shift 跑步 · E 互動</small></div>
-    <div class="world-actions"><button id="first-major-activate" class="world-activate" type="button" hidden>啟用附近傳送點</button><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button><button id="first-major-tools-toggle" type="button" aria-expanded="false" aria-controls="first-major-tools">地圖／傳送</button></div>
+    <div class="world-movement"><button id="first-major-sprint" type="button" aria-pressed="false">跑步</button><small>點地面行走 · WASD 移動 · Shift 跑步 · E 互動</small></div>
+    <div class="world-actions"><button id="first-major-stop" type="button" hidden>停止行走</button><button id="first-major-activate" class="world-activate" type="button" hidden>啟用附近傳送點</button><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button><button id="first-major-tools-toggle" type="button" aria-expanded="false" aria-controls="first-major-tools">地圖／傳送</button></div>
     <section id="first-major-tools" class="world-tools" aria-label="旅途與傳送設定" hidden><h4>旅途指引</h4><label class="world-destination">目的地 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="world-travel"><h4>傳送點</h4><div class="world-travel-controls"><label for="first-major-travel-list">快速返回</label><select id="first-major-travel-list" aria-label="傳送目的地"></select><button id="first-major-travel" class="secondary-action" type="button" disabled>傳送</button></div><p id="first-major-travel-hint" role="status"></p></div><button id="first-major-reset" class="small-button" type="button">回到本區入口</button></section>
     <div id="first-major-dialog" class="first-act-dialog game-dialogue world-dialog" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><img id="first-major-portrait" class="world-speaker-art" alt=""><div class="world-dialog-copy"><span id="first-major-dialog-location"></span><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><div class="world-dialog-footer"><small id="first-major-dialog-count"></small><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div></div></div>
   </div>
@@ -395,7 +395,7 @@
   <script src="./src/exploration-renderer.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/exploration-characters.js?v=cast-entry-20261014"></script>
   <script src="./src/exploration.js?v=exploration-art-v2-20261014"></script>
-  <script src="./src/world-presentation.js?v=world-life-20261014"></script><script src="./src/first-major-world.js?v=world-life-20261014"></script>
+  <script src="./src/hero-motion.js?v=world-motion-20261015"></script><script src="./src/world-presentation.js?v=world-motion-20261015"></script><script src="./src/first-major-world.js?v=world-motion-20261015"></script>
   <script src="./src/first-act-game.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/first-major-kits.js?v=author-preview-roster-20261005"></script>
@@ -409,6 +409,6 @@
   <script src="./src/story-monster-catalog.js?v=monster-story-20261013"></script>
   <script src="./src/story-reader.js?v=monster-story-20261013"></script>
   <script src="./src/story-narration.js?v=20261007"></script>
-  <script src="./src/player-app.js?v=cast-entry-20261014"></script>
+  <script src="./src/player-app.js?v=world-motion-cast-20261015"></script>
 </body>
 </html>
