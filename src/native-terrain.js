@@ -29,6 +29,8 @@
       m.nativeTerrain.structures=m.nativeTerrain.structures.filter(Boolean);
       m.nativeObstacles=(m.nativeTerrain.trees||[]).map(function(t){return {x:t[0]+t[3]*.475,y:t[1]+t[3]*.92,rx:t[3]*.14,ry:t[3]*.09};});
       m.buildings=m.nativeTerrain.structures.map(function(p){return {x:p.x+p.w*.06,y:p.y+p.h*.06,w:p.w*.88,h:p.h*(p.door ? .74 : .82)};});
+      // The foundation beside the entry is solid too; only the actual steps open.
+      m.nativeTerrain.structures.filter(function(p){return p.door&&p.sheet==='city'&&p.cell===0;}).forEach(function(p){var left=p.x+p.w*.06,right=p.x+p.w*.94,gap=p.w*.12,doorX=p.door[0];[[left,doorX-gap],[doorX+gap,right]].forEach(function(span){if(span[1]>span[0])m.buildings.push({x:span[0],y:p.y+p.h*.8,w:span[1]-span[0],h:p.h*.14});});});
     });
   }
   function polygon(c,points){c.beginPath();points.forEach(function(p,i){if(i)c.lineTo(p[0],p[1]);else c.moveTo(p[0],p[1]);});c.closePath();}

@@ -22,3 +22,5 @@ test('front steps remain in front of the building at the collision boundary',()=
 test('all 24 maps have traversable guidance to every exit and landmark, in both directions',()=>{
  let count=0;for(const [id,m] of Object.entries(w.maps)){const start={...w.initial(2),map:id,x:m.spawn[0],y:m.spawn[1],roaming:true};for(const target of [...m.exits,...m.sites]){for(const [from,to] of [[start,target],[{...start,x:target.x,y:target.y},{x:start.x,y:start.y}]]){const route=w.planWalk(from,to.x,to.y);assert.ok(route.length,id+':'+target.name);let s=from;for(const point of route){s=w.move(s,point.x-s.x,point.y-s.y);assert.ok(Math.hypot(s.x-point.x,s.y-point.y)<.1,id+':'+target.name+' blocked guidance');}}count++;}}assert.equal(count,93);
 });
+
+test('the workshop side foundation cannot be mistaken for its open doorway',()=>{assert.equal(w.passable('city',680,1460),false);assert.equal(w.passable('city',781,1465),true);});
