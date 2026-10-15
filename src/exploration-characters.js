@@ -6,15 +6,11 @@
   "use strict";
   var aliases = { hero: "celesia" };
   var existing = { celesia: "hero", lia: "lia", reyn: "reyn", isar: "isar" };
-  var candidates = { muheng: "沐衡", xuanshuo: "玄朔", lanxi: "嵐析", jingsen: "景燊", jinglan: "景藍", beiyin: "北隱", xiaoyue: "曉月", anzhu: "安竹", suoye: "索夜" };
   function catalog(data) {
     data = data || {};
     var result = {};
     Object.keys(data.storyCharacters || {}).forEach(function (id) { var x = data.storyCharacters[id]; result[id] = { id: id, name: x.name, original: x.portrait, kind: "story" }; });
     Object.keys(data.cards || {}).forEach(function (id) { var x = data.cards[id]; result[id] = { id: id, name: x.name, original: x.image || x.backgroundImage, kind: "playable" }; });
-    Object.keys(candidates).forEach(function (id) { result[id] = { id: id, name: candidates[id], original: "./assets/cards/candidates/" + (id === "beiyin" ? "beiyin-v2" : id) + ".png", kind: "candidate" }; });
-    result.lifan = { id: "lifan", name: "黎帆", original: "./assets/story-characters/lifan-concept.png", kind: "story" };
-    result.weina = { id: "weina", name: "葦娜", original: "./assets/story-characters/weina-formal-concept.png", kind: "story" };
     Object.keys(result).forEach(function (id) { result[id].chibi = "./assets/exploration/" + (existing[id] || id) + "-chibi-v1.png"; });
     return result;
   }

@@ -1111,7 +1111,9 @@
       }
       var skillDescription = futurePrototype ? prototypeEffect + " 未來專屬設計方向：" + (stats.skillEffect || "待定") + "（尚未實作，數值待定）。" : stats.skillEffect || "尚未登錄";
       var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><p class=\"constellation-growth-note\">共通面板成長｜" + escapeHtml(growthNote) + "各命效果累積生效；生命、攻擊、防禦與速度最終取整數。技能面板倍率是展示數值，實戰依下列技能公式計算；護盾最多累積至受盾者最大生命的 28%。</p><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
-      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>";
+      var explorerSelected = currentExplorerId() === card.id;
+      var explorerControls = "<section class=\"character-variant\"><h4>地圖探索</h4><p>使用已獲得的角色在地圖上探索；劇情對話依原本人物進行。</p><button class=\"secondary-action\" data-select-explorer=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (!copies || explorerSelected ? " disabled" : "") + ">" + (!copies ? "取得角色後可設為探索角色" : explorerSelected ? "目前的探索角色" : "設為探索角色") + "</button></section>";
+      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>" + explorerControls;
       detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(skillDescription) + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
     }
@@ -2022,11 +2024,28 @@
     byId("open-star-law-test").addEventListener("click", function () { setStarLawTestPanelVisible(!starLawTestPanelOpen); });
     byId("claim-star-law-test-reward").addEventListener("click", claimStarLawTestReward);
     byId("continue-story").addEventListener("click", function () { showView("story-view"); });
+    function explorerStorageKey() { return 'starship-explorer:' + encodeURIComponent(playerKey(currentPlayerName)); }
+    function currentExplorerId() {
+      var saved; try { saved = window.localStorage.getItem(explorerStorageKey()); } catch (error) { /* storage may be unavailable */ }
+      var state = game && game.getState();
+      return rosterCards().some(function (card) { return card.id === saved && state && state.collection[card.id] > 0; }) ? saved : 'celesia';
+    }
+    function selectExplorer(cardId) {
+      var state = game && game.getState();
+      if (!state || !rosterCards().some(function (card) { return card.id === cardId && state.collection[card.id] > 0; })) return;
+      try { window.localStorage.setItem(explorerStorageKey(), cardId); } catch (error) { showMessage('無法儲存探索角色，請檢查瀏覽器儲存設定後重試。', true); return; }
+      [firstActGame, exploration, firstMajorWorld].forEach(function (controller) { if (controller && controller.setPlayer) controller.setPlayer(cardId); });
+      renderCharacters(); showMessage('已將 ' + data.cards[cardId].name + ' 設為探索角色。', false);
+    }
+    function applyExplorerSelection(controller) {
+      if (controller.setPlayer) controller.setPlayer(currentExplorerId());
+    }
     function firstActKey() { return "starship-first-act-game-v2:" + encodeURIComponent(playerKey(currentPlayerName)); }
     function loadFirstAct() { try { return JSON.parse(window.localStorage.getItem(firstActKey())); } catch (error) { return null; } }
     function saveFirstAct(value) { try { window.localStorage.setItem(firstActKey(), JSON.stringify(value)); } catch (error) { /* local game checkpoint is optional */ } }
     byId("play-first-act").addEventListener("click", function () {
       if (!firstActGame) firstActGame = window.StarshipFirstActGame.create({ canvas: byId("first-act-canvas"), panel: byId("first-act-panel"), zone: byId("first-act-zone"), objective: byId("first-act-objective"), distance: byId("first-act-distance"), interact: byId("first-act-interact"), dialog: byId("first-act-dialog"), dialogTitle: byId("first-act-dialog-title"), dialogText: byId("first-act-dialog-text"), dialogNext: byId("first-act-dialog-next"), reset: byId("first-act-reset"), enter: byId("first-act-enter-village"), pad: byId("first-act-panel"), load: loadFirstAct, save: saveFirstAct, onRestart: function () { var village = window.StarshipExploration.normalize(loadExploration()); village.arrived = false; village.storyStep = 0; saveExploration(village); if (exploration) exploration.reload(); } });
+      applyExplorerSelection(firstActGame);
       showView("first-act-view"); firstActGame.open();
     });
     byId("first-act-back").addEventListener("click", function () { showView("story-view"); byId("play-first-act").focus({ preventScroll: true }); });
@@ -2041,6 +2060,7 @@
       byId("first-major-entry").hidden = false;
       if (fromStory) { mapReturnViewId = "story-view"; byId("map-view-back").textContent = "← 回到劇情"; showView("map-view"); }
       if (!exploration) exploration = window.StarshipExploration.create({ canvas: byId("exploration-canvas"), panel: byId("exploration-panel"), status: byId("exploration-status"), position: byId("exploration-position"), discoveries: byId("exploration-discoveries"), objective: byId("exploration-objective"), distance: byId("exploration-distance"), interact: byId("exploration-interact"), reset: byId("exploration-reset"), dialog: byId("exploration-dialog"), dialogTitle: byId("exploration-dialog-title"), dialogText: byId("exploration-dialog-text"), dialogNext: byId("exploration-dialog-next"), read: byId("exploration-story-read"), pad: byId("exploration-panel"), load: loadExploration, save: saveExploration, onStoryComplete: function () { completeStoryScene("main-1-0", "signal"); } });
+      applyExplorerSelection(exploration);
       exploration.reload(); if (fromStory) exploration.enterStory();
       byId("story-world-map").hidden = true; byId("exploration-panel").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = true; exploration.open();
     }
@@ -2063,6 +2083,7 @@
       showView("map-view");
       if(!firstMajorWorld) firstMajorWorld=window.StarshipFirstMajorWorld.create({canvas:byId("first-major-canvas"),minimap:byId("first-major-minimap"),regionTag:byId("first-major-region-tag"),compass:byId("first-major-compass"),scene:byId("first-major-scene"),banner:byId("first-major-banner"),loading:byId("first-major-loading"),tools:byId("first-major-tools"),toolsToggle:byId("first-major-tools-toggle"),fullscreen:byId("first-major-fullscreen"),sprint:byId("first-major-sprint"),portrait:byId("first-major-portrait"),dialogLocation:byId("first-major-dialog-location"),dialogCount:byId("first-major-dialog-count"),destination:byId("first-major-destination"),activate:byId("first-major-activate"),travelList:byId("first-major-travel-list"),travel:byId("first-major-travel"),travelHint:byId("first-major-travel-hint"),loadWaypoints:loadWorldWaypoints,saveWaypoints:saveWorldWaypoints,panel:byId("first-major-panel"),zone:byId("first-major-zone"),status:byId("first-major-status"),objective:byId("first-major-objective"),distance:byId("first-major-distance"),position:byId("first-major-position"),interact:byId("first-major-interact"),dialog:byId("first-major-dialog"),dialogTitle:byId("first-major-dialog-title"),dialogText:byId("first-major-dialog-text"),dialogNext:byId("first-major-dialog-next"),reset:byId("first-major-reset"),sync:byId("first-major-sync"),next:byId("first-major-next"),pad:byId("first-major-panel"),load:loadFirstMajorWorld,save:saveFirstMajorWorld,canStart:canStartWorldAct,onComplete:function(act){return performLiveStoryAction({action:"complete",chapterId:"main-1-0",sceneId:act===3?"north":"village"}).then(function(payload){refreshWorldEntries();return payload;});}});
       byId("exploration-panel").hidden=true;byId("story-world-map").hidden=true;byId("open-exploration").closest(".explore-entry").hidden=true;byId("first-major-entry").hidden=true;byId("first-major-panel").hidden=false;
+      applyExplorerSelection(firstMajorWorld);
       firstMajorWorld.open(act);
     }
     [2,3].forEach(function(act){byId("open-world-act-"+act).addEventListener("click",function(){showFirstMajorWorld(act);});});
@@ -2109,6 +2130,7 @@
     byId("character-search").addEventListener("input", function () { characterSearchTerm = this.value; renderCharacters(); });
     byId("character-filter").addEventListener("change", function () { characterListFilter = this.value; renderCharacters(); });
     byId("character-detail").addEventListener("click", function (event) {
+       var explorerButton = event.target.closest('[data-select-explorer]'); if (explorerButton) { if (!explorerButton.disabled) selectExplorer(explorerButton.getAttribute('data-select-explorer')); return; }
        var formButton = event.target.closest("[data-character-form]"); if (formButton) { selectCharacterForm(formButton.getAttribute("data-character-form")); return; }
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
