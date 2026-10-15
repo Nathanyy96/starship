@@ -44,7 +44,9 @@
     var dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1)));
     return Math.hypot(px - (ax + dx * t), py - (ay + dy * t));
   }
+  function worldVillage(){var w=globalThis.StarshipFirstMajorWorld;return w&&w.maps.village.nativeTerrain?w:null;}
   function passable(x, y) {
+    var shared=worldVillage();if(shared)return shared.passable('village',x*1.5,y*1.5);
     if (!Number.isFinite(x) || !Number.isFinite(y) || x < 10 || y < 95 || x > WIDTH - 10 || y > HEIGHT - 10) return false;
     if (Math.hypot(x - 832, y - 395) < 32) return false; // fire pit
     if (Math.pow((x - 1370) / 70, 2) + Math.pow((y - 370) / 55, 2) < 1) return false; // healer tent
@@ -73,12 +75,14 @@
     return site ? { kind: "site", value: site } : null;
   }
   function move(state, dx, dy) {
+    var shared=worldVillage();if(shared){var moved=shared.move(Object.assign(shared.initial(2),{map:'village',x:state.x*1.5,y:state.y*1.5,roaming:true}),dx*1.5,dy*1.5);return Object.assign(normalize(state),{x:moved.x/1.5,y:moved.y/1.5});}
     var next = normalize(state), nx = next.x + dx, ny = next.y + dy;
     if (passable(nx - 10, next.y - 10) && passable(nx + 10, next.y + 10)) next.x = nx;
     if (passable(next.x - 10, ny - 10) && passable(next.x + 10, ny + 10)) next.y = ny;
     return next;
   }
   function route(state, target) {
+    var shared=worldVillage(),destination=target||objective(state);if(shared)return destination?shared.route(Object.assign(shared.initial(2),{map:'village',x:state.x*1.5,y:state.y*1.5,roaming:true}),{x:destination.x*1.5,y:destination.y*1.5}).map(function(p){return {x:p.x/1.5,y:p.y/1.5};}):[];
     target = target || objective(state); if (!target) return [];
     var columns = Math.ceil(WIDTH / NAV), rows = Math.ceil(HEIGHT / NAV), key = function (x, y) { return y * columns + x; };
     var start = key(Math.floor(state.x / NAV), Math.floor(state.y / NAV));
@@ -122,17 +126,18 @@
       playerLoad = characterArt.load(id, characterData, function (image) { if (image) images.hero = image; draw(); });
       return true;
     }
-    loadImage("map", mapImage); Object.keys(spriteSources).forEach(function (id) { if (id !== "hero") loadCharacter(id, spriteSources[id]); });
+    if(!worldVillage())loadImage("map", mapImage); Object.keys(spriteSources).forEach(function (id) { if (id !== "hero") loadCharacter(id, spriteSources[id]); });
     if (!setPlayer(options.playerId || "hero")) loadImage("hero", spriteSources.hero);
     extraActors.forEach(function (actor) { loadCharacter(actor.id); });
     function save() { options.save(state); }
+    var visualScale=worldVillage()?1.5:1;
     function sprite(id, x, y, height, flip, bob) {
-      renderer.sprite(ctx, images[id], x, y, height, flip, bob);
+      renderer.sprite(ctx, images[id], x, y, height/visualScale, flip, bob);
     }
     function draw() {
-      var view = renderer.begin(canvas, ctx, WIDTH, HEIGHT, state.x, state.y);
+      var shared=worldVillage(),model=shared&&shared.maps.village;visualScale=model?1.5:1;var view = renderer.begin(canvas, ctx, model?model.width:WIDTH, model?model.height:HEIGHT, state.x*visualScale, state.y*visualScale);
       ctx.fillStyle = "#315842"; ctx.fillRect(view.x, view.y, view.width, view.height);
-      var ground=renderer.terrain('village',WIDTH,HEIGHT,passable,{image:mapImage,landmarks:sites});if(ground)ctx.drawImage(ground,0,0);
+      var ground=model?renderer.terrain('village',model.width,model.height,function(x,y){return shared.passable('village',x,y);},{native:model.nativeTerrain,groundOnly:true,paths:model.paths}):renderer.terrain('village',WIDTH,HEIGHT,passable,{image:mapImage,landmarks:sites});if(ground)ctx.drawImage(ground,0,0);ctx.scale(visualScale,visualScale);
       var target = objective(state), key = Math.floor(state.x / NAV) + ":" + Math.floor(state.y / NAV) + ":" + (target ? target.id : "done");
       if (key !== routeKey) { currentRoute = route(state, target); routeKey = key; }
       if (target && currentRoute.length > 1) {
@@ -146,12 +151,9 @@
         ctx.fillStyle = state.discovered.includes(site.id) ? "#f5cf75" : "#f8f0d5";
         ctx.beginPath(); ctx.arc(site.x, site.y, 7, 0, Math.PI * 2); ctx.fill();
       });
-      sprite("reyn", 355, 399, 44, false, 0);
-      sprite("isar", 1335, 467, 44, false, 0);
-      sprite("lia", 1425, 472, 44, false, 0);
-      extraActors.forEach(function (actor) { sprite(actor.id, actor.x, actor.y, actor.height || 78, false, 0); });
-      ctx.fillStyle = "rgba(10,26,27,.4)"; ctx.beginPath(); ctx.ellipse(state.x, state.y + 10, 15, 6, 0, 0, Math.PI * 2); ctx.fill();
-      sprite("hero", state.x, state.y, 44, pressed.has("left"), pressed.size ? Math.sin(performance.now() / 95) * 2 : 0);
+      var cast=[{id:'reyn',x:355,y:399},{id:'isar',x:1335,y:467},{id:'lia',x:1425,y:472},{id:'hero',x:state.x,y:state.y,hero:true}].concat(extraActors);
+      if(model)globalThis.StarshipNativeTerrain.objects(model.nativeTerrain).forEach(function(o){cast.push({native:o,x:(o.x+o.w/2)/visualScale,y:(o.door?o.door[1]-12:o.y+o.h*.9)/visualScale});});
+      cast.sort(function(a,b){return a.y-b.y;}).forEach(function(p){if(p.native){ctx.save();ctx.scale(1/visualScale,1/visualScale);globalThis.StarshipNativeTerrain.drawObject(ctx,p.native);ctx.restore();return;}sprite(p.id,p.x,p.y,44,p.hero&&pressed.has('left'),p.hero&&pressed.size?Math.sin(performance.now()/95)*2:0);});
       renderer.end(ctx);
       var near = nearby(state);
       options.position.textContent = "位置：" + (near ? near.value.name || near.value.title : "獸靈之村");
@@ -168,7 +170,7 @@
       var dt = Math.min((now - (lastFrame || now)) / 1000, .05); lastFrame = now;
       var dx = Number(pressed.has("right")) - Number(pressed.has("left")), dy = Number(pressed.has("down")) - Number(pressed.has("up"));
       if (sceneIndex < 0 && (dx || dy)) {
-        var len = Math.hypot(dx, dy), next = move(state, dx / len * dt * 190, dy / len * dt * 190);
+        var len = Math.hypot(dx, dy), next = move(state, dx / len * dt * 190/visualScale, dy / len * dt * 190);
         if(options.onExit&&((next.x<55&&next.y<420)||(next.y>865&&next.x<710))){state=next;save();options.onExit(next.x<55?"road":"south",next.x<55?1515:1480,next.x<55?455:895);return;}
         if (next.x !== state.x || next.y !== state.y) { state = next; if (now - lastSave > 800) { save(); lastSave = now; } }
       }

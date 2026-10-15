@@ -36,9 +36,11 @@
     var objects=new Image();objects.onload=function(){objectArt=objects;terrainCache={};artVersion++;};objects.src='./assets/exploration/terrain-objects-atlas-v1.png';
     var furniture=new Image();furniture.onload=function(){interiorArt=furniture;terrainCache={};artVersion++;};furniture.src='./assets/exploration/interior-objects-atlas-v1.png';
   }
+  var nativeTerrain=typeof module==='object'&&module.exports&&typeof require==='function'?require('./native-terrain'):globalThis.StarshipNativeTerrain;
   function terrain(key,width,height,passable,settings){
     if(typeof document==='undefined')return null;
     settings=settings||{};
+    if(settings.native&&nativeTerrain)return nativeTerrain.paint(key,width,height,passable,settings);
     var scenery=null;if(settings.image&&!settings.furniture&&typeof Image!=='undefined'){scenery=sceneryImages[settings.image];if(!sceneryRequests[settings.image]){sceneryRequests[settings.image]=true;var original=new Image();original.onload=function(){sceneryImages[settings.image]=original;terrainCache={};artVersion++;};original.src=settings.image;}}
     var cacheKey=key+':'+width+'x'+height+':'+(settings.image||'');if(terrainCache[cacheKey])return terrainCache[cacheKey];
     settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=Boolean(settings.furniture)||/Inn|factory|recovery|clinic|observatory|station/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
@@ -73,5 +75,5 @@
 
     terrainCache[cacheKey]=sheet;return sheet;
   }
-  return { begin: begin, end: end, sprite: sprite, terrain:terrain, terrainVersion:function(){return artVersion;} };
+  return { begin: begin, end: end, sprite: sprite, terrain:terrain, terrainVersion:function(){return artVersion+(nativeTerrain?nativeTerrain.version():0);} };
 }));

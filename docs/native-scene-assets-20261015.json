@@ -1,0 +1,15 @@
+{
+  "tool": "built-in image_gen",
+  "intent": "independent materials and transparent scene objects; no overview image is enlarged into gameplay",
+  "prompts": {
+    "ground-materials-v1.png": "Production fantasy RPG terrain material atlas, exact 2x2 cells: pale sandstone paving; compacted dirt/gravel road; meadow ground; teal sea. Straight down orthographic seamless textures, no objects, flat lighting, no labels or borders.",
+    "detail-materials-v1.png": "2x2 seamless fantasy RPG material atlas: weathered oak dock planks; small grey limestone cobblestones; muted sage trampled grassy earth; dense fern/bracken ground cover. Refined hand painted textures, subdued natural palette, no horizon or objects.",
+    "harbor-props-v1.png": "Four unique transparent orthographic RPG sprites: coastal timber/stucco warehouse; ochre market stall; rustic roadside shelter; asymmetrical mixed vegetation island. Sharp hand painted materials, compact shadows, no people or background.",
+    "nature-props-v1.png": "Four transparent distinct natural sprites: twisted oak with shrubs; birch/fern thicket; limestone/moss/heather ledge; split-rail fence and golden wheat. Three-quarter overhead game view, detailed painterly art, no landscape.",
+    "landmark-props-v1.png": "Four transparent unique RPG landmarks: healer cottage; white limestone blue-roof inn; mountain lodge with wind vane; bell motif stone fountain. Front doors at bottom, overhead orthographic, crisp painterly materials.",
+    "city-props-v1.png": "Four transparent unique city buildings in separate quadrants: copper roof clockmaker workshop; red tile apothecary townhouse; blue-green dome observatory; white brick riverside residence. Consistent overhead three-quarter camera, all doors face bottom.",
+    "village-props-v1.png": "Four transparent woodland beastfolk village landmarks: large carved timber chief longhouse; open ranger shelter with bow rack; green leaf roof healer cottage; asymmetric village supply workshop. Hand painted orthographic game sprites, no repeated houses.",
+    "workshop-building-v1.png": "Using city sprite atlas as reference, extract/repaint only copper roof clockmaker workshop as a full-size high-resolution transparent sprite, preserving exact architecture and camera. Complete roof/base, small transparent margin, no other buildings.",
+    "healer-building-v1.png": "Using village sprite atlas as reference, extract/repaint only leafy green roof healer cottage as a full-size high-resolution transparent sprite, preserving exact architecture/camera and carved front door. Complete roof/base, no other landmarks."
+  }
+}
