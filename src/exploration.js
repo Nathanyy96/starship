@@ -30,8 +30,8 @@
     { id: "heal", name: "療養所", x: 1390, y: 474, text: "這裡備有藥草與清水。莉亞會先問傷者的情況，再決定如何處理。" },
     { id: "rangers", name: "巡林者據點", x: 355, y: 399, text: "雷恩在這裡記錄林道與天候；沒有帶路的人不該自行往溪溝下游。" },
     { id: "supplies", name: "物資倉與工坊", x: 1038, y: 584, text: "工具、木料與日常補給堆放在村道旁。" },
-    { id: "west-road", name: "西側白鐘商路", x: 124, y: 390, text: "西側商路通向白鐘城；步行約兩日，這次探索不會直接傳送過去。" },
-    { id: "bridge", name: "南側溪橋", x: 704, y: 655, text: "溪水只能從橋上通過。對岸林地目前仍需帶路與後續地圖。" }
+    { id: "west-road", name: "西側白鐘商路", x: 124, y: 390, text: "西側商路通向白鐘城；步行約兩日，走到西側出口即可接續商路。" },
+    { id: "bridge", name: "南側溪橋", x: 704, y: 655, text: "溪水只能從橋上通過。向南沿驛路可到南驛山谷。" }
   ];
   var storyGoals = [
     { id: "isar", title: "在療養屋與伊薩爾談話", x: 1335, y: 467, text: "伊薩爾聽完南驛祭壇、界痕與巨獸的經過，允許瑟蕾雅今晚住在村裡，也提醒她別獨自去溪溝下游。" },
@@ -130,7 +130,7 @@
     function draw() {
       var view = renderer.begin(canvas, ctx, WIDTH, HEIGHT, state.x, state.y);
       ctx.fillStyle = "#315842"; ctx.fillRect(view.x, view.y, view.width, view.height);
-      if (images.map) ctx.drawImage(images.map, 0, 0, WIDTH, HEIGHT);
+      var ground=renderer.terrain('village',WIDTH,HEIGHT,passable,{landmarks:sites});if(ground)ctx.drawImage(ground,0,0);
       var target = objective(state), key = Math.floor(state.x / NAV) + ":" + Math.floor(state.y / NAV) + ":" + (target ? target.id : "done");
       if (key !== routeKey) { currentRoute = route(state, target); routeKey = key; }
       if (target && currentRoute.length > 1) {
@@ -144,12 +144,12 @@
         ctx.fillStyle = state.discovered.includes(site.id) ? "#f5cf75" : "#f8f0d5";
         ctx.beginPath(); ctx.arc(site.x, site.y, 7, 0, Math.PI * 2); ctx.fill();
       });
-      sprite("reyn", 355, 399, 100, false, 0);
-      sprite("isar", 1335, 467, 112, false, 0);
-      sprite("lia", 1425, 472, 102, false, 0);
+      sprite("reyn", 355, 399, 44, false, 0);
+      sprite("isar", 1335, 467, 44, false, 0);
+      sprite("lia", 1425, 472, 44, false, 0);
       extraActors.forEach(function (actor) { sprite(actor.id, actor.x, actor.y, actor.height || 78, false, 0); });
       ctx.fillStyle = "rgba(10,26,27,.4)"; ctx.beginPath(); ctx.ellipse(state.x, state.y + 10, 15, 6, 0, 0, Math.PI * 2); ctx.fill();
-      sprite("hero", state.x, state.y, 104, pressed.has("left"), pressed.size ? Math.sin(performance.now() / 95) * 2 : 0);
+      sprite("hero", state.x, state.y, 44, pressed.has("left"), pressed.size ? Math.sin(performance.now() / 95) * 2 : 0);
       renderer.end(ctx);
       var near = nearby(state);
       options.position.textContent = "位置：" + (near ? near.value.name || near.value.title : "獸靈之村");
@@ -167,6 +167,7 @@
       var dx = Number(pressed.has("right")) - Number(pressed.has("left")), dy = Number(pressed.has("down")) - Number(pressed.has("up"));
       if (sceneIndex < 0 && (dx || dy)) {
         var len = Math.hypot(dx, dy), next = move(state, dx / len * dt * 190, dy / len * dt * 190);
+        if(options.onExit&&((next.x<55&&next.y<420)||(next.y>865&&next.x<710))){state=next;save();options.onExit(next.x<55?"road":"south",next.x<55?1515:1480,next.x<55?455:895);return;}
         if (next.x !== state.x || next.y !== state.y) { state = next; if (now - lastSave > 800) { save(); lastSave = now; } }
       }
       draw(); frame = requestAnimationFrame(tick);

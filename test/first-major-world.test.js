@@ -6,9 +6,25 @@ const world = require('../src/first-major-world.js');
 const source = require('../src/story-1-0-current.js');
 const vm = require('node:vm');
 
-test('exploration retains every published word of acts two and three in order', () => {
+test('all ten published acts of 1.0 and 1.1 retain every word in exploration order', () => {
   const clean = s => s.replace(/\s/g, '');
-  for (const act of [2,3]) assert.equal(clean(world.acts[act].flatMap(s => s.lines).join('')), clean(source.scenes[act-1].body));
+  const first=require('../src/first-act-scenes'), source11=require('../src/story-1-1-current');
+  assert.equal(clean(first.all.flat().map(line=>line[1]).join('')),clean(source.scenes[0].body));
+  for (const act of world.storyOrder) {
+    const meta=world.storyMeta(act),published=(meta.missions?source11:source).scenes[meta.index];
+    assert.equal(meta.sceneId,published.id);
+    assert.equal(clean(world.acts[act].flatMap(s => s.lines).join('')),clean(published.body),meta.label);
+  }
+});
+
+test('workshop crossing opens only after the near-bank checks and is reachable for rescue',()=>{
+  const exit=world.maps.factoryNear.exits.find(e=>e.storyBridge),at={...world.initial(4),map:'factoryNear',x:exit.x,y:exit.y};
+  assert.equal(world.transition({...at,index:2},exit).changed,false);
+  const result=world.transition({...at,index:3},exit);
+  assert.equal(result.changed,true);assert.equal(result.state.map,'factoryFar');
+  assert.ok(world.navigationTarget({...at,index:3}).storyBridge);
+  assert.equal(world.passable('factoryNear',900,250),false);
+  assert.equal(world.passable('rescue',1120,520),false);
 });
 
 test('each region uses its own existing or new background', () => {
@@ -19,7 +35,7 @@ test('each region uses its own existing or new background', () => {
 test('every scene, site and regional exit is reachable along the walkable ground', () => {
   for (const [id,map] of Object.entries(world.maps)) {
     const state = {...world.initial(3),map:id,x:map.spawn[0],y:map.spawn[1],index:world.acts[3].length};
-    const goals = world.acts[2].concat(world.acts[3]).filter(s => s.map===id).concat(map.sites,map.exits);
+    const goals = Object.values(world.acts).flat().filter(s => s.map===id).concat(map.sites,map.exits);
     for (const goal of goals) {
       assert.ok(world.passable(id,goal.x,goal.y),id+':'+goal.title);
       const route = world.route(state,goal);
@@ -59,7 +75,9 @@ test('invalid positions recover and exploration away from the main story resumes
 
 function controllerHarness() {
   const context=vm.createContext({window:{addEventListener(){}},Image:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
-  for(const name of ['story-1-0-current','first-act-scenes','exploration-renderer','exploration','world-presentation','hero-motion','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+
+  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','exploration-renderer','exploration','world-presentation','hero-motion','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+
   function element(){const handlers={};return {hidden:false,textContent:'',addEventListener(k,f){handlers[k]=f;},click(){handlers.click?.({});},focus(){},querySelectorAll:()=>[]};}
   const options={load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};
   for(const key of ['canvas','panel','zone','status','objective','distance','position','interact','dialog','dialogTitle','dialogText','dialogNext','reset','sync','next','pad'])options[key]=element();
@@ -93,12 +111,17 @@ test('formal progress gate blocks later acts and closing twice does not write in
  test('all first-major maps are connected without advancing story; ocean and later versions stay closed',()=>{
   const state=world.initial(2),seen=new Set(['village']),queue=['village'];
   for(let i=0;i<queue.length;i++)for(const exit of world.maps[queue[i]].exits){
+
+    if(exit.storyBridge)continue;
+
     const at={...state,map:queue[i],x:exit.x,y:exit.y};const result=world.transition(at,exit);
     assert.equal(result.changed,true);assert.equal(result.state.index,0);assert.equal(result.state.act,2);
     assert.ok(world.passable(result.state.map,result.state.x,result.state.y));
     if(!seen.has(exit.to)){seen.add(exit.to);queue.push(exit.to);}
   }
-  assert.equal(seen.size,Object.keys(world.maps).length);
+
+  assert.equal(seen.size,Object.keys(world.maps).length-1);
+
   for(const id of ['south','mistbridge','echo','relic','banksWest','banksEast','bellcourt'])assert.ok(seen.has(id));
   for(const id of ['ocean','R2-000','C2-201','S6-001','__proto__'])assert.equal(world.canVisit(state,id),false);
   assert.equal(world.navigationTarget({...state,map:'relic',x:210,y:890}).to,'echo');
@@ -163,6 +186,7 @@ test('ambient NPC dialogue closes without advancing the story or granting progre
 });
 
 
+
 test('tap-to-walk plans only walkable segments and rejects terrain barriers',()=>{
   for(const [id,map] of Object.entries(world.maps)){
     const state={...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]};
@@ -172,3 +196,4 @@ test('tap-to-walk plans only walkable segments and rejects terrain barriers',()=
   assert.deepEqual(world.planWalk({...world.initial(2),map:'city',x:800,y:300},837,413),[]);
   assert.deepEqual(world.planWalk({...world.initial(2),map:'banksWest',x:740,y:240},835,240),[]);
 });
+

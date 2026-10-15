@@ -7,7 +7,11 @@
   'use strict';
   var renderer = typeof module === 'object' && module.exports ? require('./exploration-renderer.js') : globalThis.StarshipExplorationRenderer;
   var presentation=typeof module==='object'&&module.exports?require('./world-presentation.js'):globalThis.StarshipWorldPresentation;
+
+  var campaign=typeof module==='object'&&module.exports?require('./world-story-campaign.js'):globalThis.StarshipWorldStoryCampaign;
+  var dialogue=typeof module==='object'&&module.exports?require('./world-story-dialogue'):globalThis.StarshipWorldStoryDialogue;
   var heroMotion=typeof module==='object'&&module.exports?require('./hero-motion.js'):globalThis.StarshipHeroMotion;
+
   var maps = {
     village: { name: '獸靈之村', image: village.mapImage, width: village.WIDTH, height: village.HEIGHT, spawn: [1390,474], paths: village.paths,
       sites: village.sites, exits: [{name:'西行商路', x:70,y:370,to:'road',spawn:[1515,455]}] },
@@ -87,6 +91,15 @@
   connect('echo',1460,690,'banksEast',1400,130,'前往北斷橋東岸山路','返回山腰驛站');
   connect('relic',800,237,'bellcourt',175,785,'經遺構窗口前往鐘庭外庭','經窗口返回第七遺構');
   maps.city.sites.push({id:'sea-closed',name:'下游航線未開放',x:260,y:650,text:'洛汀灣、群島與海洋屬後續版本；船隻與海洋航線尚未開放。'});
+
+  campaign.install(maps,connect);
+  // Roads end at actual exits, rather than at an invisible wall inside the picture.
+  connect('village',648,880,'south',1480,895,'南行南驛山谷','北返獸靈之村');
+  maps.village.paths.push({width:54,points:[[648,764],[648,880],[648,920]]});
+  var westExit=maps.village.exits.find(function(e){return e.to==='road';});westExit.x=24;westExit.y=355;
+  maps.road.exits.find(function(e){return e.to==='village';}).spawn=[85,365];
+  Object.values(maps).forEach(function(m){if(m!==maps.village)m.paths.forEach(function(p){p.width=Math.max(p.width,48);});});
+
   // Stable IDs let future regions add anchors without changing travel or save logic.
   var waypoints=Object.keys(maps).map(function(id){var m=maps[id];return {id:id+'-anchor',map:id,name:m.name+'・傳送點',x:m.spawn[0],y:m.spawn[1]};});
   waypoints.push({id:'city-plaza',map:'city',name:'白鐘城・中央廣場',x:800,y:300});
@@ -94,7 +107,7 @@
   function knownWaypoints(ids){return Array.isArray(ids)?Array.from(new Set(ids.filter(function(id){return Boolean(waypointById(id));}))):[];}
   var placements = {
     2:[['village',1390,474],['village',1038,584],['village',1405,479],['village',704,655],['village',330,455],['village',1405,479],['village',648,764],['village',1270,433]],
-    3:[['village',326,319],['village',1390,474],['village',124,390],['road',1300,523],['road',940,425],['road',203,258],['city',1140,340],['city',1280,380],['city',290,230],['city',260,650],['city',290,230],['city',1390,430]]
+    3:[['village',326,319],['village',1390,474],['village',124,390],['road',1300,523],['road',940,425],['road',203,258],['cityInn',670,550],['city',1280,380],['city',290,230],['city',260,650],['city',290,230],['city',1390,430]]
   };
   function splitAct(act) {
     var blocks = source.scenes[act - 1].body.split(/(?=【場景：)/).map(function(s){return s.trim();}).filter(Boolean);
@@ -108,26 +121,30 @@
         sentences.forEach(function(sentence){if(buffer && buffer.length+sentence.length>160){lines.push(buffer);buffer='';}buffer+=sentence;});
         if(buffer)lines.push(buffer);
       });
-      return {id:'act'+act+'-'+i,map:p[0],x:p[1],y:p[2],title:header.split('｜')[0].replace(/^場景：/,''),time:header.split('｜').slice(1).join('｜'),lines:lines};
+      return {id:'act'+act+'-'+i,map:p[0],x:p[1],y:p[2],title:header.split('｜')[0].replace(/^場景：/,''),time:header.split('｜').slice(1).join('｜'),lines:dialogue.cards(act,body).map(function(l){return l.text;}),speakers:dialogue.cards(act,body).map(function(l){return l.speaker;})};
     });
   }
-  var acts={2:splitAct(2),3:splitAct(3)};
+  var acts=Object.assign({2:splitAct(2),3:splitAct(3)},campaign.acts);
   function passable(mapId,x,y) {
     var map=maps[mapId]; if(!map || !Number.isFinite(x)||!Number.isFinite(y)||x<10||y<10||x>map.width-10||y>map.height-10)return false;
     if(mapId==='village')return village.passable(x,y);
     if(mapId==='city'&&Math.hypot(x-837,y-413)<90)return false;
     return map.paths.some(function(path){return path.points.some(function(p,i){if(!i)return false;var a=path.points[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=path.width;});});
   }
-  function initial(act) {act=act===3?3:2;var map=maps[acts[act][0].map];return {version:1,act:act,index:0,map:acts[act][0].map,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
+
+  function initial(act) {act=campaign.order.includes(act)?act:2;var map=maps[acts[act][0].map];return {version:1,act:act,index:0,map:acts[act][0].map,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
+
   function normalize(raw) {
     var state=initial(raw&&raw.act), steps=acts[state.act];
     if(raw&&raw.version===1){state.index=Math.max(0,Math.min(steps.length,Math.floor(Number(raw.index)||0)));state.map=canVisit(state,raw.map)?raw.map:'village';
       if(state.map===raw.map && passable(state.map,Number(raw.x),Number(raw.y))){state.x=Number(raw.x);state.y=Number(raw.y);}else {state.x=maps[state.map].spawn[0];state.y=maps[state.map].spawn[1];}
-      state.visited=Array.isArray(raw.visited)?raw.visited.filter(function(id){return Object.keys(maps).some(function(k){return maps[k].sites.some(function(s){return k+':'+s.id===id;});});}):[];
+
+      state.roaming=raw.roaming===true;state.visited=Array.isArray(raw.visited)?raw.visited.filter(function(id){return Object.keys(maps).some(function(k){return maps[k].sites.some(function(s){return k+':'+s.id===id;});});}):[];
+
       state.waypoints=knownWaypoints(raw.waypoints);
     }return state;
   }
-  function goal(state){return acts[state.act][state.index]||null;}
+  function goal(state){return state.roaming?null:acts[state.act][state.index]||null;}
   function fits(map,x,y){return [[-6,-6],[-6,6],[6,-6],[6,6]].every(function(d){return passable(map,x+d[0],y+d[1]);});}
   function clearSegment(map,ax,ay,bx,by){var count=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/2));for(var i=1;i<=count;i++)if(!fits(map,ax+(bx-ax)*i/count,ay+(by-ay)*i/count))return false;return true;}
   function move(state,dx,dy){var next=normalize(state),steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/2));for(var i=0;i<steps;i++){var x=next.x+dx/steps,y=next.y+dy/steps;if(fits(next.map,x,y)){next.x=x;next.y=y;}else{if(fits(next.map,x,next.y))next.x=x;if(fits(next.map,next.x,y))next.y=y;}}return next;}
@@ -141,7 +158,12 @@
     var candidates=maps[state.map].exits.map(function(x){return {kind:'exit',value:x};}).concat(maps[state.map].sites.map(function(x){return {kind:'site',value:x};}));
     return candidates.filter(function(x){return Math.hypot(state.x-x.value.x,state.y-x.value.y)<48;}).sort(function(a,b){return Math.hypot(state.x-a.value.x,state.y-a.value.y)-Math.hypot(state.x-b.value.x,state.y-b.value.y);})[0]||null;
   }
-  function transition(state,exit){var next=normalize(state);if(!maps[state.map].exits.includes(exit)||Math.hypot(state.x-exit.x,state.y-exit.y)>=48||!canVisit(state,exit.to))return {state:next,changed:false};next.map=exit.to;next.x=exit.spawn[0];next.y=exit.spawn[1];return {state:next,changed:true};}
+  function exitAvailable(state,exit){return !exit.storyBridge||exit.to==='factoryNear'||campaign.bridgeOpen(state);}
+  function transition(state,exit){var next=normalize(state);if(!maps[state.map].exits.includes(exit)||Math.hypot(state.x-exit.x,state.y-exit.y)>=48||!canVisit(state,exit.to)||!exitAvailable(state,exit))return {state:next,changed:false};next.map=exit.to;next.x=exit.spawn[0];next.y=exit.spawn[1];return {state:next,changed:true};}
+  function crossExit(state,previousMap,previousX,previousY){
+    var exit=maps[state.map].exits.find(function(e){return Math.hypot(state.x-e.x,state.y-e.y)<24&&Math.hypot(previousX-e.x,previousY-e.y)>=24&&exitAvailable(state,e);});
+    return exit?transition(state,exit):{state:state,changed:false};
+  }
   function route(state,target) {
     if(!target||!passable(state.map,target.x,target.y))return [];
     var size=16,map=maps[state.map],columns=Math.ceil(map.width/size),key=function(x,y){return y*columns+x;},start=key(Math.floor(state.x/size),Math.floor(state.y/size)),end=key(Math.floor(target.x/size),Math.floor(target.y/size));
@@ -149,57 +171,91 @@
     for(var head=0;head<queue.length&&!prev.has(end);head++){var at=queue[head],x=at%columns,y=Math.floor(at/columns);[[1,0],[0,1],[-1,0],[0,-1]].forEach(function(d){var nx=x+d[0],ny=y+d[1],n=key(nx,ny);if(nx>=0&&ny>=0&&nx<columns&&ny<Math.ceil(map.height/size)&&!prev.has(n)&&clearSegment(state.map,(x+.5)*size,(y+.5)*size,(nx+.5)*size,(ny+.5)*size)){prev.set(n,at);queue.push(n);}});}
     if(!prev.has(end))return [];var out=[];for(var n=end;n!==-1;n=prev.get(n))out.push({x:(n%columns+.5)*size,y:(Math.floor(n/columns)+.5)*size});return out.reverse();
   }
+
   function planWalk(state,x,y){
     if(!Number.isFinite(x)||!Number.isFinite(y)||!fits(state.map,x,y))return [];
     var path=route(state,{x:x,y:y});if(!path.length||!clearSegment(state.map,state.x,state.y,path[0].x,path[0].y))return [];
     var last=path[path.length-1];if(!clearSegment(state.map,last.x,last.y,x,y))return [];path.push({x:x,y:y});return path;
   }
+
   function navigationTarget(state,destination){
     var target=destination&&maps[destination]?{map:destination,x:maps[destination].spawn[0],y:maps[destination].spawn[1]}:goal(state);
     if(!target)return null;if(target.map===state.map)return target;
     var queue=[{map:state.map,first:null}],seen=new Set([state.map]);
     for(var i=0;i<queue.length;i++){var item=queue[i],exits=maps[item.map].exits;
-      for(var j=0;j<exits.length;j++){var exit=exits[j];if(!canVisit(state,exit.to)||seen.has(exit.to))continue;var first=item.first||exit;if(exit.to===target.map)return first;seen.add(exit.to);queue.push({map:exit.to,first:first});}
+
+      for(var j=0;j<exits.length;j++){var exit=exits[j];if(!canVisit(state,exit.to)||!exitAvailable(state,exit)||seen.has(exit.to))continue;var first=item.first||exit;if(exit.to===target.map)return first;seen.add(exit.to);queue.push({map:exit.to,first:first});}
     }return null;
   }
   function create(options) {
-    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},requested={},held=new Set(),active=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[],destination='',waypointKey='',dialogKind='story',talking=null,camera={map:'',x:state.x,y:state.y},bannerUntil=0,lastMini=0,sprintMode=false,autoPath=[],autoIntent=null,autoTarget=null,lastView=null,heading='down',stride=0,walkingNow=false,useHeroAtlas=!options.playerId||options.playerId==='hero'||options.playerId==='celesia';
+    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},requested={},held=new Set(),active=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[],destination='',waypointKey='',dialogKind='story',talking=null,camera={map:'',x:state.x,y:state.y},bannerUntil=0,lastMini=0,sprintMode=false,taskKey='',missionFeedback='',autoPath=[],autoIntent=null,autoTarget=null,lastView=null,heading='down',stride=0,walkingNow=false,useHeroAtlas=!options.playerId||options.playerId==='hero'||options.playerId==='celesia';
     var motion=typeof window.matchMedia==='function'?window.matchMedia('(prefers-reduced-motion: reduce)'):null;
     function reduced(){return Boolean(motion&&motion.matches);}
+    function storyStatus(){if(state.roaming)return {read:true,missionComplete:true,claimed:true};return options.storyStatus?options.storyStatus(state.act):{read:false,missionComplete:true,claimed:false};}
+    function taskActive(){return Boolean(options.task&&!options.task.hidden);}
+    function escape(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function updateMission(){
+      var status=storyStatus(),show=!goal(state)&&!lines&&status.task,signature=show?state.act+':'+status.step+':'+pending+':'+missionFeedback:'closed';
+      if(options.task){options.task.hidden=!show;if(show&&taskKey!==signature){options.task.innerHTML='<h4>本幕互動・'+(status.step+1)+' / '+status.totalSteps+'</h4><p>'+escape(status.task.prompt)+'</p><div class="world-task-choices">'+status.task.choices.map(function(label,i){return '<button type="button" data-world-choice="'+i+'"'+(pending?' disabled':'')+'>'+escape(label)+'</button>';}).join('')+'</div><p role="status">'+escape(missionFeedback)+'</p>';taskKey=signature;}if(!show)taskKey='';}
+      if(options.claim){var m=campaign.meta(state.act);options.claim.hidden=Boolean(goal(state))||!m.missions||!m.last||!status.missionComplete;options.claim.disabled=pending||status.claimed||!status.canClaim;options.claim.textContent=status.claimed?'1.1 版本獎勵已領取':'領取 1.1 版本獎勵';}
+    }
     function stopWalking(){autoPath=[];autoIntent=null;autoTarget=null;walkingNow=false;}
-    function save(){options.save(normalize(state));if(options.saveWaypoints)options.saveWaypoints(state.waypoints.slice());}
+    function save(){if(state.roaming){if(options.saveRoam)options.saveRoam(normalize(state));}else options.save(normalize(state));if(options.saveWaypoints)options.saveWaypoints(state.waypoints.slice());}
     function loadImage(key,src){requested[key]=true;var img=new Image();img.onload=function(){images[key]=img;draw();};img.onerror=function(){requested[key]='failed';if(maps[key]){options.status.textContent='地圖素材載入失敗，請重新開啟探索。';if(options.loading)options.loading.hidden=true;}};img.src=src;}
     var characterArt=globalThis.StarshipExplorationCharacters,characterData=options.characterData||globalThis.StarshipGachaData||{},playerLoad;
     function setPlayer(id){if(!characterArt||!characterArt.resolve(id,characterData))return false;useHeroAtlas=id==='hero'||id==='celesia';if(useHeroAtlas&&!requested.heroWalk)loadImage('heroWalk','./assets/exploration/hero-walk-atlas-v1.png');if(playerLoad)playerLoad.cancel();delete images.hero;playerLoad=characterArt.load(id,characterData,function(img){if(img)images.hero=img;draw();});return true;}
     if(options.destination){options.destination.innerHTML='<option value="">追蹤目前劇情</option>'+Object.keys(maps).map(function(id){return '<option value="'+id+'">'+maps[id].name+'</option>';}).join('');options.destination.addEventListener('change',function(){destination=options.destination.value;routeKey='';draw();});}
-    loadImage(state.map,maps[state.map].image);if(useHeroAtlas)loadImage('heroWalk','./assets/exploration/hero-walk-atlas-v1.png');if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
-    function updateTravel(){
-      var busy=Boolean(lines)||pending,near=nearWaypoint(state);
+    if(useHeroAtlas)loadImage('heroWalk','./assets/exploration/hero-walk-atlas-v1.png');if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
+    function updateTravel(){updateAtlas();
+      var busy=Boolean(lines)||pending||taskActive(),near=nearWaypoint(state);
+
       if(options.activate){options.activate.hidden=!near;options.activate.disabled=busy||Boolean(near&&state.waypoints.includes(near.id));options.activate.textContent=near&&state.waypoints.includes(near.id)?'此傳送點已啟用':'啟用附近傳送點';}
       if(options.travelList){var signature=state.waypoints.slice().sort().join('|');if(signature!==waypointKey||!options.travelList.innerHTML){var selected=options.travelList.value;options.travelList.innerHTML='<option value="">選擇已啟用的傳送點</option>'+waypoints.map(function(p){var unlocked=state.waypoints.includes(p.id);return '<option value="'+p.id+'"'+(unlocked?'':' disabled')+'>'+p.name+(unlocked?'':'（未啟用）')+'</option>';}).join('');options.travelList.value=state.waypoints.includes(selected)?selected:'';waypointKey=signature;}
         options.travelList.disabled=busy||!state.waypoints.length;}
       if(options.travel)options.travel.disabled=busy||!options.travelList||!state.waypoints.includes(options.travelList.value);
       if(options.travelHint)options.travelHint.textContent=state.waypoints.length?'已啟用 '+state.waypoints.length+' / '+waypoints.length+' 處・可隨時免費傳送；劇情對話結束後可使用。':'首次靠近菱形傳送點並啟用，即可快速返回。';
     }
-    if(options.activate)options.activate.addEventListener('click',function(){if(!active||lines||pending)return;var near=nearWaypoint(state);if(!near)return;var result=activateWaypoint(state,near.id);if(result.changed){state=result.state;save();options.status.textContent='已啟用 '+near.name+'，可從傳送列表快速返回。';draw();}});
-    if(options.travelList)options.travelList.addEventListener('change',function(){held.clear();updateTravel();});
-    if(options.travel)options.travel.addEventListener('click',function(){if(!active||lines||pending)return;var result=teleport(state,options.travelList.value);if(!result.changed)return;held.clear();stopWalking();state=result.state;routeKey='';if(options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}save();options.status.textContent='已傳送至 '+maps[state.map].name+'。';draw();canvas.focus({preventScroll:true});});
-    function showLine(){options.dialogTitle.textContent=dialogKind==='npc'?talking.name:'旁白';options.dialogText.textContent=lines[lineIndex];if(options.dialogLocation)options.dialogLocation.textContent=dialogKind==='npc'?talking.role:goal(state).title;if(options.dialogCount)options.dialogCount.textContent=(lineIndex+1)+' / '+lines.length;if(options.portrait){options.portrait.src='./assets/exploration/'+(dialogKind==='npc'?talking.id:'hero')+'-chibi-v1.png';options.portrait.alt=dialogKind==='npc'?talking.name:'瑟蕾雅';}options.dialogNext.textContent=lineIndex+1<lines.length?'繼續 →':'結束對話';options.dialog.hidden=false;options.dialogNext.focus({preventScroll:true});}
-    if(options.toolsToggle)options.toolsToggle.addEventListener('click',function(){if(lines||pending)return;held.clear();stopWalking();options.tools.hidden=!options.tools.hidden;options.toolsToggle.setAttribute('aria-expanded',String(!options.tools.hidden));});
-    if(options.fullscreen)options.fullscreen.addEventListener('click',function(){held.clear();var action=document.fullscreenElement?document.exitFullscreen():options.panel.requestFullscreen?options.panel.requestFullscreen():Promise.reject(new Error('unsupported'));Promise.resolve(action).catch(function(){options.status.textContent='此瀏覽器未支援全螢幕，仍可直接在目前畫面探索。';});});
+
+    if(options.activate)options.activate.addEventListener('click',function(){if(!active||lines||pending||taskActive())return;var near=nearWaypoint(state);if(!near)return;var result=activateWaypoint(state,near.id);if(result.changed){state=result.state;save();options.status.textContent='已啟用 '+near.name+'，可從傳送列表快速返回。';draw();}});
+    if(options.travelList)options.travelList.addEventListener('change',function(){held.clear();stopWalking();updateTravel();});
+    if(options.travel)options.travel.addEventListener('click',function(){if(!active||lines||pending||taskActive())return;var result=teleport(state,options.travelList.value);if(!result.changed)return;held.clear();stopWalking();state=result.state;routeKey='';if(options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}save();options.status.textContent='已傳送至 '+maps[state.map].name+'。';draw();canvas.focus({preventScroll:true});});
+    function showLine(){var speaker=dialogKind==='npc'?talking.name:(goal(state).speakers||[])[lineIndex]||'旁白';options.dialogTitle.textContent=speaker;options.dialogText.textContent=lines[lineIndex];if(options.dialogLocation)options.dialogLocation.textContent=dialogKind==='npc'?talking.role:goal(state).title;if(options.dialogCount)options.dialogCount.textContent=(lineIndex+1)+' / '+lines.length;if(options.portrait){options.portrait.src='./assets/exploration/'+(dialogKind==='npc'?talking.id:'hero')+'-chibi-v1.png';options.portrait.alt=speaker;options.portrait.hidden=speaker==='旁白';if(speaker!=='旁白'&&characterArt){var person=characterArt.byName(speaker,characterData);options.portrait.hidden=!person;if(person)options.portrait.src=person.chibi;}}options.dialogNext.textContent=lineIndex+1<lines.length?'繼續 →':'結束對話';options.dialog.hidden=false;options.dialogNext.focus({preventScroll:true});}
+    if(options.toolsToggle)options.toolsToggle.addEventListener('click',function(){if(lines||pending||taskActive())return;held.clear();stopWalking();options.tools.hidden=!options.tools.hidden;if(!options.tools.hidden){atlasRegion='';atlasKey='';}options.toolsToggle.setAttribute('aria-expanded',String(!options.tools.hidden));});
+    var atlasRegion='',atlasKey='',atlasArt={};
+    var atlasPositions={south:[61,83],village:[72,60],road:[58,59],city:[43,60],northRoad:[45,49],mistbridge:[48,38],echo:[59,27],relic:[50,13],banksWest:[68,38],banksEast:[76,28],bellcourt:[23,18],riverRoad:[72,87],lotin:[88,89]};
+    var atlasParents={factoryNear:'city',factoryFar:'factoryNear',cityInn:'city',recovery:'city',mistInn:'mistbridge',rescue:'echo'};
+    function updateAtlas(){
+      if(!options.atlas||!options.tools||options.tools.hidden)return;
+      var signature=atlasRegion+'|'+state.waypoints.join('|')+'|'+(renderer.terrainVersion?renderer.terrainVersion():0);if(signature===atlasKey)return;atlasKey=signature;
+      var pins=[],src,heading;
+      if(!atlasRegion){src='./assets/maps/r1-000.png';heading='選擇區域，查看可傳送的位置';Object.keys(atlasPositions).forEach(function(id){pins.push({id:id,x:atlasPositions[id][0],y:atlasPositions[id][1],name:maps[id].name,region:true});});}
+      else{var m=maps[atlasRegion];heading=m.name+'・點選亮起的傳送點';var ground=renderer.terrain(atlasRegion,m.width,m.height,function(x,y){return passable(atlasRegion,x,y);},{landmarks:m.sites});src=m.image;
+        waypoints.filter(function(p){return p.map===atlasRegion;}).forEach(function(p){pins.push({id:p.id,x:p.x/m.width*100,y:p.y/m.height*100,name:p.name,locked:!state.waypoints.includes(p.id)});});
+        Object.keys(atlasParents).filter(function(id){return atlasParents[id]===atlasRegion;}).forEach(function(id){var exit=m.exits.find(function(e){return e.to===id;});pins.push({id:id,x:exit.x/m.width*100,y:exit.y/m.height*100,name:maps[id].name,region:true});});}
+      options.atlas.innerHTML='<div class="atlas-heading"><button type="button" data-atlas-region="">區域總圖</button><strong>'+escape(heading)+'</strong></div><div class="atlas-sheet"><img alt="'+escape(heading)+'" src="'+src+'">'+pins.map(function(p){return '<button type="button" class="atlas-pin'+(p.region?' atlas-region':'')+(p.locked?' atlas-locked':'')+'" style="left:'+p.x+'%;top:'+p.y+'%" '+(p.region?'data-atlas-region':'data-atlas-travel')+'="'+p.id+'" '+(p.locked?'disabled ':'')+'title="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'" aria-label="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">'+(p.region?'<circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="2"/>':'<path d="M12 3L19 12L12 21L5 12Z" fill="currentColor"/>')+'</svg><small>'+escape(p.name.replace('・傳送點',''))+'</small></button>';}).join('')+'</div><p>亮色菱形：已啟用，點一下傳送。灰色：先走到現場啟用。圓形：查看區域。</p>';
+      if(atlasRegion&&ground){var surface=document.createElement('canvas');surface.width=m.width;surface.height=m.height;surface.getContext('2d').drawImage(ground,0,0);surface.setAttribute('aria-label',heading);options.atlas.querySelector('.atlas-sheet>img').replaceWith(surface);}
+    }
+    if(options.atlas)options.atlas.addEventListener('click',function(e){var region=e.target.closest('[data-atlas-region]'),pin=e.target.closest('[data-atlas-travel]');if(region){atlasRegion=region.dataset.atlasRegion;atlasKey='';updateAtlas();return;}if(!pin||pending||lines||taskActive())return;var result=teleport(state,pin.dataset.atlasTravel);if(!result.changed)return;state=result.state;held.clear();stopWalking();routeKey='';save();options.tools.hidden=true;options.toolsToggle.setAttribute('aria-expanded','false');options.status.textContent='已傳送至 '+maps[state.map].name;draw();canvas.focus({preventScroll:true});});
+
+    if(options.fullscreen)options.fullscreen.addEventListener('click',function(){held.clear();stopWalking();var action=document.fullscreenElement?document.exitFullscreen():options.panel.requestFullscreen?options.panel.requestFullscreen():Promise.reject(new Error('unsupported'));Promise.resolve(action).catch(function(){options.status.textContent='此瀏覽器未支援全螢幕，仍可直接在目前畫面探索。';});});
     if(options.fullscreen)document.addEventListener('fullscreenchange',function(){options.fullscreen.textContent=document.fullscreenElement?'離開全螢幕':'全螢幕';});
     if(options.sprint)options.sprint.addEventListener('click',function(){sprintMode=!sprintMode;options.sprint.setAttribute('aria-pressed',String(sprintMode));options.sprint.textContent=sprintMode?'慢行':'跑步';});
 
-    function syncComplete(){if(pending)return;var syncAct=state.act,stamp=epoch;pending=true;options.status.textContent='正在保存第'+syncAct+'幕主線進度…';Promise.resolve().then(function(){if(stamp!==epoch)return;return options.onComplete(syncAct);}).then(function(){if(stamp!==epoch)return;pending=false;options.status.textContent='第'+syncAct+'幕完成，主線進度已保存。';draw();}).catch(function(error){if(stamp!==epoch)return;pending=false;options.status.textContent='主線進度尚未保存：'+error.message+'。可按「保存本幕進度」重試。';draw();});}
+
+    function syncComplete(){if(state.roaming||pending||goal(state))return;var syncAct=state.act,stamp=epoch,label=campaign.meta(syncAct).label;pending=true;options.status.textContent='正在保存 '+label+' 主線進度…';Promise.resolve().then(function(){if(stamp!==epoch)return;return options.onComplete(syncAct);}).then(function(payload){if(stamp!==epoch)return;pending=false;options.status.textContent=label+' 正文已保存。'+(storyStatus().task?'請在場景內完成本幕互動。':payload&&Object.values(payload.reward||{}).some(function(n){return n>0;})?'版本獎勵已存入帳號。':'');draw();}).catch(function(error){if(stamp!==epoch)return;pending=false;options.status.textContent='主線進度尚未保存：'+error.message+'。可按「保存本幕進度」重試。';draw();});}
+    if(options.task)options.task.addEventListener('click',function(event){var button=event.target.closest('[data-world-choice]'),status=storyStatus();if(!active||pending||!button||!status.task||goal(state))return;var stamp=epoch,act=state.act;held.clear();stopWalking();pending=true;missionFeedback='正在保存選擇…';draw();Promise.resolve().then(function(){if(stamp!==epoch)return;return options.onAnswer(act,Number(button.dataset.worldChoice),status.step);}).then(function(payload){if(stamp!==epoch)return;pending=false;missionFeedback=payload.feedback||'選擇已保存。';options.status.textContent=missionFeedback;draw();var focus=options.task.querySelector('button:not(:disabled)');if(focus)focus.focus({preventScroll:true});else canvas.focus({preventScroll:true});}).catch(function(error){if(stamp!==epoch)return;pending=false;missionFeedback=error.message+'；請重新嘗試。';draw();});});
+    if(options.claim)options.claim.addEventListener('click',function(){var status=storyStatus();if(pending||goal(state)||!status.canClaim||status.claimed)return;var stamp=epoch,act=state.act;pending=true;draw();Promise.resolve().then(function(){if(stamp!==epoch)return;return options.onClaim(act);}).then(function(payload){if(stamp!==epoch)return;pending=false;options.status.textContent=payload.alreadyClaimed?'版本獎勵已領取，沒有重複發放。':'1.1 版本獎勵已存入帳號。';draw();}).catch(function(error){if(stamp!==epoch)return;pending=false;options.status.textContent=error.message+'；可重新領取。';draw();});});
+
     function nextLine(){if(!lines||pending)return;if(++lineIndex<lines.length){showLine();return;}if(dialogKind==='npc'){lines=null;talking=null;options.dialog.hidden=true;draw();canvas.focus({preventScroll:true});return;}state.index++;lines=null;options.dialog.hidden=true;save();routeKey='';if(!goal(state))syncComplete();draw();canvas.focus({preventScroll:true});}
     function draw(){
       var now=performance.now(),actors=presentation.npcs(state.map),changed=camera.map!==state.map;
       if(changed){camera={map:state.map,x:state.x,y:state.y};bannerUntil=now+3200;lastMini=0;if(options.scene){options.scene.classList.remove('world-arrival');void options.scene.offsetWidth;options.scene.classList.add('world-arrival');}}
-      if(!requested[state.map])loadImage(state.map,maps[state.map].image);
       actors.forEach(function(n){if(!requested['npc-'+n.id])loadImage('npc-'+n.id,'./assets/exploration/'+n.id+'-chibi-v1.png');});
       camera.x+=(state.x-camera.x)*(reduced()?1:.14);camera.y+=(state.y-camera.y)*(reduced()?1:.14);
-      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);if(images[state.map])ctx.drawImage(images[state.map],0,0,map.width,map.height);
-      if(options.regionTag)options.regionTag.textContent=state.map==='bellcourt'?'遺構特殊連結・鐘庭外庭':'南部內陸生活圈';if(options.compass)options.compass.textContent=state.map==='bellcourt'?'局部':'N ↑';if(options.loading)options.loading.hidden=Boolean(images[state.map])||requested[state.map]==='failed';
+
+      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);var ground=renderer.terrain(state.map,map.width,map.height,function(x,y){return passable(state.map,x,y);},{landmarks:map.sites});if(ground)ctx.drawImage(ground,0,0);
+      if(state.map.indexOf('factory')===0&&campaign.bridgeOpen(state)){ctx.save();ctx.strokeStyle='#b99860';ctx.lineWidth=24;ctx.beginPath();ctx.moveTo(780,220);ctx.lineTo(1070,250);ctx.stroke();ctx.strokeStyle='#57462f';ctx.lineWidth=2;for(var plank=0;plank<=16;plank++){var px=780+290*plank/16,py=220+30*plank/16;ctx.beginPath();ctx.moveTo(px,py-11);ctx.lineTo(px,py+11);ctx.stroke();}ctx.restore();}
+      if(options.regionTag)options.regionTag.textContent=state.map==='bellcourt'?'遺構特殊連結・鐘庭外庭':state.map==='lotin'?'洛汀灣・陸路港區':'南部內陸生活圈';if(options.compass)options.compass.textContent=state.map==='bellcourt'?'局部':'N ↑';if(options.loading)options.loading.hidden=Boolean(ground);
       if(options.banner){options.banner.hidden=Boolean(lines)||now>bannerUntil;options.banner.textContent=map.name;}
       var target=navigationTarget(state,destination),key=state.map+':'+Math.floor(state.x/16)+':'+Math.floor(state.y/16)+':'+state.index+':'+destination;if(key!==routeKey){currentRoute=route(state,target);routeKey=key;}
       var visibleRoute=autoPath.length?autoPath:currentRoute;
@@ -209,43 +265,45 @@
       var walking=walkingNow;
       if(autoTarget){ctx.save();ctx.strokeStyle='#ffedb0';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(autoTarget.x,autoTarget.y,12,6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
       var drawn=actors.map(function(n){var p=presentation.position(n,now,reduced(),function(x,y){return fits(state.map,x,y);});return {x:p.x,y:p.y,actor:n};});drawn.push({x:state.x,y:state.y,hero:true});
-      drawn.sort(function(a,b){return a.y-b.y;}).forEach(function(p){ctx.fillStyle='rgba(12,30,28,.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+5,p.hero?17:15,6,0,0,Math.PI*2);ctx.fill();if(!(p.hero&&useHeroAtlas&&heroMotion.draw(ctx,images.heroWalk,p.x,p.y,104,heading,stride,walking,reduced())))renderer.sprite(ctx,p.hero?images.hero:images['npc-'+p.actor.id],p.x,p.y,p.hero?104:96,p.hero?heading==='left':false,reduced()?0:p.hero&&walking?Math.sin(now/95)*2:Math.sin(now/700+(p.hero?0:p.x))*.8);if(!p.hero){presentation.label(ctx,p.actor.name,p.x,p.y-112);if(Math.hypot(state.x-p.x,state.y-p.y)<115)presentation.label(ctx,'···',p.x,p.y-133,'#b9f0da');}});
+      drawn.sort(function(a,b){return a.y-b.y;}).forEach(function(p){ctx.fillStyle='rgba(12,30,28,.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+5,p.hero?17:15,6,0,0,Math.PI*2);ctx.fill();if(!(p.hero&&useHeroAtlas&&heroMotion.draw(ctx,images.heroWalk,p.x,p.y,44,heading,stride,walking,reduced())))renderer.sprite(ctx,p.hero?images.hero:images['npc-'+p.actor.id],p.x,p.y,p.hero?44:42,p.hero?heading==='left':false,reduced()?0:p.hero&&walking?Math.sin(now/95)*2:Math.sin(now/700+(p.hero?0:p.x))*.8);if(!p.hero){presentation.label(ctx,p.actor.name,p.x,p.y-52);if(Math.hypot(state.x-p.x,state.y-p.y)<115)presentation.label(ctx,'···',p.x,p.y-73,'#b9f0da');}});
       if(state.map==='village')presentation.fire(ctx,832,395,now,reduced());presentation.environment(ctx,map,view,now,reduced());
       // Pins use names and distinct silhouettes instead of anonymous dots.
       var named=map.exits.concat(map.sites);named.forEach(function(p){if(Math.hypot(state.x-p.x,state.y-p.y)<125&&Math.hypot(state.x-p.x,state.y-p.y)>55)presentation.label(ctx,p.name,p.x,p.y+25,'#e4f0d8');});
-      if(options.minimap&&(now-lastMini>120||!lastMini)){presentation.minimap(options.minimap,images[state.map],map,state,visibleRoute,actors,view);lastMini=now;}
+      if(options.minimap&&(now-lastMini>120||!lastMini)){presentation.minimap(options.minimap,ground||images[state.map],map,state,currentRoute,actors,view);lastMini=now;}
       if(options.dialog.hidden===false&&options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}
       renderer.end(ctx);
-      var g=goal(state),near=nearby(state);options.zone.textContent=map.name;options.objective.textContent=g?g.title:'本幕完成，可自由探索第一大版本全區';options.distance.textContent=autoPath.length?'前往點選位置 · 約 '+Math.max(1,Math.round(autoPath.length*16/24))+' 步':target?((destination?'前往 '+maps[destination].name:target.map?'沿路線前往劇情地點':target.name)+' · 約 '+Math.max(1,Math.round(currentRoute.length*16/24))+' 步'):'可自由探索，啟用沿途傳送點';options.position.textContent='第'+state.act+'幕 · '+Math.min(state.index+1,acts[state.act].length)+' / '+acts[state.act].length+' 段';options.interact.hidden=Boolean(lines)||!near;options.interact.textContent=near?(near.kind==='story'?'開始此段劇情 E':near.kind==='exit'?near.value.name+' E':near.kind==='npc'?'與'+near.value.name+'交談 E':'調查 '+near.value.name+' E'):'靠近目標互動';options.sync.hidden=Boolean(g);options.sync.disabled=pending;options.next.hidden=Boolean(g)||state.act===3;options.next.disabled=!options.canStart(3);if(options.stop)options.stop.hidden=!autoPath.length;updateTravel();
+      var g=goal(state),near=nearby(state),meta=campaign.meta(state.act),status=storyStatus();updateMission();options.zone.textContent=map.name;options.objective.textContent=state.roaming?'自由探索・循路前往相鄰區域':g?g.title:status.task?'完成本幕互動':meta.missions&&meta.last&&!status.claimed?'完成旅程並領取版本獎勵':'本幕完成，可自由探索第一大版本全區';options.distance.textContent=target?((destination?'前往 '+maps[destination].name:target.map?'沿路線前往劇情地點':target.name)+' · 約 '+Math.max(1,Math.round(currentRoute.length*16/24))+' 步'+(g&&g.time?' · '+g.time:'')):'可自由探索，啟用沿途傳送點';options.position.textContent=state.roaming?'連續地圖・自由探索':meta.label+' · '+Math.min(state.index+1,acts[state.act].length)+' / '+acts[state.act].length+' 段';options.interact.hidden=Boolean(lines)||taskActive()||!near;options.interact.textContent=near?(near.kind==='story'?'開始此段劇情 E':near.kind==='exit'?near.value.name+' E':near.kind==='npc'?'與'+near.value.name+'交談 E':'調查 '+near.value.name+' E'):'靠近目標互動';options.sync.hidden=state.roaming||Boolean(g)||Boolean(status.read);options.sync.disabled=pending;options.next.hidden=state.roaming||Boolean(g)||!meta.next;options.next.disabled=pending||!meta.next||!options.canStart(meta.next);options.next.textContent=meta.next?'繼續 '+campaign.meta(meta.next).label+' →':'旅程已完成';updateTravel();
     }
-    function interact(){if(lines||pending)return;stopWalking();var found=nearby(state);if(!found)return;if(found.kind==='npc'){dialogKind='npc';talking=found.value;lines=[found.value.line];lineIndex=0;held.clear();showLine();draw();return;}if(found.kind==='story'){dialogKind='story';lines=found.value.lines;lineIndex=0;held.clear();showLine();draw();return;}if(found.kind==='exit'){var result=transition(state,found.value);if(result.changed){state=result.state;save();routeKey='';options.status.textContent=maps[state.map].name; }else options.status.textContent='請靠近此區域的實際出口，再嘗試通行。';}else {var id=state.map+':'+found.value.id;if(!state.visited.includes(id))state.visited.push(id);save();options.status.textContent=found.value.name+'｜'+found.value.text;}draw();}
+    function interact(){if(lines||pending||taskActive())return;stopWalking();var found=nearby(state);if(!found)return;if(found.kind==='npc'){dialogKind='npc';talking=found.value;lines=[found.value.line];lineIndex=0;held.clear();stopWalking();showLine();draw();return;}if(found.kind==='story'){dialogKind='story';lines=found.value.lines;lineIndex=0;held.clear();stopWalking();showLine();draw();return;}if(found.kind==='exit'){var result=transition(state,found.value);if(result.changed){state=result.state;save();routeKey='';options.status.textContent=maps[state.map].name; }else options.status.textContent=found.value.storyBridge?'先在完整地面完成繩索、木板與承重複核，才可接應對岸。':'請靠近此區域的實際出口，再嘗試通行。';}else {var id=state.map+':'+found.value.id;if(!state.visited.includes(id))state.visited.push(id);save();options.status.textContent=found.value.name+'｜'+found.value.text;}draw();}
     function tick(now){
       if(!active)return;var dt=Math.min((now-(previous||now))/1000,.05);previous=now;
       var dx=Number(held.has('right'))-Number(held.has('left')),dy=Number(held.has('down'))-Number(held.has('up')),beforeX=state.x,beforeY=state.y;
-      if(!lines&&!pending&&(!options.tools||options.tools.hidden)){
+      if(!lines&&!pending&&!taskActive()&&(!options.tools||options.tools.hidden)){
         if(dx||dy){stopWalking();var norm=Math.hypot(dx,dy),speed=sprintMode||held.has('sprint')?285:185;state=move(state,dx/norm*dt*speed,dy/norm*dt*speed);}
         else if(autoPath.length){while(autoPath.length&&Math.hypot(autoPath[0].x-state.x,autoPath[0].y-state.y)<2)autoPath.shift();
           if(autoPath.length){var point=autoPath[0],distance=Math.hypot(point.x-state.x,point.y-state.y),step=Math.min(distance,dt*(sprintMode?285:185));state=move(state,(point.x-state.x)/distance*step,(point.y-state.y)/distance*step);if(step>0&&Math.hypot(state.x-beforeX,state.y-beforeY)<.05){stopWalking();options.status.textContent='路線受到阻擋，請重新選擇道路上的位置。';}}
           if(!autoPath.length&&autoTarget){var intent=autoIntent;stopWalking();options.status.textContent='已抵達點選位置。';if(intent&&intent.map===state.map){var found=nearby(state);if(found&&(found.kind==='story'||found.kind==='npc'&&found.value.id===intent.id))interact();}}
         }
       }
+      var crossed=crossExit(state,state.map,beforeX,beforeY);if(crossed.changed){state=crossed.state;stopWalking();held.clear();stopWalking();save();routeKey='';options.status.textContent='已抵達 '+maps[state.map].name;beforeX=state.x;beforeY=state.y;}
       var moved=Math.hypot(state.x-beforeX,state.y-beforeY);walkingNow=moved>.05;if(walkingNow){heading=heroMotion.heading(state.x-beforeX,state.y-beforeY,heading);stride+=moved;if(now-lastSave>800){save();lastSave=now;}}
       draw();frame=requestAnimationFrame(tick);
     }
     if(options.stop)options.stop.addEventListener('click',function(){stopWalking();options.status.textContent='已停止行走。';draw();});
     canvas.addEventListener('pointerdown',function(e){
-      if(!active||lines||pending||options.tools&&!options.tools.hidden||!lastView||e.button>0)return;
+      if(!active||lines||pending||taskActive()||options.tools&&!options.tools.hidden||!lastView||e.button>0)return;
       var rect=canvas.getBoundingClientRect(),x=lastView.x+(e.clientX-rect.left)/rect.width*lastView.width,y=lastView.y+(e.clientY-rect.top)/rect.height*lastView.height;
-      var npc=presentation.npcs(state.map).map(function(n){var pos=presentation.position(n,performance.now(),reduced(),function(px,py){return fits(state.map,px,py);});return {npc:n,x:pos.x,y:pos.y};}).filter(function(p){return Math.abs(x-p.x)<43&&y>p.y-100&&y<p.y+12;}).sort(function(a,b){return Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y);})[0];
-      var target=npc?{x:npc.x,y:npc.y}:{x:x,y:y},path=planWalk(state,target.x,target.y);stopWalking();held.clear();if(!path.length){options.status.textContent='這裡無法通行，請點選道路或空地。';draw();return;}
+      var npc=presentation.npcs(state.map).map(function(n){var pos=presentation.position(n,performance.now(),reduced(),function(px,py){return fits(state.map,px,py);});return {npc:n,x:pos.x,y:pos.y};}).filter(function(p){return Math.abs(x-p.x)<24&&y>p.y-44&&y<p.y+12;}).sort(function(a,b){return Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y);})[0];
+      var target=npc?{x:npc.x,y:npc.y}:{x:x,y:y},path=planWalk(state,target.x,target.y);stopWalking();held.clear();stopWalking();if(!path.length){options.status.textContent='這裡無法通行，請點選道路或空地。';draw();return;}
       autoPath=path;autoTarget=target;autoIntent=npc?{id:npc.npc.id,map:state.map}:null;options.status.textContent=npc?'正在走近 '+npc.npc.name+'…':'沿道路前往點選位置。';canvas.focus({preventScroll:true});draw();
     });
     function key(e,down){if(!active||options.panel.hidden||e.target.closest&&e.target.closest('input,textarea,select'))return;if(lines){if(down&&!e.repeat&&e.target!==options.dialogNext&&['KeyE','Enter','Space'].includes(e.code)){e.preventDefault();nextLine();}return;}if(options.tools&&!options.tools.hidden){if(down&&e.code==='Escape'){options.tools.hidden=true;options.toolsToggle.setAttribute('aria-expanded','false');}return;}if(e.code==='ShiftLeft'||e.code==='ShiftRight'){if(down)held.add('sprint');else held.delete('sprint');return;}if(down&&e.code==='Escape'){stopWalking();draw();return;}var keys={KeyW:'up',ArrowUp:'up',KeyS:'down',ArrowDown:'down',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right'};if(keys[e.code]){e.preventDefault();if(down){stopWalking();held.add(keys[e.code]);}else held.delete(keys[e.code]);}if(down&&e.code==='KeyE'&&!e.repeat){e.preventDefault();interact();}}
-    window.addEventListener('keydown',function(e){key(e,true);});window.addEventListener('keyup',function(e){key(e,false);});window.addEventListener('blur',function(){held.clear();stopWalking();});
+    window.addEventListener('keydown',function(e){key(e,true);});window.addEventListener('keyup',function(e){key(e,false);});window.addEventListener('blur',function(){held.clear();stopWalking();stopWalking();});
     options.pad.querySelectorAll('[data-world-move]').forEach(function(button){button.addEventListener('pointerdown',function(e){e.preventDefault();stopWalking();held.add(button.dataset.worldMove);button.setPointerCapture(e.pointerId);});['pointerup','pointercancel','lostpointercapture'].forEach(function(event){button.addEventListener(event,function(){held.delete(button.dataset.worldMove);});});});
-    options.interact.addEventListener('click',interact);options.dialogNext.addEventListener('click',nextLine);options.sync.addEventListener('click',syncComplete);options.next.addEventListener('click',function(){start(3);});options.reset.addEventListener('click',function(){stopWalking();state.x=maps[state.map].spawn[0];state.y=maps[state.map].spawn[1];save();routeKey='';draw();});
-    function start(act){if(!options.canStart(act)){options.status.textContent='先完成第'+(act-1)+'幕主線，才能開始第'+act+'幕探索。';return false;}epoch++;pending=false;held.clear();stopWalking();var saved=options.load(act);state=normalize(saved&&saved.act===act?saved:initial(act));if(options.loadWaypoints)state.waypoints=knownWaypoints(state.waypoints.concat(knownWaypoints(options.loadWaypoints())));waypointKey='';lines=null;talking=null;dialogKind='story';camera.map='';if(options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}options.dialog.hidden=true;routeKey='';save();draw();return true;}
-    return {open:function(act){if(!start(act))return false;active=true;previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);canvas.focus({preventScroll:true});return true;},close:function(){if(active)save();if(options.fullscreen&&document.fullscreenElement===options.panel)Promise.resolve(document.exitFullscreen()).catch(function(){});epoch++;pending=false;active=false;held.clear();stopWalking();lines=null;options.dialog.hidden=true;cancelAnimationFrame(frame);},setPlayer:setPlayer,state:function(){return normalize(state);}};
+    options.interact.addEventListener('click',interact);options.dialogNext.addEventListener('click',nextLine);options.sync.addEventListener('click',syncComplete);options.next.addEventListener('click',function(){var next=campaign.meta(state.act).next;if(next&&!pending)start(next);});options.reset.addEventListener('click',function(){if(lines||pending||taskActive())return;state.x=maps[state.map].spawn[0];state.y=maps[state.map].spawn[1];save();routeKey='';draw();});
+    function start(act,roaming){if(!campaign.meta(act)||(!roaming&&!options.canStart(act))){options.status.textContent='先完成前一幕正文、互動及版本領獎條件，再開始下一幕探索。';return false;}epoch++;pending=false;held.clear();stopWalking();var saved=roaming&&options.loadRoam?options.loadRoam():options.load(act);state=normalize(saved&&saved.act===act?saved:initial(act));state.roaming=Boolean(roaming);if(options.loadWaypoints)state.waypoints=knownWaypoints(state.waypoints.concat(knownWaypoints(options.loadWaypoints())));waypointKey='';lines=null;talking=null;dialogKind='story';camera.map='';taskKey='';missionFeedback='';options.status.textContent=roaming?'沿路走近出口即可換圖；地圖／傳送可點選已啟用的傳送點。':campaign.meta(act).label+'・沿金色路線前往劇情地點。';destination='';if(options.destination)options.destination.value='';if(options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}options.dialog.hidden=true;routeKey='';save();draw();return true;}
+    return {openTerrain:function(map,x,y){if(!start(2,true))return false;if(map&&maps[map]){state.map=map;state.x=x===undefined?maps[map].spawn[0]:x;state.y=y===undefined?maps[map].spawn[1]:y;}active=true;previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);save();draw();canvas.focus({preventScroll:true});return true;},open:function(act){if(!start(act))return false;active=true;previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);canvas.focus({preventScroll:true});return true;},close:function(){if(active)save();if(options.fullscreen&&document.fullscreenElement===options.panel)Promise.resolve(document.exitFullscreen()).catch(function(){});epoch++;pending=false;active=false;held.clear();stopWalking();lines=null;options.dialog.hidden=true;if(options.task)options.task.hidden=true;cancelAnimationFrame(frame);},setPlayer:setPlayer,state:function(){return normalize(state);}};
   }
-  return {maps:maps,waypoints:waypoints,activateWaypoint:activateWaypoint,teleport:teleport,nearWaypoint:nearWaypoint,knownWaypoints:knownWaypoints,acts:acts,initial:initial,normalize:normalize,passable:passable,move:move,route:route,planWalk:planWalk,goal:goal,canVisit:canVisit,nearby:nearby,transition:transition,navigationTarget:navigationTarget,create:create};
+  return {maps:maps,storyMeta:campaign.meta,storyOrder:campaign.order,waypoints:waypoints,activateWaypoint:activateWaypoint,teleport:teleport,nearWaypoint:nearWaypoint,knownWaypoints:knownWaypoints,acts:acts,initial:initial,normalize:normalize,passable:passable,move:move,route:route,planWalk:planWalk,goal:goal,canVisit:canVisit,nearby:nearby,transition:transition,crossExit:crossExit,navigationTarget:navigationTarget,create:create};
+
 }));

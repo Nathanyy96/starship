@@ -30,6 +30,7 @@
     var mapReturnViewId = "game-lobby";
     var exploration = null;
     var firstMajorWorld = null;
+    var worldStoryStatus = {};
     var firstActGame = null;
     var authorAtlasMapId = "W-001";
     var authorAtlasPointId = "";
@@ -973,6 +974,7 @@
       renderStoryReader(state, current);
       decorateStoryMythic(current);
       moveStoryPlotToTop();
+      refreshWorldEntries();
     }
     function renderCharacters() {
       if (!game) return;
@@ -2044,7 +2046,7 @@
     function loadFirstAct() { try { return JSON.parse(window.localStorage.getItem(firstActKey())); } catch (error) { return null; } }
     function saveFirstAct(value) { try { window.localStorage.setItem(firstActKey(), JSON.stringify(value)); } catch (error) { /* local game checkpoint is optional */ } }
     byId("play-first-act").addEventListener("click", function () {
-      if (!firstActGame) firstActGame = window.StarshipFirstActGame.create({ canvas: byId("first-act-canvas"), panel: byId("first-act-panel"), zone: byId("first-act-zone"), objective: byId("first-act-objective"), distance: byId("first-act-distance"), interact: byId("first-act-interact"), dialog: byId("first-act-dialog"), dialogTitle: byId("first-act-dialog-title"), dialogText: byId("first-act-dialog-text"), dialogNext: byId("first-act-dialog-next"), reset: byId("first-act-reset"), enter: byId("first-act-enter-village"), pad: byId("first-act-panel"), load: loadFirstAct, save: saveFirstAct, onRestart: function () { var village = window.StarshipExploration.normalize(loadExploration()); village.arrived = false; village.storyStep = 0; saveExploration(village); if (exploration) exploration.reload(); } });
+      if (!firstActGame) firstActGame = window.StarshipFirstActGame.create({ canvas: byId("first-act-canvas"), panel: byId("first-act-panel"), zone: byId("first-act-zone"), objective: byId("first-act-objective"), distance: byId("first-act-distance"), interact: byId("first-act-interact"), dialog: byId("first-act-dialog"), dialogTitle: byId("first-act-dialog-title"), dialogText: byId("first-act-dialog-text"), dialogNext: byId("first-act-dialog-next"), reset: byId("first-act-reset"), enter: byId("first-act-enter-village"), pad: byId("first-act-panel"), load: loadFirstAct, save: saveFirstAct, onEnterVillage:function(){showVillageExploration(true);},onRestart: function () { var village = window.StarshipExploration.normalize(loadExploration()); village.arrived = false; village.storyStep = 0; saveExploration(village); if (exploration) exploration.reload(); } });
       applyExplorerSelection(firstActGame);
       showView("first-act-view"); firstActGame.open();
     });
@@ -2059,34 +2061,45 @@
       byId("first-major-panel").hidden = true;
       byId("first-major-entry").hidden = false;
       if (fromStory) { mapReturnViewId = "story-view"; byId("map-view-back").textContent = "← 回到劇情"; showView("map-view"); }
-      if (!exploration) exploration = window.StarshipExploration.create({ canvas: byId("exploration-canvas"), panel: byId("exploration-panel"), status: byId("exploration-status"), position: byId("exploration-position"), discoveries: byId("exploration-discoveries"), objective: byId("exploration-objective"), distance: byId("exploration-distance"), interact: byId("exploration-interact"), reset: byId("exploration-reset"), dialog: byId("exploration-dialog"), dialogTitle: byId("exploration-dialog-title"), dialogText: byId("exploration-dialog-text"), dialogNext: byId("exploration-dialog-next"), read: byId("exploration-story-read"), pad: byId("exploration-panel"), load: loadExploration, save: saveExploration, onStoryComplete: function () { completeStoryScene("main-1-0", "signal"); } });
+      if (!exploration) exploration = window.StarshipExploration.create({ canvas: byId("exploration-canvas"), panel: byId("exploration-panel"), status: byId("exploration-status"), position: byId("exploration-position"), discoveries: byId("exploration-discoveries"), objective: byId("exploration-objective"), distance: byId("exploration-distance"), interact: byId("exploration-interact"), reset: byId("exploration-reset"), dialog: byId("exploration-dialog"), dialogTitle: byId("exploration-dialog-title"), dialogText: byId("exploration-dialog-text"), dialogNext: byId("exploration-dialog-next"), read: byId("exploration-story-read"), pad: byId("exploration-panel"), load: loadExploration, save: saveExploration, onExit:function(map,x,y){showFirstMajorWorld(2,map,x,y);},onStoryComplete: function () { completeStoryScene("main-1-0", "signal"); } });
       applyExplorerSelection(exploration);
       exploration.reload(); if (fromStory) exploration.enterStory();
       byId("story-world-map").hidden = true; byId("exploration-panel").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = true; exploration.open();
     }
     byId("open-exploration").addEventListener("click", function () { showVillageExploration(false); });
     byId("exploration-continue-act-2").addEventListener("click",function(){showFirstMajorWorld(2);});
-    function canStartWorldAct(act) { return !!game && sceneClaimed(game.getState(), "main-1-0", act === 3 ? "village" : "signal"); }
+    function canStartWorldAct(act) { return Boolean(game && worldStoryStatus[act] && worldStoryStatus[act].unlocked); }
     function refreshWorldEntries() {
+      worldStoryStatus={};
+      var world=window.StarshipFirstMajorWorld,state=game&&game.getState(),workflow=window.StarshipStoryReleaseProgress,missions=window.StarshipStory11Missions;
+      if(world&&state&&workflow)world.storyOrder.forEach(function(act){var meta=world.storyMeta(act),chapter=storyChapterById(meta.chapterId),p=workflow.progress(state),read=sceneClaimed(state,meta.chapterId,meta.sceneId),task=meta.missions&&read&&p.act===meta.index?missions.acts[meta.index].steps[p.step]:null;
+        worldStoryStatus[act]={unlocked:Boolean(chapter&&chapter.releaseOpen!==false&&workflow.unlocked(state,chapter,meta.index)),read:read,missionComplete:!meta.missions||p.act>meta.index,step:p.step,task:task,totalSteps:meta.missions?missions.acts[meta.index].steps.length:0,claimed:Boolean(state.storyProgress.claimedVersions[meta.version]),canClaim:Boolean(meta.missions&&p.act===5&&chapter.scenes.every(function(scene){return sceneClaimed(state,chapter.id,scene.id);}))};});
       [2,3].forEach(function (act) { var button=byId("open-world-act-"+act); if(button){button.disabled=!canStartWorldAct(act);button.title=button.disabled?"先完成第"+(act-1)+"幕主線":"進入第"+act+"幕可探索場景";} });
       if(byId("exploration-continue-act-2"))byId("exploration-continue-act-2").disabled=!canStartWorldAct(2);
+      var select=byId("world-story-select");if(select&&world){var selected=select.value||'1';select.innerHTML='<option value="1">1.0・第一幕｜南驛與入村</option>'+world.storyOrder.map(function(act){var meta=world.storyMeta(act);return '<option value="'+act+'"'+(canStartWorldAct(act)?'':' disabled')+'>'+escapeHtml(meta.label+'｜'+meta.title.replace(/^第.+?幕[｜・]/,''))+(canStartWorldAct(act)?'':'（待解鎖）')+'</option>';}).join('');select.value=selected;byId("open-world-campaign").disabled=selected!=='1'&&!canStartWorldAct(Number(selected));}
     }
+    function worldCampaignAction(act,action,choice,step){var meta=window.StarshipFirstMajorWorld.storyMeta(act),body={action:action,chapterId:meta.chapterId,sceneId:meta.sceneId};if(action==='answer'){body.choice=choice;body.act=meta.index;body.step=step;}return performLiveStoryAction(body).then(function(payload){refreshWorldEntries();return payload;});}
     function worldSaveKey(act) { return "starship-first-major-world-v1:" + encodeURIComponent(playerKey(currentPlayerName)) + ":" + act; }
     function loadFirstMajorWorld(act) { try { return JSON.parse(window.localStorage.getItem(worldSaveKey(act || 2))); } catch(error) { return null; } }
     function saveFirstMajorWorld(state) { try { window.localStorage.setItem(worldSaveKey(state.act), JSON.stringify(state)); } catch(error) { byId("first-major-status").textContent="瀏覽器未能保存探索位置，離開後可能需要重走此段。"; } }
     function waypointSaveKey(){return "starship-world-waypoints-v1:"+encodeURIComponent(playerKey(currentPlayerName));}
     function loadWorldWaypoints(){try{return JSON.parse(window.localStorage.getItem(waypointSaveKey()))||[];}catch(error){return [];}}
     function saveWorldWaypoints(ids){try{window.localStorage.setItem(waypointSaveKey(),JSON.stringify(ids));}catch(error){byId("first-major-status").textContent="傳送點暫時無法保存；請確認瀏覽器儲存空間。";}}
-    function showFirstMajorWorld(act) {
-      if(!canStartWorldAct(act)) return;
+
+    function showFirstMajorWorld(act,terrainMap,terrainX,terrainY) {
+      if(!terrainMap&&!canStartWorldAct(act)) return;
       if(exploration) exploration.close();
       showView("map-view");
-      if(!firstMajorWorld) firstMajorWorld=window.StarshipFirstMajorWorld.create({canvas:byId("first-major-canvas"),stop:byId("first-major-stop"),minimap:byId("first-major-minimap"),regionTag:byId("first-major-region-tag"),compass:byId("first-major-compass"),scene:byId("first-major-scene"),banner:byId("first-major-banner"),loading:byId("first-major-loading"),tools:byId("first-major-tools"),toolsToggle:byId("first-major-tools-toggle"),fullscreen:byId("first-major-fullscreen"),sprint:byId("first-major-sprint"),portrait:byId("first-major-portrait"),dialogLocation:byId("first-major-dialog-location"),dialogCount:byId("first-major-dialog-count"),destination:byId("first-major-destination"),activate:byId("first-major-activate"),travelList:byId("first-major-travel-list"),travel:byId("first-major-travel"),travelHint:byId("first-major-travel-hint"),loadWaypoints:loadWorldWaypoints,saveWaypoints:saveWorldWaypoints,panel:byId("first-major-panel"),zone:byId("first-major-zone"),status:byId("first-major-status"),objective:byId("first-major-objective"),distance:byId("first-major-distance"),position:byId("first-major-position"),interact:byId("first-major-interact"),dialog:byId("first-major-dialog"),dialogTitle:byId("first-major-dialog-title"),dialogText:byId("first-major-dialog-text"),dialogNext:byId("first-major-dialog-next"),reset:byId("first-major-reset"),sync:byId("first-major-sync"),next:byId("first-major-next"),pad:byId("first-major-panel"),load:loadFirstMajorWorld,save:saveFirstMajorWorld,canStart:canStartWorldAct,onComplete:function(act){return performLiveStoryAction({action:"complete",chapterId:"main-1-0",sceneId:act===3?"north":"village"}).then(function(payload){refreshWorldEntries();return payload;});}});
+      if(!firstMajorWorld) firstMajorWorld=window.StarshipFirstMajorWorld.create({canvas:byId("first-major-canvas"),stop:byId("first-major-stop"),minimap:byId("first-major-minimap"),regionTag:byId("first-major-region-tag"),compass:byId("first-major-compass"),scene:byId("first-major-scene"),banner:byId("first-major-banner"),loading:byId("first-major-loading"),tools:byId("first-major-tools"),toolsToggle:byId("first-major-tools-toggle"),fullscreen:byId("first-major-fullscreen"),sprint:byId("first-major-sprint"),portrait:byId("first-major-portrait"),dialogLocation:byId("first-major-dialog-location"),dialogCount:byId("first-major-dialog-count"),destination:byId("first-major-destination"),activate:byId("first-major-activate"),travelList:byId("first-major-travel-list"),travel:byId("first-major-travel"),travelHint:byId("first-major-travel-hint"),loadWaypoints:loadWorldWaypoints,saveWaypoints:saveWorldWaypoints,panel:byId("first-major-panel"),zone:byId("first-major-zone"),status:byId("first-major-status"),objective:byId("first-major-objective"),distance:byId("first-major-distance"),position:byId("first-major-position"),interact:byId("first-major-interact"),dialog:byId("first-major-dialog"),dialogTitle:byId("first-major-dialog-title"),dialogText:byId("first-major-dialog-text"),dialogNext:byId("first-major-dialog-next"),reset:byId("first-major-reset"),sync:byId("first-major-sync"),next:byId("first-major-next"),pad:byId("first-major-panel"),load:loadFirstMajorWorld,save:saveFirstMajorWorld,loadRoam:function(){return loadFirstMajorWorld("roam");},saveRoam:function(state){try{localStorage.setItem(worldSaveKey("roam"),JSON.stringify(state));}catch(e){}},atlas:byId("first-major-atlas"),canStart:canStartWorldAct,task:byId("first-major-task"),claim:byId("first-major-claim"),storyStatus:function(act){return worldStoryStatus[act]||{};},onAnswer:function(act,choice,step){return worldCampaignAction(act,"answer",choice,step);},onClaim:function(act){return worldCampaignAction(act,"claim");},onComplete:function(act){return worldCampaignAction(act,"complete");}});
+
       byId("exploration-panel").hidden=true;byId("story-world-map").hidden=true;byId("open-exploration").closest(".explore-entry").hidden=true;byId("first-major-entry").hidden=true;byId("first-major-panel").hidden=false;
       applyExplorerSelection(firstMajorWorld);
-      firstMajorWorld.open(act);
+      if(terrainMap)firstMajorWorld.openTerrain(terrainMap,terrainX,terrainY);else firstMajorWorld.open(act);
     }
+    byId("open-free-world").addEventListener("click",function(){showFirstMajorWorld(2,"resume");});
     [2,3].forEach(function(act){byId("open-world-act-"+act).addEventListener("click",function(){showFirstMajorWorld(act);});});
+    byId("world-story-select").addEventListener("change",function(){byId("open-world-campaign").disabled=this.value!=='1'&&!canStartWorldAct(Number(this.value));});
+    byId("open-world-campaign").addEventListener("click",function(){var act=Number(byId("world-story-select").value);if(act===1)byId("play-first-act").click();else showFirstMajorWorld(act);});
     byId("close-first-major").addEventListener("click",function(){if(firstMajorWorld)firstMajorWorld.close();byId("first-major-panel").hidden=true;byId("first-major-entry").hidden=false;byId("story-world-map").hidden=false;byId("open-exploration").closest(".explore-entry").hidden=false;refreshWorldEntries();byId("open-world-act-2").focus({preventScroll:true});});
     byId("close-exploration").addEventListener("click", function () { if (exploration) exploration.close(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; byId("open-exploration").focus({ preventScroll: true }); });
     byId("open-world-map").addEventListener("click", function () { openWorldMap("game-lobby"); });

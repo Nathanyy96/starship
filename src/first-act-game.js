@@ -17,8 +17,8 @@
   // Local ground traced against the detailed scene art; coordinates are in tiles.
   var paths = {
     valley: [
-      { width: 1.45, points: [[17,23],[16.5,19],[15.5,16.5],[15.7,14.5],[12.6,12.7],[10.2,11],[9,9],[7.5,8.5],[5.1,7.3],[2.5,5]] },
-      { width: 1.5, points: [[7.5,8.5],[11.5,8],[14,9],[17.5,11.5],[21,11],[22.5,9.5],[25.5,9.4],[27,11.8],[25.5,14.5],[22,15],[18,15],[15.7,14.5]] }
+      { width: 1.5, points: [[17,23],[16.5,19],[15.5,16.5],[20,16.5],[23.5,16.5],[23.5,14.5],[23.5,13],[22,11],[17.5,11.5],[14,9],[11.5,8],[7.5,8.5],[5.1,7.3],[2.5,5]] },
+      { width: 1.5, points: [[17.5,11.5],[21,11],[22.5,9.5],[25.5,9.4],[27,11.8],[25.5,14.5],[23.5,14.5]] }
     ],
     forest: [
       { width: 1.05, points: [[2.5,15.5],[4.5,15.8],[7.5,15.5],[11.5,14.4],[15,13],[17.5,12.5],[21,11.8],[24,10.5],[26.5,10.5],[29,8.8],[32.5,7.5],[32,4],[31,1]] },
@@ -50,6 +50,7 @@
   function initial() { return { index: 0, zone: "valley", x: 15.5, y: 16.5 }; }
   function passable(zone, x, y) {
     if (!Number.isFinite(x) || !Number.isFinite(y) || x < .4 || y < .4 || x > W-.4 || y > H-.4) return false;
+    if(zone==='valley'&&x>=13&&x<=27&&y>=7.5&&y<=12.5)return true;
     return (paths[zone] || []).some(function (path) { return path.points.some(function (b, i) {
       if (!i) return false; var a = path.points[i-1], dx = b[0]-a[0], dy = b[1]-a[1];
       var t = Math.max(0, Math.min(1, ((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));
@@ -107,7 +108,6 @@
     Object.keys(sprites).forEach(function (id) { if (id !== "hero") loadCharacter(id, sprites[id]); });
     if (!setPlayer(options.playerId || "hero")) loadCharacter("hero", sprites.hero);
     extraActors.forEach(function (actor) { loadCharacter(actor.id); });
-    Object.keys(backgrounds).forEach(function (zone) { var img = new Image(); img.onload = function () { art[zone] = img; draw(); }; img.src = backgrounds[zone]; });
     var beast = new Image(); beast.onload = function () { art.beast = beast; draw(); }; beast.src = beastSource;
     function save() { options.save(state); }
     function sprite(id, x, y, height, flip, bob) {
@@ -116,11 +116,11 @@
     function draw() {
       var view = renderer.begin(canvas, ctx, W * TILE, H * TILE, state.x * TILE, state.y * TILE);
       ctx.fillStyle = "#243e35"; ctx.fillRect(view.x, view.y, view.width, view.height);
-      if (art[state.zone]) ctx.drawImage(art[state.zone], 0, 0, W * TILE, H * TILE);
-      else { ctx.fillStyle = "#fff6dc"; ctx.font = "16px system-ui"; ctx.textAlign = "center"; ctx.fillText("正在展開場景…", view.x + view.width/2, view.y + view.height/2); }
+      var ground=renderer.terrain('opening-'+state.zone,W*TILE,H*TILE,function(x,y){return passable(state.zone,x/TILE,y/TILE);},{stairs:state.zone==='valley'?[[22*TILE,13*TILE,3*TILE,2.5*TILE]]:[]});
+      if(ground)ctx.drawImage(ground,0,0);
       if (state.zone === "valley" && state.index >= 2 && state.index <= 3) {
         ctx.fillStyle = "rgba(163,179,252,.5)"; ctx.beginPath(); ctx.ellipse(22.5 * TILE, 8.5 * TILE, 12, 48, -.2, 0, Math.PI * 2); ctx.fill();
-        sprite("beast", 25.5*TILE, 11.7*TILE, 170, false, 0);
+        sprite("beast", 25.5*TILE, 11.7*TILE, 90, false, 0);
       }
       var step = steps[state.index], nextKey = state.zone + ":" + Math.floor(state.x) + ":" + Math.floor(state.y) + ":" + state.index;
       if (nextKey !== routeKey) { currentRoute = route(state); routeKey = nextKey; }
@@ -131,7 +131,7 @@
         ctx.lineWidth = 4; ctx.strokeStyle = "#f5d486"; ctx.setLineDash([5, 8]); ctx.stroke(); ctx.setLineDash([]);
       }
       lookouts.forEach(function (place) { if (place.zone !== state.zone) return; ctx.beginPath(); ctx.arc(place.x*TILE,place.y*TILE,5,0,Math.PI*2); ctx.fillStyle="#d4f0e4";ctx.fill(); });
-      if (state.zone === "forest") { sprite("reyn", 26.5 * TILE, 10.5 * TILE, 98, false, 0); sprite("lia", 29.5 * TILE, 11.5 * TILE, 98, false, 0); }
+      if (state.zone === "forest") { sprite("reyn", 26.5 * TILE, 10.5 * TILE, 44, false, 0); sprite("lia", 29.5 * TILE, 11.5 * TILE, 44, false, 0); }
       if (state.zone === "village") { sprite("isar", 22.5 * TILE, 10.5 * TILE, 72, false, 0); sprite("lia", 26.5 * TILE, 12.5 * TILE, 64, false, 0); sprite("reyn", 29.5 * TILE, 13.5 * TILE, 64, false, 0); }
       extraActors.forEach(function (actor) { if (!actor.zone || actor.zone === state.zone) sprite(actor.id, actor.x, actor.y, actor.height || 70, false, 0); });
       if (step) {
@@ -141,7 +141,7 @@
       }
       var px = state.x * TILE, py = state.y * TILE;
       ctx.fillStyle = "rgba(15,33,36,.35)"; ctx.beginPath(); ctx.ellipse(px, py + 11, 12, 5, 0, 0, Math.PI * 2); ctx.fill();
-      sprite("hero", px, py, 102, held.has("left"), held.size ? Math.sin(performance.now() / 90) * 2 : 0);
+      sprite("hero", px, py, 44, held.has("left"), held.size ? Math.sin(performance.now() / 90) * 2 : 0);
       renderer.end(ctx);
       options.zone.textContent = zoneNames[state.zone];
       options.objective.textContent = step ? step.prompt : "林道已走完，現在可以進入獸靈之村自由探索。";
@@ -156,6 +156,7 @@
       if (!active) return;
       var dt = Math.min((now - (previous || now)) / 1000, .05); previous = now;
       var dx = Number(held.has("right")) - Number(held.has("left")), dy = Number(held.has("down")) - Number(held.has("up"));
+      if (!talking() && state.index>=steps.length && state.y<2 && options.onEnterVillage){options.onEnterVillage();return;}
       if (!talking() && (dx || dy)) {
         var len = Math.hypot(dx, dy), nx = state.x + dx / len * dt * 4, ny = state.y + dy / len * dt * 4;
         if (passable(state.zone, nx - .22, state.y - .22) && passable(state.zone, nx + .22, state.y + .22)) state.x = nx;
