@@ -106,3 +106,40 @@ test('formal progress gate blocks later acts and closing twice does not write in
   assert.equal(world.passable('banksWest',835,240),false);
   assert.equal(world.passable('banksEast',835,240),false);
  });
+
+
+test('waypoints require nearby activation and preserve story on travel',()=>{
+  let state=world.initial(2);assert.equal(world.teleport(state,'city-anchor').changed,false);
+  assert.equal(world.activateWaypoint(state,'city-anchor').changed,false);
+  assert.equal(world.activateWaypoint({...state,x:300,y:300},'village-anchor').changed,false);
+  let result=world.activateWaypoint(state,'village-anchor');assert.equal(result.changed,true);state=result.state;
+  assert.equal(world.activateWaypoint(state,'village-anchor').changed,false);
+  const p=world.waypoints.find(p=>p.id==='city-plaza');
+  state=world.activateWaypoint({...state,map:p.map,x:p.x,y:p.y},p.id).state;
+  result=world.teleport({...state,index:2,visited:['city:plaza']},'village-anchor');
+  assert.equal(result.changed,true);assert.equal(result.state.map,'village');assert.equal(result.state.index,2);
+  assert.deepEqual(result.state.visited,['city:plaza']);assert.deepEqual(result.state.waypoints,['village-anchor','city-plaza']);
+  for(const id of ['ocean','R2-000','__proto__'])assert.equal(world.teleport(state,id).changed,false);
+  assert.deepEqual(world.normalize({...state,waypoints:['city-plaza','ocean','city-plaza']}).waypoints,['city-plaza']);
+});
+
+test('each waypoint can be walked to and arrives on safe ground',()=>{
+  for(const p of world.waypoints){const map=world.maps[p.map];let state={...world.initial(2),map:p.map,x:map.spawn[0],y:map.spawn[1]};
+    const route=world.route(state,p);assert.ok(route.length,p.id);
+    for(const step of route)state=world.move(state,step.x-state.x,step.y-state.y);
+    assert.ok(world.activateWaypoint(state,p.id).changed,p.id);
+    const landed=world.teleport({...state,waypoints:[p.id]},p.id);assert.equal(landed.changed,true,p.id);
+  }
+});
+
+test('travel controls share unlocks across acts, reload by account, and block travel during dialogue',()=>{
+  const {world:w,options}=controllerHarness();
+  for(const key of ['activate','travel','travelHint','travelList'])options[key]={hidden:false,disabled:false,value:'',innerHTML:'',textContent:'',handlers:{},addEventListener(k,f){this.handlers[k]=f;},click(){this.handlers.click?.();}};
+  let shared=['city-anchor'];options.loadWaypoints=()=>shared;options.saveWaypoints=ids=>shared=ids;
+  const controller=w.create(options);controller.open(2);options.activate.click();assert.deepEqual(Array.from(shared),['city-anchor','village-anchor']);
+  options.interact.click();options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
+  controller.close();controller.open(3);assert.ok(controller.state().waypoints.includes('city-anchor'));
+  options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'city');assert.equal(controller.state().index,0);
+  controller.close();shared=[];controller.open(2);assert.equal(controller.state().waypoints.length,0);
+  options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
+});

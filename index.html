@@ -168,7 +168,7 @@
         <div class="exploration-guide"><strong id="first-major-objective"></strong><span id="first-major-distance"></span></div>
         <div class="exploration-stage"><canvas id="first-major-canvas" width="960" height="576" tabindex="0" aria-label="第一大版本可行走地圖"></canvas><div class="exploration-dpad" aria-label="觸控移動"><button data-world-move="up" aria-label="往上移動">↑</button><button data-world-move="left" aria-label="往左移動">←</button><button data-world-move="down" aria-label="往下移動">↓</button><button data-world-move="right" aria-label="往右移動">→</button></div><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button></div>
         <div id="first-major-dialog" class="first-act-dialog game-dialogue" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div>
-        <label class="world-destination">路線指引 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="exploration-footer"><span id="first-major-position"></span><button id="first-major-reset" class="small-button" type="button">回到本區入口</button><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></div>
+        <section class="world-travel" aria-label="傳送點"><div class="world-travel-heading"><h4>傳送點</h4><button id="first-major-activate" class="small-button" type="button" hidden>啟用附近傳送點</button></div><div class="world-travel-controls"><label for="first-major-travel-list">快速返回</label><select id="first-major-travel-list" aria-label="傳送目的地"></select><button id="first-major-travel" class="secondary-action" type="button" disabled>傳送</button></div><p id="first-major-travel-hint" role="status"></p></section><label class="world-destination">路線指引 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="exploration-footer"><span id="first-major-position"></span><button id="first-major-reset" class="small-button" type="button">回到本區入口</button><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></div>
       </section>
       <section id="exploration-panel" class="exploration-panel" hidden aria-label="獸靈之村探索測試版">
         <div class="exploration-bar"><div><h3>獸靈之村</h3><p id="exploration-status" role="status">可以離開主線路徑自由走訪。使用 WASD 或方向鍵移動，靠近地點按 E 互動。</p></div><button id="close-exploration" class="small-button" type="button">返回世界地圖</button></div>
@@ -385,7 +385,7 @@
   <script src="./src/exploration-renderer.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/exploration-characters.js?v=world-cast-20261014"></script>
   <script src="./src/exploration.js?v=exploration-art-v2-20261014"></script>
-  <script src="./src/first-major-world.js?v=first-major-free-roam-20261014"></script>
+  <script src="./src/first-major-world.js?v=waypoints-20261014"></script>
   <script src="./src/first-act-game.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/first-major-kits.js?v=author-preview-roster-20261005"></script>
@@ -399,6 +399,6 @@
   <script src="./src/story-monster-catalog.js?v=monster-story-20261013"></script>
   <script src="./src/story-reader.js?v=monster-story-20261013"></script>
   <script src="./src/story-narration.js?v=20261007"></script>
-  <script src="./src/player-app.js?v=free-roam-world-acts-2-3-20261014"></script>
+  <script src="./src/player-app.js?v=waypoints-free-roam-world-acts-2-3-20261014"></script>
 </body>
 </html>
