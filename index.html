@@ -26,7 +26,7 @@
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
   <link rel="apple-touch-icon" href="./assets/ui/game-icon.png">
   <link rel="stylesheet" href="./styles.css?v=exploration-art-v2-20261014">
-</head>
+<link rel="stylesheet" href="./world-game.css?v=world-life-20261014"></head>
 <body>
   <main class="page-shell">
     <header class="topbar">
@@ -163,13 +163,23 @@
       <section id="story-world-map" class="story-world-map-panel" aria-labelledby="story-map-title"></section>
       <section class="explore-entry" aria-labelledby="explore-entry-title"><div><h3 id="explore-entry-title">獸靈之村｜自由探索</h3><p>使用已製作的村莊地圖，沿道路走訪療養所、巡林據點、火場、物資倉與溪橋。第一幕從林道進村後會在這裡繼續。</p></div><button id="open-exploration" class="secondary-action" type="button">進入村莊 →</button></section>
       <section id="first-major-entry" class="explore-entry"><div><h3>第一大版本｜接續大世界探索</h3><p>進入獸靈之村後，可自由探索第一大版本全區。劇情按順序進行，金色路線可指引主線或自選目的地；其他大版本與海洋未開放。</p></div><div class="first-act-actions"><button id="open-world-act-2" class="secondary-action" type="button">第二幕・村內走訪</button><button id="open-world-act-3" class="secondary-action" type="button">第三幕・西行至白鐘</button></div></section>
-      <section id="first-major-panel" class="exploration-panel" hidden aria-label="第一大版本大世界探索">
-        <div class="exploration-bar"><div><h3 id="first-major-zone">獸靈之村</h3><p id="first-major-status" role="status">WASD／方向鍵移動，靠近目標按 E 互動。</p></div><button id="close-first-major" class="small-button" type="button">返回世界地圖</button></div>
-        <div class="exploration-guide"><strong id="first-major-objective"></strong><span id="first-major-distance"></span></div>
-        <div class="exploration-stage"><canvas id="first-major-canvas" width="960" height="576" tabindex="0" aria-label="第一大版本可行走地圖"></canvas><div class="exploration-dpad" aria-label="觸控移動"><button data-world-move="up" aria-label="往上移動">↑</button><button data-world-move="left" aria-label="往左移動">←</button><button data-world-move="down" aria-label="往下移動">↓</button><button data-world-move="right" aria-label="往右移動">→</button></div><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button></div>
-        <div id="first-major-dialog" class="first-act-dialog game-dialogue" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div>
-        <section class="world-travel" aria-label="傳送點"><div class="world-travel-heading"><h4>傳送點</h4><button id="first-major-activate" class="small-button" type="button" hidden>啟用附近傳送點</button></div><div class="world-travel-controls"><label for="first-major-travel-list">快速返回</label><select id="first-major-travel-list" aria-label="傳送目的地"></select><button id="first-major-travel" class="secondary-action" type="button" disabled>傳送</button></div><p id="first-major-travel-hint" role="status"></p></section><label class="world-destination">路線指引 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="exploration-footer"><span id="first-major-position"></span><button id="first-major-reset" class="small-button" type="button">回到本區入口</button><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></div>
-      </section>
+      <section id="first-major-panel" class="exploration-panel world-game" hidden aria-label="第一大版本大世界探索">
+  <div id="first-major-scene" class="exploration-stage world-scene">
+    <canvas id="first-major-canvas" width="960" height="576" tabindex="0" aria-label="第一大版本可行走地圖"></canvas>
+    <div class="world-shade" aria-hidden="true"></div>
+    <header class="world-hud-header"><div><span id="first-major-region-tag" class="world-region-tag">南部內陸生活圈</span><h3 id="first-major-zone">獸靈之村</h3></div><nav aria-label="探索選單"><button id="first-major-fullscreen" type="button">全螢幕</button><button id="close-first-major" type="button">返回</button></nav></header>
+    <div class="world-quest"><span class="world-quest-type">◆ 追蹤中的旅程</span><strong id="first-major-objective"></strong><span id="first-major-distance"></span></div>
+    <aside class="world-minimap"><span>區域地圖 <b id="first-major-compass" aria-label="地圖方向">N ↑</b></span><canvas id="first-major-minimap" width="320" height="190" aria-label="目前區域、角色及路線概覽"></canvas></aside>
+    <div id="first-major-banner" class="world-region-banner" aria-live="polite" hidden></div>
+    <div id="first-major-loading" class="world-loading" role="status">正在展開旅途…</div>
+    <div class="exploration-dpad world-dpad" aria-label="觸控移動"><button data-world-move="up" aria-label="往上移動">↑</button><button data-world-move="left" aria-label="往左移動">←</button><button data-world-move="down" aria-label="往下移動">↓</button><button data-world-move="right" aria-label="往右移動">→</button></div>
+    <div class="world-movement"><button id="first-major-sprint" type="button" aria-pressed="false">跑步</button><small>WASD 移動 · Shift 跑步 · E 互動</small></div>
+    <div class="world-actions"><button id="first-major-activate" class="world-activate" type="button" hidden>啟用附近傳送點</button><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button><button id="first-major-tools-toggle" type="button" aria-expanded="false" aria-controls="first-major-tools">地圖／傳送</button></div>
+    <section id="first-major-tools" class="world-tools" aria-label="旅途與傳送設定" hidden><h4>旅途指引</h4><label class="world-destination">目的地 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="world-travel"><h4>傳送點</h4><div class="world-travel-controls"><label for="first-major-travel-list">快速返回</label><select id="first-major-travel-list" aria-label="傳送目的地"></select><button id="first-major-travel" class="secondary-action" type="button" disabled>傳送</button></div><p id="first-major-travel-hint" role="status"></p></div><button id="first-major-reset" class="small-button" type="button">回到本區入口</button></section>
+    <div id="first-major-dialog" class="first-act-dialog game-dialogue world-dialog" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><img id="first-major-portrait" class="world-speaker-art" alt=""><div class="world-dialog-copy"><span id="first-major-dialog-location"></span><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><div class="world-dialog-footer"><small id="first-major-dialog-count"></small><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div></div></div>
+  </div>
+  <footer class="world-status"><p id="first-major-status" role="status">循路探索，靠近人物與地點按 E 互動。</p><span id="first-major-position"></span><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></footer>
+</section>
       <section id="exploration-panel" class="exploration-panel" hidden aria-label="獸靈之村探索測試版">
         <div class="exploration-bar"><div><h3>獸靈之村</h3><p id="exploration-status" role="status">可以離開主線路徑自由走訪。使用 WASD 或方向鍵移動，靠近地點按 E 互動。</p></div><button id="close-exploration" class="small-button" type="button">返回世界地圖</button></div>
         <div class="exploration-guide" aria-live="polite"><strong id="exploration-objective">目前目的地：共用火場</strong><span id="exploration-distance">跟隨金色路線前進</span></div>
@@ -385,7 +395,7 @@
   <script src="./src/exploration-renderer.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/exploration-characters.js?v=world-cast-20261014"></script>
   <script src="./src/exploration.js?v=exploration-art-v2-20261014"></script>
-  <script src="./src/first-major-world.js?v=waypoints-20261014"></script>
+  <script src="./src/world-presentation.js?v=world-life-20261014"></script><script src="./src/first-major-world.js?v=world-life-20261014"></script>
   <script src="./src/first-act-game.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/first-major-kits.js?v=author-preview-roster-20261005"></script>

@@ -59,7 +59,7 @@ test('invalid positions recover and exploration away from the main story resumes
 
 function controllerHarness() {
   const context=vm.createContext({window:{addEventListener(){}},Image:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
-  for(const name of ['story-1-0-current','first-act-scenes','exploration-renderer','exploration','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+  for(const name of ['story-1-0-current','first-act-scenes','exploration-renderer','exploration','world-presentation','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
   function element(){const handlers={};return {hidden:false,textContent:'',addEventListener(k,f){handlers[k]=f;},click(){handlers.click?.({});},focus(){},querySelectorAll:()=>[]};}
   const options={load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};
   for(const key of ['canvas','panel','zone','status','objective','distance','position','interact','dialog','dialogTitle','dialogText','dialogNext','reset','sync','next','pad'])options[key]=element();
@@ -142,4 +142,22 @@ test('travel controls share unlocks across acts, reload by account, and block tr
   options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'city');assert.equal(controller.state().index,0);
   controller.close();shared=[];controller.open(2);assert.equal(controller.state().waypoints.length,0);
   options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
+});
+
+
+test('named NPCs use existing chibi assets, stand on reachable ground and patrol safely',()=>{
+  const p=require('../src/world-presentation');
+  for(const [id,map] of Object.entries(world.maps))for(const npc of p.npcs(id)){
+    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',npc.id+'-chibi-v1.png')));
+    assert.ok(world.passable(id,npc.x,npc.y),npc.id);
+    assert.ok(world.route({...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]},npc).length,npc.id);
+    for(const time of [0,2000,5000,10000]){const at=p.position(npc,time,false,(x,y)=>world.passable(id,x,y));assert.ok(world.passable(id,at.x,at.y),npc.id);}
+    assert.deepEqual(p.position(npc,5000,true),{x:npc.x,y:npc.y});
+  }
+});
+
+test('ambient NPC dialogue closes without advancing the story or granting progress',()=>{
+  const {world:w,options}=controllerHarness();const original={...w.initial(2),map:'city',x:200,y:620};options.load=()=>original;
+  let completions=0;options.onComplete=()=>completions++;
+  const controller=w.create(options);controller.open(2);assert.equal(w.nearby(controller.state()).kind,'npc');options.interact.click();assert.equal(options.dialog.hidden,false);assert.equal(options.dialogTitle.textContent,'米菈');options.dialogNext.click();assert.equal(options.dialog.hidden,true);assert.equal(controller.state().index,0);assert.equal(completions,0);assert.equal(controller.state().map,'city');
 });

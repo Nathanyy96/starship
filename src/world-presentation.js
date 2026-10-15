@@ -1,0 +1,24 @@
+(function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipWorldPresentation=api;}(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  var cast={
+    village:[{id:'lia',name:'莉亞',role:'療養屋',x:1350,y:490,line:'藥草和清水都在這裡。妳先照顧好自己的傷，別急著提重物。'},{id:'reyn',name:'雷恩',role:'巡林者',x:355,y:405,patrol:[0,24],line:'走林道要看地面，也要看風。溪水就從橋上過，別抄下游的近路。'},{id:'isar',name:'伊薩爾',role:'村中守望者',x:805,y:477,line:'沿亮著燈的村道走。想歇一會兒，就到火場旁坐坐。'}],
+    city:[{id:'mila',name:'米菈',role:'工坊學徒',x:200,y:620,patrol:[12,6],line:'要找工坊就沿城西這條街走。搬東西的人多，轉彎記得慢一點。'},{id:'vark',name:'老瓦克',role:'工坊匠人',x:270,y:655,line:'修東西得看仔細。先別碰工作臺上的工具，沿街走走吧。'},{id:'seifra',name:'賽芙拉',role:'觀測分會',x:320,y:310,line:'分會就在這裡。有需要記錄的路況，可以先把圖紙整理好。'}],
+    echo:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:620,y:480,line:'山路上先找穩當的落腳處。到了驛站，就停下來歇歇。'}],
+    banksWest:[{id:'musa',name:'穆莎',role:'岸邊採集者',x:400,y:460,line:'橋中間的斷口還在。想去另一岸，得從各自的陸路入口走。'}],
+    banksEast:[{id:'kerida',name:'珂芮妲',role:'外勤測量師',x:1170,y:300,line:'地圖上的線要和腳下的地面一起看。斷掉的地方，可不能當成路。'}],
+    bellcourt:[{id:'wenlan',name:'溫藍',role:'外庭物資管事',x:630,y:425,line:'外庭的石階可以慢慢走。再往外就是雲海，別離開完整的地面。'}]
+  };
+  function npcs(map){return cast[map]||[];}
+  function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}
+  function label(ctx,text,x,y,color){ctx.save();ctx.font='600 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#162f29';ctx.strokeText(text,x,y);ctx.fillStyle=color||'#fff0c7';ctx.fillText(text,x,y);ctx.restore();}
+  function environment(ctx,map,view,time,reduced){
+    if(reduced)return;
+    ctx.save();
+    // World-space wind motes stay attached to the terrain while the camera moves.
+    for(var i=0;i<22;i++){var x=((i*193+time*.012)%(map.width+80))-40,y=(i*137+Math.sin(time/2200+i)*22)%map.height;if(x<view.x-20||x>view.x+view.width+20||y<view.y||y>view.y+view.height)continue;ctx.globalAlpha=.22+.18*Math.sin(time/1700+i);ctx.fillStyle=i%3?'#f5df9e':'#d3e5b4';ctx.beginPath();ctx.ellipse(x,y,3,1.2,Math.sin(time/1600+i),0,Math.PI*2);ctx.fill();}
+    ctx.restore();
+  }
+  function fire(ctx,x,y,time,reduced){if(reduced)return;ctx.save();var g=ctx.createRadialGradient&&ctx.createRadialGradient(x,y,2,x,y,72);if(g&&g.addColorStop){g.addColorStop(0,'rgba(255,177,69,.18)');g.addColorStop(1,'rgba(255,177,69,0)');ctx.fillStyle=g;ctx.fillRect(x-72,y-72,144,144);}ctx.fillStyle='#ffd18a';ctx.globalAlpha=.65;for(var i=0;i<4;i++){var t=reduced?.4:(time/1300+i*.23)%1;ctx.beginPath();ctx.arc(x+Math.sin(i+time/700)*7,y-12-t*26,1.5*(1-t),0,Math.PI*2);ctx.fill();}ctx.restore();}
+  function minimap(canvas,img,map,state,route,npcs,view){if(!canvas)return;var ctx=canvas.getContext('2d');if(!ctx)return;var w=canvas.width,h=canvas.height,scale=Math.min(w/map.width,h/map.height),left=(w-map.width*scale)/2,top=(h-map.height*scale)/2;ctx.clearRect(0,0,w,h);ctx.fillStyle='#16352d';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(left,top);ctx.scale(scale,scale);if(img)ctx.drawImage(img,0,0,map.width,map.height);ctx.fillStyle='rgba(8,27,23,.24)';ctx.fillRect(0,0,map.width,map.height);if(route.length){ctx.beginPath();route.forEach(function(p,i){if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#ffe2a1';ctx.lineWidth=2/scale;ctx.stroke();}ctx.strokeStyle='rgba(239,236,208,.6)';ctx.lineWidth=1/scale;ctx.strokeRect(view.x,view.y,view.width,view.height);map.exits.forEach(function(p){ctx.fillStyle='#b4e4cf';ctx.beginPath();ctx.arc(p.x,p.y,2.4/scale,0,Math.PI*2);ctx.fill();});npcs.forEach(function(p){ctx.fillStyle='#f7d38a';ctx.beginPath();ctx.arc(p.x,p.y,1.8/scale,0,Math.PI*2);ctx.fill();});ctx.fillStyle='#fff8db';ctx.strokeStyle='#1c3b30';ctx.lineWidth=1.5/scale;ctx.beginPath();ctx.arc(state.x,state.y,4/scale,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
+  return {npcs:npcs,position:position,label:label,environment:environment,fire:fire,minimap:minimap};
+}));

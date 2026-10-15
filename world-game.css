@@ -1,0 +1,54 @@
+/* Shared game scene: the painted world leads, controls sit at its edges. */
+.world-game{padding:0!important;overflow:hidden;border:1px solid #77846a!important;border-radius:12px!important;background:#122c25!important;color:#f2ead0;box-shadow:0 14px 36px #071c2452}
+.world-game [hidden]{display:none!important}
+.world-scene{position:relative!important;height:min(790px,82svh);min-height:550px;aspect-ratio:auto!important;overflow:hidden;border:0!important;border-radius:0!important;background:#15392f}
+.world-scene>canvas#first-major-canvas{display:block;width:100%!important;height:100%!important;aspect-ratio:auto!important;outline:none;touch-action:none}
+.world-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,29,24,.72),transparent 23%,transparent 75%,rgba(10,29,24,.5));z-index:1}
+.world-hud-header{position:absolute;inset:20px 22px auto;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;z-index:4;pointer-events:none}
+.world-hud-header h3{font-size:27px;line-height:1.2;margin:3px 0 0;color:#fff2cf;text-shadow:0 2px 5px #13271d}
+.world-region-tag{font-size:11px;color:#e5e7ce;letter-spacing:.13em;text-shadow:0 1px 3px #142d25}
+.world-hud-header nav{display:flex;gap:7px;pointer-events:auto}
+.world-game button{font-family:inherit;cursor:pointer}
+.world-hud-header button,.world-actions>button:not(.exploration-interact),.world-movement button{padding:9px 13px;border:1px solid #abb79b8c;border-radius:6px;background:#15372ee8;color:#f4ebcf;box-shadow:0 3px 9px #10271d30;font-size:13px;min-height:38px}
+.world-game button:hover:not(:disabled){filter:brightness(1.13)}
+.world-game :focus-visible{outline:2px solid #fff0b7;outline-offset:3px}
+.world-game button:disabled{cursor:default;opacity:.6}
+.world-quest{position:absolute;top:104px;left:22px;width:min(310px,calc(100% - 230px));padding:13px 15px;background:#15372eeb;border:1px solid #9baf8560;border-radius:5px;z-index:3;pointer-events:none;box-shadow:0 4px 14px #0b231c30}
+.world-quest-type{display:block;color:#ebcb86;font-size:11px;margin-bottom:7px;letter-spacing:.06em}
+.world-quest strong{display:block;font-size:15px;line-height:1.6;font-weight:600;color:#fff4d4}
+.world-quest>span:last-child{display:block;font-size:12px;color:#d5e4cd;margin-top:6px;line-height:1.5}
+.world-minimap{position:absolute;top:83px;right:22px;width:174px;padding:5px;border:1px solid #c6bb8e;background:#132d26;z-index:3;box-shadow:0 5px 15px #0b201a50;border-radius:4px}
+.world-minimap>span{display:flex;justify-content:space-between;font-size:10px;color:#e2dfbe;padding:1px 4px 5px;letter-spacing:.06em}.world-minimap b{font-weight:500;color:#f2d08c}
+.world-minimap canvas{display:block;width:100%;height:auto;border:1px solid #536e53}
+.world-region-banner{position:absolute;top:34%;left:50%;transform:translate(-50%,-50%);max-width:85%;padding:14px 26px;border-block:1px solid #f4e4b3b3;background:#183b2cd9;color:#fff0ce;font-size:29px;text-align:center;font-family:Georgia,'Noto Serif TC',serif;letter-spacing:.09em;z-index:6;pointer-events:none;animation:world-region 3.2s ease both}
+.world-loading{position:absolute;inset:0;display:grid;place-items:center;background:#17372f;color:#e4d6a7;z-index:8;font-size:18px;letter-spacing:.08em}
+.world-actions{position:absolute;right:22px;bottom:22px;display:flex;flex-direction:column;align-items:flex-end;gap:9px;z-index:5}
+.world-actions .exploration-interact{position:static!important;inset:auto!important;padding:13px 22px;min-height:48px;max-width:310px;border:1px solid #ffe7aa;border-radius:6px;background:#f0d9a1;color:#253d2b;font-size:14px;font-weight:700;box-shadow:0 5px 18px #0f291f50}
+.world-actions .world-activate{border-color:#a6e1d0!important;color:#d3fff0!important;background:#234b3df2!important}
+.world-actions>button[aria-expanded=true]{background:#f0d9a1!important;color:#263f30!important}
+.world-dpad{left:22px!important;bottom:54px!important;z-index:5!important;gap:5px!important}
+.world-dpad button{width:40px!important;height:40px!important;background:#173a30e8!important;border:1px solid #c3cfaaab!important;border-radius:8px!important;color:#f0ead2!important;box-shadow:0 3px 9px #122a1c40}
+.world-movement{position:absolute;left:22px;bottom:15px;display:flex;align-items:center;gap:12px;z-index:5}
+.world-movement button{font-size:11px;min-height:28px;padding:5px 12px}
+.world-movement button[aria-pressed=true]{background:#e3cb91;color:#18392b}
+.world-movement small{font-size:11px;color:#f0eed8;text-shadow:0 1px 3px #142b20}
+.world-tools{position:absolute;right:22px;bottom:76px;width:330px;max-width:calc(100% - 44px);max-height:calc(100% - 160px);overflow:auto;z-index:7;background:#15372efc;border:1px solid #bfbd90;border-radius:8px;padding:18px;box-shadow:0 8px 28px #0b211a66;scrollbar-color:#77946c #15372e}
+.world-tools h4{margin:0 0 12px;font-size:17px;color:#f1dca7}.world-tools .world-destination{margin:0 0 22px;font-size:13px;display:grid;gap:8px}.world-tools .world-destination select{width:100%}
+.world-tools .world-travel{background:none;border:0;border-top:1px solid #788c6959;border-radius:0;margin:0 0 18px;padding:18px 0 0}.world-tools .world-travel-controls{display:grid;gap:9px}.world-tools .world-travel-controls select{width:100%;min-width:0}.world-tools .world-travel-controls .secondary-action{width:100%;padding:11px}.world-tools .world-travel p{font-size:12px;line-height:1.8}
+.world-dialog{position:absolute!important;inset:auto 20px 20px!important;transform:none!important;width:auto!important;max-width:none!important;max-height:60%!important;margin:0!important;padding:20px 22px!important;display:flex;align-items:flex-end;gap:20px;z-index:10!important;border:1px solid #d3c697!important;border-radius:8px!important;background:#15372efa!important;box-shadow:0 8px 30px #061c1a70;color:#f8edd1!important;overflow:auto}
+.world-speaker-art{flex:none;width:112px;height:160px;object-fit:contain;align-self:flex-end;filter:drop-shadow(0 4px 4px #071f2566)}
+.world-dialog-copy{min-width:0;flex:1}.world-dialog-copy>span{font-size:11px;color:#c9dbba}.world-dialog-copy h3{font-size:20px;color:#eed096;margin:4px 0 12px!important}.world-dialog-copy p{font-size:16px!important;line-height:1.95!important;max-width:68ch;margin:0!important;white-space:pre-line;color:#f5eed7!important}
+.world-dialog-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px}.world-dialog-footer small{font-size:11px;color:#cbddc0}.world-dialog-footer button{width:auto!important;min-width:112px;padding:9px 16px;font-size:13px}
+.world-game:has(.world-dialog:not([hidden])) .world-dpad,.world-game:has(.world-dialog:not([hidden])) .world-actions,.world-game:has(.world-dialog:not([hidden])) .world-movement{visibility:hidden}
+.world-status{padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#142e27;color:#d9e4c9;font-size:11px;min-height:38px}.world-status p{margin:0;flex:1}.world-status>span{color:#c9d7b7}.world-status button{font-size:12px;padding:7px 12px;width:auto}
+.world-arrival{animation:world-enter .5s ease both}.world-game:fullscreen{width:100vw;height:100dvh;border:0!important;border-radius:0!important}.world-game:fullscreen .world-scene{height:calc(100dvh - 40px);min-height:0}
+.terrain-preview{max-width:1320px!important;padding:14px!important}.terrain-preview>h1{font-size:19px!important;display:inline-block;margin:0 16px 12px 0}.terrain-preview>p:first-of-type{display:none}.terrain-preview>.world-destination{display:inline-flex;font-size:12px;margin:0 0 12px!important;gap:8px}.terrain-preview>.world-destination select{padding:7px 10px;font-size:12px}.terrain-preview>p:last-of-type{font-size:11px;margin:8px 0}
+@keyframes world-region{0%{opacity:0;filter:blur(3px)}12%,78%{opacity:1;filter:blur(0)}100%{opacity:0}}
+@keyframes world-enter{from{filter:brightness(.65)}to{filter:brightness(1)}}
+@media(max-width:600px){.world-scene{height:calc(100svh - 100px);min-height:570px}.world-hud-header{inset:14px 12px auto}.world-hud-header h3{font-size:21px;max-width:230px}.world-region-tag{font-size:9px}.world-hud-header button{padding:6px 9px;min-height:30px;font-size:11px}.world-hud-header button#first-major-fullscreen{display:none}.world-quest{top:90px;left:12px;width:calc(100% - 140px);padding:9px 10px}.world-quest-type{font-size:9px;margin-bottom:4px}.world-quest strong{font-size:12px}.world-quest>span:last-child{font-size:10px}.world-minimap{right:12px;top:87px;width:108px;padding:3px}.world-minimap>span{font-size:8px;padding-bottom:3px}.world-region-banner{font-size:20px;padding:12px 18px;width:max-content}.world-dpad{left:12px!important;bottom:52px!important}.world-dpad button{width:36px!important;height:36px!important}.world-movement{left:12px;bottom:14px}.world-movement small{display:none}.world-actions{right:12px;bottom:14px;gap:7px}.world-actions .exploration-interact{padding:10px 13px;max-width:205px;font-size:12px;min-height:42px}.world-actions>button:not(.exploration-interact){font-size:11px;padding:7px 10px;min-height:31px}.world-tools{right:12px;bottom:56px;max-width:calc(100% - 24px);max-height:65%;padding:15px}.world-dialog{inset:auto 10px 10px!important;gap:10px;padding:14px!important;max-height:65%!important}.world-speaker-art{width:65px;height:115px}.world-dialog-copy h3{font-size:17px;margin-bottom:8px!important}.world-dialog-copy p{font-size:13px!important;line-height:1.8!important}.world-dialog-copy>span{font-size:10px}.world-dialog-footer{gap:8px;margin-top:10px}.world-dialog-footer button{padding:8px 12px;min-width:90px}.world-status{padding:8px 10px;font-size:10px}.world-status>span{display:none}.terrain-preview{padding:8px!important}.terrain-preview>h1{font-size:16px!important;margin-bottom:8px}.terrain-preview>.world-destination{display:flex;margin-bottom:8px!important}.terrain-preview>.world-destination select{flex:1;min-width:0}}
+@media(prefers-reduced-motion:reduce){.world-arrival,.world-region-banner{animation:none}.world-region-banner{opacity:1}.world-game *{scroll-behavior:auto!important}}
+
+.world-scene{width:100%!important;max-width:none!important;margin:0!important}
+.world-game:has(.world-tools:not([hidden])) .world-dpad,.world-game:has(.world-tools:not([hidden])) .world-movement,.world-game:has(.world-tools:not([hidden])) .world-actions>button:not(#first-major-tools-toggle){visibility:hidden}
+
+.world-dialog .world-speaker-art{object-fit:cover;object-position:center;align-self:center}
