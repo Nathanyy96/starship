@@ -130,7 +130,7 @@
     function draw() {
       var view = renderer.begin(canvas, ctx, WIDTH, HEIGHT, state.x, state.y);
       ctx.fillStyle = "#315842"; ctx.fillRect(view.x, view.y, view.width, view.height);
-      var ground=renderer.terrain('village',WIDTH,HEIGHT,passable,{landmarks:sites});if(ground)ctx.drawImage(ground,0,0);
+      var ground=renderer.terrain('village',WIDTH,HEIGHT,passable,{image:mapImage,landmarks:sites});if(ground)ctx.drawImage(ground,0,0);
       var target = objective(state), key = Math.floor(state.x / NAV) + ":" + Math.floor(state.y / NAV) + ":" + (target ? target.id : "done");
       if (key !== routeKey) { currentRoute = route(state, target); routeKey = key; }
       if (target && currentRoute.length > 1) {

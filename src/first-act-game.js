@@ -116,7 +116,7 @@
     function draw() {
       var view = renderer.begin(canvas, ctx, W * TILE, H * TILE, state.x * TILE, state.y * TILE);
       ctx.fillStyle = "#243e35"; ctx.fillRect(view.x, view.y, view.width, view.height);
-      var ground=renderer.terrain('opening-'+state.zone,W*TILE,H*TILE,function(x,y){return passable(state.zone,x/TILE,y/TILE);},{stairs:state.zone==='valley'?[[22*TILE,13*TILE,3*TILE,2.5*TILE]]:[]});
+      var ground=renderer.terrain('opening-'+state.zone,W*TILE,H*TILE,function(x,y){return passable(state.zone,x/TILE,y/TILE);},{image:backgrounds[state.zone],stairs:state.zone==='valley'?[[22*TILE,13*TILE,3*TILE,2.5*TILE]]:[]});
       if(ground)ctx.drawImage(ground,0,0);
       if (state.zone === "valley" && state.index >= 2 && state.index <= 3) {
         ctx.fillStyle = "rgba(163,179,252,.5)"; ctx.beginPath(); ctx.ellipse(22.5 * TILE, 8.5 * TILE, 12, 48, -.2, 0, Math.PI * 2); ctx.fill();

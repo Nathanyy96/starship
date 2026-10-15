@@ -100,18 +100,26 @@
     map('riverRoad','南行驛路・下游商路','north-trade-road-v1.png',[240,100],[
       [[240,100],[360,200],[480,300],[650,400],[900,500],[1100,650],[1300,780],[1460,850]]
     ],[{id:'river-sign',name:'下游洛汀港方向',x:900,y:500,text:'白鐘至洛汀的河運順流約兩日；此處是陸路探索接段，不以畫面距離換算步程。'}]);
-    map('lotin','洛汀港・陸路與港區','./assets/maps/c2-201-lotin-port-concept.png',[200,100],[
-      [[200,100],[400,250],[650,350],[900,450],[1100,500]],
-      [[900,450],[900,720],[1100,780]],[[650,350],[650,650],[400,700]]
-    ],[{id:'quay',name:'河運碼頭',x:1100,y:500,text:'白鐘主河下游的河口港；海上航線仍須依後續主線開放。'},
-      {id:'tide',name:'潮位告示',x:1100,y:780,text:'可在港區步行查看，尚未開放的海路不能由此直接出航。'}]);
+    // Trace the existing port illustration in its native 1536×1024 coordinates.
+    // The original diagonal placeholder crossed the harbour; these follow the west quay, bridge and east quay.
+    map('lotin','洛汀港・陸路與港區','./assets/maps/c2-201-lotin-port-concept.png',[20,643],[
+      [[20,643],[80,630],[150,633],[210,642],[270,652],[305,647],[350,651],[400,685],[450,690],[500,708],[550,724],[610,740],[665,750],[720,756],[780,755],[835,745],[890,727],[930,711]],
+      [[305,647],[330,615],[345,590],[320,570],[320,548],[337,512],[355,486],[380,461],[420,444],[475,424],[520,408],[550,399],[610,398],[660,394],[704,391],[740,410],[765,435],[790,466],[835,495],[885,520],[930,538],[980,540]],
+      [[320,548],[355,565],[390,583]],[[500,708],[540,687],[580,664]]
+    ],[{id:'quay',name:'西岸港區市集',x:320,y:548,text:'沿原圖西岸港區道路走訪市集，屋頂、泊船水道與海面均不可穿越。'},
+      {id:'tide',name:'南側防波堤',x:890,y:727,text:'沿既有石砌岸道查看港內潮位；船隻與海路不屬於陸地通路。'},
+      {id:'east-quay',name:'東岸碼頭',x:980,y:540,text:'經港內石橋與東岸岸道抵達，不能從港池水面抄近路。'}]);
+    maps.lotin.width=1536;maps.lotin.height=1024;maps.lotin.traced=true;
+    maps.lotin.paths.forEach(function(p,i){p.width=i===1?10:14;});
     // Replace the direct city/town jump with the actual three-day road.
     maps.city.exits=maps.city.exits.filter(function(e){return e.to!=='mistbridge';});maps.mistbridge.exits=maps.mistbridge.exits.filter(function(e){return e.to!=='city';});
     connect('northRoad',410,480,'roadShelter',480,630,'進入第一晚避雨棚屋','返回北行商路');
     connect('south',540,475,'southStation',480,630,'進入南驛驛務休整處','返回南驛驛務廣場');
     connect('city',840,80,'northRoad',850,850,'北門外・北方商路','返回白鐘北門');
     connect('northRoad',1460,120,'mistbridge',1045,880,'抵達霧橋鎮・三日行程','南返北方商路');
-    connect('city',140,580,'factoryNear',300,760,'進入城西工坊','退出工坊至警戒線外');
+    connect('city',355,666,'factoryNear',300,760,'進入城西工坊','退出工坊至警戒線外');
+    maps.factoryNear.exits.find(function(e){return e.to==='city';}).spawn=[355,686];
+    maps.city.paths.push({width:44,points:[[260,650],[300,680],[355,686],[355,666]]});
     connect('factoryNear',780,220,'factoryFar',1070,250,'沿核准木板接應老瓦克','沿接應線返回完整地面');
     maps.factoryNear.exits.find(function(e){return e.to==='factoryFar';}).storyBridge=true;
     maps.factoryFar.exits.find(function(e){return e.to==='factoryNear';}).storyBridge=true;
@@ -124,7 +132,7 @@
     connect('mistbridge',826,328,'mistInn',850,870,'進入旅店後廳','返回霧橋鎮');
     connect('echo',1000,273,'rescue',140,800,'沿山路至迴音谷舊渡台','返回山腰驛站');
     connect('south',780,962,'riverRoad',240,100,'南行下游商路・洛汀港方向','北返南驛山谷');
-    connect('riverRoad',1460,850,'lotin',200,100,'進入洛汀港陸路入口','沿商路返回南驛');
+    connect('riverRoad',1460,850,'lotin',20,643,'進入洛汀港陸路入口','沿商路返回南驛');
   }
   function bridgeOpen(state){return state.act>4||(state.act===4&&state.index>=3);}
   return {order:order,meta:meta,acts:acts,install:install,bridgeOpen:bridgeOpen};
