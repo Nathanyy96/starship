@@ -162,13 +162,13 @@
       <div class="view-toolbar"><button id="map-view-back" class="small-button" type="button">← 回到遊戲大廳</button><div><h2>世界地圖</h2><p>選擇地區進入子地圖；地點標記可查看說明。</p></div><span>地圖探索</span></div>
       <section id="story-world-map" class="story-world-map-panel" aria-labelledby="story-map-title"></section>
       <section class="explore-entry" aria-labelledby="explore-entry-title"><div><h3 id="explore-entry-title">獸靈之村｜自由探索</h3><p>使用已製作的村莊地圖，沿道路走訪療養所、巡林據點、火場、物資倉與溪橋。第一幕從林道進村後會在這裡繼續。</p></div><button id="open-exploration" class="secondary-action" type="button">進入村莊 →</button></section>
-      <section id="first-major-entry" class="explore-entry"><div><h3>第一大版本｜接續大世界探索</h3><p>第二幕走訪村內；第三幕經西行商路與營地，抵達白鐘城。完成前一幕主線後解鎖。</p></div><div class="first-act-actions"><button id="open-world-act-2" class="secondary-action" type="button">第二幕・村內走訪</button><button id="open-world-act-3" class="secondary-action" type="button">第三幕・西行至白鐘</button></div></section>
+      <section id="first-major-entry" class="explore-entry"><div><h3>第一大版本｜接續大世界探索</h3><p>進入獸靈之村後，可自由探索第一大版本全區。劇情按順序進行，金色路線可指引主線或自選目的地；其他大版本與海洋未開放。</p></div><div class="first-act-actions"><button id="open-world-act-2" class="secondary-action" type="button">第二幕・村內走訪</button><button id="open-world-act-3" class="secondary-action" type="button">第三幕・西行至白鐘</button></div></section>
       <section id="first-major-panel" class="exploration-panel" hidden aria-label="第一大版本大世界探索">
         <div class="exploration-bar"><div><h3 id="first-major-zone">獸靈之村</h3><p id="first-major-status" role="status">WASD／方向鍵移動，靠近目標按 E 互動。</p></div><button id="close-first-major" class="small-button" type="button">返回世界地圖</button></div>
         <div class="exploration-guide"><strong id="first-major-objective"></strong><span id="first-major-distance"></span></div>
         <div class="exploration-stage"><canvas id="first-major-canvas" width="960" height="576" tabindex="0" aria-label="第一大版本可行走地圖"></canvas><div class="exploration-dpad" aria-label="觸控移動"><button data-world-move="up" aria-label="往上移動">↑</button><button data-world-move="left" aria-label="往左移動">←</button><button data-world-move="down" aria-label="往下移動">↓</button><button data-world-move="right" aria-label="往右移動">→</button></div><button id="first-major-interact" class="exploration-interact" type="button">互動 E</button></div>
         <div id="first-major-dialog" class="first-act-dialog game-dialogue" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div>
-        <div class="exploration-footer"><span id="first-major-position"></span><button id="first-major-reset" class="small-button" type="button">回到本區入口</button><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></div>
+        <label class="world-destination">路線指引 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="exploration-footer"><span id="first-major-position"></span><button id="first-major-reset" class="small-button" type="button">回到本區入口</button><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續第三幕 →</button></div>
       </section>
       <section id="exploration-panel" class="exploration-panel" hidden aria-label="獸靈之村探索測試版">
         <div class="exploration-bar"><div><h3>獸靈之村</h3><p id="exploration-status" role="status">可以離開主線路徑自由走訪。使用 WASD 或方向鍵移動，靠近地點按 E 互動。</p></div><button id="close-exploration" class="small-button" type="button">返回世界地圖</button></div>
@@ -385,7 +385,7 @@
   <script src="./src/exploration-renderer.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/exploration-characters.js?v=world-cast-20261014"></script>
   <script src="./src/exploration.js?v=exploration-art-v2-20261014"></script>
-  <script src="./src/first-major-world.js?v=exploration-art-v2-20261014"></script>
+  <script src="./src/first-major-world.js?v=first-major-free-roam-20261014"></script>
   <script src="./src/first-act-game.js?v=exploration-art-v2-20261014"></script>
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/first-major-kits.js?v=author-preview-roster-20261005"></script>
@@ -399,6 +399,6 @@
   <script src="./src/story-monster-catalog.js?v=monster-story-20261013"></script>
   <script src="./src/story-reader.js?v=monster-story-20261013"></script>
   <script src="./src/story-narration.js?v=20261007"></script>
-  <script src="./src/player-app.js?v=world-acts-2-3-20261014"></script>
+  <script src="./src/player-app.js?v=free-roam-world-acts-2-3-20261014"></script>
 </body>
 </html>

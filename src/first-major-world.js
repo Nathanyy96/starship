@@ -26,6 +26,65 @@
       sites:[{id:'plaza',name:'中央廣場',x:800,y:300,text:'廣場的噴泉與花壇不可穿越，沿環形街面行走。'}, {id:'north',name:'北門方向',x:840,y:80,text:'北門往霧橋鎮的正常步程為三日；北行探索場景將接在後續主線。'}],
       exits:[{name:'返回西行商路',x:1570,y:390,to:'road',spawn:[203,258]}] }
   };
+  // First-major terrain is open independently of story progress. Coordinates follow the existing painted maps.
+  function terrain(id,name,image,width,height,spawn,lines,sites) {
+    maps[id]={name:name,image:'./assets/maps/'+image,width:width,height:height,spawn:spawn,
+      paths:lines.map(function(points){return {width:28,points:points};}),
+      sites:sites.map(function(p,i){return {id:'landmark-'+i,name:p[0],x:p[1],y:p[2],text:p[3]};}),exits:[]};
+  }
+  terrain('south','南驛山谷・農地與驛路','c1-104.png',1536,1024,[80,690],[
+    [[40,675],[200,735],[365,770],[500,825],[660,893],[780,962]],
+    [[365,770],[433,678],[485,600],[503,554],[590,512],[720,473],[835,484],[1000,530],[1120,565],[1150,690],[1210,775]],
+    [[835,484],[1000,389],[1110,323],[1153,300],[1200,257],[1230,211],[1215,155],[1180,115]],
+    [[660,893],[820,856],[990,800],[1150,770],[1320,835],[1480,895]],
+    [[503,554],[540,475],[450,466],[328,450]],[[1150,690],[1035,686],[965,707]]
+  ],[['南驛驛務廣場',540,475,'農地、驛站與商路相連；開場界痕不是永久道路。'],['田間路',990,800,'可以循田埂走訪南部農地。']]);
+  terrain('mistbridge','霧橋鎮','c1-103.png',1672,941,[1045,880],[
+    [[1050,900],[1015,810],[972,727],[997,655],[1025,607],[963,554],[892,514],[810,471],[738,428],[707,390],[756,360],[826,328],[900,300],[1050,298],[1200,270],[1300,224],[1350,199]],
+    [[738,428],[650,484],[590,500],[510,483]],[[707,390],[625,348],[545,350],[460,346],[350,365],[260,390]],
+    [[756,360],[700,300],[640,270],[580,225],[535,180],[590,142],[685,116],[680,75]],
+    [[997,655],[1115,627],[1225,600],[1390,591],[1510,575]],[[1350,199],[1420,177],[1490,151]]
+  ],[['鎮中心',738,428,'丘陵河谷中的居民聚落；北上進入山路。'],['霧橋驛站前',826,328,'南返白鐘的正常步行行程為三日。'],['河畔',1225,600,'河水與陡岸不可直接穿越，請走完整的石橋。']]);
+  terrain('echo','山腰驛站／迴音谷','a1-105.png',1536,1024,[1430,930],[
+    [[1490,945],[1350,905],[1200,873],[1080,825],[980,789],[850,753],[735,700],[620,638],[510,570],[410,510],[310,467],[230,418],[150,375],[50,330]],
+    [[410,510],[490,495],[580,480],[650,480],[740,500],[850,515],[965,537],[1100,554],[1200,589],[1290,624],[1355,658]],
+    [[230,418],[380,375],[510,340],[620,300],[700,263],[770,235],[825,238],[940,260],[1000,273]],
+    [[770,235],[740,210],[700,180],[780,157],[790,110],[750,65],[780,30]],
+    [[1080,825],[1200,790],[1270,740],[1355,658],[1460,690]]
+  ],[['山腰驛站廣場',650,480,'沿既有橋面走訪驛站，瀑布與谷底水面不可踏入。'],['迴音谷觀景台',1000,273,'可以在平台查看谷地，離開主線也不會推進任務。']]);
+  terrain('relic','霧橋第七遺構','a1-106.png',1536,1024,[210,890],[
+    [[210,890],[240,795],[265,725],[360,680],[450,661],[560,675],[675,693],[755,643],[810,620],[870,594]],
+    [[870,594],[800,544],[733,490],[690,442],[710,394],[790,340],[870,325],[950,306],[1050,271],[1100,233],[1050,196],[950,190],[870,210],[800,237]],
+    [[870,594],[985,540],[1080,512],[1185,485],[1290,477],[1380,490]],
+    [[690,442],[580,430],[450,437],[350,450],[260,478],[160,484]],
+    [[800,237],[690,220],[610,246],[520,282],[440,316],[390,364]],
+    [[1100,233],[1150,170],[1090,110],[1080,45]]
+  ],[['遺構外環',870,594,'沿完整階梯與環廊探索，中央能量井與斷崖不可穿越。'],['東側觀測台',1380,490,'在觀測平台查看遺構外側。']]);
+  // The two banks remain physically separated by the broken span; each has its own land approach.
+  terrain('banksWest','北斷橋・西岸聚落','a1-108-two-banks-concept.png',1536,1024,[210,850],[
+    [[210,850],[280,748],[285,667],[242,568],[210,486],[230,421],[300,365],[365,322],[465,283],[590,255],[740,240]],
+    [[230,421],[340,452],[420,465],[530,475]],[[365,322],[450,228],[555,240],[590,255]]
+  ],[['西岸撤離空地',420,465,'居民與巡林者使用的岸邊空地。'],['斷橋西端',740,240,'橋面中央斷裂；兩岸各有陸路入口，不能踏過斷口。']]);
+  terrain('banksEast','北斷橋・東岸工區','a1-108-two-banks-concept.png',1536,1024,[1400,130],[
+    [[1400,130],[1350,195],[1330,248],[1240,298],[1165,297],[1090,271],[1000,249],[925,237]]
+  ],[['東岸監控空地',1165,297,'工區位在東岸的完整地面。'],['斷橋東端',925,237,'橋面斷口保持碰撞，探索不會把斷橋變成完整道路。']]);
+  terrain('bellcourt','彼岸鐘庭・外庭','s1-201-bell-court-concept.png',1672,941,[175,785],[
+    [[100,850],[175,785],[280,710],[380,648],[450,575],[475,510],[540,465],[620,430],[700,420],[770,450],[860,455],[950,420],[980,370]],
+    [[475,510],[500,418],[555,360],[620,325],[720,317],[750,285]],[[980,370],[1080,415],[1150,470],[1250,535]],
+    [[980,370],[950,285],[900,245],[940,202],[990,160]]
+  ],[['外庭鐘台前',770,450,'經遺構特殊連結抵達的外庭，不是一般城市道路。'],['鐘庭階梯',990,160,'可以探索已繪製的外庭地面；雲海與無地面處不可行走。']]);
+  function connect(a,ax,ay,b,bx,by,label,back) {
+    maps[a].exits.push({name:label,x:ax,y:ay,to:b,spawn:[bx,by]});
+    maps[b].exits.push({name:back,x:bx,y:by,to:a,spawn:[ax,ay]});
+  }
+  connect('city',840,80,'mistbridge',1045,880,'北行霧橋鎮・三日陸路','南返白鐘城');
+  connect('city',390,700,'south',80,690,'南行南驛山谷','返回白鐘城陸路');
+  connect('mistbridge',680,75,'echo',1430,930,'前往山腰驛站／迴音谷','返回霧橋鎮');
+  connect('echo',780,30,'relic',210,890,'北行第七遺構・兩日山路','返回迴音谷');
+  connect('mistbridge',1490,151,'banksWest',210,850,'前往北斷橋西岸','返回霧橋鎮');
+  connect('echo',1460,690,'banksEast',1400,130,'前往北斷橋東岸山路','返回山腰驛站');
+  connect('relic',800,237,'bellcourt',175,785,'經遺構窗口前往鐘庭外庭','經窗口返回第七遺構');
+  maps.city.sites.push({id:'sea-closed',name:'下游航線未開放',x:260,y:650,text:'洛汀灣、群島與海洋屬後續版本；船隻與海洋航線尚未開放。'});
   var placements = {
     2:[['village',1390,474],['village',1038,584],['village',1405,479],['village',704,655],['village',330,455],['village',1405,479],['village',648,764],['village',1270,433]],
     3:[['village',326,319],['village',1390,474],['village',124,390],['road',1300,523],['road',940,425],['road',203,258],['city',1140,340],['city',1280,380],['city',290,230],['city',260,650],['city',290,230],['city',1390,430]]
@@ -56,16 +115,15 @@
   function normalize(raw) {
     var state=initial(raw&&raw.act), steps=acts[state.act];
     if(raw&&raw.version===1){state.index=Math.max(0,Math.min(steps.length,Math.floor(Number(raw.index)||0)));state.map=maps[raw.map]?raw.map:'village';
-      var seen=steps.slice(0,Math.min(state.index+1,steps.length)).some(function(s){return s.map===state.map;});if(!seen)state.map=steps[Math.min(state.index,steps.length-1)].map;
       if(state.map===raw.map && passable(state.map,Number(raw.x),Number(raw.y))){state.x=Number(raw.x);state.y=Number(raw.y);}else {state.x=maps[state.map].spawn[0];state.y=maps[state.map].spawn[1];}
       state.visited=Array.isArray(raw.visited)?raw.visited.filter(function(id){return Object.keys(maps).some(function(k){return maps[k].sites.some(function(s){return k+':'+s.id===id;});});}):[];
     }return state;
   }
   function goal(state){return acts[state.act][state.index]||null;}
   function fits(map,x,y){return [[-6,-6],[-6,6],[6,-6],[6,6]].every(function(d){return passable(map,x+d[0],y+d[1]);});}
-  function clearSegment(map,ax,ay,bx,by){var count=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/4));for(var i=1;i<=count;i++)if(!fits(map,ax+(bx-ax)*i/count,ay+(by-ay)*i/count))return false;return true;}
-  function move(state,dx,dy){var next=normalize(state),steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/6));for(var i=0;i<steps;i++){var x=next.x+dx/steps,y=next.y+dy/steps;if(fits(next.map,x,next.y))next.x=x;if(fits(next.map,next.x,y))next.y=y;}return next;}
-  function canVisit(state,map){return acts[state.act].slice(0,Math.min(state.index+1,acts[state.act].length)).some(function(s){return s.map===map;});}
+  function clearSegment(map,ax,ay,bx,by){var count=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/2));for(var i=1;i<=count;i++)if(!fits(map,ax+(bx-ax)*i/count,ay+(by-ay)*i/count))return false;return true;}
+  function move(state,dx,dy){var next=normalize(state),steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/2));for(var i=0;i<steps;i++){var x=next.x+dx/steps,y=next.y+dy/steps;if(fits(next.map,x,y)){next.x=x;next.y=y;}else{if(fits(next.map,x,next.y))next.x=x;if(fits(next.map,next.x,y))next.y=y;}}return next;}
+  function canVisit(state,map){return Object.prototype.hasOwnProperty.call(maps,map);}
   function nearby(state) {
     var target=goal(state);if(target&&target.map===state.map&&Math.hypot(state.x-target.x,state.y-target.y)<55)return {kind:'story',value:target};
     var candidates=maps[state.map].exits.map(function(x){return {kind:'exit',value:x};}).concat(maps[state.map].sites.map(function(x){return {kind:'site',value:x};}));
@@ -79,25 +137,33 @@
     for(var head=0;head<queue.length&&!prev.has(end);head++){var at=queue[head],x=at%columns,y=Math.floor(at/columns);[[1,0],[0,1],[-1,0],[0,-1]].forEach(function(d){var nx=x+d[0],ny=y+d[1],n=key(nx,ny);if(nx>=0&&ny>=0&&nx<columns&&ny<Math.ceil(map.height/size)&&!prev.has(n)&&clearSegment(state.map,(x+.5)*size,(y+.5)*size,(nx+.5)*size,(ny+.5)*size)){prev.set(n,at);queue.push(n);}});}
     if(!prev.has(end))return [];var out=[];for(var n=end;n!==-1;n=prev.get(n))out.push({x:(n%columns+.5)*size,y:(Math.floor(n/columns)+.5)*size});return out.reverse();
   }
-  function navigationTarget(state){var target=goal(state);if(!target)return null;if(target.map===state.map)return target;return maps[state.map].exits.find(function(exit){return canVisit(state,exit.to)&&(exit.to===target.map||(state.map==='village'&&target.map==='city'&&exit.to==='road'));})||null;}
+  function navigationTarget(state,destination){
+    var target=destination&&maps[destination]?{map:destination,x:maps[destination].spawn[0],y:maps[destination].spawn[1]}:goal(state);
+    if(!target)return null;if(target.map===state.map)return target;
+    var queue=[{map:state.map,first:null}],seen=new Set([state.map]);
+    for(var i=0;i<queue.length;i++){var item=queue[i],exits=maps[item.map].exits;
+      for(var j=0;j<exits.length;j++){var exit=exits[j];if(!canVisit(state,exit.to)||seen.has(exit.to))continue;var first=item.first||exit;if(exit.to===target.map)return first;seen.add(exit.to);queue.push({map:exit.to,first:first});}
+    }return null;
+  }
   function create(options) {
-    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},held=new Set(),active=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[];
+    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},requested={},held=new Set(),active=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[],destination='';
     function save(){options.save(normalize(state));}
-    function loadImage(key,src){var img=new Image();img.onload=function(){images[key]=img;draw();};img.onerror=function(){options.status.textContent='地圖素材載入失敗，請重新開啟探索。';};img.src=src;}
+    function loadImage(key,src){requested[key]=true;var img=new Image();img.onload=function(){images[key]=img;draw();};img.onerror=function(){options.status.textContent='地圖素材載入失敗，請重新開啟探索。';};img.src=src;}
     var characterArt=globalThis.StarshipExplorationCharacters,characterData=options.characterData||globalThis.StarshipGachaData||{},playerLoad;
     function setPlayer(id){if(!characterArt||!characterArt.resolve(id,characterData))return false;if(playerLoad)playerLoad.cancel();delete images.hero;playerLoad=characterArt.load(id,characterData,function(img){if(img)images.hero=img;draw();});return true;}
-    Object.keys(maps).forEach(function(k){loadImage(k,maps[k].image);});if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
+    if(options.destination){options.destination.innerHTML='<option value="">追蹤目前劇情</option>'+Object.keys(maps).map(function(id){return '<option value="'+id+'">'+maps[id].name+'</option>';}).join('');options.destination.addEventListener('change',function(){destination=options.destination.value;routeKey='';draw();});}
+    loadImage(state.map,maps[state.map].image);if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
     function showLine(){options.dialogTitle.textContent=goal(state).title;options.dialogText.textContent=lines[lineIndex];options.dialogNext.textContent=lineIndex+1<lines.length?'繼續 →':'完成此段對話';options.dialog.hidden=false;options.dialogNext.focus({preventScroll:true});}
     function syncComplete(){if(pending)return;var syncAct=state.act,stamp=epoch;pending=true;options.status.textContent='正在保存第'+syncAct+'幕主線進度…';Promise.resolve().then(function(){if(stamp!==epoch)return;return options.onComplete(syncAct);}).then(function(){if(stamp!==epoch)return;pending=false;options.status.textContent='第'+syncAct+'幕完成，主線進度已保存。';draw();}).catch(function(error){if(stamp!==epoch)return;pending=false;options.status.textContent='主線進度尚未保存：'+error.message+'。可按「保存本幕進度」重試。';draw();});}
     function nextLine(){if(!lines||pending)return;if(++lineIndex<lines.length){showLine();return;}state.index++;lines=null;options.dialog.hidden=true;save();routeKey='';if(!goal(state))syncComplete();draw();canvas.focus({preventScroll:true});}
-    function draw(){var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,state.x,state.y);ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);if(images[state.map])ctx.drawImage(images[state.map],0,0,map.width,map.height);
-      var target=navigationTarget(state),key=state.map+':'+Math.floor(state.x/16)+':'+Math.floor(state.y/16)+':'+state.index;if(key!==routeKey){currentRoute=route(state,target);routeKey=key;}
+    function draw(){if(!requested[state.map])loadImage(state.map,maps[state.map].image);var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,state.x,state.y);ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);if(images[state.map])ctx.drawImage(images[state.map],0,0,map.width,map.height);
+      var target=navigationTarget(state,destination),key=state.map+':'+Math.floor(state.x/16)+':'+Math.floor(state.y/16)+':'+state.index+':'+destination;if(key!==routeKey){currentRoute=route(state,target);routeKey=key;}
       if(currentRoute.length){ctx.beginPath();ctx.moveTo(state.x,state.y);currentRoute.forEach(function(p){ctx.lineTo(p.x,p.y);});ctx.strokeStyle='#243d38';ctx.lineWidth=8;ctx.stroke();ctx.strokeStyle='#f5cf75';ctx.lineWidth=4;ctx.setLineDash([5,10]);ctx.stroke();ctx.setLineDash([]);}
       map.sites.concat(map.exits).forEach(function(s){ctx.beginPath();ctx.arc(s.x,s.y,7,0,Math.PI*2);ctx.fillStyle='#d4f4e9';ctx.fill();});if(target){ctx.beginPath();ctx.arc(target.x,target.y,18,0,Math.PI*2);ctx.strokeStyle='#ffe4a0';ctx.lineWidth=3;ctx.stroke();}
       ctx.fillStyle='rgba(12,30,28,.4)';ctx.beginPath();ctx.ellipse(state.x,state.y+6,13,5,0,0,Math.PI*2);ctx.fill();renderer.sprite(ctx,images.hero,state.x,state.y,104,held.has('left'),held.size?Math.sin(performance.now()/95)*2:0);renderer.end(ctx);
-      var g=goal(state),near=nearby(state);options.zone.textContent=map.name;options.objective.textContent=g?'主線目的地：'+g.title:'本幕完成，可自由走訪已抵達區域';options.distance.textContent=g?g.time:'探索紀錄保存在此瀏覽器';options.position.textContent='第'+state.act+'幕 · '+Math.min(state.index+1,acts[state.act].length)+' / '+acts[state.act].length+' 段';options.interact.hidden=Boolean(lines)||!near;options.interact.textContent=near?(near.kind==='story'?'開始此段劇情 E':near.kind==='exit'?near.value.name+' E':'調查 '+near.value.name+' E'):'靠近目標互動';options.sync.hidden=Boolean(g);options.sync.disabled=pending;options.next.hidden=Boolean(g)||state.act===3;options.next.disabled=!options.canStart(3);
+      var g=goal(state),near=nearby(state);options.zone.textContent=map.name;options.objective.textContent=g?'主線目的地：'+g.title:'本幕完成，可自由探索第一大版本全區';options.distance.textContent=destination?'探索指引：'+maps[destination].name:g?g.time:'探索紀錄保存在此瀏覽器';options.position.textContent='第'+state.act+'幕 · '+Math.min(state.index+1,acts[state.act].length)+' / '+acts[state.act].length+' 段';options.interact.hidden=Boolean(lines)||!near;options.interact.textContent=near?(near.kind==='story'?'開始此段劇情 E':near.kind==='exit'?near.value.name+' E':'調查 '+near.value.name+' E'):'靠近目標互動';options.sync.hidden=Boolean(g);options.sync.disabled=pending;options.next.hidden=Boolean(g)||state.act===3;options.next.disabled=!options.canStart(3);
     }
-    function interact(){if(lines||pending)return;var found=nearby(state);if(!found)return;if(found.kind==='story'){lines=found.value.lines;lineIndex=0;held.clear();showLine();draw();return;}if(found.kind==='exit'){var result=transition(state,found.value);if(result.changed){state=result.state;save();routeKey='';options.status.textContent=maps[state.map].name; }else options.status.textContent='先完成目前主線對話，才可前往下一個區域。';}else {var id=state.map+':'+found.value.id;if(!state.visited.includes(id))state.visited.push(id);save();options.status.textContent=found.value.name+'｜'+found.value.text;}draw();}
+    function interact(){if(lines||pending)return;var found=nearby(state);if(!found)return;if(found.kind==='story'){lines=found.value.lines;lineIndex=0;held.clear();showLine();draw();return;}if(found.kind==='exit'){var result=transition(state,found.value);if(result.changed){state=result.state;save();routeKey='';options.status.textContent=maps[state.map].name; }else options.status.textContent='請靠近此區域的實際出口，再嘗試通行。';}else {var id=state.map+':'+found.value.id;if(!state.visited.includes(id))state.visited.push(id);save();options.status.textContent=found.value.name+'｜'+found.value.text;}draw();}
     function tick(now){if(!active)return;var dt=Math.min((now-(previous||now))/1000,.05);previous=now;var dx=Number(held.has('right'))-Number(held.has('left')),dy=Number(held.has('down'))-Number(held.has('up'));if(!lines&&!pending&&(dx||dy)){var norm=Math.hypot(dx,dy);state=move(state,dx/norm*dt*185,dy/norm*dt*185);if(now-lastSave>800){save();lastSave=now;}}draw();frame=requestAnimationFrame(tick);}
     function key(e,down){if(!active||options.panel.hidden||e.target.closest&&e.target.closest('input,textarea,select'))return;if(lines){if(down&&!e.repeat&&e.target!==options.dialogNext&&['KeyE','Enter','Space'].includes(e.code)){e.preventDefault();nextLine();}return;}var keys={KeyW:'up',ArrowUp:'up',KeyS:'down',ArrowDown:'down',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right'};if(keys[e.code]){e.preventDefault();if(down)held.add(keys[e.code]);else held.delete(keys[e.code]);}if(down&&e.code==='KeyE'&&!e.repeat){e.preventDefault();interact();}}
     window.addEventListener('keydown',function(e){key(e,true);});window.addEventListener('keyup',function(e){key(e,false);});window.addEventListener('blur',function(){held.clear();});

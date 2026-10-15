@@ -209,7 +209,8 @@
   function render(id, selectedPoint, options) {
     var map = maps[id] || maps["W-001"];
     var canPreview = !!(options && options.authorPreview);
-    var locked = map.previewOnly && !canPreview;
+    var firstMajor = /^(R1-|C1-|A1-|S1-)/.test(id);
+    var locked = map.previewOnly && !canPreview && !firstMajor;
     var trail = lineage(id).map(function (key, i, all) { return key === id ? "<span>" + escapeHtml(maps[key].name) + "</span>" : "<button type=\"button\" data-map-go=\"" + key + "\">" + escapeHtml(maps[key].name) + "</button><span aria-hidden=\"true\">›</span>"; }).join("");
     var dots = (locked ? [] : map.points || []).map(function (point) {
       var target = maps[point[0]], unavailable = target && target.pending, isDetail = point[0].charAt(0) === "#";

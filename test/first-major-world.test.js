@@ -40,9 +40,9 @@ test('water and buildings block movement, including a large movement across the 
   assert.ok(next.y<550);
 });
 
-test('village cannot skip to later regions and route guides travel via actual exits', () => {
+test('first-major terrain opens independently of story and guidance uses real exits', () => {
   const locked=world.initial(3),exit=world.maps.village.exits[0];
-  assert.equal(world.transition({...locked,x:exit.x,y:exit.y},exit).changed,false);
+  assert.equal(world.transition({...locked,x:exit.x,y:exit.y},exit).changed,true);
   const ready={...locked,index:3,x:exit.x,y:exit.y};
   const result=world.transition(ready,exit);
   assert.equal(result.changed,true);
@@ -51,8 +51,8 @@ test('village cannot skip to later regions and route guides travel via actual ex
   assert.equal(world.transition(ready,{...exit}).changed,false);
 });
 
-test('old or invalid saved positions recover and second act cannot resume in the city', () => {
-  assert.equal(world.normalize({...world.initial(2),map:'city',x:800,y:400}).map,'village');
+test('invalid positions recover and exploration away from the main story resumes', () => {
+  assert.equal(world.normalize({...world.initial(2),map:'city',x:800,y:300}).map,'city');
   assert.equal(world.normalize({...world.initial(3),index:7,map:'city',x:Infinity,y:-1}).x,world.maps.city.spawn[0]);
   assert.equal(world.normalize({version:0,act:2,index:100}).index,0);
 });
@@ -89,3 +89,20 @@ test('formal progress gate blocks later acts and closing twice does not write in
   assert.equal(controller.open(2),true);controller.close();const count=saves;
   controller.close();assert.equal(saves,count);
 });
+
+ test('all first-major maps are connected without advancing story; ocean and later versions stay closed',()=>{
+  const state=world.initial(2),seen=new Set(['village']),queue=['village'];
+  for(let i=0;i<queue.length;i++)for(const exit of world.maps[queue[i]].exits){
+    const at={...state,map:queue[i],x:exit.x,y:exit.y};const result=world.transition(at,exit);
+    assert.equal(result.changed,true);assert.equal(result.state.index,0);assert.equal(result.state.act,2);
+    assert.ok(world.passable(result.state.map,result.state.x,result.state.y));
+    if(!seen.has(exit.to)){seen.add(exit.to);queue.push(exit.to);}
+  }
+  assert.equal(seen.size,Object.keys(world.maps).length);
+  for(const id of ['south','mistbridge','echo','relic','banksWest','banksEast','bellcourt'])assert.ok(seen.has(id));
+  for(const id of ['ocean','R2-000','C2-201','S6-001','__proto__'])assert.equal(world.canVisit(state,id),false);
+  assert.equal(world.navigationTarget({...state,map:'relic',x:210,y:890}).to,'echo');
+  assert.equal(world.navigationTarget(state,'bellcourt').to,'road');
+  assert.equal(world.passable('banksWest',835,240),false);
+  assert.equal(world.passable('banksEast',835,240),false);
+ });
