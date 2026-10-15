@@ -87,6 +87,16 @@
       {sprite:6,x:100,y:100,w:145,h:185},{sprite:3,x:640,y:445,w:160,h:155}
     ],[{id:'supplies',name:'繩索與急用物資',x:470,y:335,text:'山路出發前複核繩索、藥品與回程記號，不把未抵達的驛報當作已送達。'},
       {id:'rest',name:'避風休整處',x:560,y:510,text:'休息與換藥後再上路；當晚不能憑遠處燈火冒險趕路。'}]);
+    room('roadShelter','北行商路・第一晚避雨棚屋',[
+      {sprite:0,x:120,y:110,w:150,h:160},{sprite:7,x:650,y:105,w:160,h:135},
+      {sprite:3,x:355,y:280,w:185,h:150},{sprite:2,x:110,y:475,w:145,h:125}
+    ],[{id:'rain',name:'避雨與休整',x:330,y:200,text:'北行第一晚的避雨棚屋，門口通回原來的商路；休整不會跳過主線行程。'},
+      {id:'packed',name:'靠牆行囊',x:690,y:340,text:'行囊沿牆擺放，中央通道與出口保持暢通。'}]);
+    room('southStation','南驛山谷・驛務休整處',[
+      {sprite:4,x:150,y:110,w:190,h:145},{sprite:6,x:650,y:105,w:140,h:175},
+      {sprite:0,x:120,y:440,w:145,h:160},{sprite:3,x:635,y:450,w:160,h:145}
+    ],[{id:'directions',name:'驛路方向',x:450,y:230,text:'出門回到南驛驛務廣場。北側陸路返回白鐘，東側田間路通獸靈之村，南行驛路接下游商路與洛汀港。'},
+      {id:'rest',name:'旅人休整區',x:340,y:510,text:'休整區與驛務桌分開，留出寬闊的中央走道。'}]);
     map('riverRoad','南行驛路・下游商路','north-trade-road-v1.png',[240,100],[
       [[240,100],[360,200],[480,300],[650,400],[900,500],[1100,650],[1300,780],[1460,850]]
     ],[{id:'river-sign',name:'下游洛汀港方向',x:900,y:500,text:'白鐘至洛汀的河運順流約兩日；此處是陸路探索接段，不以畫面距離換算步程。'}]);
@@ -97,6 +107,8 @@
       {id:'tide',name:'潮位告示',x:1100,y:780,text:'可在港區步行查看，尚未開放的海路不能由此直接出航。'}]);
     // Replace the direct city/town jump with the actual three-day road.
     maps.city.exits=maps.city.exits.filter(function(e){return e.to!=='mistbridge';});maps.mistbridge.exits=maps.mistbridge.exits.filter(function(e){return e.to!=='city';});
+    connect('northRoad',410,480,'roadShelter',480,630,'進入第一晚避雨棚屋','返回北行商路');
+    connect('south',540,475,'southStation',480,630,'進入南驛驛務休整處','返回南驛驛務廣場');
     connect('city',840,80,'northRoad',850,850,'北門外・北方商路','返回白鐘北門');
     connect('northRoad',1460,120,'mistbridge',1045,880,'抵達霧橋鎮・三日行程','南返北方商路');
     connect('city',140,580,'factoryNear',300,760,'進入城西工坊','退出工坊至警戒線外');

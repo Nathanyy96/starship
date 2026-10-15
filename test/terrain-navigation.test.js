@@ -24,7 +24,7 @@ test('dialogue identifies the actual speakers and preserves complete narration',
  for(const scenes of Object.values(world.acts))for(const scene of scenes)assert.equal(scene.lines.length,scene.speakers.length);
 });
 test('new interiors have solid furniture, reachable floor and a return to their own settlement',()=>{
- for(const [id,parent]of [['clinic','village'],['observatory','city'],['station','echo']]){
+ for(const [id,parent]of [['clinic','village'],['observatory','city'],['station','echo'],['roadShelter','northRoad'],['southStation','south']]){
   const map=world.maps[id],state={...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]};
   assert.ok(world.passable(id,state.x,state.y),id);
   assert.equal(world.passable(id,30,30),false,id+' walls');
@@ -44,3 +44,5 @@ test('White Bell is physically larger, workshop roof is blocked, and old positio
  const original={version:1,act:3,index:7,map:'city',x:1280,y:380,visited:[],waypoints:[]},migrated=world.normalize(original);
  assert.equal(migrated.x,1280*2.2);assert.equal(migrated.y,380*2.2);assert.deepEqual(world.normalize(migrated),migrated);
 });
+
+test('first-night shelter retains original prose and its story position is reachable',()=>{const g=world.acts[11][1];assert.equal(g.map,'roadShelter');const m=world.maps[g.map],state={...world.initial(11),index:1,map:g.map,x:m.spawn[0],y:m.spawn[1]};assert.ok(world.route(state,g).length);assert.ok(g.lines.join('').includes('第一晚下小雨'));for(const id of ['roadShelter','southStation']){const m=world.maps[id],e=m.exits[0],parent=world.maps[e.to],entry=parent.exits.find(x=>x.to===id);assert.ok(world.passable(e.to,entry.x,entry.y));assert.equal(world.crossExit({...state,map:e.to,x:entry.x,y:entry.y},e.to,entry.x+40,entry.y).state.map,id);}});

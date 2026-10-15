@@ -39,11 +39,11 @@
   function terrain(key,width,height,passable,settings){
     if(typeof document==='undefined')return null;
     if(terrainCache[key])return terrainCache[key];
-    settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=/Inn|factory|recovery|clinic|observatory|station/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
+    settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=Boolean(settings.furniture)||/Inn|factory|recovery|clinic|observatory|station/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
     var patterns=[];
     if(tileArt)for(var cell=0;cell<8;cell++){var tile=document.createElement('canvas');tile.width=128;tile.height=128;var tc=tile.getContext('2d'),sw=tileArt.naturalWidth/4,sh=tileArt.naturalHeight/2;tc.imageSmoothingEnabled=false;tc.drawImage(tileArt,(cell%4)*sw+2,Math.floor(cell/4)*sh+2,sw-4,sh-4,0,0,128,128);patterns.push(c.createPattern(tile,'repeat'));}
     c.fillStyle=indoor?'#39413b':stone?'#66715b':'#4f7952';c.fillRect(0,0,width,height);
-    var columns=Math.ceil(width/step),rows=Math.ceil(height/step),mask=new Uint8Array(columns*rows);for(var my=0;my<rows;my++)for(var mx=0;mx<columns;mx++)mask[my*columns+mx]=passable(mx*step+4,my*step+4)?1:0;
+    var columns=Math.ceil(width/step),rows=Math.ceil(height/step),mask=new Uint8Array(columns*rows);for(var my=0;my<rows;my++)for(var mx=0;mx<columns;mx++)mask[my*columns+mx]=(passable(mx*step+4,my*step+4)||(settings.furniture||[]).some(function(p){var x=mx*step+4,y=my*step+4;return x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h;}))?1:0;
     for(var y=0;y<height;y+=step)for(var x=0;x<width;x+=step){
       var hash=((x*13+y*29)%101),walk=Boolean(mask[(y/step)*columns+x/step]);
       c.fillStyle=patterns.length?patterns[walk?(indoor?3:stone?2:1):(indoor?7:/valley|relic|bellcourt/.test(key)?6:4)]:walk?(indoor?(hash<48?'#bd975f':'#c6a16b'):stone?(hash<48?'#d2c6a1':'#c9be99'):(hash<48?'#d9c18d':'#d4b983')):(indoor?'#465047':hash<42?'#567e54':'#5b8557');c.fillRect(x,y,step,step);

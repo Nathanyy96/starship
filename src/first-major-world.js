@@ -130,7 +130,7 @@
     });
   }
   var acts=Object.assign({2:splitAct(2),3:splitAct(3)},campaign.acts);
-  [[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
+  [[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,1,'roadShelter',575,490],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
   Object.values(acts).flat().forEach(function(scene){var p=mapPoint(scene.map,scene.x,scene.y);scene.x=p.x;scene.y=p.y;});
   function passable(mapId,x,y) {
     var map=maps[mapId]; if(!map || !Number.isFinite(x)||!Number.isFinite(y)||x<10||y<10||x>map.width-10||y>map.height-10)return false;
@@ -233,7 +233,7 @@
     if(options.toolsToggle)options.toolsToggle.addEventListener('click',function(){if(lines||pending||taskActive())return;held.clear();stopWalking();options.tools.hidden=!options.tools.hidden;if(!options.tools.hidden){atlasRegion='';atlasKey='';}options.toolsToggle.setAttribute('aria-expanded',String(!options.tools.hidden));});
     var atlasRegion='',atlasKey='',atlasArt={};
     var atlasPositions={south:[61,83],village:[72,60],road:[58,59],city:[43,60],northRoad:[45,49],mistbridge:[48,38],echo:[59,27],relic:[50,13],banksWest:[68,38],banksEast:[76,28],bellcourt:[23,18],riverRoad:[72,87],lotin:[88,89]};
-    var atlasParents={factoryNear:'city',factoryFar:'factoryNear',cityInn:'city',recovery:'city',mistInn:'mistbridge',rescue:'echo',clinic:'village',observatory:'city',station:'echo'};
+    var atlasParents={factoryNear:'city',factoryFar:'factoryNear',cityInn:'city',recovery:'city',mistInn:'mistbridge',rescue:'echo',clinic:'village',observatory:'city',station:'echo',roadShelter:'northRoad',southStation:'south'};
     function updateAtlas(){
       if(!options.atlas||!options.tools||options.tools.hidden)return;
       var signature=atlasRegion+'|'+state.waypoints.join('|')+'|'+(renderer.terrainVersion?renderer.terrainVersion():0);if(signature===atlasKey)return;atlasKey=signature;
