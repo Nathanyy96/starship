@@ -1,6 +1,9 @@
 (function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipWorldPresentation=api;}(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   var cast={
+    clinic:[{id:'lia',name:'莉亞',role:'醫療屋',x:560,y:350,line:'清水和乾淨布帶放在這邊。先坐下，把傷口照顧好。'}],
+    observatory:[{id:'seifra',name:'賽芙拉',role:'觀測分會',x:550,y:330,line:'量到的數值和記得的路況要分開記，還沒核對的地方先留白。'}],
+    station:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:570,y:355,line:'繩索和回程記號先核對。驛報還沒送到的，就明寫未送達。'}],
     village:[{id:'lia',name:'莉亞',role:'療養屋',x:1350,y:490,line:'藥草和清水都在這裡。妳先照顧好自己的傷，別急著提重物。'},{id:'reyn',name:'雷恩',role:'巡林者',x:355,y:405,patrol:[0,24],line:'走林道要看地面，也要看風。溪水就從橋上過，別抄下游的近路。'},{id:'isar',name:'伊薩爾',role:'村中守望者',x:805,y:477,line:'沿亮著燈的村道走。想歇一會兒，就到火場旁坐坐。'}],
     city:[{id:'mila',name:'米菈',role:'工坊學徒',x:200,y:620,patrol:[12,6],line:'要找工坊就沿城西這條街走。搬東西的人多，轉彎記得慢一點。'},{id:'vark',name:'老瓦克',role:'工坊匠人',x:270,y:655,line:'修東西得看仔細。先別碰工作臺上的工具，沿街走走吧。'},{id:'seifra',name:'賽芙拉',role:'觀測分會',x:320,y:310,line:'分會就在這裡。有需要記錄的路況，可以先把圖紙整理好。'}],
     echo:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:620,y:480,line:'山路上先找穩當的落腳處。到了驛站，就停下來歇歇。'}],

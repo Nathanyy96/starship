@@ -23,3 +23,15 @@ test('dialogue identifies the actual speakers and preserves complete narration',
  assert.equal(mixed.find(p=>p.text.startsWith('「我沒有怪妳')).speaker,'Siyeon');
  for(const scenes of Object.values(world.acts))for(const scene of scenes)assert.equal(scene.lines.length,scene.speakers.length);
 });
+test('new interiors have solid furniture, reachable floor and a return to their own settlement',()=>{
+ for(const [id,parent]of [['clinic','village'],['observatory','city'],['station','echo']]){
+  const map=world.maps[id],state={...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]};
+  assert.ok(world.passable(id,state.x,state.y),id);
+  assert.equal(world.passable(id,30,30),false,id+' walls');
+  for(const p of map.furniture)assert.equal(world.passable(id,p.x+p.w/2,p.y+p.h/2),false,id+' furniture');
+  for(const site of map.sites)assert.ok(world.route(state,site).length,id+':'+site.id);
+  const exit=map.exits.find(e=>e.to===parent);assert.ok(exit);
+  assert.ok(world.transition({...state,x:exit.x,y:exit.y},exit).changed);
+  assert.ok(world.maps[parent].exits.find(e=>e.to===id));
+ }
+});

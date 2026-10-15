@@ -125,14 +125,16 @@
     });
   }
   var acts=Object.assign({2:splitAct(2),3:splitAct(3)},campaign.acts);
+  [[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
   function passable(mapId,x,y) {
     var map=maps[mapId]; if(!map || !Number.isFinite(x)||!Number.isFinite(y)||x<10||y<10||x>map.width-10||y>map.height-10)return false;
+    if(map.floor){var f=map.floor;if(x<f[0]||y<f[1]||x>f[2]||y>f[3])return false;return !(map.furniture||[]).some(function(p){return x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h;});}
     if(mapId==='village')return village.passable(x,y);
     if(mapId==='city'&&Math.hypot(x-837,y-413)<90)return false;
     return map.paths.some(function(path){return path.points.some(function(p,i){if(!i)return false;var a=path.points[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=path.width;});});
   }
 
-  function initial(act) {act=campaign.order.includes(act)?act:2;var map=maps[acts[act][0].map];return {version:1,act:act,index:0,map:acts[act][0].map,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
+  function initial(act) {act=campaign.order.includes(act)?act:2;var startMap=act===2?'village':acts[act][0].map,map=maps[startMap];return {version:1,act:act,index:0,map:startMap,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
 
   function normalize(raw) {
     var state=initial(raw&&raw.act), steps=acts[state.act];
@@ -223,13 +225,13 @@
     if(options.toolsToggle)options.toolsToggle.addEventListener('click',function(){if(lines||pending||taskActive())return;held.clear();stopWalking();options.tools.hidden=!options.tools.hidden;if(!options.tools.hidden){atlasRegion='';atlasKey='';}options.toolsToggle.setAttribute('aria-expanded',String(!options.tools.hidden));});
     var atlasRegion='',atlasKey='',atlasArt={};
     var atlasPositions={south:[61,83],village:[72,60],road:[58,59],city:[43,60],northRoad:[45,49],mistbridge:[48,38],echo:[59,27],relic:[50,13],banksWest:[68,38],banksEast:[76,28],bellcourt:[23,18],riverRoad:[72,87],lotin:[88,89]};
-    var atlasParents={factoryNear:'city',factoryFar:'factoryNear',cityInn:'city',recovery:'city',mistInn:'mistbridge',rescue:'echo'};
+    var atlasParents={factoryNear:'city',factoryFar:'factoryNear',cityInn:'city',recovery:'city',mistInn:'mistbridge',rescue:'echo',clinic:'village',observatory:'city',station:'echo'};
     function updateAtlas(){
       if(!options.atlas||!options.tools||options.tools.hidden)return;
       var signature=atlasRegion+'|'+state.waypoints.join('|')+'|'+(renderer.terrainVersion?renderer.terrainVersion():0);if(signature===atlasKey)return;atlasKey=signature;
       var pins=[],src,heading;
       if(!atlasRegion){src='./assets/maps/r1-000.png';heading='選擇區域，查看可傳送的位置';Object.keys(atlasPositions).forEach(function(id){pins.push({id:id,x:atlasPositions[id][0],y:atlasPositions[id][1],name:maps[id].name,region:true});});}
-      else{var m=maps[atlasRegion];heading=m.name+'・點選亮起的傳送點';var ground=renderer.terrain(atlasRegion,m.width,m.height,function(x,y){return passable(atlasRegion,x,y);},{landmarks:m.sites});src=m.image;
+      else{var m=maps[atlasRegion];heading=m.name+'・點選亮起的傳送點';var ground=renderer.terrain(atlasRegion,m.width,m.height,function(x,y){return passable(atlasRegion,x,y);},{landmarks:m.sites,furniture:m.furniture});src=m.image;
         waypoints.filter(function(p){return p.map===atlasRegion;}).forEach(function(p){pins.push({id:p.id,x:p.x/m.width*100,y:p.y/m.height*100,name:p.name,locked:!state.waypoints.includes(p.id)});});
         Object.keys(atlasParents).filter(function(id){return atlasParents[id]===atlasRegion;}).forEach(function(id){var exit=m.exits.find(function(e){return e.to===id;});pins.push({id:id,x:exit.x/m.width*100,y:exit.y/m.height*100,name:maps[id].name,region:true});});}
       options.atlas.innerHTML='<div class="atlas-heading"><button type="button" data-atlas-region="">區域總圖</button><strong>'+escape(heading)+'</strong></div><div class="atlas-sheet"><img alt="'+escape(heading)+'" src="'+src+'">'+pins.map(function(p){return '<button type="button" class="atlas-pin'+(p.region?' atlas-region':'')+(p.locked?' atlas-locked':'')+'" style="left:'+p.x+'%;top:'+p.y+'%" '+(p.region?'data-atlas-region':'data-atlas-travel')+'="'+p.id+'" '+(p.locked?'disabled ':'')+'title="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'" aria-label="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">'+(p.region?'<circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="2"/>':'<path d="M12 3L19 12L12 21L5 12Z" fill="currentColor"/>')+'</svg><small>'+escape(p.name.replace('・傳送點',''))+'</small></button>';}).join('')+'</div><p>亮色菱形：已啟用，點一下傳送。灰色：先走到現場啟用。圓形：查看區域。</p>';
@@ -253,7 +255,7 @@
       actors.forEach(function(n){if(!requested['npc-'+n.id])loadImage('npc-'+n.id,'./assets/exploration/'+n.id+'-chibi-v1.png');});
       camera.x+=(state.x-camera.x)*(reduced()?1:.14);camera.y+=(state.y-camera.y)*(reduced()?1:.14);
 
-      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);var ground=renderer.terrain(state.map,map.width,map.height,function(x,y){return passable(state.map,x,y);},{landmarks:map.sites});if(ground)ctx.drawImage(ground,0,0);
+      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);var ground=renderer.terrain(state.map,map.width,map.height,function(x,y){return passable(state.map,x,y);},{landmarks:map.sites,furniture:map.furniture});if(ground)ctx.drawImage(ground,0,0);
       if(state.map.indexOf('factory')===0&&campaign.bridgeOpen(state)){ctx.save();ctx.strokeStyle='#b99860';ctx.lineWidth=24;ctx.beginPath();ctx.moveTo(780,220);ctx.lineTo(1070,250);ctx.stroke();ctx.strokeStyle='#57462f';ctx.lineWidth=2;for(var plank=0;plank<=16;plank++){var px=780+290*plank/16,py=220+30*plank/16;ctx.beginPath();ctx.moveTo(px,py-11);ctx.lineTo(px,py+11);ctx.stroke();}ctx.restore();}
       if(options.regionTag)options.regionTag.textContent=state.map==='bellcourt'?'遺構特殊連結・鐘庭外庭':state.map==='lotin'?'洛汀灣・陸路港區':'南部內陸生活圈';if(options.compass)options.compass.textContent=state.map==='bellcourt'?'局部':'N ↑';if(options.loading)options.loading.hidden=Boolean(ground);
       if(options.banner){options.banner.hidden=Boolean(lines)||now>bannerUntil;options.banner.textContent=map.name;}

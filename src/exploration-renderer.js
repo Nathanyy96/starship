@@ -30,15 +30,16 @@
   }
   // The visible ground is sampled from the same walkability function as movement.
   // Scenic overview paintings remain available in the atlas, not as collision surfaces.
-  var terrainCache={},tileArt=null,objectArt=null,artVersion=0;
+  var terrainCache={},tileArt=null,objectArt=null,interiorArt=null,artVersion=0;
   if(typeof Image!=='undefined'){
     var tiles=new Image();tiles.onload=function(){tileArt=tiles;terrainCache={};artVersion++;};tiles.src='./assets/exploration/terrain-ground-atlas-v1.png';
     var objects=new Image();objects.onload=function(){objectArt=objects;terrainCache={};artVersion++;};objects.src='./assets/exploration/terrain-objects-atlas-v1.png';
+    var furniture=new Image();furniture.onload=function(){interiorArt=furniture;terrainCache={};artVersion++;};furniture.src='./assets/exploration/interior-objects-atlas-v1.png';
   }
   function terrain(key,width,height,passable,settings){
     if(typeof document==='undefined')return null;
     if(terrainCache[key])return terrainCache[key];
-    settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=/Inn|factory|recovery/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
+    settings=settings||{};var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),indoor=/Inn|factory|recovery|clinic|observatory|station/.test(key),stone=/city|bellcourt|relic|valley/.test(key),step=8;
     var patterns=[];
     if(tileArt)for(var cell=0;cell<8;cell++){var tile=document.createElement('canvas');tile.width=128;tile.height=128;var tc=tile.getContext('2d'),sw=tileArt.naturalWidth/4,sh=tileArt.naturalHeight/2;tc.imageSmoothingEnabled=false;tc.drawImage(tileArt,(cell%4)*sw+2,Math.floor(cell/4)*sh+2,sw-4,sh-4,0,0,128,128);patterns.push(c.createPattern(tile,'repeat'));}
     c.fillStyle=indoor?'#39413b':stone?'#66715b':'#4f7952';c.fillRect(0,0,width,height);
@@ -52,6 +53,7 @@
     function blocked(x,y,w,h){for(var py=y;py<=y+h;py+=8)for(var px=x;px<=x+w;px+=8)if(passable(px,py))return false;return true;}
     function prop(index,x,y,w,h){var sw=objectArt.naturalWidth/4,sh=objectArt.naturalHeight/2;c.drawImage(objectArt,(index%4)*sw+3,Math.floor(index/4)*sh+3,sw-6,sh-6,x,y,w,h);}
     for(var ty=20;ty<height-52;ty+=64)for(var tx=20;tx<width-48;tx+=64){
+      if(settings.furniture)continue;
       if(!blocked(tx-8,ty-12,56,64))continue;
       if((key==='lotin'&&tx>1150)||(key==='road'&&tx>595&&tx<750))continue;
       if(objectArt){var urban=/city|lotin|mistbridge|village/.test(key),ruin=/valley|relic|bellcourt/.test(key),index=indoor?7:ruin?6:urban?2:((tx+ty)%192?0:1);prop(index,tx-5,ty-10,54,62);continue;}
@@ -59,6 +61,7 @@
       else{c.fillStyle='#3d6243';c.fillRect(tx+6,ty+28,32,14);c.fillStyle='#775f42';c.fillRect(tx+18,ty+20,8,29);c.fillStyle='#294e38';c.fillRect(tx+2,ty+7,40,26);c.fillStyle='#396a45';c.fillRect(tx+6,ty,32,28);c.fillStyle='#52834f';c.fillRect(tx+10,ty+3,20,9);}
     }
     if(objectArt&&/city|village|mistbridge|lotin/.test(key))for(var hy=70;hy<height-150;hy+=192)for(var hx=70;hx<width-140;hx+=192){if(blocked(hx-12,hy-12,140,140))prop((hx+hy)%384?4:5,hx,hy,116,128);}
+    (settings.furniture||[]).forEach(function(p){c.fillStyle=patterns[3]||'#b88d54';c.fillRect(p.x,p.y,p.w,p.h);if(interiorArt){var sw=interiorArt.naturalWidth/4,sh=interiorArt.naturalHeight/2;c.drawImage(interiorArt,(p.sprite%4)*sw+2,Math.floor(p.sprite/4)*sh+2,sw-4,sh-4,p.x,p.y,p.w,p.h);}else{c.fillStyle='#897559';c.fillRect(p.x+4,p.y+4,p.w-8,p.h-8);}});
     if(key==='opening-valley'){c.strokeStyle='#9d9272';c.lineWidth=4;c.beginPath();c.arc(18.5*32,10*32,58,0,Math.PI*2);c.stroke();c.beginPath();c.moveTo(18.5*32-45,10*32);c.lineTo(18.5*32+45,10*32);c.moveTo(18.5*32,10*32-45);c.lineTo(18.5*32,10*32+45);c.stroke();}
     (settings.stairs||[]).forEach(function(s){for(var sy=s[1];sy<s[1]+s[3];sy+=8)for(var sx=s[0];sx<s[0]+s[2];sx+=8)if(passable(sx+4,sy+4)){c.fillStyle='#847d67';c.fillRect(sx,sy,8,8);c.fillStyle='#e3d7b6';c.fillRect(sx,sy,8,4);}});
     terrainCache[key]=sheet;return sheet;

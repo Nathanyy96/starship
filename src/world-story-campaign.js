@@ -68,6 +68,25 @@
     map('recovery','白鐘城・老瓦克休養處','vark-recovery-room-v1.png',[850,850],[
       [[850,850],[850,700],[850,600],[800,500],[700,400]]
     ]);
+    function room(id,name,furniture,sites){
+      map(id,name,'journey-inn-interior-v1.png',[480,630],[[[480,630],[480,360],[240,360],[720,360]]],sites);
+      maps[id].width=960;maps[id].height=720;maps[id].floor=[64,64,896,656];maps[id].furniture=furniture;
+    }
+    room('clinic','獸靈之村・醫療屋與廚房',[
+      {sprite:0,x:635,y:105,w:145,h:160},{sprite:1,x:175,y:105,w:160,h:125},
+      {sprite:2,x:110,y:470,w:155,h:130},{sprite:3,x:635,y:450,w:160,h:150}
+    ],[{id:'care',name:'療養與換藥',x:560,y:260,text:'清水、布帶與藥草分開放置，傷者休養區靠窗。'},
+      {id:'kitchen',name:'共用廚房',x:340,y:490,text:'火爐、用水與飯桌分開，為村內留宿和日常照護準備熱食。'}]);
+    room('observatory','白鐘城・城西觀測分會',[
+      {sprite:4,x:330,y:115,w:190,h:145},{sprite:5,x:670,y:125,w:135,h:150},
+      {sprite:6,x:100,y:100,w:145,h:190},{sprite:6,x:100,y:430,w:145,h:170}
+    ],[{id:'records',name:'路況與量測記錄',x:460,y:330,text:'原始量測、現地記憶與待複核事項分開保管；未確認的線不能直接當作通路。'},
+      {id:'charts',name:'分會圖庫',x:310,y:480,text:'沿既有正文查閱商路與異常記錄，沒有因此新增可直接穿行的界痕。'}]);
+    room('station','山腰驛站・內部與補給間',[
+      {sprite:7,x:320,y:110,w:200,h:150},{sprite:0,x:650,y:110,w:145,h:160},
+      {sprite:6,x:100,y:100,w:145,h:185},{sprite:3,x:640,y:445,w:160,h:155}
+    ],[{id:'supplies',name:'繩索與急用物資',x:470,y:335,text:'山路出發前複核繩索、藥品與回程記號，不把未抵達的驛報當作已送達。'},
+      {id:'rest',name:'避風休整處',x:560,y:510,text:'休息與換藥後再上路；當晚不能憑遠處燈火冒險趕路。'}]);
     map('riverRoad','南行驛路・下游商路','north-trade-road-v1.png',[240,100],[
       [[240,100],[360,200],[480,300],[650,400],[900,500],[1100,650],[1300,780],[1460,850]]
     ],[{id:'river-sign',name:'下游洛汀港方向',x:900,y:500,text:'白鐘至洛汀的河運順流約兩日；此處是陸路探索接段，不以畫面距離換算步程。'}]);
@@ -86,6 +105,9 @@
     maps.factoryFar.exits.find(function(e){return e.to==='factoryNear';}).storyBridge=true;
     connect('city',1140,340,'cityInn',850,870,'進入東門旅店','返回白鐘東門街區');
     connect('city',390,700,'recovery',850,850,'前往老瓦克休養處','返回城西街區');
+    connect('village',1390,474,'clinic',480,630,'進入醫療屋與廚房','返回獸靈之村');
+    connect('city',290,230,'observatory',480,630,'進入城西觀測分會','返回白鐘城西街區');
+    connect('echo',650,480,'station',480,630,'進入山腰驛站','返回驛站外山路');
     connect('mistbridge',826,328,'mistInn',850,870,'進入旅店後廳','返回霧橋鎮');
     connect('echo',1000,273,'rescue',140,800,'沿山路至迴音谷舊渡台','返回山腰驛站');
     connect('south',780,962,'riverRoad',240,100,'南行下游商路・洛汀港方向','北返南驛山谷');
