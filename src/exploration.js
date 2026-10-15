@@ -4,6 +4,8 @@
   root.StarshipExploration = api;
 }(typeof globalThis !== "undefined" ? globalThis : this, function (dialogue) {
   "use strict";
+  var storyArt=typeof module==='object'&&module.exports?require('./exploration-story-art'):globalThis.StarshipExplorationStoryArt;
+
   var renderer = typeof module === "object" && module.exports ? require("./exploration-renderer.js") : globalThis.StarshipExplorationRenderer;
   // Coordinates and corridors are traced against the existing C1-102 illustration.
   var WIDTH = 1672, HEIGHT = 939, NAV = 16;
@@ -172,9 +174,11 @@
       }
       draw(); frame = requestAnimationFrame(tick);
     }
+    var artScenes=storyScenes.map(function(lines){return storyArt?storyArt.timeline("main-1-0",1,lines):[];});
     function showLine() {
       var line = storyScenes[sceneIndex][lineIndex];
       options.dialogTitle.textContent = line[0]; options.dialogText.textContent = line[1];
+      if(storyArt)storyArt.show(options.dialog,artScenes[sceneIndex],lineIndex);
       if (characterArt) characterArt.speakerPortrait(options.dialog, line[0], characterData);
       options.dialogNext.textContent = lineIndex + 1 < storyScenes[sceneIndex].length ? "繼續 →" : "完成對話 ✓";
       options.dialog.hidden = false; options.dialogNext.focus({ preventScroll: true }); draw();
@@ -182,7 +186,7 @@
     function nextLine() {
       if (sceneIndex < 0) return;
       if (++lineIndex < storyScenes[sceneIndex].length) { showLine(); return; }
-      state.storyStep++; save(); sceneIndex = -1; options.dialog.hidden = true;
+      state.storyStep++; save(); sceneIndex = -1; options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog);
       if (state.storyStep === storyGoals.length && options.onStoryComplete) options.onStoryComplete();
       options.status.textContent = state.storyStep >= storyGoals.length ? "第一幕已在獸靈之村完成。你可以繼續自由探索。" : "劇情對話完成。沿金色路線前往下一個人物。";
       draw(); canvas.focus({ preventScroll: true });
@@ -195,6 +199,7 @@
     }
     function onKey(e, down) {
       if (!active || options.panel.hidden) return;
+      if(storyArt&&storyArt.isZoomed())return;
       if (sceneIndex >= 0) { if (down && (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") && !e.repeat) { e.preventDefault(); nextLine(); } return; }
       var keys = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
       if (keys[e.code] && !(e.target instanceof HTMLInputElement) && !(e.target.closest && e.target.closest('select,textarea'))) { e.preventDefault(); if (down) pressed.add(keys[e.code]); else pressed.delete(keys[e.code]); }
@@ -213,7 +218,7 @@
     });
     draw();
     return { open: function () { active = true; lastFrame = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
-      close: function () { active = false; pressed.clear(); sceneIndex = -1; options.dialog.hidden = true; cancelAnimationFrame(frame); save(); },
+      close: function () { active = false; pressed.clear(); sceneIndex = -1; options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); cancelAnimationFrame(frame); save(); },
       reload: function () { state = normalize(options.load()); draw(); },
       enterStory: function () { state.arrived = true; if (state.storyStep === 0) { state.x = 1518; state.y = 216; } save(); draw(); },
       setPlayer: setPlayer, state: function () { return normalize(state); } };

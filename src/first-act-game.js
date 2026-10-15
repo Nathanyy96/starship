@@ -4,6 +4,8 @@
   root.StarshipFirstActGame = api;
 }(typeof globalThis !== "undefined" ? globalThis : this, function (dialogue) {
   "use strict";
+  var storyArt=typeof module==='object'&&module.exports?require('./exploration-story-art'):globalThis.StarshipExplorationStoryArt;
+
   var renderer = typeof module === "object" && module.exports ? require("./exploration-renderer.js") : globalThis.StarshipExplorationRenderer;
   var TILE = 32, W = 36, H = 24;
   var backgrounds = { valley: "./assets/exploration/south-post-altar-v2.png", forest: "./assets/exploration/village-forest-v2.png" };
@@ -117,6 +119,7 @@
   function create(options) {
     var canvas = options.canvas, ctx = canvas.getContext("2d"), state = normalize(options.load());
     var active = false, held = new Set(), frame = 0, previous = 0, lastSave = 0, routeKey = "", currentRoute = [], art = {}, sceneIndex = -1, lineIndex = 0, optionalScene = null;
+    var artScenes=scenes.map(function(lines){return storyArt?storyArt.timeline("main-1-0",1,lines):[];});
     function talking() { return sceneIndex >= 0 || optionalScene !== null; }
     var characterArt = globalThis.StarshipExplorationCharacters, characterData = options.characterData || globalThis.StarshipGachaData || {};
     var extraActors = (options.actors || []).filter(function (actor) { return actor.id && Number.isFinite(actor.x) && Number.isFinite(actor.y); });
@@ -196,6 +199,7 @@
     function showLine() {
       var lines = optionalScene || scenes[sceneIndex], line = lines[lineIndex];
       options.dialogTitle.textContent = line[0]; options.dialogText.textContent = line[1];
+      if(storyArt)storyArt.show(options.dialog,optionalScene?[]:artScenes[sceneIndex],lineIndex);
       if (characterArt) characterArt.speakerPortrait(options.dialog, line[0], characterData);
       options.dialogNext.textContent = lineIndex + 1 < lines.length ? "繼續 →" : "完成對話 ✓";
       options.dialog.hidden = false; options.dialogNext.focus({ preventScroll: true }); draw();
@@ -210,14 +214,15 @@
       sceneIndex = state.index; lineIndex = 0; held.clear(); showLine();
     }
     function nextLine() {
-      if (optionalScene) { optionalScene=null; options.dialog.hidden=true;draw();canvas.focus({preventScroll:true});return; }
+      if (optionalScene) { optionalScene=null; options.dialog.hidden=true;if(storyArt)storyArt.clear(options.dialog);draw();canvas.focus({preventScroll:true});return; }
       if (sceneIndex < 0) return;
       if (++lineIndex < scenes[sceneIndex].length) { showLine(); return; }
       var result = advance(state); state = result.state; save(); sceneIndex = -1;
-      options.dialog.hidden = true; draw(); canvas.focus({ preventScroll: true });
+      options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); draw(); canvas.focus({ preventScroll: true });
     }
     function onKey(e, down) {
       if (!active || options.panel.hidden) return;
+      if(storyArt&&storyArt.isZoomed())return;
       if (talking()) { if (down && (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") && !e.repeat) { e.preventDefault(); nextLine(); } return; }
       var keys = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
       if (keys[e.code] && !(e.target instanceof HTMLInputElement) && !(e.target.closest && e.target.closest('select,textarea'))) { e.preventDefault(); if (down) held.add(keys[e.code]); else held.delete(keys[e.code]); }
@@ -227,7 +232,7 @@
     window.addEventListener("blur", function () { held.clear(); });
     options.interact.addEventListener("click", interact);
     options.dialogNext.addEventListener("click", nextLine);
-    options.reset.addEventListener("click", function () { state = initial(); sceneIndex = -1; optionalScene=null; save(); if (options.onRestart) options.onRestart(); options.dialog.hidden = true; draw(); canvas.focus({ preventScroll: true }); });
+    options.reset.addEventListener("click", function () { state = initial(); sceneIndex = -1; optionalScene=null; save(); if (options.onRestart) options.onRestart(); options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); draw(); canvas.focus({ preventScroll: true }); });
     options.pad.querySelectorAll("[data-act-move]").forEach(function (button) {
       function release(e) { held.delete(button.dataset.actMove); if (e.pointerId !== undefined && button.hasPointerCapture(e.pointerId)) button.releasePointerCapture(e.pointerId); }
       button.addEventListener("pointerdown", function (e) { e.preventDefault(); held.add(button.dataset.actMove); button.setPointerCapture(e.pointerId); });
@@ -235,7 +240,7 @@
     });
     draw();
     return { open: function () { state = normalize(options.load()); active = true; previous = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
-      close: function () { active = false; held.clear(); sceneIndex = -1; optionalScene=null; options.dialog.hidden = true; cancelAnimationFrame(frame); save(); }, setPlayer: setPlayer, state: function () { return normalize(state); } };
+      close: function () { active = false; held.clear(); sceneIndex = -1; optionalScene=null; options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); cancelAnimationFrame(frame); save(); }, setPlayer: setPlayer, state: function () { return normalize(state); } };
   }
   return { steps: steps, scenes: scenes, sprites: sprites, backgrounds: backgrounds, paths: paths, lookouts: lookouts, nearLookout: nearLookout, zoneNames: zoneNames, initial: initial, terrain: terrain, passable: passable, fits:fits, clearSegment:clearSegment, normalize: normalize, route: route, advance: advance, create: create };
 }));
