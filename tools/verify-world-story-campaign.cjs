@@ -8,7 +8,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
  const saveKey='starship-gacha-save-v1:campaign-qa';
  async function saved(){return page.evaluate(k=>JSON.parse(localStorage.getItem(k)),saveKey);}
  async function clickCards(prefix,expected){
-   const actual=await page.evaluate(({prefix,expected})=>{const out=[];for(const line of expected){out.push(document.getElementById(prefix+'-dialog-text').textContent);document.getElementById(prefix+'-dialog-next').click();}return out;},{prefix,expected});
+   const actual=await page.evaluate(({prefix,expected})=>{const out=[];for(const line of expected){out.push({text:document.getElementById(prefix+'-dialog-text').textContent,speaker:document.getElementById(prefix+'-dialog-title').textContent});document.getElementById(prefix+'-dialog-next').click();}return out;},{prefix,expected});
    assert.deepEqual(actual,expected);cards+=expected.length;segments++;
  }
  try{
@@ -19,7 +19,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
   for(let i=0;i<9;i++){
    await page.evaluate(i=>{const s=StarshipFirstActGame.steps[i];localStorage.setItem('starship-first-act-game-v2:campaign-qa',JSON.stringify({index:i,zone:s.zone,x:s.x,y:s.y}));},i);
    await page.click('#play-first-act');await page.click('#first-act-interact');
-   await clickCards('first-act',await page.evaluate(i=>StarshipFirstActGame.scenes[i].map(line=>line[1]),i));
+   await clickCards('first-act',await page.evaluate(i=>StarshipFirstActGame.scenes[i].map(line=>({text:line[1],speaker:line[0]})),i));
    if(i<8)await page.click('#first-act-back');
   }
   await page.click('#first-act-enter-village');
@@ -27,7 +27,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
    await page.click('#close-exploration');
    await page.evaluate(i=>{const e=StarshipExploration,g=e.storyGoals[i];localStorage.setItem('starship-exploration-test-v1:campaign-qa',JSON.stringify({...e.initial(),arrived:true,storyStep:i,x:g.x,y:g.y}));},i);
    await page.click('#open-exploration');await page.click('#exploration-interact');
-   await clickCards('exploration',await page.evaluate(i=>StarshipExploration.storyScenes[i].map(line=>line[1]),i));
+   await clickCards('exploration',await page.evaluate(i=>StarshipExploration.storyScenes[i].map(line=>({text:line[1],speaker:line[0]})),i));
   }
   await page.waitForFunction(k=>Boolean(JSON.parse(localStorage.getItem(k)).storyProgress.completedScenes['main-1-0:signal']),saveKey);
   await page.click('#close-exploration');
@@ -42,7 +42,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
      await page.waitForTimeout(250);await page.locator('#first-major-panel').screenshot({path:path.join(output,'scene-'+act+'-'+index+'-desktop.png')});
      await page.setViewportSize({width:390,height:844});await page.waitForTimeout(80);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('#first-major-panel').screenshot({path:path.join(output,'scene-'+act+'-'+index+'-mobile.png')});await page.setViewportSize({width:1280,height:900});
     }
-    await clickCards('first-major',await page.evaluate(({act,index})=>StarshipFirstMajorWorld.acts[act][index].lines,{act,index}));
+    await clickCards('first-major',await page.evaluate(({act,index})=>StarshipFirstMajorWorld.acts[act][index].lines.map((text,i)=>({text,speaker:StarshipFirstMajorWorld.acts[act][index].speakers[i]})),{act,index}));
     if(index<count-1)await page.click('#close-first-major');
    }
    const meta=await page.evaluate(act=>StarshipFirstMajorWorld.storyMeta(act),act);

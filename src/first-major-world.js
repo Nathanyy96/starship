@@ -13,8 +13,8 @@
   var heroMotion=typeof module==='object'&&module.exports?require('./hero-motion.js'):globalThis.StarshipHeroMotion;
 
   var maps = {
-    village: { name: '獸靈之村', image: village.mapImage, width: village.WIDTH, height: village.HEIGHT, spawn: [1390,474], paths: village.paths,
-      sites: village.sites, exits: [{name:'西行商路', x:70,y:370,to:'road',spawn:[1515,455]}] },
+    village: { name: '獸靈之村', image: village.mapImage, width: village.WIDTH, height: village.HEIGHT, spawn: [1390,474], paths: village.paths.map(function(p){return {width:p.width,points:p.points.map(function(v){return v.slice();})};}),
+      sites: village.sites.map(function(p){return Object.assign({},p);}), exits: [{name:'西行商路', x:70,y:370,to:'road',spawn:[1515,455]}] },
     road: { name: '西行商路・兩日行程', image: './assets/exploration/west-trade-road-v1.png', width:1672,height:939,spawn:[1515,455],
       paths:[{width:30,points:[[1565,423],[1515,455],[1450,465],[1375,495],[1300,523],[1195,510],[1100,509],[1030,528],[957,506],[911,474],[874,456],[788,468],[726,452],[676,435],[638,427],[580,413],[529,368],[461,355],[355,357],[264,342],[226,296],[203,258],[131,209]]},
         {width:32,points:[[874,456],[920,420],[958,420]]}],
@@ -98,11 +98,16 @@
   maps.village.paths.push({width:54,points:[[648,764],[648,880],[648,920]]});
   var westExit=maps.village.exits.find(function(e){return e.to==='road';});westExit.x=24;westExit.y=355;
   maps.road.exits.find(function(e){return e.to==='village';}).spawn=[85,365];
-  Object.values(maps).forEach(function(m){if(m!==maps.village)m.paths.forEach(function(p){p.width=Math.max(p.width,48);});});
+  Object.values(maps).forEach(function(m){if(m!==maps.village)m.paths.forEach(function(p){p.width=Math.max(p.width,64);});});
+  var regionScale={city:2.2,village:1.5,mistbridge:1.6};
+  Object.keys(regionScale).forEach(function(id){var m=maps[id],factor=regionScale[id];m.scale=factor;m.width=Math.round(m.width*factor);m.height=Math.round(m.height*factor);m.spawn=m.spawn.map(function(n){return n*factor;});m.paths.forEach(function(p){p.points=p.points.map(function(v){return [v[0]*factor,v[1]*factor];});p.width*=id==='village'?factor:1.4;});m.sites.concat(m.exits).forEach(function(p){p.x*=factor;p.y*=factor;});});
+  Object.values(maps).forEach(function(m){m.exits.forEach(function(e){var factor=regionScale[e.to]||1;e.spawn=e.spawn.map(function(n){return n*factor;});});});
+  maps.city.buildings=[{sprite:5,x:140*2.2,y:430*2.2,w:210*2.2,h:120*2.2}];
+  function mapPoint(id,x,y){var factor=regionScale[id]||1;return {x:x*factor,y:y*factor};}
 
   // Stable IDs let future regions add anchors without changing travel or save logic.
   var waypoints=Object.keys(maps).map(function(id){var m=maps[id];return {id:id+'-anchor',map:id,name:m.name+'・傳送點',x:m.spawn[0],y:m.spawn[1]};});
-  waypoints.push({id:'city-plaza',map:'city',name:'白鐘城・中央廣場',x:800,y:300});
+  waypoints.push({id:'city-plaza',map:'city',name:'白鐘城・中央廣場',x:800*(regionScale.city||1),y:300*(regionScale.city||1)});
   function waypointById(id){return waypoints.find(function(p){return p.id===id;});}
   function knownWaypoints(ids){return Array.isArray(ids)?Array.from(new Set(ids.filter(function(id){return Boolean(waypointById(id));}))):[];}
   var placements = {
@@ -126,19 +131,22 @@
   }
   var acts=Object.assign({2:splitAct(2),3:splitAct(3)},campaign.acts);
   [[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
+  Object.values(acts).flat().forEach(function(scene){var p=mapPoint(scene.map,scene.x,scene.y);scene.x=p.x;scene.y=p.y;});
   function passable(mapId,x,y) {
     var map=maps[mapId]; if(!map || !Number.isFinite(x)||!Number.isFinite(y)||x<10||y<10||x>map.width-10||y>map.height-10)return false;
     if(map.floor){var f=map.floor;if(x<f[0]||y<f[1]||x>f[2]||y>f[3])return false;return !(map.furniture||[]).some(function(p){return x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h;});}
-    if(mapId==='village')return village.passable(x,y);
-    if(mapId==='city'&&Math.hypot(x-837,y-413)<90)return false;
+    if(mapId==='village'){var vs=map.scale||1;if(Math.hypot(x-832*vs,y-395*vs)<32*vs)return false;if(Math.pow((x-1370*vs)/(70*vs),2)+Math.pow((y-370*vs)/(55*vs),2)<1)return false;}
+    if((map.buildings||[]).some(function(p){return x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h;}))return false;
+    if(mapId==='city'&&Math.hypot(x-837*map.scale,y-413*map.scale)<90*map.scale)return false;
     return map.paths.some(function(path){return path.points.some(function(p,i){if(!i)return false;var a=path.points[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=path.width;});});
   }
 
-  function initial(act) {act=campaign.order.includes(act)?act:2;var startMap=act===2?'village':acts[act][0].map,map=maps[startMap];return {version:1,act:act,index:0,map:startMap,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
+  function initial(act) {act=campaign.order.includes(act)?act:2;var startMap=act===2?'village':acts[act][0].map,map=maps[startMap];return {version:1,geometryVersion:2,act:act,index:0,map:startMap,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
 
   function normalize(raw) {
     var state=initial(raw&&raw.act), steps=acts[state.act];
     if(raw&&raw.version===1){state.index=Math.max(0,Math.min(steps.length,Math.floor(Number(raw.index)||0)));state.map=canVisit(state,raw.map)?raw.map:'village';
+      if(raw.geometryVersion!==2){raw=Object.assign({},raw);var oldFactor=regionScale[state.map]||1;raw.x=Number(raw.x)*oldFactor;raw.y=Number(raw.y)*oldFactor;}
       if(state.map===raw.map && passable(state.map,Number(raw.x),Number(raw.y))){state.x=Number(raw.x);state.y=Number(raw.y);}else {state.x=maps[state.map].spawn[0];state.y=maps[state.map].spawn[1];}
 
       state.roaming=raw.roaming===true;state.visited=Array.isArray(raw.visited)?raw.visited.filter(function(id){return Object.keys(maps).some(function(k){return maps[k].sites.some(function(s){return k+':'+s.id===id;});});}):[];
@@ -156,7 +164,7 @@
   function teleport(state,id){var next=normalize(state),p=waypointById(id);if(!p||!canVisit(next,p.map)||!next.waypoints.includes(id)||!fits(p.map,p.x,p.y))return {state:next,changed:false};next.map=p.map;next.x=p.x;next.y=p.y;return {state:next,changed:true};}
   function nearby(state) {
     var target=goal(state);if(target&&target.map===state.map&&Math.hypot(state.x-target.x,state.y-target.y)<55)return {kind:'story',value:target};
-    var actors=presentation.npcs(state.map).filter(function(n){return Math.hypot(state.x-n.x,state.y-n.y)<62;});if(actors.length)return {kind:'npc',value:actors.sort(function(a,b){return Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y);})[0]};
+    var actors=presentation.npcs(state.map).map(function(n){var p=mapPoint(state.map,n.x,n.y);return Object.assign({},n,p);}).filter(function(n){return Math.hypot(state.x-n.x,state.y-n.y)<62;});if(actors.length)return {kind:'npc',value:actors.sort(function(a,b){return Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y);})[0]};
     var candidates=maps[state.map].exits.map(function(x){return {kind:'exit',value:x};}).concat(maps[state.map].sites.map(function(x){return {kind:'site',value:x};}));
     return candidates.filter(function(x){return Math.hypot(state.x-x.value.x,state.y-x.value.y)<48;}).sort(function(a,b){return Math.hypot(state.x-a.value.x,state.y-a.value.y)-Math.hypot(state.x-b.value.x,state.y-b.value.y);})[0]||null;
   }
@@ -231,7 +239,7 @@
       var signature=atlasRegion+'|'+state.waypoints.join('|')+'|'+(renderer.terrainVersion?renderer.terrainVersion():0);if(signature===atlasKey)return;atlasKey=signature;
       var pins=[],src,heading;
       if(!atlasRegion){src='./assets/maps/r1-000.png';heading='選擇區域，查看可傳送的位置';Object.keys(atlasPositions).forEach(function(id){pins.push({id:id,x:atlasPositions[id][0],y:atlasPositions[id][1],name:maps[id].name,region:true});});}
-      else{var m=maps[atlasRegion];heading=m.name+'・點選亮起的傳送點';var ground=renderer.terrain(atlasRegion,m.width,m.height,function(x,y){return passable(atlasRegion,x,y);},{landmarks:m.sites,furniture:m.furniture});src=m.image;
+      else{var m=maps[atlasRegion];heading=m.name+'・點選亮起的傳送點';var ground=renderer.terrain(atlasRegion,m.width,m.height,function(x,y){return passable(atlasRegion,x,y);},{landmarks:m.sites,furniture:m.furniture,buildings:m.buildings});src=m.image;
         waypoints.filter(function(p){return p.map===atlasRegion;}).forEach(function(p){pins.push({id:p.id,x:p.x/m.width*100,y:p.y/m.height*100,name:p.name,locked:!state.waypoints.includes(p.id)});});
         Object.keys(atlasParents).filter(function(id){return atlasParents[id]===atlasRegion;}).forEach(function(id){var exit=m.exits.find(function(e){return e.to===id;});pins.push({id:id,x:exit.x/m.width*100,y:exit.y/m.height*100,name:maps[id].name,region:true});});}
       options.atlas.innerHTML='<div class="atlas-heading"><button type="button" data-atlas-region="">區域總圖</button><strong>'+escape(heading)+'</strong></div><div class="atlas-sheet"><img alt="'+escape(heading)+'" src="'+src+'">'+pins.map(function(p){return '<button type="button" class="atlas-pin'+(p.region?' atlas-region':'')+(p.locked?' atlas-locked':'')+'" style="left:'+p.x+'%;top:'+p.y+'%" '+(p.region?'data-atlas-region':'data-atlas-travel')+'="'+p.id+'" '+(p.locked?'disabled ':'')+'title="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'" aria-label="'+escape(p.name+(p.locked?'（尚未啟用）':''))+'"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">'+(p.region?'<circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="2"/>':'<path d="M12 3L19 12L12 21L5 12Z" fill="currentColor"/>')+'</svg><small>'+escape(p.name.replace('・傳送點',''))+'</small></button>';}).join('')+'</div><p>亮色菱形：已啟用，點一下傳送。灰色：先走到現場啟用。圓形：查看區域。</p>';
@@ -250,12 +258,12 @@
 
     function nextLine(){if(!lines||pending)return;if(++lineIndex<lines.length){showLine();return;}if(dialogKind==='npc'){lines=null;talking=null;options.dialog.hidden=true;draw();canvas.focus({preventScroll:true});return;}state.index++;lines=null;options.dialog.hidden=true;save();routeKey='';if(!goal(state))syncComplete();draw();canvas.focus({preventScroll:true});}
     function draw(){
-      var now=performance.now(),actors=presentation.npcs(state.map),changed=camera.map!==state.map;
+      var now=performance.now(),actors=presentation.npcs(state.map).map(function(n){var p=mapPoint(state.map,n.x,n.y);return Object.assign({},n,{x:p.x,y:p.y,patrol:n.patrol?n.patrol.map(function(v){return v*(regionScale[state.map]||1);}):null});}),changed=camera.map!==state.map;
       if(changed){camera={map:state.map,x:state.x,y:state.y};bannerUntil=now+3200;lastMini=0;if(options.scene){options.scene.classList.remove('world-arrival');void options.scene.offsetWidth;options.scene.classList.add('world-arrival');}}
       actors.forEach(function(n){if(!requested['npc-'+n.id])loadImage('npc-'+n.id,'./assets/exploration/'+n.id+'-chibi-v1.png');});
       camera.x+=(state.x-camera.x)*(reduced()?1:.14);camera.y+=(state.y-camera.y)*(reduced()?1:.14);
 
-      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);var ground=renderer.terrain(state.map,map.width,map.height,function(x,y){return passable(state.map,x,y);},{landmarks:map.sites,furniture:map.furniture});if(ground)ctx.drawImage(ground,0,0);
+      var map=maps[state.map],view=renderer.begin(canvas,ctx,map.width,map.height,camera.x,camera.y);lastView=view;ctx.fillStyle='#234c40';ctx.fillRect(view.x,view.y,view.width,view.height);var ground=renderer.terrain(state.map,map.width,map.height,function(x,y){return passable(state.map,x,y);},{landmarks:map.sites,furniture:map.furniture,buildings:map.buildings});if(ground)ctx.drawImage(ground,0,0);
       if(state.map.indexOf('factory')===0&&campaign.bridgeOpen(state)){ctx.save();ctx.strokeStyle='#b99860';ctx.lineWidth=24;ctx.beginPath();ctx.moveTo(780,220);ctx.lineTo(1070,250);ctx.stroke();ctx.strokeStyle='#57462f';ctx.lineWidth=2;for(var plank=0;plank<=16;plank++){var px=780+290*plank/16,py=220+30*plank/16;ctx.beginPath();ctx.moveTo(px,py-11);ctx.lineTo(px,py+11);ctx.stroke();}ctx.restore();}
       if(options.regionTag)options.regionTag.textContent=state.map==='bellcourt'?'遺構特殊連結・鐘庭外庭':state.map==='lotin'?'洛汀灣・陸路港區':'南部內陸生活圈';if(options.compass)options.compass.textContent=state.map==='bellcourt'?'局部':'N ↑';if(options.loading)options.loading.hidden=Boolean(ground);
       if(options.banner){options.banner.hidden=Boolean(lines)||now>bannerUntil;options.banner.textContent=map.name;}
@@ -295,7 +303,7 @@
     canvas.addEventListener('pointerdown',function(e){
       if(!active||lines||pending||taskActive()||options.tools&&!options.tools.hidden||!lastView||e.button>0)return;
       var rect=canvas.getBoundingClientRect(),x=lastView.x+(e.clientX-rect.left)/rect.width*lastView.width,y=lastView.y+(e.clientY-rect.top)/rect.height*lastView.height;
-      var npc=presentation.npcs(state.map).map(function(n){var pos=presentation.position(n,performance.now(),reduced(),function(px,py){return fits(state.map,px,py);});return {npc:n,x:pos.x,y:pos.y};}).filter(function(p){return Math.abs(x-p.x)<24&&y>p.y-44&&y<p.y+12;}).sort(function(a,b){return Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y);})[0];
+      var npc=presentation.npcs(state.map).map(function(n){var scaled=mapPoint(state.map,n.x,n.y);n=Object.assign({},n,{x:scaled.x,y:scaled.y});var pos=presentation.position(n,performance.now(),reduced(),function(px,py){return fits(state.map,px,py);});return {npc:n,x:pos.x,y:pos.y};}).filter(function(p){return Math.abs(x-p.x)<24&&y>p.y-44&&y<p.y+12;}).sort(function(a,b){return Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y);})[0];
       var target=npc?{x:npc.x,y:npc.y}:{x:x,y:y},path=planWalk(state,target.x,target.y);stopWalking();held.clear();stopWalking();if(!path.length){options.status.textContent='這裡無法通行，請點選道路或空地。';draw();return;}
       autoPath=path;autoTarget=target;autoIntent=npc?{id:npc.npc.id,map:state.map}:null;options.status.textContent=npc?'正在走近 '+npc.npc.name+'…':'沿道路前往點選位置。';canvas.focus({preventScroll:true});draw();
     });
@@ -306,6 +314,6 @@
     function start(act,roaming){if(!campaign.meta(act)||(!roaming&&!options.canStart(act))){options.status.textContent='先完成前一幕正文、互動及版本領獎條件，再開始下一幕探索。';return false;}epoch++;pending=false;held.clear();stopWalking();var saved=roaming&&options.loadRoam?options.loadRoam():options.load(act);state=normalize(saved&&saved.act===act?saved:initial(act));state.roaming=Boolean(roaming);if(options.loadWaypoints)state.waypoints=knownWaypoints(state.waypoints.concat(knownWaypoints(options.loadWaypoints())));waypointKey='';lines=null;talking=null;dialogKind='story';camera.map='';taskKey='';missionFeedback='';options.status.textContent=roaming?'沿路走近出口即可換圖；地圖／傳送可點選已啟用的傳送點。':campaign.meta(act).label+'・沿金色路線前往劇情地點。';destination='';if(options.destination)options.destination.value='';if(options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}options.dialog.hidden=true;routeKey='';save();draw();return true;}
     return {openTerrain:function(map,x,y){if(!start(2,true))return false;if(map&&maps[map]){state.map=map;state.x=x===undefined?maps[map].spawn[0]:x;state.y=y===undefined?maps[map].spawn[1]:y;}active=true;previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);save();draw();canvas.focus({preventScroll:true});return true;},open:function(act){if(!start(act))return false;active=true;previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);canvas.focus({preventScroll:true});return true;},close:function(){if(active)save();if(options.fullscreen&&document.fullscreenElement===options.panel)Promise.resolve(document.exitFullscreen()).catch(function(){});epoch++;pending=false;active=false;held.clear();stopWalking();lines=null;options.dialog.hidden=true;if(options.task)options.task.hidden=true;cancelAnimationFrame(frame);},setPlayer:setPlayer,state:function(){return normalize(state);}};
   }
-  return {maps:maps,storyMeta:campaign.meta,storyOrder:campaign.order,waypoints:waypoints,activateWaypoint:activateWaypoint,teleport:teleport,nearWaypoint:nearWaypoint,knownWaypoints:knownWaypoints,acts:acts,initial:initial,normalize:normalize,passable:passable,move:move,route:route,planWalk:planWalk,goal:goal,canVisit:canVisit,nearby:nearby,transition:transition,crossExit:crossExit,navigationTarget:navigationTarget,create:create};
+  return {maps:maps,mapPoint:mapPoint,storyMeta:campaign.meta,storyOrder:campaign.order,waypoints:waypoints,activateWaypoint:activateWaypoint,teleport:teleport,nearWaypoint:nearWaypoint,knownWaypoints:knownWaypoints,acts:acts,initial:initial,normalize:normalize,passable:passable,move:move,route:route,planWalk:planWalk,goal:goal,canVisit:canVisit,nearby:nearby,transition:transition,crossExit:crossExit,navigationTarget:navigationTarget,create:create};
 
 }));

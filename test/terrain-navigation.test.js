@@ -35,3 +35,12 @@ test('new interiors have solid furniture, reachable floor and a return to their 
   assert.ok(world.maps[parent].exits.find(e=>e.to===id));
  }
 });
+
+test('White Bell is physically larger, workshop roof is blocked, and old positions migrate once',()=>{
+ assert.ok(world.maps.city.width>world.maps.village.width*1.4);
+ const roof=world.maps.city.buildings[0],center={x:roof.x+roof.w/2,y:roof.y+roof.h/2};
+ assert.equal(world.passable('city',center.x,center.y),false);
+ assert.deepEqual(world.planWalk({...world.initial(3),map:'city',...world.mapPoint('city',260,650)},center.x,center.y),[]);
+ const original={version:1,act:3,index:7,map:'city',x:1280,y:380,visited:[],waypoints:[]},migrated=world.normalize(original);
+ assert.equal(migrated.x,1280*2.2);assert.equal(migrated.y,380*2.2);assert.deepEqual(world.normalize(migrated),migrated);
+});

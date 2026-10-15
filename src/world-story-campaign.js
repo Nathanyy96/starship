@@ -104,7 +104,8 @@
     maps.factoryNear.exits.find(function(e){return e.to==='factoryFar';}).storyBridge=true;
     maps.factoryFar.exits.find(function(e){return e.to==='factoryNear';}).storyBridge=true;
     connect('city',1140,340,'cityInn',850,870,'進入東門旅店','返回白鐘東門街區');
-    connect('city',390,700,'recovery',850,850,'前往老瓦克休養處','返回城西街區');
+    maps.city.paths.push({width:64,points:[[390,700],[460,730]]});
+    connect('city',460,730,'recovery',850,850,'前往老瓦克休養處','返回城西街區');
     connect('village',1390,474,'clinic',480,630,'進入醫療屋與廚房','返回獸靈之村');
     connect('city',290,230,'observatory',480,630,'進入城西觀測分會','返回白鐘城西街區');
     connect('echo',650,480,'station',480,630,'進入山腰驛站','返回驛站外山路');

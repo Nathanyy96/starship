@@ -12,7 +12,7 @@ test('mobile camera keeps the character readable and renders at device resolutio
     assert.ok(44*view.zoom >= 44);
     assert.equal(ctx.imageSmoothingEnabled,true);
     assert.equal(ctx.imageSmoothingQuality,'high');
-    assert.equal(transforms.at(-1)[0],2*1.05);
+    assert.equal(transforms.at(-1)[0],2*1.2);
   } finally { global.window=old; }
 });
 test('camera and sprite feet stay inside the scene when close to an edge', () => {

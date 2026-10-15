@@ -29,7 +29,7 @@ test('workshop crossing opens only after the near-bank checks and is reachable f
 
 test('each region uses its own existing or new background', () => {
   for (const map of Object.values(world.maps)) assert.ok(fs.existsSync(path.join(__dirname,'..',map.image.replace(/^\.\//,''))));
-  assert.equal(world.maps.city.width,1672);
+  assert.equal(world.maps.city.width,Math.round(1672*2.2));
 });
 
 test('every scene, site and regional exit is reachable along the walkable ground', () => {
@@ -134,7 +134,7 @@ test('formal progress gate blocks later acts and closing twice does not write in
 test('waypoints require nearby activation and preserve story on travel',()=>{
   let state=world.initial(2);assert.equal(world.teleport(state,'city-anchor').changed,false);
   assert.equal(world.activateWaypoint(state,'city-anchor').changed,false);
-  assert.equal(world.activateWaypoint({...state,x:300,y:300},'village-anchor').changed,false);
+  assert.equal(world.activateWaypoint({...state,...world.mapPoint('village',330,455)},'village-anchor').changed,false);
   let result=world.activateWaypoint(state,'village-anchor');assert.equal(result.changed,true);state=result.state;
   assert.equal(world.activateWaypoint(state,'village-anchor').changed,false);
   const p=world.waypoints.find(p=>p.id==='city-plaza');
@@ -160,17 +160,17 @@ test('travel controls share unlocks across acts, reload by account, and block tr
   for(const key of ['activate','travel','travelHint','travelList'])options[key]={hidden:false,disabled:false,value:'',innerHTML:'',textContent:'',handlers:{},addEventListener(k,f){this.handlers[k]=f;},click(){this.handlers.click?.();}};
   let shared=['city-anchor'];options.loadWaypoints=()=>shared;options.saveWaypoints=ids=>shared=ids;
   const controller=w.create(options);controller.open(2);options.activate.click();assert.deepEqual(Array.from(shared),['city-anchor','village-anchor']);
-  options.interact.click();options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
+  options.load=()=>({...w.initial(2),...w.mapPoint('village',1350,490)});controller.open(2);options.interact.click();options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
   controller.close();controller.open(3);assert.ok(controller.state().waypoints.includes('city-anchor'));
   options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'city');assert.equal(controller.state().index,0);
-  controller.close();shared=[];controller.open(2);assert.equal(controller.state().waypoints.length,0);
+  controller.close();shared=[];options.load=()=>null;controller.open(2);assert.equal(controller.state().waypoints.length,0);
   options.travelList.value='city-anchor';options.travel.click();assert.equal(controller.state().map,'village');
 });
 
 
 test('named NPCs use existing chibi assets, stand on reachable ground and patrol safely',()=>{
   const p=require('../src/world-presentation');
-  for(const [id,map] of Object.entries(world.maps))for(const npc of p.npcs(id)){
+  for(const [id,map] of Object.entries(world.maps))for(const original of p.npcs(id)){const npc={...original,...world.mapPoint(id,original.x,original.y),patrol:original.patrol?.map(n=>n*(map.scale||1))};
     assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',npc.id+'-chibi-v1.png')));
     assert.ok(world.passable(id,npc.x,npc.y),npc.id);
     assert.ok(world.route({...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]},npc).length,npc.id);
@@ -180,7 +180,7 @@ test('named NPCs use existing chibi assets, stand on reachable ground and patrol
 });
 
 test('ambient NPC dialogue closes without advancing the story or granting progress',()=>{
-  const {world:w,options}=controllerHarness();const original={...w.initial(2),map:'city',x:200,y:620};options.load=()=>original;
+  const {world:w,options}=controllerHarness();const original={...w.initial(2),map:'city',...w.mapPoint('city',200,620)};options.load=()=>original;
   let completions=0;options.onComplete=()=>completions++;
   const controller=w.create(options);controller.open(2);assert.equal(w.nearby(controller.state()).kind,'npc');options.interact.click();assert.equal(options.dialog.hidden,false);assert.equal(options.dialogTitle.textContent,'米菈');options.dialogNext.click();assert.equal(options.dialog.hidden,true);assert.equal(controller.state().index,0);assert.equal(completions,0);assert.equal(controller.state().map,'city');
 });
