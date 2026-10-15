@@ -100,7 +100,7 @@
   maps.road.exits.find(function(e){return e.to==='village';}).spawn=[85,365];
   Object.values(maps).forEach(function(m){if(m!==maps.village&&!m.traced)m.paths.forEach(function(p){p.width=Math.max(p.width,64);});});
   var regionScale={city:2.2,village:1.5,mistbridge:1.6,lotin:3};
-  Object.keys(regionScale).forEach(function(id){var m=maps[id],factor=regionScale[id];m.scale=factor;m.width=Math.round(m.width*factor);m.height=Math.round(m.height*factor);m.spawn=m.spawn.map(function(n){return n*factor;});m.paths.forEach(function(p){p.points=p.points.map(function(v){return [v[0]*factor,v[1]*factor];});p.width*=id==='village'||m.traced?factor:1.4;});m.sites.concat(m.exits).forEach(function(p){p.x*=factor;p.y*=factor;});});
+  Object.keys(regionScale).forEach(function(id){var m=maps[id],factor=regionScale[id];m.scale=factor;m.width=Math.round(m.width*factor);m.height=Math.round(m.height*factor);m.spawn=m.spawn.map(function(n){return n*factor;});(m.buildings||[]).forEach(function(b){['x','y','w','h'].forEach(function(k){b[k]*=factor;});});m.paths.forEach(function(p){p.points=p.points.map(function(v){return [v[0]*factor,v[1]*factor];});p.width*=id==='village'||m.traced?factor:1.4;});m.sites.concat(m.exits).forEach(function(p){p.x*=factor;p.y*=factor;});});
   Object.values(maps).forEach(function(m){m.exits.forEach(function(e){var factor=regionScale[e.to]||1;e.spawn=e.spawn.map(function(n){return n*factor;});});});
   maps.city.buildings=[{sprite:5,x:300*2.2,y:480*2.2,w:150*2.2,h:175*2.2}];
   function mapPoint(id,x,y){var factor=regionScale[id]||1;return {x:x*factor,y:y*factor};}
