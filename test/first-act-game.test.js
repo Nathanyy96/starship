@@ -31,6 +31,31 @@ test('all first act checkpoints have a walkable route and advance in order', () 
   assert.equal(game.normalize(state).index, game.steps.length);
 });
 
+test('opening guidance clears the whole actor footprint and uses the altar stairs', () => {
+  const state={index:0,zone:'valley',x:17.5,y:10.5};
+  const route=game.route(state).map(p=>[p[0]+.5,p[1]+.5]);
+  assert.ok(route.length);
+  assert.ok(route.some(([x,y])=>x>20&&y>12),'leave platform by southeast stairs');
+  for(let i=1;i<route.length;i++)assert.equal(game.clearSegment('valley',route[i-1],route[i]),true,JSON.stringify(route.slice(i-1,i+1)));
+  assert.equal(game.clearSegment('valley',[17.5,10.5],[12,10.5]),false,'west altar rim blocks a straight shortcut');
+  assert.equal(game.passable('valley',14,11.5),false,'visible west wall stays solid');
+  assert.equal(game.fits('valley',21,13),true,'visible southeast stairs accept actor width');
+  assert.equal(game.fits('valley',10.5,8.5),true,'cliff objective is on road instead of a pillar');
+});
+
+test('every opening guide segment is traversable, including fractional saved positions', () => {
+  for(let i=0;i<game.steps.length;i++){
+    const step=game.steps[i],previous=game.steps[i-1];
+    let state={...game.initial(),index:i,zone:step.zone};
+    if(previous&&previous.zone===step.zone){state.x=previous.x+.5;state.y=previous.y+.5;}
+    else if(step.zone==='forest'){state.x=4.5;state.y=15.8;}
+    const path=game.route(state).map(p=>[p[0]+.5,p[1]+.5]);assert.ok(path.length,step.title);
+    for(let j=1;j<path.length;j++)assert.equal(game.clearSegment(step.zone,path[j-1],path[j]),true,step.title);
+    const midpoint=path[Math.floor(path.length/2)],fraction={...state,x:midpoint[0]+.07,y:midpoint[1]-.03};
+    if(game.fits(step.zone,fraction.x,fraction.y)){const reroute=game.route(fraction).map(p=>[p[0]+.5,p[1]+.5]);assert.ok(reroute.length,step.title);for(let j=1;j<reroute.length;j++)assert.ok(game.clearSegment(step.zone,reroute[j-1],reroute[j]));}
+  }
+});
+
 test('map cast uses transparent chibi sprites', () => {
   for (const source of Object.values(game.sprites)) {
     const file = path.join(__dirname, '..', source.replace(/^\.\//, ''));

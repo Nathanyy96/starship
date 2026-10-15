@@ -10,7 +10,7 @@
   var beastSource = "./assets/exploration/opening-beast-map-v2.png";
   var lookouts = [
     { zone:"valley", x:11.5, y:8, title:"查看斷柱", text:"風掠過斷柱與苔蘚，碎石間長著細小的白花。祭壇就在前方。" },
-    { zone:"valley", x:5.1, y:7.3, title:"查看谷口石路", text:"石路沿溪谷延伸，接向谷外商道。瑟蕾雅原本打算從這條路返回南驛。" },
+    { zone:"valley", x:5.1, y:4.3, title:"查看谷口石路", text:"石路沿溪谷延伸，接向谷外商道。瑟蕾雅原本打算從這條路返回南驛。" },
     { zone:"forest", x:11.7, y:9.7, title:"查看林間泉水", text:"泉水從覆滿苔蘚的石間落下，沿溪流向林外。回到主路仍能找到通村林道。" },
     { zone:"forest", x:28.6, y:16.4, title:"查看溪上木橋", text:"木橋跨過溪流。通往村子的路在北側，燈柱與繩結留下清楚的路標。" }
   ];
@@ -35,10 +35,10 @@
   };
   // Each destination plays a short in-world scene before the next route unlocks.
   var steps = [
-    { zone: "valley", x: 7, y: 8, title: "核對岔路", prompt: "前往舊圖標錯的岔路，核對斷崖。", text: "舊圖把兩條岔路畫成一條。瑟蕾雅劃掉錯線，標出載貨車不能通行的斷崖。" },
-    { zone: "valley", x: 17, y: 11, title: "收好路圖", prompt: "返回舊祭壇，收好補完的路圖。", text: "她把炭筆收進皮套，捲好圖紙。天色尚亮，她本來只想趕上南驛旅店的晚餐。" },
-    { zone: "valley", x: 22, y: 9, title: "界痕與巨獸", prompt: "靠近裂縫，觀察落在祭壇上的巨獸。", text: "銀白裂縫張開，黑晶巨獸落在祭壇。牠回頭望著逐漸合攏的界痕，瑟蕾雅卻看見牠正轉向谷外商路。" },
-    { zone: "valley", x: 25, y: 14, title: "引開巨獸", prompt: "繞過斷柱，把巨獸帶離谷口石路。", text: "她敲響石柱引牠轉身，利用斷柱擋住衝勢。鬆動的階角只被星光定住一瞬，腳下的空氣隨後向內凹去。", nextZone: "forest", spawn: [4.5, 15.8] },
+    { zone: "valley", x: 10, y: 8, title: "核對岔路", prompt: "前往舊圖標錯的岔路，核對斷崖。", text: "舊圖把兩條岔路畫成一條。瑟蕾雅劃掉錯線，標出載貨車不能通行的斷崖。" },
+    { zone: "valley", x: 17, y: 10, title: "收好路圖", prompt: "經祭壇右下方階梯返回平台，收好路圖。", text: "她把炭筆收進皮套，捲好圖紙。天色尚亮，她本來只想趕上南驛旅店的晚餐。" },
+    { zone: "valley", x: 19, y: 10, title: "界痕與巨獸", prompt: "靠近裂縫，觀察落在祭壇上的巨獸。", text: "銀白裂縫張開，黑晶巨獸落在祭壇。牠回頭望著逐漸合攏的界痕，瑟蕾雅卻看見牠正轉向谷外商路。" },
+    { zone: "valley", x: 23, y: 14, title: "引開巨獸", prompt: "沿右下方階梯離開祭壇，把巨獸帶離谷口。", text: "她敲響石柱引牠轉身，利用斷柱擋住衝勢。鬆動的階角只被星光定住一瞬，腳下的空氣隨後向內凹去。", nextZone: "forest", spawn: [4.5, 15.8] },
     { zone: "forest", x: 7, y: 15, title: "確認傷勢", prompt: "在位移落點檢查傷口和背包。", text: "她醒在陌生森林。最後一張路圖不見了，指南針的指針卡住，左臂傷口仍在滲血。" },
     { zone: "forest", x: 17, y: 12, title: "沿水聲尋路", prompt: "循水聲穿過林地。", text: "附近的細葉灌木與圓石都不在她熟悉的路上。順水走，總比站著等天黑好。" },
     { zone: "forest", x: 26, y: 10, title: "遇見雷恩", prompt: "靠近巡林者雷恩，停下腳步。", text: "一支箭落在鞋尖前。雷恩守著通村林道，先請陌生的瑟蕾雅不要再往前走。" },
@@ -47,42 +47,69 @@
   ];
   var scenes = dialogue.approach;
   var zoneNames = { valley: "南驛山谷・舊祭壇", forest: "獸靈之村外・林道", village: "獸靈之村・醫療屋" };
-  function initial() { return { index: 0, zone: "valley", x: 15.5, y: 16.5 }; }
+  function initial() { return { index: 0, zone: "valley", x: 17.25, y: 16.5 }; }
+  // Trace visible ground in the original 1536×1024 painting. The raised altar
+  // has a solid rim; only its southeast stairs join it to the surrounding road.
+  var valleyRoads=[
+    {width:48,points:[[680,1020],[700,900],[720,800],[730,715],[680,660],[570,625],[500,560],[450,480],[470,400],[450,330],[350,270],[250,225],[150,180],[25,145]]},
+    {width:60,points:[[730,715],[850,700],[970,660],[1080,620],[1190,550],[1270,470],[1300,380],[1220,340],[1120,320],[1000,320],[880,340],[720,330],[620,350],[470,400]]},
+    {width:28,points:[[835,510],[870,545],[910,575],[955,610],[1000,640]]}
+  ];
+  function onRoad(roads,x,y){return roads.some(function(p){return p.points.some(function(b,i){if(!i)return false;var a=p.points[i-1],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=p.width;});});}
+  function valleyGround(x,y){
+    x*=1536/W;y*=1024/H;
+    var inner=Math.pow((x-762)/139,2)+Math.pow((y-450)/85,2)<=1;
+    var rim=Math.pow((x-762)/176,2)+Math.pow((y-460)/121,2)<=1;
+    var stairs=onRoad([valleyRoads[2]],x,y);
+    if(rim&&!inner&&!stairs)return false;
+    return inner||onRoad(valleyRoads,x,y);
+  }
   function passable(zone, x, y) {
     if (!Number.isFinite(x) || !Number.isFinite(y) || x < .4 || y < .4 || x > W-.4 || y > H-.4) return false;
-    if(zone==='valley'&&x>=13&&x<=27&&y>=7.5&&y<=12.5)return true;
+    if(zone==='valley')return valleyGround(x,y);
     return (paths[zone] || []).some(function (path) { return path.points.some(function (b, i) {
       if (!i) return false; var a = path.points[i-1], dx = b[0]-a[0], dy = b[1]-a[1];
       var t = Math.max(0, Math.min(1, ((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));
       return Math.hypot(x-a[0]-t*dx, y-a[1]-t*dy) <= path.width;
     }); });
   }
+  function fits(zone,x,y){return [[-.22,-.22],[.22,-.22],[-.22,.22],[.22,.22],[0,0]].every(function(p){return passable(zone,x+p[0],y+p[1]);});}
+  function clearSegment(zone,a,b){var count=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/.1));for(var i=0;i<=count;i++){var t=i/count;if(!fits(zone,a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t))return false;}return true;}
   function terrain(zone, x, y) { return passable(zone, x+.5, y+.5) ? "path" : zone === "forest" && y > 17 ? "water" : zone === "forest" ? "tree" : "stone"; }
   function nearLookout(state) { return lookouts.find(function (place) { return place.zone === state.zone && Math.hypot(state.x-place.x,state.y-place.y) < 1.5; }) || null; }
   function normalize(raw) {
     var index = Math.max(0, Math.min(steps.length, Math.floor(Number(raw && raw.index) || 0)));
     var expected = index < steps.length ? steps[index].zone : "forest";
     var zone = raw && raw.zone === expected ? expected : expected;
-    var spawn = zone === "valley" ? [15.5, 16.5] : [4.5, 15.8];
+    var spawn = zone === "valley" ? [17.25, 16.5] : [4.5, 15.8];
     var x = Number(raw && raw.x), y = Number(raw && raw.y);
-    if (!Number.isFinite(x) || !Number.isFinite(y) || !passable(zone, x, y)) { x = spawn[0]; y = spawn[1]; }
+    if (!Number.isFinite(x) || !Number.isFinite(y)) { x = spawn[0]; y = spawn[1]; }
+    if(!fits(zone,x,y)){var best=null,distance=Infinity;for(var gy=.5;gy<H;gy+=.5)for(var gx=.5;gx<W;gx+=.5){var d=Math.hypot(x-gx,y-gy);if(d<distance&&fits(zone,gx,gy)){best=[gx,gy];distance=d;}}x=best?best[0]:spawn[0];y=best?best[1]:spawn[1];}
     return { index: index, zone: zone, x: x, y: y };
   }
+  var routeEdges={};
   function route(state) {
     var step = steps[state.index]; if (!step || step.zone !== state.zone) return [];
-    var start = [Math.floor(state.x), Math.floor(state.y)], end = [step.x, step.y], key = function (x, y) { return y * W + x; };
-    var queue = [key(start[0], start[1])], prev = new Map([[queue[0], -1]]), target = key(end[0], end[1]);
-    for (var head = 0; head < queue.length && !prev.has(target); head++) {
-      var at = queue[head], x = at % W, y = Math.floor(at / W);
-      [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(function (d) { var nx = x + d[0], ny = y + d[1], n = key(nx, ny); if (!prev.has(n) && passable(state.zone, nx + .5, ny + .5)) { prev.set(n, at); queue.push(n); } });
+    var size=.5,cols=W/size,rows=H/size,startPoint=[state.x,state.y],end=[step.x+.5,step.y+.5];
+    if(!fits(state.zone,startPoint[0],startPoint[1])||!fits(state.zone,end[0],end[1]))return [];
+    var key=function(x,y){return y*cols+x;},point=function(n){return [(n%cols+.5)*size,(Math.floor(n/cols)+.5)*size];};
+    var queue=[],prev=new Map(),target=-1,edges=routeEdges[state.zone]||(routeEdges[state.zone]=new Map());
+    function edge(a,b){var k=Math.min(a,b)*cols*rows+Math.max(a,b);if(!edges.has(k))edges.set(k,clearSegment(state.zone,point(a),point(b)));return edges.get(k);}
+    for(var sy=0;sy<rows;sy++)for(var sx=0;sx<cols;sx++){var n=key(sx,sy),p=point(n);if(Math.hypot(p[0]-state.x,p[1]-state.y)<.8&&clearSegment(state.zone,startPoint,p)){queue.push(n);prev.set(n,-1);}}
+    for (var head = 0; head < queue.length; head++) {
+      var at = queue[head], x = at % cols, y = Math.floor(at / cols),a=point(at);
+      if(Math.hypot(a[0]-end[0],a[1]-end[1])<.8&&clearSegment(state.zone,a,end)){target=at;break;}
+      [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(function (d) { var nx = x + d[0], ny = y + d[1], n = key(nx, ny); if(nx>=0&&ny>=0&&nx<cols&&ny<rows&&!prev.has(n)&&edge(at,n)) { prev.set(n, at); queue.push(n); } });
     }
-    if (!prev.has(target)) return [];
-    var result = []; for (var n = target; n !== -1; n = prev.get(n)) result.push([n % W, Math.floor(n / W)]);
-    return result.reverse();
+    if(target<0)return [];
+    var result=[];for(var n=target;n!==-1;n=prev.get(n)){var p=point(n);result.push([p[0]-.5,p[1]-.5]);}
+    result.reverse();result.unshift([state.x-.5,state.y-.5]);result.push([step.x,step.y]);
+    // Remove grid zigzags only when the complete swept actor remains on ground.
+    var smooth=[result[0]],cursor=0;while(cursor<result.length-1){var next=cursor+1;for(var j=result.length-1;j>cursor+1;j--)if(clearSegment(state.zone,[result[cursor][0]+.5,result[cursor][1]+.5],[result[j][0]+.5,result[j][1]+.5])){next=j;break;}smooth.push(result[next]);cursor=next;}return smooth;
   }
   function advance(state) {
     var next = normalize(state), step = steps[next.index];
-    if (!step || Math.hypot(next.x - (step.x + .5), next.y - (step.y + .5)) >= 2.2) return { state: next, completed: false, text: "請靠近目前目標，再按 E 互動。" };
+    if (!step || Math.hypot(next.x - (step.x + .5), next.y - (step.y + .5)) >= 2.2 || !clearSegment(next.zone,[next.x,next.y],[step.x+.5,step.y+.5])) return { state: next, completed: false, text: "請沿道路靠近目前目標，再按 E 互動。" };
     next.index++;
     if (step.nextZone) { next.zone = step.nextZone; next.x = step.spawn[0]; next.y = step.spawn[1]; }
     return { state: next, completed: next.index === steps.length, text: step.text, title: step.title };
@@ -122,8 +149,8 @@
         ctx.fillStyle = "rgba(163,179,252,.5)"; ctx.beginPath(); ctx.ellipse(22.5 * TILE, 8.5 * TILE, 12, 48, -.2, 0, Math.PI * 2); ctx.fill();
         sprite("beast", 25.5*TILE, 11.7*TILE, 90, false, 0);
       }
-      var step = steps[state.index], nextKey = state.zone + ":" + Math.floor(state.x) + ":" + Math.floor(state.y) + ":" + state.index;
-      if (nextKey !== routeKey) { currentRoute = route(state); routeKey = nextKey; }
+      var step = steps[state.index], nextKey = state.zone + ":" + Math.floor(state.x*4) + ":" + Math.floor(state.y*4) + ":" + state.index;
+      if (nextKey !== routeKey || currentRoute.length>1&&!clearSegment(state.zone,[state.x,state.y],[currentRoute[1][0]+.5,currentRoute[1][1]+.5])) { currentRoute = route(state); routeKey = nextKey; }
       if (currentRoute.length > 1) {
         ctx.beginPath(); ctx.moveTo(state.x * TILE, state.y * TILE);
         currentRoute.slice(1).forEach(function (p) { ctx.lineTo((p[0] + .5) * TILE, (p[1] + .5) * TILE); });
@@ -145,8 +172,9 @@
       renderer.end(ctx);
       options.zone.textContent = zoneNames[state.zone];
       options.objective.textContent = step ? step.prompt : "林道已走完，現在可以進入獸靈之村自由探索。";
-      options.distance.textContent = step ? (currentRoute.length ? "沿金色路線前進 · 約 " + Math.max(0, currentRoute.length - 1) + " 步" : "請返回可通行道路") : "已抵達第一幕結尾";
-      var mainNear = step && Math.hypot(state.x - (step.x+.5),state.y-(step.y+.5)) < 2.2, lookout = nearLookout(state);
+      var remaining=currentRoute.reduce(function(sum,p,i){return i?sum+Math.hypot(p[0]-currentRoute[i-1][0],p[1]-currentRoute[i-1][1]):sum;},0);
+      options.distance.textContent = step ? (currentRoute.length ? "沿金色路線前進 · 約 " + Math.ceil(remaining) + " 步" : "目前沒有可通行的指引路線，請返回道路") : "已抵達第一幕結尾";
+      var mainNear = step && Math.hypot(state.x - (step.x+.5),state.y-(step.y+.5)) < 2.2&&clearSegment(state.zone,[state.x,state.y],[step.x+.5,step.y+.5]), lookout = nearLookout(state);
       options.interact.hidden = talking() || (!mainNear && !lookout);
       options.interact.disabled = options.interact.hidden;
       options.interact.textContent = mainNear ? "進入劇情對話 E" : lookout ? lookout.title+" E" : "靠近地點互動";
@@ -159,8 +187,8 @@
       if (!talking() && state.index>=steps.length && state.y<2 && options.onEnterVillage){options.onEnterVillage();return;}
       if (!talking() && (dx || dy)) {
         var len = Math.hypot(dx, dy), nx = state.x + dx / len * dt * 4, ny = state.y + dy / len * dt * 4;
-        if (passable(state.zone, nx - .22, state.y - .22) && passable(state.zone, nx + .22, state.y + .22)) state.x = nx;
-        if (passable(state.zone, state.x - .22, ny - .22) && passable(state.zone, state.x + .22, ny + .22)) state.y = ny;
+        if (clearSegment(state.zone,[state.x,state.y],[nx,state.y])) state.x = nx;
+        if (clearSegment(state.zone,[state.x,state.y],[state.x,ny])) state.y = ny;
         if (now - lastSave > 800) { save(); lastSave = now; }
       }
       draw(); frame = requestAnimationFrame(tick);
@@ -175,7 +203,7 @@
     function interact() {
       var step = steps[state.index];
       if (talking()) return;
-      if (!step || Math.hypot(state.x - (step.x+.5),state.y-(step.y+.5)) >= 2.2) {
+      if (!step || Math.hypot(state.x - (step.x+.5),state.y-(step.y+.5)) >= 2.2 || !clearSegment(state.zone,[state.x,state.y],[step.x+.5,step.y+.5])) {
         var place = nearLookout(state); if (!place) return;
         optionalScene = [[place.title,place.text]]; lineIndex=0;held.clear();showLine();return;
       }
@@ -209,5 +237,5 @@
     return { open: function () { state = normalize(options.load()); active = true; previous = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
       close: function () { active = false; held.clear(); sceneIndex = -1; optionalScene=null; options.dialog.hidden = true; cancelAnimationFrame(frame); save(); }, setPlayer: setPlayer, state: function () { return normalize(state); } };
   }
-  return { steps: steps, scenes: scenes, sprites: sprites, backgrounds: backgrounds, paths: paths, lookouts: lookouts, nearLookout: nearLookout, zoneNames: zoneNames, initial: initial, terrain: terrain, passable: passable, normalize: normalize, route: route, advance: advance, create: create };
+  return { steps: steps, scenes: scenes, sprites: sprites, backgrounds: backgrounds, paths: paths, lookouts: lookouts, nearLookout: nearLookout, zoneNames: zoneNames, initial: initial, terrain: terrain, passable: passable, fits:fits, clearSegment:clearSegment, normalize: normalize, route: route, advance: advance, create: create };
 }));

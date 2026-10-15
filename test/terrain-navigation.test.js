@@ -3,7 +3,8 @@ const world=require('../src/first-major-world'),opening=require('../src/first-ac
 test('altar has a broad walkable platform and right-hand stairs; the former wall shortcut is blocked',()=>{
  assert.equal(opening.passable('valley',23.5,14.5),true);
  assert.equal(opening.passable('valley',18.5,10),true);
- assert.equal(opening.passable('valley',12.6,12.7),false);
+ assert.equal(opening.passable('valley',14,11.5),false,'actual west altar wall');
+ assert.equal(opening.passable('valley',12.6,12.7),true,'open ground outside that wall');
  assert.ok(opening.route({...opening.initial(),x:23.5,y:14.5,index:1}).length);
 });
 test('automatic regional exits connect westward and southward without advancing the story',()=>{
