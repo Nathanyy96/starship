@@ -171,7 +171,7 @@ test('travel controls share unlocks across acts, reload by account, and block tr
 test('named NPCs use existing chibi assets, stand on reachable ground and patrol safely',()=>{
   const p=require('../src/world-presentation');
   for(const [id,map] of Object.entries(world.maps))for(const original of p.npcs(id)){const npc={...original,...world.mapPoint(id,original.x,original.y),patrol:original.patrol?.map(n=>n*(map.scale||1))};
-    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',npc.id+'-chibi-v1.png')));
+    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',(npc.spriteId||npc.id)+'-chibi-v1.png')));
     assert.ok(world.passable(id,npc.x,npc.y),npc.id);
     assert.ok(world.route({...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]},npc).length,npc.id);
     for(const time of [0,2000,5000,10000]){const at=p.position(npc,time,false,(x,y)=>world.passable(id,x,y));assert.ok(world.passable(id,at.x,at.y),npc.id);}

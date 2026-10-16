@@ -6,11 +6,16 @@
     station:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:570,y:355,line:'繩索和回程記號先核對。驛報還沒送到的，就明寫未送達。'}],
     village:[{id:'lia',name:'莉亞',role:'療養屋',x:1350,y:490,line:'藥草和清水都在這裡。妳先照顧好自己的傷，別急著提重物。'},{id:'reyn',name:'雷恩',role:'巡林者',x:355,y:405,patrol:[0,24],line:'走林道要看地面，也要看風。溪水就從橋上過，別抄下游的近路。'},{id:'isar',name:'伊薩爾',role:'村中守望者',x:805,y:477,line:'沿亮著燈的村道走。想歇一會兒，就到火場旁坐坐。'}],
     city:[{id:'mila',name:'米菈',role:'工坊學徒',x:200,y:620,patrol:[12,6],line:'要找工坊就沿城西這條街走。搬東西的人多，轉彎記得慢一點。'},{id:'vark',name:'老瓦克',role:'工坊匠人',x:270,y:655,line:'修東西得看仔細。先別碰工作臺上的工具，沿街走走吧。'},{id:'seifra',name:'賽芙拉',role:'觀測分會',x:320,y:310,line:'分會就在這裡。有需要記錄的路況，可以先把圖紙整理好。'}],
+    mistbridge:[{id:'town-trader',spriteId:'town-trader',name:'行商',role:'商路補給',x:705,y:435,patrol:[8,0],line:'南街可通旅店，補給攤就在鎮中心附近。'},{id:'town-grower',spriteId:'town-grower',name:'採集居民',role:'鎮上居民',x:760,y:425,patrol:[0,8],line:'過河請走橋，河岸草坡有些地方很滑。'},{id:'town-caretaker',spriteId:'town-caretaker',name:'街區管理員',role:'鎮上居民',x:875,y:690,line:'這條街接回鎮中心，往南能返回白鐘城。'}],
+    lotin:[{id:'town-harbor',name:'碼頭工人',role:'港區作業',x:320,y:580,patrol:[6,0],line:'貨物留在岸上整理，過港內水道請走完整的橋面。'}],
+    south:[{id:'town-grower',name:'田間居民',role:'農地照料',x:980,y:800,patrol:[8,0],line:'田埂接回驛路，往河邊走要留意橋的位置。'}],
     echo:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:620,y:480,line:'山路上先找穩當的落腳處。到了驛站，就停下來歇歇。'}],
     banksWest:[{id:'musa',name:'穆莎',role:'岸邊採集者',x:400,y:460,line:'橋中間的斷口還在。想去另一岸，得從各自的陸路入口走。'}],
     banksEast:[{id:'kerida',name:'珂芮妲',role:'外勤測量師',x:1170,y:300,line:'地圖上的線要和腳下的地面一起看。斷掉的地方，可不能當成路。'}],
     bellcourt:[{id:'wenlan',name:'溫藍',role:'外庭物資管事',x:630,y:425,line:'外庭的石階可以慢慢走。再往外就是雲海，別離開完整的地面。'}]
   };
+  cast.city.push({id:'town-trader',name:'布匹行商',role:'街區商販',x:920,y:300,line:'主街接著住宅巷，工坊在城西那一側。'});
+  cast.village.push({id:'town-grower',name:'採集居民',role:'村中居民',x:750,y:455,line:'藥草分好以後就送到醫療屋，走村道就能到。'});
   function npcs(map){return cast[map]||[];}
   function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}
   function label(ctx,text,x,y,color){ctx.save();ctx.font='600 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#162f29';ctx.strokeText(text,x,y);ctx.fillStyle=color||'#fff0c7';ctx.fillText(text,x,y);ctx.restore();}

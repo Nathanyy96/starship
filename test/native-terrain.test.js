@@ -49,6 +49,27 @@ test('new roadside vignettes keep their full footprints clear of playable roads'
 test('White Bell and Beast Village have populated street-facing districts',()=>{
  for(const [id,count] of [['city',25],['village',14]]){const m=w.maps[id];assert.ok(m.nativeTerrain.structures.length>=count,id+' has a populated settlement');for(const p of m.nativeTerrain.structures.filter(p=>p.residential)){assert.ok(p.door,id+' street-facing frontage');assert.ok(w.passable(id,...p.door),id+' accessible front walk');}}
 });
+test('Mistbridge town center has accessible homes and residents',()=>{
+ const m=w.maps.mistbridge,homes=m.nativeTerrain.structures.filter(p=>p.residential);
+ assert.ok(homes.length>=8);
+ assert.ok(homes.filter(p=>Math.hypot(p.x+p.w/2-1181,p.y+p.h/2-685)<500).length>=2);
+ for(const home of homes)assert.ok(w.passable('mistbridge',...home.door));
+ const residents=require('../src/world-presentation').npcs('mistbridge');
+ assert.ok(residents.length>=3);
+ for(const person of residents)assert.ok(w.passable('mistbridge',person.x*1.6,person.y*1.6),person.name);
+});
+test('Echo Valley keeps one river crossing and the far workshop road reaches its facade',()=>{
+ const echo=w.maps.echo,river=echo.nativeTerrain.water[0].points;
+ function riverX(y){for(let i=1;i<river.length;i++)if(y<=river[i][1]){const a=river[i-1],b=river[i],t=(y-a[1])/(b[1]-a[1]);return a[0]+(b[0]-a[0])*t;}return river.at(-1)[0];}
+ let crossings=0;
+ for(const lane of echo.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i];if(a[1]>300&&b[1]>300&&(a[0]-riverX(a[1]))*(b[0]-riverX(b[1]))<0)crossings++;}
+ assert.equal(crossings,1,'the station and valley share one clear bridge');
+ const far=w.maps.factoryFar,approach=far.paths[0].points.at(-1);
+ assert.ok(approach[1]>far.buildings[0].y+far.buildings[0].h,'road reaches the workshop frontage');
+ assert.ok(w.planWalk({...w.initial(2),map:'factoryFar',x:far.spawn[0],y:far.spawn[1]},...approach).length);
+});
 test('guidance to Vark avoids automatically entering the recovery house on the way',()=>{
  const m=w.maps.city,target=m.exits.find(e=>e.to==='factoryNear'),other=m.exits.find(e=>e.to==='recovery'),route=w.planWalk({...w.initial(2),map:'city',x:m.spawn[0],y:m.spawn[1],roaming:true},target.x,target.y);assert.ok(route.length);for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)));for(let k=0;k<=n;k++)assert.ok(Math.hypot(a.x+(b.x-a.x)*k/n-other.x,a.y+(b.y-a.y)*k/n-other.y)>24,'route must not cross another doorway trigger');}
 });
+
+test('relocated Mistbridge trees leave the old street clear and keep solid trunks',()=>{assert.equal(w.passable('mistbridge',1121.25,1088),true);assert.equal(w.passable('mistbridge',1121.25,1338),false);const m=w.maps.mistbridge;const route=w.planWalk({...w.initial(2),map:'mistbridge',x:985,y:1100,roaming:true},1400,1100);assert.ok(route.length);let s={...w.initial(2),map:'mistbridge',x:985,y:1100,roaming:true};for(const p of route){s=w.move(s,p.x-s.x,p.y-s.y);assert.ok(Math.hypot(s.x-p.x,s.y-p.y)<.1);}});

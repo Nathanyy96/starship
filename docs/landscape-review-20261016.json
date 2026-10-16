@@ -1,0 +1,196 @@
+{
+  "date": "2026-10-16",
+  "scope": [
+    "mistbridge",
+    "city",
+    "village",
+    "south",
+    "lotin"
+  ],
+  "mistbridge": {
+    "buildings": 12,
+    "homes": 8,
+    "streets": "主街半寬40、鎮中心廣場78、南側住宅街32、門前小徑24",
+    "oldTreeLocationNowPassable": true,
+    "newTrunkLocationSolid": true
+  },
+  "residents": [
+    {
+      "map": "city",
+      "people": [
+        {
+          "id": "mila",
+          "name": "米菈",
+          "sprite": "mila",
+          "x": 200,
+          "y": 620
+        },
+        {
+          "id": "vark",
+          "name": "老瓦克",
+          "sprite": "vark",
+          "x": 270,
+          "y": 655
+        },
+        {
+          "id": "seifra",
+          "name": "賽芙拉",
+          "sprite": "seifra",
+          "x": 320,
+          "y": 310
+        },
+        {
+          "id": "town-trader",
+          "name": "布匹行商",
+          "sprite": "town-trader",
+          "x": 920,
+          "y": 300
+        }
+      ]
+    },
+    {
+      "map": "village",
+      "people": [
+        {
+          "id": "lia",
+          "name": "莉亞",
+          "sprite": "lia",
+          "x": 1350,
+          "y": 490
+        },
+        {
+          "id": "reyn",
+          "name": "雷恩",
+          "sprite": "reyn",
+          "x": 355,
+          "y": 405
+        },
+        {
+          "id": "isar",
+          "name": "伊薩爾",
+          "sprite": "isar",
+          "x": 805,
+          "y": 477
+        },
+        {
+          "id": "town-grower",
+          "name": "採集居民",
+          "sprite": "town-grower",
+          "x": 750,
+          "y": 455
+        }
+      ]
+    },
+    {
+      "map": "mistbridge",
+      "people": [
+        {
+          "id": "town-trader",
+          "name": "行商",
+          "sprite": "town-trader",
+          "x": 705,
+          "y": 435
+        },
+        {
+          "id": "town-grower",
+          "name": "採集居民",
+          "sprite": "town-grower",
+          "x": 760,
+          "y": 425
+        },
+        {
+          "id": "town-caretaker",
+          "name": "街區管理員",
+          "sprite": "town-caretaker",
+          "x": 875,
+          "y": 690
+        }
+      ]
+    },
+    {
+      "map": "south",
+      "people": [
+        {
+          "id": "town-grower",
+          "name": "田間居民",
+          "sprite": "town-grower",
+          "x": 980,
+          "y": 800
+        }
+      ]
+    },
+    {
+      "map": "lotin",
+      "people": [
+        {
+          "id": "town-harbor",
+          "name": "碼頭工人",
+          "sprite": "town-harbor",
+          "x": 320,
+          "y": 580
+        }
+      ]
+    }
+  ],
+  "keyboardTransitions": [
+    {
+      "map": "mistbridge",
+      "index": 0,
+      "to": "echo",
+      "x": 1088,
+      "y": 120,
+      "locked": false,
+      "frames": 375,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 1,
+      "to": "banksWest",
+      "x": 2384,
+      "y": 241.60000000000002,
+      "locked": false,
+      "frames": 380,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 2,
+      "to": "northRoad",
+      "x": 1672,
+      "y": 1408,
+      "locked": false,
+      "frames": 7,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 3,
+      "to": "mistInn",
+      "x": 1460,
+      "y": 350,
+      "locked": false,
+      "frames": 153,
+      "result": "transition reached"
+    }
+  ],
+  "art": {
+    "source": "exec-fac91ae5-facf-479f-a882-9d3546247ebc.png",
+    "files": [
+      "assets/exploration/town-trader-chibi-v1.png",
+      "assets/exploration/town-grower-chibi-v1.png",
+      "assets/exploration/town-caretaker-chibi-v1.png",
+      "assets/exploration/town-harbor-chibi-v1.png"
+    ],
+    "preparation": "內建 imagegen 產生真透明四格居民圖；按四象限擷取、裁去透明外框，保留alpha，未改畫人物。",
+    "prompt": "四位中世紀奇幻一般居民，2x2透明圖集，精緻手繪Q版、自然暖光、全身站姿、無文字；左上酒紅背心鬍鬚布商，右上綠裙辮髮採集居民，左下藍衣芥末圍巾銀髮管理員，右下藍工作服黑髮持繩索碼頭工人。"
+  },
+  "verification": {
+    "tests": 212,
+    "passed": 203,
+    "skipped": 9,
+    "failed": 0,
+    "motionIntegrationBase": "724faa7",
+    "keyboardMistbridgeExits": 4
+  }
+}
