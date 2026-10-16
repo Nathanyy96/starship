@@ -8,11 +8,11 @@ test('mobile camera keeps the character readable and renders at device resolutio
     const transforms = [], ctx = { setTransform(...args){transforms.push(args);}, clearRect(){} };
     const view = renderer.begin(canvas,ctx,1152,768,500,500);
     assert.equal(canvas.width,640); assert.equal(canvas.height,800);
-    assert.ok(view.width < 400);
-    assert.ok(44*view.zoom >= 44);
+    assert.ok(view.width >= 350 && view.width < 400);
+    assert.ok(44*view.zoom >= 36);
     assert.equal(ctx.imageSmoothingEnabled,true);
     assert.equal(ctx.imageSmoothingQuality,'high');
-    assert.equal(transforms.at(-1)[0],2*1.2);
+    assert.equal(transforms.at(-1)[0],2*.9);
   } finally { global.window=old; }
 });
 test('camera and sprite feet stay inside the scene when close to an edge', () => {

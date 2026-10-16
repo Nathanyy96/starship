@@ -1,6 +1,6 @@
 (function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipNativeTerrain=api;}(globalThis,function(){
   'use strict';
-  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png'},images={},cache={},version=0,requested={},failed=[];
+  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',firepit:'village-firepit-v1.png'},images={},cache={},version=0,requested={},failed=[];
   // Frames are authored against the delivered transparent sprite sheets. They
   // are individual objects, never a resized overview illustration.
   var frames={
@@ -9,7 +9,7 @@
     landmarks:[[0,0,625,610],[630,0,624,615],[0,620,640,634],[640,620,614,634]]
   };
   function imageId(p){return p.sheet==='city'&&p.cell===0?'workshop':p.sheet==='village'&&p.cell===2?'healer':p.sheet;}
-  function needed(p){var ids=['ground','detail','nature'];objects(p).forEach(function(o){var id=imageId(o);if(!ids.includes(id))ids.push(id);});if(p.fountain&&!ids.includes('landmarks'))ids.push('landmarks');return ids;}
+  function needed(p){var ids=['ground','detail','nature'];objects(p).forEach(function(o){var id=imageId(o);if(!ids.includes(id))ids.push(id);});if(p.fire)ids.push('firepit');if(p.fountain&&!ids.includes('landmarks'))ids.push('landmarks');return ids;}
   function ensure(p){if(typeof Image==='undefined')return;needed(p).forEach(function(id){if(requested[id])return;requested[id]=true;var img=new Image();img.onload=function(){images[id]=img;cache={};version++;};img.onerror=function(){failed.push(id);};img.src='./assets/exploration/native/'+files[id];});}
 
   function structure(sheet,cell,x,y,w,h){return {sheet:sheet,cell:cell,x:x,y:y,w:w,h:h};}
@@ -20,12 +20,15 @@
     south.nativeTerrain={style:'country',structures:[door(south,'southStation','landmarks',2,260,280)],trees:[[180,450,3,250],[730,150,1,250],[680,590,0,220],[90,420,0,200],[200,850,1,180],[670,300,0,220],[1310,440,1,210],[1300,930,0,180]],fields:[[80,90,330,210],[760,50,260,200],[760,590,200,140],[1130,30,280,110]],water:[{points:[[1400,0],[1370,200],[1340,400],[1300,600],[1320,850],[1370,1024]],width:125}]};
     maps.riverRoad.nativeTerrain={style:'country',structures:[structure('harbor',2,430,20,250,200)],trees:[[500,260,1,220],[1030,520,2,180],[150,400,0,220],[500,630,1,210],[1150,260,0,240],[1430,510,1,200]],fields:[[20,570,300,180],[390,5,270,90],[1040,25,430,170],[1070,780,190,120]],water:[{points:[[810,0],[830,180],[880,350],[900,550],[830,750],[740,939]],width:160}]};
     var port=maps.lotin;
-    port.paths.forEach(function(p,i){p.width=i===1?82:100;});
+    port.paths.forEach(function(p,i){p.width=i===1?68:80;});
     port.nativeTerrain={style:'port',structures:[structure('harbor',0,1090,1390,350,300),structure('harbor',1,985,1550,125,105),structure('city',3,1400,1640,270,300),structure('landmarks',1,1820,1890,260,280)],trees:[[640,1340,0,240],[650,1670,1,210],[1200,1030,3,250],[320,1530,1,210],[670,2080,0,210],[1250,2240,1,210],[2830,1330,0,230]],fields:[],land:[[[0,0],[1560,0],[1590,990],[1500,1140],[1440,1290],[1560,1500],[1800,1740],[2040,1950],[2700,1980],[3030,2070],[3060,2460],[2400,2700],[0,2700]],[[2340,0],[4608,0],[4608,2040],[3000,2040],[2940,1800],[2700,1740],[2550,1530],[2400,1380],[2280,1200],[2325,990]]],water:[]};
     village.nativeTerrain={style:'village',structures:[door(village,'clinic','village',2,260,300,.64),structure('village',0,860,230,300,290),structure('village',1,370,220,270,240),structure('village',3,1560,635,260,220)],trees:[[1710,600,0,230],[2210,480,1,240],[2150,880,3,220],[80,840,0,230],[550,1030,1,220],[1450,180,0,260],[1850,970,1,250],[2230,1030,0,240],[2250,200,1,230]],fields:[],water:[{points:[[0,1100],[400,1070],[800,1010],[1250,970],[1750,1080],[2508,1260]],width:110}],fire:[1248,592,48]};
     // Arrival squares and staging areas give the player room to turn, meet
     // characters and find doors without squeezing through corridor junctions.
-    [['mistbridge',1181,685,120],['echo',650,500,78],['rescue',550,530,105],['relic',870,594,100]].forEach(function(a){maps[a[0]].paths.push({width:a[3],points:[[a[1],a[2]],[a[1]+1,a[2]]]});});
+    [['mistbridge',1181,685,120],['echo',650,500,78],['rescue',550,530,105],['relic',870,594,100]].forEach(function(a){maps[a[0]].paths.push({plaza:true,width:a[3],points:[[a[1],a[2]],[a[1]+1,a[2]]]});});
+    // Road widths are world-space half-widths: leave room for two-way movement
+    // while allowing banks, buildings and planted setbacks into the camera.
+    Object.keys(maps).forEach(function(id){if(id==='road'||maps[id].floor)return;var cap=id==='city'?76:id==='lotin'?80:id==='village'||id==='echo'?64:52;maps[id].paths.forEach(function(path){if(!path.plaza)path.width=Math.min(path.width,cap);});});
     // Local-scale compositions for the complete currently playable mainland.
     // Coordinates retain save/story anchors; roads are the shared movement graph.
     maps.mistbridge.nativeTerrain={style:'city',structures:[door(maps.mistbridge,'mistInn','frontier',0,290,290,.5),structure('city',1,570,650,210,270),structure('city',3,1820,540,240,260),structure('harbor',1,1540,1030,150,130)],trees:[[280,890,0,230],[2150,890,1,240],[950,1150,3,240],[1380,170,1,190]],fields:[],water:[{points:[[1950,0],[2020,330],[2120,590],[2120,850],[2220,1150],[2320,1506]],width:115}]};
@@ -87,7 +90,7 @@
     // Deliberately placed, varied silhouettes; no grid of cloned trees/houses.
     if(!settings.groundOnly)objects(p).forEach(function(o){drawObject(c,o);});
     if(p.fountain){var f=p.fountain;c.fillStyle='#89916d';c.beginPath();c.arc(f[0],f[1],f[2],0,Math.PI*2);c.fill();c.strokeStyle='#c6c4a0';c.lineWidth=8;c.stroke();drawObject(c,structure('landmarks',3,f[0]-160,f[1]-220,320,330));}
-    if(p.fire){var f=p.fire;c.fillStyle='#63533a';c.beginPath();c.ellipse(f[0],f[1],f[2],f[2]*.7,0,0,Math.PI*2);c.fill();for(var i=0;i<10;i++){var a=i*Math.PI/5;c.fillStyle=i%2?'#c5bca0':'#a69776';c.beginPath();c.ellipse(f[0]+Math.cos(a)*f[2],f[1]+Math.sin(a)*f[2]*.7,12,9,a,0,Math.PI*2);c.fill();}c.fillStyle='#edab4c';c.beginPath();c.moveTo(f[0]-18,f[1]);c.quadraticCurveTo(f[0]-25,f[1]-18,f[0]+4,f[1]-42);c.quadraticCurveTo(f[0]+5,f[1]-14,f[0]+20,f[1]);c.closePath();c.fill();}
+    if(p.fire&&images.firepit){var f=p.fire;c.drawImage(images.firepit,f[0]-80,f[1]-96,160,120);}else if(p.fire){var f=p.fire;c.fillStyle='#63533a';c.beginPath();c.ellipse(f[0],f[1],f[2],f[2]*.7,0,0,Math.PI*2);c.fill();for(var i=0;i<10;i++){var a=i*Math.PI/5;c.fillStyle=i%2?'#c5bca0':'#a69776';c.beginPath();c.ellipse(f[0]+Math.cos(a)*f[2],f[1]+Math.sin(a)*f[2]*.7,12,9,a,0,Math.PI*2);c.fill();}c.fillStyle='#edab4c';c.beginPath();c.moveTo(f[0]-18,f[1]);c.quadraticCurveTo(f[0]-25,f[1]-18,f[0]+4,f[1]-42);c.quadraticCurveTo(f[0]+5,f[1]-14,f[0]+20,f[1]);c.closePath();c.fill();}
 
     cache[token]=sheet;return sheet;
   }

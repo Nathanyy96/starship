@@ -12,7 +12,9 @@
     var ratio = Math.min(2, typeof window !== "undefined" && window.devicePixelRatio || 1);
     var width = Math.round(cssWidth * ratio), height = Math.round(cssHeight * ratio);
     if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
-    var zoom = cssWidth < 600 ? 1.2 : 1.55;
+    // Short landscape viewports need more of the surroundings, not a closer
+    // crop of the same road. Keep world geometry and character proportions.
+    var zoom = cssWidth < 600 && cssHeight > cssWidth ? .9 : Math.max(.7, Math.min(1.05, cssHeight / 620));
     var viewWidth = cssWidth / zoom, viewHeight = cssHeight / zoom;
     var cameraX = Math.max(0, Math.min(Math.max(0, worldWidth - viewWidth), x - viewWidth / 2));
     var cameraY = Math.max(0, Math.min(Math.max(0, worldHeight - viewHeight), y - viewHeight / 2));
