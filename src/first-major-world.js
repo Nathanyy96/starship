@@ -133,7 +133,7 @@
     });
   }
   var acts=Object.assign({2:splitAct(2),3:splitAct(3)},campaign.acts);
-  [[4,0,'city',355,686],[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,1,'roadShelter',575,490],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
+  [[4,0,'city',355,686],[2,0,'clinic',480,335],[2,2,'clinic',340,490],[2,5,'clinic',570,450],[2,7,'village',1247,473],[3,1,'clinic',480,335],[3,8,'observatory',460,330],[3,10,'observatory',460,330],[5,2,'observatory',460,330],[11,1,'roadShelter',575,490],[11,5,'station',470,335],[12,0,'station',470,335]].forEach(function(p){var scene=acts[p[0]][p[1]];scene.map=p[2];scene.x=p[3];scene.y=p[4];});
   Object.values(acts).flat().forEach(function(scene){var p=mapPoint(scene.map,scene.x,scene.y);scene.x=p.x;scene.y=p.y;});
   function passable(mapId,x,y) {
     var map=maps[mapId]; if(!map || !Number.isFinite(x)||!Number.isFinite(y)||x<10||y<10||x>map.width-10||y>map.height-10)return false;
@@ -289,7 +289,7 @@
       drawn.sort(function(a,b){return a.y-b.y;}).forEach(function(p){if(p.native){nativeTerrain.drawObject(ctx,p.native);return;}ctx.fillStyle='rgba(12,30,28,.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+5,p.hero?17:15,6,0,0,Math.PI*2);ctx.fill();if(!(p.hero&&useHeroAtlas&&heroMotion.draw(ctx,images.heroWalk,p.x,p.y,44,heading,stride,walking,reduced())))renderer.sprite(ctx,p.hero?images.hero:images['npc-'+p.actor.id],p.x,p.y,p.hero?44:42,p.hero?heading==='left':false,reduced()?0:p.hero&&walking?Math.sin(now/95)*2:Math.sin(now/700+(p.hero?0:p.x))*.8);if(!p.hero){presentation.label(ctx,p.actor.name,p.x,p.y-52);if(Math.hypot(state.x-p.x,state.y-p.y)<115)presentation.label(ctx,'···',p.x,p.y-73,'#b9f0da');}});
       if(state.map==='village'&&!map.nativeTerrain)presentation.fire(ctx,832,395,now,reduced());presentation.environment(ctx,map,view,now,reduced());
       // Pins use names and distinct silhouettes instead of anonymous dots.
-      var named=map.exits.concat(map.sites);named.forEach(function(p){if(Math.hypot(state.x-p.x,state.y-p.y)<125&&Math.hypot(state.x-p.x,state.y-p.y)>55)presentation.label(ctx,p.name,p.x,p.y+25,'#e4f0d8');});
+      var named=presentation.locationLabels(map.exits,map.sites);named.forEach(function(p){if(Math.hypot(state.x-p.x,state.y-p.y)<125&&Math.hypot(state.x-p.x,state.y-p.y)>55)presentation.label(ctx,p.name,p.x,p.y+25,'#e4f0d8');});
       if(options.minimap&&(now-lastMini>120||!lastMini)){presentation.minimap(options.minimap,ground||images[state.map],map,state,currentRoute,actors,view);lastMini=now;}
       if(options.dialog.hidden===false&&options.tools){options.tools.hidden=true;if(options.toolsToggle)options.toolsToggle.setAttribute('aria-expanded','false');}
       renderer.end(ctx);

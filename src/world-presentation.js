@@ -14,6 +14,9 @@
   function npcs(map){return cast[map]||[];}
   function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}
   function label(ctx,text,x,y,color){ctx.save();ctx.font='600 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#162f29';ctx.strokeText(text,x,y);ctx.fillStyle=color||'#fff0c7';ctx.fillText(text,x,y);ctx.restore();}
+  // A doorway can also be a story landmark. Prefer its actionable entrance
+  // label rather than drawing two different names on the same ground anchor.
+  function locationLabels(exits,sites){var labels=exits.slice();sites.forEach(function(site){if(!labels.some(function(label){return Math.hypot(label.x-site.x,label.y-site.y)<32;}))labels.push(site);});return labels;}
   function environment(ctx,map,view,time,reduced){
     if(reduced)return;
     ctx.save();
@@ -23,5 +26,5 @@
   }
   function fire(ctx,x,y,time,reduced){if(reduced)return;ctx.save();var g=ctx.createRadialGradient&&ctx.createRadialGradient(x,y,2,x,y,72);if(g&&g.addColorStop){g.addColorStop(0,'rgba(255,177,69,.18)');g.addColorStop(1,'rgba(255,177,69,0)');ctx.fillStyle=g;ctx.fillRect(x-72,y-72,144,144);}ctx.fillStyle='#ffd18a';ctx.globalAlpha=.65;for(var i=0;i<4;i++){var t=reduced?.4:(time/1300+i*.23)%1;ctx.beginPath();ctx.arc(x+Math.sin(i+time/700)*7,y-12-t*26,1.5*(1-t),0,Math.PI*2);ctx.fill();}ctx.restore();}
   function minimap(canvas,img,map,state,route,npcs,view){if(!canvas)return;var ctx=canvas.getContext('2d');if(!ctx)return;var w=canvas.width,h=canvas.height,scale=Math.min(w/map.width,h/map.height),left=(w-map.width*scale)/2,top=(h-map.height*scale)/2;ctx.clearRect(0,0,w,h);ctx.fillStyle='#16352d';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(left,top);ctx.scale(scale,scale);if(img)ctx.drawImage(img,0,0,map.width,map.height);var native=globalThis.StarshipNativeTerrain;if(map.nativeTerrain&&native)native.objects(map.nativeTerrain).forEach(function(o){native.drawObject(ctx,o);});ctx.fillStyle='rgba(8,27,23,.24)';ctx.fillRect(0,0,map.width,map.height);if(route.length){ctx.beginPath();route.forEach(function(p,i){if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#ffe2a1';ctx.lineWidth=2/scale;ctx.stroke();}ctx.strokeStyle='rgba(239,236,208,.6)';ctx.lineWidth=1/scale;ctx.strokeRect(view.x,view.y,view.width,view.height);map.exits.forEach(function(p){ctx.fillStyle='#b4e4cf';ctx.beginPath();ctx.arc(p.x,p.y,2.4/scale,0,Math.PI*2);ctx.fill();});npcs.forEach(function(p){ctx.fillStyle='#f7d38a';ctx.beginPath();ctx.arc(p.x,p.y,1.8/scale,0,Math.PI*2);ctx.fill();});ctx.fillStyle='#fff8db';ctx.strokeStyle='#1c3b30';ctx.lineWidth=1.5/scale;ctx.beginPath();ctx.arc(state.x,state.y,4/scale,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
-  return {npcs:npcs,position:position,label:label,environment:environment,fire:fire,minimap:minimap};
+  return {npcs:npcs,position:position,label:label,locationLabels:locationLabels,environment:environment,fire:fire,minimap:minimap};
 }));

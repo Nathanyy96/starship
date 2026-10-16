@@ -29,3 +29,15 @@ test('the workshop side foundation cannot be mistaken for its open doorway',()=>
 test('all currently playable scenes have local geometry except the approved west trade road',()=>{
  for(const [id,m]of Object.entries(w.maps)){if(id==='road')continue;assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else{assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
 });
+
+
+test('native road centerlines do not pass through building footprints',()=>{
+ for(const [id,m]of Object.entries(w.maps)){if(!m.nativeTerrain)continue;for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/8));for(let k=0;k<=n;k++){const x=a[0]+(b[0]-a[0])*k/n,y=a[1]+(b[1]-a[1])*k/n;assert.ok(!m.buildings.some(p=>x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h),id+' road through building at '+x+','+y);}}}
+ const inn=w.maps.mistbridge.exits.find(e=>e.to==='mistInn');assert.deepEqual([inn.x,inn.y],[1460,350]);assert.deepEqual(w.maps.mistInn.exits.find(e=>e.to==='mistbridge').spawn,[1460,394]);
+});
+
+test('hand placed roadside scenery stays off the road, door and building collision lanes',()=>{
+ const ids=['city','village','south','mistbridge','echo','relic','banksWest','banksEast','bellcourt','northRoad'];
+ for(const id of ids){const m=w.maps[id],p=m.nativeTerrain;assert.ok(p.scatter.length>=10,id+' has natural ground detail');for(const t of p.trees){const x=t[0]+t[3]*.475,y=t[1]+t[3]*.92;let roadClearance=Infinity;for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i],dx=b[0]-a[0],dy=b[1]-a[1],q=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));roadClearance=Math.min(roadClearance,Math.hypot(x-a[0]-q*dx,y-a[1]-q*dy)-lane.width);}assert.ok(roadClearance>=t[3]*.14+14,id+' tree trunk keeps road clearance');assert.equal(m.buildings.some(b=>x>b.x-30&&x<b.x+b.w+30&&y>b.y-t[3]*.8&&y<b.y+b.h+20),false,id+' tree clears buildings');}}
+ assert.ok(w.maps.south.nativeTerrain.fields.length>0);assert.ok(w.maps.south.nativeTerrain.fields.some(f=>f[4]));
+});
