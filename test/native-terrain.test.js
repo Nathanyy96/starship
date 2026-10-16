@@ -1,8 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const w=require('../src/first-major-world'),native=require('../src/native-terrain');
-test('five important locations use native scene materials while west road keeps its approved scale',()=>{
+test('all outdoor locations use local scene materials at their intended scale',()=>{
   for(const id of['village','city','south','riverRoad','lotin'])assert.ok(w.maps[id].nativeTerrain,id);
-  assert.equal(w.maps.road.nativeTerrain,undefined);
+  assert.ok(w.maps.road.nativeTerrain);assert.equal(w.maps.road.width,1672);
   for(const [id,file]of Object.entries(native.files)){const data=fs.readFileSync(path.join(__dirname,'../assets/exploration/native',file));assert.ok(data.readUInt32BE(16)>=1024,file);assert.equal(data[25],['ground','detail'].includes(id)?2:6,file);}
 });
 test('every illustrated entry has an accessible door and solid building footprint',()=>{
@@ -26,8 +26,8 @@ test('all 24 maps have traversable guidance to every exit and landmark, in both 
 test('the workshop side foundation cannot be mistaken for its open doorway',()=>{assert.equal(w.passable('city',680,1460),false);assert.equal(w.passable('city',781,1465),true);});
 
 
-test('all currently playable scenes have local geometry except the approved west trade road',()=>{
- for(const [id,m]of Object.entries(w.maps)){if(id==='road')continue;assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else{assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
+test('all currently playable scenes have local geometry',()=>{
+ for(const [id,m]of Object.entries(w.maps)){assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else{assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
 });
 
 
@@ -44,4 +44,11 @@ test('hand placed roadside scenery stays off the road, door and building collisi
 
 test('new roadside vignettes keep their full footprints clear of playable roads',()=>{
  for(const [id,m]of Object.entries(w.maps)){if(!m.nativeTerrain)continue;const props=m.nativeTerrain.scenery;assert.ok(props.length,id);for(const p of props){assert.equal(native.objects(m.nativeTerrain).includes(p),true);for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i],n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/10);for(let k=0;k<=n;k++){const x=a[0]+(b[0]-a[0])*k/n,y=a[1]+(b[1]-a[1])*k/n;const dx=Math.max(p.x-x,0,x-p.x-p.w),dy=Math.max(p.y-y,0,y-p.y-p.h);assert.ok(Math.hypot(dx,dy)>lane.width,id+' scenery intrudes on road');}}}}
+});
+
+test('White Bell and Beast Village have populated street-facing districts',()=>{
+ for(const [id,count] of [['city',25],['village',14]]){const m=w.maps[id];assert.ok(m.nativeTerrain.structures.length>=count,id+' has a populated settlement');for(const p of m.nativeTerrain.structures.filter(p=>p.residential)){assert.ok(p.door,id+' street-facing frontage');assert.ok(w.passable(id,...p.door),id+' accessible front walk');}}
+});
+test('guidance to Vark avoids automatically entering the recovery house on the way',()=>{
+ const m=w.maps.city,target=m.exits.find(e=>e.to==='factoryNear'),other=m.exits.find(e=>e.to==='recovery'),route=w.planWalk({...w.initial(2),map:'city',x:m.spawn[0],y:m.spawn[1],roaming:true},target.x,target.y);assert.ok(route.length);for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)));for(let k=0;k<=n;k++)assert.ok(Math.hypot(a.x+(b.x-a.x)*k/n-other.x,a.y+(b.y-a.y)*k/n-other.y)>24,'route must not cross another doorway trigger');}
 });

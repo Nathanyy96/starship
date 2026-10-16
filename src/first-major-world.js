@@ -142,7 +142,7 @@
     if((map.nativeObstacles||[]).some(function(o){return Math.pow((x-o.x)/o.rx,2)+Math.pow((y-o.y)/o.ry,2)<=1;}))return false;
     if((map.buildings||[]).some(function(p){return x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h;}))return false;
     if(mapId==='city'&&Math.hypot(x-837*map.scale,y-413*map.scale)<90*map.scale)return false;
-    return map.paths.some(function(path){return path.points.some(function(p,i){if(!i)return false;var a=path.points[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=path.width;});});
+    return map.paths.some(function(path){return path.points.some(function(p,i){if(!i)return false;var a=path.points[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=path.width+1e-6;});});
   }
 
   function initial(act) {act=campaign.order.includes(act)?act:2;var startMap=act===2?'village':acts[act][0].map,map=maps[startMap];return {version:1,geometryVersion:3,act:act,index:0,map:startMap,x:map.spawn[0],y:map.spawn[1],visited:[],waypoints:[]};}
@@ -161,7 +161,7 @@
   }
   function goal(state){return state.roaming?null:acts[state.act][state.index]||null;}
   function fits(map,x,y){return [[-6,-6],[-6,6],[6,-6],[6,6]].every(function(d){return passable(map,x+d[0],y+d[1]);});}
-  function clearSegment(map,ax,ay,bx,by){var count=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/2));for(var i=1;i<=count;i++)if(!fits(map,ax+(bx-ax)*i/count,ay+(by-ay)*i/count))return false;return true;}
+  function clearSegment(map,ax,ay,bx,by,leavingEdge){var distance=Math.hypot(bx-ax,by-ay),count=Math.max(1,Math.ceil(distance));for(var i=1;i<=count;i++){var margin=distance*i/count<(leavingEdge?24:2)||distance*(count-i)/count<2?6:6.25;for(var sx=-1;sx<=1;sx+=2)for(var sy=-1;sy<=1;sy+=2)if(!passable(map,ax+(bx-ax)*i/count+sx*margin,ay+(by-ay)*i/count+sy*margin))return false;}return true;}
   function move(state,dx,dy){var next=normalize(state),steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/2));for(var i=0;i<steps;i++){var x=next.x+dx/steps,y=next.y+dy/steps;if(fits(next.map,x,y)){next.x=x;next.y=y;}else{if(fits(next.map,x,next.y))next.x=x;if(fits(next.map,next.x,y))next.y=y;}}return next;}
   function canVisit(state,map){return Object.prototype.hasOwnProperty.call(maps,map);}
   function nearWaypoint(state){return waypoints.filter(function(p){return p.map===state.map&&Math.hypot(state.x-p.x,state.y-p.y)<56;}).sort(function(a,b){return Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y);})[0]||null;}
@@ -183,12 +183,15 @@
   function route(state,target) {
     if(!target||!fits(state.map,target.x,target.y)||!fits(state.map,state.x,state.y))return [];
     var size=16,map=maps[state.map],columns=Math.ceil(map.width/size),rows=Math.ceil(map.height/size),key=function(x,y){return y*columns+x;},point=function(n){return {x:(n%columns+.5)*size,y:(Math.floor(n/columns)+.5)*size};},edges=navigationEdges[state.map]||(navigationEdges[state.map]=new Map());
-    function edge(a,b){var k=Math.min(a,b)*columns*rows+Math.max(a,b);if(!edges.has(k)){var p=point(a),q=point(b);edges.set(k,clearSegment(state.map,p.x,p.y,q.x,q.y));}return edges.get(k);}
+    var avoid=map.exits.filter(function(e){return Boolean(map.nativeTerrain&&map.nativeTerrain.structures.some(function(p){return p.door&&Math.hypot(p.door[0]-e.x,p.door[1]-e.y)<2;}))&&Math.hypot(state.x-e.x,state.y-e.y)>64&&Math.hypot(target.x-e.x,target.y-e.y)>64;});
+    function portalClear(ax,ay,bx,by){return !avoid.some(function(e){var dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((e.x-ax)*dx+(e.y-ay)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(e.x-ax-t*dx,e.y-ay-t*dy)<34;});}
+    function walkSegment(ax,ay,bx,by){return portalClear(ax,ay,bx,by)&&clearSegment(state.map,ax,ay,bx,by,ax===state.x&&ay===state.y);}
+    function edge(a,b){var k=Math.min(a,b)*columns*rows+Math.max(a,b);if(!edges.has(k)){var p=point(a),q=point(b);edges.set(k,clearSegment(state.map,p.x,p.y,q.x,q.y));}var p=point(a),q=point(b);return edges.get(k)&&portalClear(p.x,p.y,q.x,q.y);}
     var queue=[],prev=new Map(),end=-1;
-    for(var sy=Math.max(0,Math.floor(state.y/size)-1);sy<=Math.min(rows-1,Math.floor(state.y/size)+1);sy++)for(var sx=Math.max(0,Math.floor(state.x/size)-1);sx<=Math.min(columns-1,Math.floor(state.x/size)+1);sx++){var n=key(sx,sy),p=point(n);if(clearSegment(state.map,state.x,state.y,p.x,p.y)){queue.push(n);prev.set(n,-1);}}
-    for(var head=0;head<queue.length;head++){var at=queue[head],x=at%columns,y=Math.floor(at/columns),p=point(at);if(Math.hypot(p.x-target.x,p.y-target.y)<24&&clearSegment(state.map,p.x,p.y,target.x,target.y)){end=at;break;}[[1,0],[0,1],[-1,0],[0,-1]].forEach(function(d){var nx=x+d[0],ny=y+d[1],n=key(nx,ny);if(nx>=0&&ny>=0&&nx<columns&&ny<rows&&!prev.has(n)&&edge(at,n)){prev.set(n,at);queue.push(n);}});}
+    for(var sy=Math.max(0,Math.floor(state.y/size)-2);sy<=Math.min(rows-1,Math.floor(state.y/size)+2);sy++)for(var sx=Math.max(0,Math.floor(state.x/size)-2);sx<=Math.min(columns-1,Math.floor(state.x/size)+2);sx++){var n=key(sx,sy),p=point(n);if(walkSegment(state.x,state.y,p.x,p.y)){queue.push(n);prev.set(n,-1);}}
+    for(var head=0;head<queue.length;head++){var at=queue[head],x=at%columns,y=Math.floor(at/columns),p=point(at);if(Math.hypot(p.x-target.x,p.y-target.y)<24&&walkSegment(p.x,p.y,target.x,target.y)){end=at;break;}[[1,0],[0,1],[-1,0],[0,-1]].forEach(function(d){var nx=x+d[0],ny=y+d[1],n=key(nx,ny);if(nx>=0&&ny>=0&&nx<columns&&ny<rows&&!prev.has(n)&&edge(at,n)){prev.set(n,at);queue.push(n);}});}
     if(end<0)return [];var out=[];for(var n=end;n!==-1;n=prev.get(n))out.push(point(n));out.reverse();out.unshift({x:state.x,y:state.y});out.push({x:target.x,y:target.y});
-    var smooth=[out[0]],cursor=0;while(cursor<out.length-1){var next=cursor+1;for(var j=out.length-1;j>cursor+1;j--)if(clearSegment(state.map,out[cursor].x,out[cursor].y,out[j].x,out[j].y)){next=j;break;}smooth.push(out[next]);cursor=next;}return smooth;
+    var smooth=[out[0]],cursor=0;while(cursor<out.length-1){var next=cursor+1;for(var j=out.length-1;j>cursor+1;j--)if(walkSegment(out[cursor].x,out[cursor].y,out[j].x,out[j].y)){next=j;break;}smooth.push(out[next]);cursor=next;}return smooth;
   }
 
   function planWalk(state,x,y){

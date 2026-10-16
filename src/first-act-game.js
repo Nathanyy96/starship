@@ -190,8 +190,12 @@
       if (!talking() && state.index>=steps.length && state.y<2 && options.onEnterVillage){options.onEnterVillage();return;}
       if (!talking() && (dx || dy)) {
         var len = Math.hypot(dx, dy), nx = state.x + dx / len * dt * 4, ny = state.y + dy / len * dt * 4;
-        if (clearSegment(state.zone,[state.x,state.y],[nx,state.y])) state.x = nx;
-        if (clearSegment(state.zone,[state.x,state.y],[state.x,ny])) state.y = ny;
+        if (clearSegment(state.zone,[state.x,state.y],[nx,ny])) {
+          state.x = nx; state.y = ny;
+        } else {
+          if (clearSegment(state.zone,[state.x,state.y],[nx,state.y])) state.x = nx;
+          if (clearSegment(state.zone,[state.x,state.y],[state.x,ny])) state.y = ny;
+        }
         if (now - lastSave > 800) { save(); lastSave = now; }
       }
       draw(); frame = requestAnimationFrame(tick);

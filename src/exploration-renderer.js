@@ -61,6 +61,9 @@
     // The room boundary is visible wainscot and timber, with a real doorway
     // matching the return exit. Furniture does not masquerade as open floor.
     if(settings.floor){var f=settings.floor;c.save();c.lineJoin='miter';c.strokeStyle='#332d25';c.lineWidth=24;c.strokeRect(f[0]-12,f[1]-12,f[2]-f[0]+24,f[3]-f[1]+24);c.strokeStyle='#826746';c.lineWidth=8;c.strokeRect(f[0]-2,f[1]-2,f[2]-f[0]+4,f[3]-f[1]+4);c.strokeStyle='#b99867';c.lineWidth=2;c.strokeRect(f[0]+3,f[1]+3,f[2]-f[0]-6,f[3]-f[1]-6);(settings.exits||[]).forEach(function(e){c.fillStyle=patterns[3]||'#b58e56';c.fillRect(e.x-42,f[3]-4,84,30);c.fillStyle='#d1b788';c.fillRect(e.x-44,f[3]+18,88,5);});c.restore();}
+    // Daylight windows belong to the solid back wall, leaving the room's
+    // central circulation and the return doorway clear.
+    if(settings.floor){var wall=settings.floor;[.28,.72].forEach(function(t){var wx=wall[0]+(wall[2]-wall[0])*t-34,wy=wall[1]-23;c.save();c.fillStyle='#5e4933';c.fillRect(wx-5,wy-4,78,38);c.fillStyle='#b4d7ce';c.fillRect(wx,wy,68,28);c.fillStyle='#e8d8a2';c.fillRect(wx+32,wy,4,28);c.fillRect(wx,wy+12,68,3);c.fillStyle='#d4bb85';c.fillRect(wx-7,wy+28,82,5);c.restore();});}
     // Decorations may occupy blocked cells only, including their complete footprint.
     function blocked(x,y,w,h){for(var py=y;py<=y+h;py+=8)for(var px=x;px<=x+w;px+=8)if(passable(px,py))return false;return true;}
     function prop(index,x,y,w,h){var sw=objectArt.naturalWidth/4,sh=objectArt.naturalHeight/2;c.drawImage(objectArt,(index%4)*sw+3,Math.floor(index/4)*sh+3,sw-6,sh-6,x,y,w,h);}

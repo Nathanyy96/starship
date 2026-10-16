@@ -1,6 +1,6 @@
-(function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipNativeTerrain=api;}(globalThis,function(){
+(function(root,factory){var api=factory(typeof module==='object'&&module.exports?require('./native-scene-layouts'):root.StarshipNativeSceneLayouts);if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipNativeTerrain=api;}(globalThis,function(layouts){
   'use strict';
-  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png',scenery:'roadside-scenery-v1.png'},images={},cache={},version=0,requested={},failed=[];
+  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png',scenery:'roadside-scenery-v1.png',town:'town-buildings-v2.png'},images={},cache={},version=0,requested={},failed=[];
   // Frames are authored against the delivered transparent sprite sheets. They
   // are individual objects, never a resized overview illustration.
   var frames={
@@ -13,106 +13,9 @@
   function ensure(p){if(typeof Image==='undefined')return;needed(p).forEach(function(id){if(requested[id])return;requested[id]=true;var img=new Image();img.onload=function(){images[id]=img;cache={};version++;};img.onerror=function(){failed.push(id);};img.src='./assets/exploration/native/'+files[id];});}
 
   function structure(sheet,cell,x,y,w,h){return {sheet:sheet,cell:cell,x:x,y:y,w:w,h:h};}
-  function door(map,to,sheet,cell,w,h,u){var e=map.exits.find(function(e){return e.to===to;});if(!e)return null;var p=structure(sheet,cell,e.x-w*(u||.5),e.y-h*.86,w,h);p.door=[e.x,e.y];return p;}
-  function install(maps){
-    var city=maps.city,south=maps.south,village=maps.village;
-    city.nativeTerrain={style:'city',structures:[door(city,'factoryNear','city',0,300,330,.64),door(city,'recovery','city',3,220,270,.55),door(city,'observatory','city',2,300,300,.52),door(city,'cityInn','landmarks',1,330,350,.46),structure('city',1,1190,400,200,300),structure('harbor',0,310,890,260,280),structure('harbor',1,2840,1040,180,150)].filter(Boolean),trees:[[420,1240,0,240],[1100,1430,1,200],[920,1120,3,200],[1120,470,0,175],[1510,1410,1,190],[2740,1210,0,210],[3140,530,1,185],[340,1570,0,170]],fields:[],water:[{points:[[0,1880],[900,1830],[1800,1770],[2670,1780],[3678,1720]],width:270}],fountain:[1841,909,180]};
-    south.nativeTerrain={style:'country',structures:[door(south,'southStation','landmarks',2,260,280)],trees:[[180,450,3,250],[730,150,1,250],[680,590,0,220],[90,420,0,200],[200,850,1,180],[670,300,0,220],[1310,440,1,210],[1300,930,0,180]],fields:[[80,90,330,210,0],[760,50,260,200,.42],[760,590,200,140,-.28],[1130,30,280,110,.16]],water:[{points:[[1400,0],[1370,200],[1340,400],[1300,600],[1320,850],[1370,1024]],width:125}]};
-    maps.riverRoad.nativeTerrain={style:'country',structures:[structure('harbor',2,430,20,250,200)],trees:[[500,260,1,220],[1030,520,2,180],[150,400,0,220],[500,630,1,210],[1150,260,0,240],[1430,510,1,200]],fields:[[20,570,300,180,.28],[390,5,270,90,-.22],[1040,25,430,170,.36],[1070,780,190,120,-.18]],water:[{points:[[810,0],[830,180],[880,350],[900,550],[830,750],[740,939]],width:160}]};
-    var port=maps.lotin;
-    port.paths.forEach(function(p,i){p.width=i===1?68:80;});
-    port.nativeTerrain={style:'port',structures:[structure('harbor',0,1090,1390,350,300),structure('harbor',1,985,1550,125,105),structure('city',3,1400,1640,270,300),structure('landmarks',1,1820,1890,260,280)],trees:[[640,1340,0,240],[650,1670,1,210],[1200,1030,3,250],[320,1530,1,210],[670,2080,0,210],[1250,2240,1,210],[2830,1330,0,230]],fields:[],land:[[[0,0],[1560,0],[1590,990],[1500,1140],[1440,1290],[1560,1500],[1800,1740],[2040,1950],[2700,1980],[3030,2070],[3060,2460],[2400,2700],[0,2700]],[[2340,0],[4608,0],[4608,2040],[3000,2040],[2940,1800],[2700,1740],[2550,1530],[2400,1380],[2280,1200],[2325,990]]],water:[]};
-    village.nativeTerrain={style:'village',structures:[door(village,'clinic','village',2,260,300,.64),structure('village',0,860,140,300,290),structure('village',1,370,220,270,240),structure('village',3,1560,635,260,220)],trees:[[1710,600,0,230],[2210,480,1,240],[2150,880,3,220],[80,840,0,230],[550,1030,1,220],[1450,180,0,260],[1850,970,1,250],[2230,1030,0,240],[2250,200,1,230]],fields:[],water:[{points:[[0,1100],[400,1070],[800,1010],[1250,970],[1750,1080],[2508,1260]],width:110}],fire:[1248,592,48]};
-    // Arrival squares and staging areas give the player room to turn, meet
-    // characters and find doors without squeezing through corridor junctions.
-    [['mistbridge',1181,685,120],['echo',650,500,78],['rescue',550,530,105],['relic',870,594,100]].forEach(function(a){maps[a[0]].paths.push({plaza:true,width:a[3],points:[[a[1],a[2]],[a[1]+1,a[2]]]});});
-    // Road widths are world-space half-widths: leave room for two-way movement
-    // while allowing banks, buildings and planted setbacks into the camera.
-    Object.keys(maps).forEach(function(id){if(id==='road'||maps[id].floor)return;var cap=id==='city'?76:id==='lotin'?80:id==='village'||id==='echo'?64:52;maps[id].paths.forEach(function(path){if(!path.plaza)path.width=Math.min(path.width,cap);});});
-    // Buildings sit beside the street: only a short approach ends at a door.
-    var mistEntry=maps.mistbridge.exits.find(function(e){return e.to==='mistInn';});mistEntry.x=1460;mistEntry.y=350;
-    maps.mistInn.exits.find(function(e){return e.to==='mistbridge';}).spawn=[1460,394];
-    // Preserve the original route graph. Add the inn spur from the road
-    // shoulder; the entry door/footprint below are aligned to its endpoint.
-    maps.mistbridge.paths.push({width:30,points:[[1427,822],[1410,770],[1400,720],[1418,680],[1450,640],[1460,590],[1460,540],[1460,480],[1460,420],[1460,350]]});
-    maps.mistbridge.nativeTerrain={style:'city',structures:[door(maps.mistbridge,'mistInn','frontier',0,290,290,.5),structure('city',1,570,650,210,270),structure('city',3,1820,540,240,260),structure('harbor',1,1540,1030,150,130)],trees:[[280,890,0,230],[2150,890,1,240],[950,1150,3,240],[1380,170,1,190]],fields:[],water:[{points:[[1950,0],[2020,330],[2120,590],[2120,850],[2220,1150],[2320,1506]],width:115}]};
-    var mistStructure=maps.mistbridge.nativeTerrain.structures[0];
-    mistStructure.door=[mistEntry.x,mistEntry.y];
-    mistStructure.x=mistEntry.x-mistStructure.w*.5;
-    mistStructure.y=mistEntry.y-mistStructure.h*.86;
-    // Route the shared southern lane around the workshop's south-west corner.
-    city.paths[2].points.splice(-2,2,[550,1410],[555,1490],[620,1540],[858,1540]);
-    city.paths[7].points=[[550,1410],[535,1470],[600,1530],[700,1545],[781,1509.2],[781,1465.2]];
-    city.paths[8].points=[[858,1540],[858,1660],[1012,1660],[1012,1606]];
-    // Route around the healer cottage walls and place the repair scene on
-    // the open shoulder beside its front walk, rather than over the roof.
-    village.paths[0].points.splice(2,2,[2220,430],[2240,700],[1900,740]);
-    village.paths[2].points.splice(2,3,[1870,710],[2025,760],[2085,760],[2085,711]);
-    // Pass east of the road shelter's front steps instead of clipping its roof.
-    maps.northRoad.paths[0].points[9]=[540,445];
-    // Approach the fountain from the main square and give its stone base a
-    // proper paved apron with connected paths on all four sides.
-    city.paths.push({width:52,plaza:true,points:[[1760,660],[1810,735],[1841,799]]},{width:52,plaza:true,points:[[1980,682],[1900,738],[1841,799]]},{width:52,plaza:true,points:[[1760,1034],[1790,960],[1841,1019]]},{width:52,plaza:true,points:[[1947,1232],[1900,1060],[1841,1019]]});
-    // Local-scale compositions for the complete currently playable mainland.
-    // Coordinates retain save/story anchors; roads are the shared movement graph.
-    maps.mistbridge.nativeTerrain={style:'city',structures:[door(maps.mistbridge,'mistInn','frontier',0,290,290,.5),structure('city',1,570,650,210,270),structure('city',3,1820,540,240,260),structure('harbor',1,1540,1030,150,130)],trees:[[280,890,0,230],[2150,890,1,240],[950,1150,3,240],[1380,170,1,190],[420,240,3,175],[850,260,0,185],[2500,510,1,200],[2450,1320,3,170],[650,1030,1,180]],fields:[],water:[{points:[[1950,0],[2020,330],[2120,590],[2120,850],[2220,1150],[2320,1506]],width:115}]};
-    maps.echo.paths[2].points=[[230,418],[350,370],[400,250],[480,170],[620,150],[770,235],[825,238],[940,260],[1000,273]];
-    maps.echo.nativeTerrain={style:'country',structures:[door(maps.echo,'station','frontier',1,390,260,.5),structure('frontier',3,60,80,300,230),structure('nature',2,1110,80,270,220)],trees:[[80,580,1,230],[460,760,0,230],[1010,360,3,180],[1120,680,1,210],[270,180,3,155],[895,690,0,180],[1310,820,3,170]],fields:[],water:[{points:[[1200,0],[1180,180],[1160,330],[1100,510],[1070,700],[990,1024]],width:100}]};
-    maps.relic.nativeTerrain={style:'ruin',structures:[structure('frontier',2,890,610,280,310),structure('frontier',3,240,60,310,210),structure('nature',2,1190,110,240,200)],trees:[[10,600,1,180],[330,760,0,200],[1250,610,3,210],[510,870,3,165],[610,120,1,160],[1110,800,0,180]],fields:[],water:[{points:[[1430,0],[1470,260],[1420,560],[1440,1024]],width:100}]};
-    maps.banksWest.nativeTerrain={style:'country',structures:[structure('harbor',2,40,200,230,190),structure('frontier',3,900,420,340,290)],trees:[[30,600,0,190],[420,40,1,200],[520,540,3,200],[660,850,0,180],[1060,230,1,170],[720,560,3,155]],fields:[],water:[{points:[[850,0],[850,250],[870,500],[880,760],[920,1024]],width:150}]};
-    maps.banksEast.nativeTerrain={style:'country',structures:[structure('village',3,1160,420,260,230),structure('frontier',3,240,580,330,260)],trees:[[1100,30,1,170],[1180,700,0,220],[100,250,3,160],[630,150,0,180],[650,850,1,160],[1450,880,3,150]],fields:[],water:[{points:[[850,0],[850,250],[870,500],[880,760],[920,1024]],width:100}]};
-    maps.bellcourt.nativeTerrain={style:'ruin',structures:[structure('frontier',2,560,60,260,310),structure('city',2,1270,100,270,300),structure('frontier',3,80,110,300,220)],trees:[[1040,570,1,220],[270,800,3,190],[350,560,0,170],[910,770,3,155],[1480,720,1,180]],fields:[],water:[{points:[[30,0],[50,240],[0,550],[0,941]],width:100}]};
-    maps.northRoad.nativeTerrain={style:'country',structures:[door(maps.northRoad,'roadShelter','harbor',2,240,225,.5),structure('frontier',3,900,20,260,180)],trees:[[160,80,0,240],[610,60,1,210],[1110,550,3,230],[1280,710,0,210],[90,620,3,170],[380,250,1,170],[1500,740,3,170]],fields:[[80,650,300,180]],water:[{points:[[680,0],[740,200],[800,400],[1000,600],[1100,939]],width:90}]};
-    ['factoryNear','factoryFar'].forEach(function(id){maps[id].nativeTerrain={style:'city',structures:id==='factoryNear'?[structure('harbor',0,30,620,200,220),structure('village',3,400,500,270,230)]:[structure('city',0,1310,500,280,300),structure('nature',2,1100,20,260,180)],trees:[],fields:[],water:[{points:[[920,0],[900,220],[850,450],[880,700],[920,939]],width:125}]};});
-    maps.rescue.nativeTerrain={style:'country',structures:[structure('harbor',2,500,660,250,200),structure('frontier',3,680,100,270,250),structure('nature',2,40,30,230,180)],trees:[[40,500,1,180],[1060,590,0,240],[1220,130,3,220]],fields:[],water:[{points:[[1010,0],[1030,230],[1010,460],[1000,680],[1040,939]],width:130}]};
-    // Large interiors have a real floor, clear circulation and individually
-    // placed furniture, rather than walking across an illustration of tables.
-    ['cityInn','mistInn','recovery'].forEach(function(id){var m=maps[id];m.floor=[70,70,m.width-70,m.height-40];m.furniture=id==='recovery'?[{sprite:0,x:180,y:130,w:240,h:200},{sprite:1,x:1040,y:110,w:210,h:160},{sprite:2,x:1260,y:570,w:190,h:160}]:[{sprite:7,x:80,y:80,w:200,h:130},{sprite:6,x:1380,y:120,w:180,h:230},{sprite:3,x:150,y:540,w:230,h:190},{sprite:1,x:1040,y:730,w:230,h:140}];});
-    ['cityInn','mistInn'].forEach(function(id){maps[id].furniture.push({sprite:0,x:100,y:300,w:210,h:170},{sprite:4,x:490,y:90,w:220,h:130},{sprite:5,x:1030,y:100,w:200,h:160},{sprite:2,x:1380,y:360,w:170,h:150});});
-    function laneDistance(m,x,y){var best=Infinity;m.paths.forEach(function(p){for(var i=1;i<p.points.length;i++){var a=p.points[i-1],b=p.points[i],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));best=Math.min(best,Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t)-p.width);}});return best;}
-    function safePlot(m,p){for(var y=p.y+p.h*.06;y<=p.y+p.h*.88;y+=16)for(var x=p.x+p.w*.06;x<=p.x+p.w*.94;x+=16){if(x<14||y<14||x>m.width-14||y>m.height-14||laneDistance(m,x,y)<14)return false;var wet=(m.nativeTerrain.water||[]).some(function(r){for(var i=1;i<r.points.length;i++){var a=r.points[i-1],b=r.points[i],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t)<r.width/2+12)return true;}return false;});if(wet)return false;}return true;}
-    // Keep the authored landmark: adjust its setback instead of deleting the
-    // architecture whenever a footprint touches the road's clearance envelope.
-    Object.keys(maps).filter(function(id){return !['city','south','riverRoad','lotin','village'].includes(id)&&maps[id].nativeTerrain;}).map(function(id){return maps[id];}).forEach(function(m){var placed=[];m.nativeTerrain.structures=m.nativeTerrain.structures.filter(function(p){if(p.door){placed.push(p);return true;}var ox=p.x,oy=p.y;for(var radius=0;radius<=400;radius+=40)for(var angle=0;angle<8;angle++){p.x=ox+Math.cos(angle*Math.PI/4)*radius;p.y=oy+Math.sin(angle*Math.PI/4)*radius;if(safePlot(m,p)&&!placed.some(function(q){return p.x<q.x+q.w+16&&p.x+p.w+16>q.x&&p.y<q.y+q.h+16&&p.y+p.h+16>q.y;})){placed.push(p);return true;}}return false;});m.nativeTerrain.trees=m.nativeTerrain.trees.filter(function(t){return laneDistance(m,t[0]+t[3]*.475,t[1]+t[3]*.92)>t[3]*.14+14;});});
-    // Different silhouettes define districts and village functions, not rows of
-    // cloned houses. Setbacks keep every existing story and travel point open.
-    [[city,structure('frontier',0,2050,1060,340,290)],[city,structure('village',3,2790,250,260,230)],[village,structure('harbor',2,250,770,240,200)],[village,structure('frontier',1,1120,990,240,210)]].forEach(function(item){if(safePlot(item[0],item[1]))item[0].nativeTerrain.structures.push(item[1]);});
-    // Landmark-scale set dressing is hand placed at the clearings visible
-    // from the main roads; these sites follow each original map's terrain.
-    [[city,[[1530,200,1,200],[1880,220,2,180]]],[village,[[1760,150,0,210],[250,800,2,170]]],[maps.mistbridge,[[1100,210,1,190],[2230,390,2,170]]],[south,[[1020,270,1,190]]],[maps.echo,[[820,220,2,170]]],[maps.relic,[[530,80,1,170]]],[maps.banksWest,[[650,760,2,160]]],[maps.banksEast,[[650,730,1,160]]],[maps.bellcourt,[[850,640,2,160]]],[maps.northRoad,[[900,680,2,160]]]].forEach(function(item){item[1].forEach(function(t){item[0].nativeTerrain.trees.push(t);});});
-    // Curated small vignettes use full-resolution art at local player scale.
-    // Every entire sprite footprint clears roads, water, crops and architecture.
-    Object.keys(maps).forEach(function(id){var m=maps[id],p=m.nativeTerrain;if(!p)return;p.scenery=[];var choices=p.style==='port'?[3,1,0]:p.style==='city'?[0,1,0,3]:p.style==='ruin'?[1,0]:[0,2,1,0],limit=['city','village','mistbridge','south','lotin'].includes(id)?14:6;
-      for(var row=0;row<Math.ceil(m.height/130);row++)for(var col=0;col<Math.ceil(m.width/160);col++){
-        var n=row*17+col*31+id.length*7,cell=choices[n%choices.length],size=cell===0?125:cell===1?145:155,x=col*160+20+(n%5)*13,y=row*130+20+(n%3)*17,o=structure('scenery',cell,x,y,size,size);
-        var cx=x+size/2,cy=y+size*.8,edge=laneDistance(m,cx,cy);
-        if(edge<70||edge>230||!safePlot(m,o))continue;
-        var roadOverlap=m.paths.some(function(lane){for(var i=1;i<lane.points.length;i++){var a=lane.points[i-1],b=lane.points[i],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/8));for(var k=0;k<=steps;k++){var px=a[0]+(b[0]-a[0])*k/steps,py=a[1]+(b[1]-a[1])*k/steps,dx=Math.max(x-px,0,px-x-size),dy=Math.max(y-py,0,py-y-size);if(Math.hypot(dx,dy)<lane.width+20)return true;}}return false;});
-        if(roadOverlap)continue;
-        if(p.land&&![[x,y],[x+size,y],[x,y+size],[x+size,y+size]].every(function(v){return p.land.some(function(poly){var inside=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var a=poly[i],b=poly[j];if((a[1]>v[1])!==(b[1]>v[1])&&v[0]<(b[0]-a[0])*(v[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;});}))continue;
-        if(p.structures.concat(p.scenery).some(function(q){return x<q.x+q.w+45&&x+size+45>q.x&&y<q.y+q.h+45&&y+size+45>q.y;}))continue;
-        if(p.fields.some(function(f){return x<f[0]+f[2]+40&&x+size+40>f[0]&&y<f[1]+f[3]+40&&y+size+40>f[1];}))continue;
-        if(p.trees.some(function(t){return Math.hypot(cx-(t[0]+t[3]*.475),cy-(t[1]+t[3]*.8))<size*.65+t[3]*.3;}))continue;
-        p.scenery.push(o);
-      }
-      function rank(o){return ((Math.round(o.x)*73856093)^(Math.round(o.y)*19349663))>>>0;}
-      p.scenery.sort(function(a,b){return rank(a)-rank(b);});p.scenery=p.scenery.slice(0,limit);
-    });
-    // Keep all visible structure footprints solid. Entries sit just outside the
-    // front facade, rather than sharing a coordinate with roof pixels.
-    Object.values(maps).filter(function(m){return m.nativeTerrain;}).forEach(function(m){
-      m.nativeTerrain.structures=m.nativeTerrain.structures.filter(Boolean);
-      m.nativeTerrain.trees=m.nativeTerrain.trees.filter(function(t){var x=t[0]+t[3]*.475,y=t[1]+t[3]*.92;if(laneDistance(m,x,y)<t[3]*.14+14)return false;return !m.nativeTerrain.structures.some(function(p){return x>p.x-30&&x<p.x+p.w+30&&y>p.y-t[3]*.8&&y<p.y+p.h+20;});});
-      m.nativeObstacles=(m.nativeTerrain.trees||[]).map(function(t){return {x:t[0]+t[3]*.475,y:t[1]+t[3]*.92,rx:t[3]*.14,ry:t[3]*.09};});
-      m.buildings=m.nativeTerrain.structures.map(function(p){return {x:p.x+p.w*.06,y:p.y+p.h*.06,w:p.w*.88,h:p.h*(p.sheet==='nature'?.86:p.door ? .74 : .82)};});
-      // The foundation beside the entry is solid too; only the actual steps open.
-      m.nativeTerrain.structures.filter(function(p){return p.door&&p.sheet==='city'&&p.cell===0;}).forEach(function(p){var left=p.x+p.w*.06,right=p.x+p.w*.94,gap=p.w*.12,doorX=p.door[0];[[left,doorX-gap],[doorX+gap,right]].forEach(function(span){if(span[1]>span[0])m.buildings.push({x:span[0],y:p.y+p.h*.8,w:span[1]-span[0],h:p.h*.14});});});
-    });
-    // Scatter small, irregular flora and stone patches over the unused
-    // clearings. Sample only genuine off-road, dry ground, keeping the road
-    // network, crop rows, doorways and building silhouettes unobstructed.
-    Object.keys(maps).forEach(function(id){var m=maps[id],p=m.nativeTerrain;if(!p)return;var seed=Array.from(id).reduce(function(a,ch){return (a*31+ch.charCodeAt(0))>>>0;},2166136261),rand=function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},count=id==='city'||id==='village'||id==='mistbridge'?190:id==='south'||id==='lotin'?130:90,items=[];function nearWater(x,y){return (p.water||[]).some(function(r){for(var i=1;i<r.points.length;i++){var a=r.points[i-1],b=r.points[i],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t)<r.width/2+70)return true;}return false;});}for(var attempt=0;attempt<count*24&&items.length<count;attempt++){var x=30+rand()*(m.width-60),y=30+rand()*(m.height-60),radius=26+rand()*34;if(laneDistance(m,x,y)<radius+28||nearWater(x,y))continue;if((p.fields||[]).some(function(f){return x>f[0]-25&&x<f[0]+f[2]+25&&y>f[1]-25&&y<f[1]+f[3]+25;}))continue;if(m.buildings.some(function(b){return x>b.x-radius-40&&x<b.x+b.w+radius+40&&y>b.y-radius-40&&y<b.y+b.h+radius+40;}))continue;if(items.some(function(q){return Math.hypot(x-q.x,y-q.y)<radius+q.r+55;}))continue;items.push({x:x,y:y,r:radius,kind:rand()});}p.scatter=items;});
-  }
+  // Authored layouts are committed after route, frontage and collision checks.
+  // Loading a map never runs a placement search or moves its buildings.
+  function install(maps){Object.keys(layouts).forEach(function(id){if(!maps[id])return;var plan=JSON.parse(JSON.stringify(layouts[id]));Object.keys(plan).forEach(function(key){maps[id][key]=plan[key];});});}
   function polygon(c,points){c.beginPath();points.forEach(function(p,i){if(i)c.lineTo(p[0],p[1]);else c.moveTo(p[0],p[1]);});c.closePath();}
   function stroke(c,path,width,color){c.beginPath();path.points.forEach(function(p,i){if(i)c.lineTo(p[0],p[1]);else c.moveTo(p[0],p[1]);});c.lineCap='round';c.lineJoin='round';c.lineWidth=width;c.strokeStyle=color;c.stroke();}
   function rectBlocked(test,x,y,w,h){for(var py=y;py<=y+h;py+=12)for(var px=x;px<=x+w;px+=12)if(test(px,py))return false;return true;}
@@ -122,14 +25,14 @@
     if(typeof document==='undefined')return null;ensure(settings.native);
     var token=key+':'+version+':'+Boolean(settings.groundOnly);if(cache[token])return cache[token];
     var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),p=settings.native,paths=settings.paths||[],tiles=patterns(c),detail=patterns(c,'detail');
-    c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.fillStyle=p.style==='port'?tiles[3]:(images.detail?detail[2]:tiles[2]);c.fillRect(0,0,width,height);
+    c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.fillStyle=p.style==='port'?tiles[3]:tiles[2];c.fillRect(0,0,width,height);
     // Lift the dark material atlas with a warm daylight tint before drawing
     // rivers, crops and buildings on top; this keeps texture instead of flat fill.
-    if(p.style!=='port'){c.save();c.globalCompositeOperation='screen';c.globalAlpha=.36;c.fillStyle='#e4e3c6';c.fillRect(0,0,width,height);c.restore();}
-    (p.land||[]).forEach(function(points){polygon(c,points);c.fillStyle=images.detail?detail[2]:tiles[2];c.fill();c.lineWidth=22;c.strokeStyle='#a59c7c';c.stroke();c.lineWidth=5;c.strokeStyle='#d5d3ad';c.stroke();});
+    if(p.style!=='port'){c.save();c.globalCompositeOperation='screen';c.globalAlpha=.15;c.fillStyle='#e4e3c6';c.fillRect(0,0,width,height);c.restore();}
+    (p.land||[]).forEach(function(points){polygon(c,points);c.fillStyle=tiles[2];c.fill();c.lineWidth=22;c.strokeStyle='#a59c7c';c.stroke();c.lineWidth=5;c.strokeStyle='#d5d3ad';c.stroke();});
     // An irregular vegetation verge makes the road boundary visible at player
     // scale. Its centerline and width remain the exact movement specification.
-    if(p.style!=='port')paths.forEach(function(path){stroke(c,path,path.width*2+90,images.detail?detail[3]:tiles[2]);});
+    if(p.style!=='port')paths.forEach(function(path){stroke(c,path,path.width*2+34,images.detail?detail[3]:tiles[2]);});
     (p.water||[]).forEach(function(r){stroke(c,r,r.width+24,'#a7aa79');stroke(c,r,r.width+10,'#9fc3af');stroke(c,r,r.width,tiles[3]);});
     (p.scatter||[]).forEach(function(q){var r=q.r;if(q.kind<.24){for(var rock=0;rock<3;rock++){var rx=q.x+(rock-1)*r*.35,ry=q.y+Math.sin(rock*2+q.kind*7)*r*.18;c.fillStyle=rock%2?'#aaa58f':'#7f8375';c.beginPath();c.ellipse(rx,ry,r*(.14+rock*.025),r*(.085+rock*.012),rock*.4,0,Math.PI*2);c.fill();c.fillStyle='#d2c9ad';c.beginPath();c.ellipse(rx-r*.04,ry-r*.025,r*.07,r*.03,0,0,Math.PI*2);c.fill();}}else{for(var leaf=0;leaf<7;leaf++){var a=leaf*2.399+q.kind*5,d=r*(.16+((leaf*17+q.kind*31)%51)/100),lx=q.x+Math.cos(a)*d,ly=q.y+Math.sin(a)*d*.75;c.save();c.globalAlpha=.3;c.fillStyle=['#56734b','#78915a','#92a56d'][leaf%3];c.beginPath();c.ellipse(lx,ly,r*.12,r*.055,a,0,Math.PI*2);c.fill();c.restore();}if(q.kind>.68){for(var fl=0;fl<4;fl++){var a2=fl*2.399+q.kind*9,fd=r*(.14+((fl*23+q.kind*21)%42)/100),fx=q.x+Math.cos(a2)*fd,fy=q.y+Math.sin(a2)*fd*.75;c.fillStyle=['#f2dfad','#eee7cf','#d8c8e3'][fl%3];c.beginPath();c.arc(fx,fy,1.5+q.kind*1.3,0,Math.PI*2);c.fill();c.fillStyle='#e8bd68';c.beginPath();c.arc(fx,fy,.9,0,Math.PI*2);c.fill();}}}});
     (p.fields||[]).forEach(function(f){if(!rectBlocked(test,f[0]-10,f[1]-10,f[2]+20,f[3]+20))return;if(images.fields){if(f[4]){c.save();c.translate(f[0]+f[2]/2,f[1]+f[3]/2);c.rotate(f[4]);c.drawImage(images.fields,-f[2]/2-10,-f[3]/2-10,f[2]+20,f[3]+20);c.restore();}else c.drawImage(images.fields,f[0]-10,f[1]-10,f[2]+20,f[3]+20);}});

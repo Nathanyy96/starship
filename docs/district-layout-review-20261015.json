@@ -1,0 +1,682 @@
+{
+  "date": "2026-10-15",
+  "reference": "作者提供七張聚落、港灣、街道與林地配置參考；借鑑空間結構，使用本作奇幻美術。",
+  "asset": "assets/exploration/native/town-buildings-v2.png",
+  "maps": [
+    {
+      "id": "village",
+      "name": "獸靈之村",
+      "buildings": 16,
+      "trees": 6,
+      "furniture": 0,
+      "exits": 3
+    },
+    {
+      "id": "road",
+      "name": "西行商路・兩日行程",
+      "buildings": 1,
+      "trees": 7,
+      "furniture": 0,
+      "exits": 2
+    },
+    {
+      "id": "city",
+      "name": "白鐘城・東門至城西",
+      "buildings": 28,
+      "trees": 7,
+      "furniture": 0,
+      "exits": 7
+    },
+    {
+      "id": "south",
+      "name": "南驛山谷・農地與驛路",
+      "buildings": 2,
+      "trees": 4,
+      "furniture": 0,
+      "exits": 4
+    },
+    {
+      "id": "mistbridge",
+      "name": "霧橋鎮",
+      "buildings": 10,
+      "trees": 15,
+      "furniture": 0,
+      "exits": 4
+    },
+    {
+      "id": "echo",
+      "name": "山腰驛站／迴音谷",
+      "buildings": 3,
+      "trees": 4,
+      "furniture": 0,
+      "exits": 5
+    },
+    {
+      "id": "relic",
+      "name": "霧橋第七遺構",
+      "buildings": 2,
+      "trees": 5,
+      "furniture": 0,
+      "exits": 2
+    },
+    {
+      "id": "banksWest",
+      "name": "北斷橋・西岸聚落",
+      "buildings": 2,
+      "trees": 6,
+      "furniture": 0,
+      "exits": 1
+    },
+    {
+      "id": "banksEast",
+      "name": "北斷橋・東岸工區",
+      "buildings": 3,
+      "trees": 10,
+      "furniture": 0,
+      "exits": 1
+    },
+    {
+      "id": "bellcourt",
+      "name": "彼岸鐘庭・外庭",
+      "buildings": 3,
+      "trees": 7,
+      "furniture": 0,
+      "exits": 1
+    },
+    {
+      "id": "northRoad",
+      "name": "北行商路・白鐘至霧橋",
+      "buildings": 2,
+      "trees": 11,
+      "furniture": 0,
+      "exits": 3
+    },
+    {
+      "id": "factoryNear",
+      "name": "城西工坊・近端",
+      "buildings": 2,
+      "trees": 7,
+      "furniture": 0,
+      "exits": 2
+    },
+    {
+      "id": "factoryFar",
+      "name": "城西工坊・對岸",
+      "buildings": 2,
+      "trees": 8,
+      "furniture": 0,
+      "exits": 1
+    },
+    {
+      "id": "rescue",
+      "name": "迴音谷・舊渡台",
+      "buildings": 2,
+      "trees": 5,
+      "furniture": 0,
+      "exits": 1
+    },
+    {
+      "id": "cityInn",
+      "name": "白鐘城・東門旅店",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 14,
+      "exits": 1
+    },
+    {
+      "id": "mistInn",
+      "name": "霧橋鎮・旅店後廳",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 14,
+      "exits": 1
+    },
+    {
+      "id": "recovery",
+      "name": "白鐘城・老瓦克休養處",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 7,
+      "exits": 1
+    },
+    {
+      "id": "clinic",
+      "name": "獸靈之村・醫療屋與廚房",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 4,
+      "exits": 1
+    },
+    {
+      "id": "observatory",
+      "name": "白鐘城・城西觀測分會",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 6,
+      "exits": 1
+    },
+    {
+      "id": "station",
+      "name": "山腰驛站・內部與補給間",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 6,
+      "exits": 1
+    },
+    {
+      "id": "roadShelter",
+      "name": "北行商路・第一晚避雨棚屋",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 5,
+      "exits": 1
+    },
+    {
+      "id": "southStation",
+      "name": "南驛山谷・驛務休整處",
+      "buildings": 0,
+      "trees": 0,
+      "furniture": 4,
+      "exits": 1
+    },
+    {
+      "id": "riverRoad",
+      "name": "南行驛路・下游商路",
+      "buildings": 3,
+      "trees": 3,
+      "furniture": 0,
+      "exits": 2
+    },
+    {
+      "id": "lotin",
+      "name": "洛汀港・陸路與港區",
+      "buildings": 12,
+      "trees": 3,
+      "furniture": 0,
+      "exits": 1
+    }
+  ],
+  "keyboardTransitions": [
+    {
+      "map": "village",
+      "index": 0,
+      "to": "road",
+      "x": 36,
+      "y": 532.5,
+      "locked": false,
+      "frames": 508,
+      "result": "transition reached"
+    },
+    {
+      "map": "village",
+      "index": 1,
+      "to": "clinic",
+      "x": 2085,
+      "y": 711,
+      "locked": false,
+      "frames": 20,
+      "result": "transition reached"
+    },
+    {
+      "map": "village",
+      "index": 2,
+      "to": "south",
+      "x": 972,
+      "y": 1320,
+      "locked": false,
+      "frames": 391,
+      "result": "transition reached"
+    },
+    {
+      "map": "road",
+      "index": 0,
+      "to": "village",
+      "x": 1515,
+      "y": 455,
+      "locked": false,
+      "frames": 15,
+      "result": "transition reached"
+    },
+    {
+      "map": "road",
+      "index": 1,
+      "to": "city",
+      "x": 131,
+      "y": 209,
+      "locked": false,
+      "frames": 329,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 0,
+      "to": "road",
+      "x": 3454.0000000000005,
+      "y": 858.0000000000001,
+      "locked": false,
+      "frames": 17,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 1,
+      "to": "south",
+      "x": 88,
+      "y": 748.0000000000001,
+      "locked": false,
+      "frames": 759,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 2,
+      "to": "northRoad",
+      "x": 1848.0000000000002,
+      "y": 176,
+      "locked": false,
+      "frames": 469,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 3,
+      "to": "factoryNear",
+      "x": 781.0000000000001,
+      "y": 1465.2,
+      "locked": false,
+      "frames": 846,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 4,
+      "to": "cityInn",
+      "x": 2508,
+      "y": 748.0000000000001,
+      "locked": false,
+      "frames": 217,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 5,
+      "to": "recovery",
+      "x": 1012.0000000000001,
+      "y": 1606.0000000000002,
+      "locked": false,
+      "frames": 684,
+      "result": "transition reached"
+    },
+    {
+      "map": "city",
+      "index": 6,
+      "to": "observatory",
+      "x": 638,
+      "y": 506.00000000000006,
+      "locked": false,
+      "frames": 668,
+      "result": "transition reached"
+    },
+    {
+      "map": "south",
+      "index": 0,
+      "to": "city",
+      "x": 80,
+      "y": 690,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "south",
+      "index": 1,
+      "to": "southStation",
+      "x": 540,
+      "y": 475,
+      "locked": false,
+      "frames": 136,
+      "result": "transition reached"
+    },
+    {
+      "map": "south",
+      "index": 2,
+      "to": "riverRoad",
+      "x": 780,
+      "y": 962,
+      "locked": false,
+      "frames": 202,
+      "result": "transition reached"
+    },
+    {
+      "map": "south",
+      "index": 3,
+      "to": "village",
+      "x": 1480,
+      "y": 895,
+      "locked": false,
+      "frames": 356,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 0,
+      "to": "echo",
+      "x": 1088,
+      "y": 120,
+      "locked": false,
+      "frames": 367,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 1,
+      "to": "banksWest",
+      "x": 2384,
+      "y": 241.60000000000002,
+      "locked": false,
+      "frames": 464,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 2,
+      "to": "northRoad",
+      "x": 1672,
+      "y": 1408,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistbridge",
+      "index": 3,
+      "to": "mistInn",
+      "x": 1460,
+      "y": 350,
+      "locked": false,
+      "frames": 252,
+      "result": "transition reached"
+    },
+    {
+      "map": "echo",
+      "index": 0,
+      "to": "mistbridge",
+      "x": 1430,
+      "y": 930,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "echo",
+      "index": 1,
+      "to": "relic",
+      "x": 780,
+      "y": 30,
+      "locked": false,
+      "frames": 470,
+      "result": "transition reached"
+    },
+    {
+      "map": "echo",
+      "index": 2,
+      "to": "banksEast",
+      "x": 1460,
+      "y": 690,
+      "locked": false,
+      "frames": 104,
+      "result": "transition reached"
+    },
+    {
+      "map": "echo",
+      "index": 3,
+      "to": "station",
+      "x": 650,
+      "y": 480,
+      "locked": false,
+      "frames": 229,
+      "result": "transition reached"
+    },
+    {
+      "map": "echo",
+      "index": 4,
+      "to": "rescue",
+      "x": 1000,
+      "y": 273,
+      "locked": false,
+      "frames": 481,
+      "result": "transition reached"
+    },
+    {
+      "map": "relic",
+      "index": 0,
+      "to": "echo",
+      "x": 210,
+      "y": 890,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "relic",
+      "index": 1,
+      "to": "bellcourt",
+      "x": 800,
+      "y": 237,
+      "locked": false,
+      "frames": 258,
+      "result": "transition reached"
+    },
+    {
+      "map": "banksWest",
+      "index": 0,
+      "to": "mistbridge",
+      "x": 210,
+      "y": 850,
+      "locked": false,
+      "frames": 16,
+      "result": "transition reached"
+    },
+    {
+      "map": "banksEast",
+      "index": 0,
+      "to": "echo",
+      "x": 1400,
+      "y": 130,
+      "locked": false,
+      "frames": 16,
+      "result": "transition reached"
+    },
+    {
+      "map": "bellcourt",
+      "index": 0,
+      "to": "relic",
+      "x": 175,
+      "y": 785,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "northRoad",
+      "index": 0,
+      "to": "roadShelter",
+      "x": 410,
+      "y": 480,
+      "locked": false,
+      "frames": 154,
+      "result": "transition reached"
+    },
+    {
+      "map": "northRoad",
+      "index": 1,
+      "to": "city",
+      "x": 850,
+      "y": 850,
+      "locked": false,
+      "frames": 17,
+      "result": "transition reached"
+    },
+    {
+      "map": "northRoad",
+      "index": 2,
+      "to": "mistbridge",
+      "x": 1460,
+      "y": 120,
+      "locked": false,
+      "frames": 382,
+      "result": "transition reached"
+    },
+    {
+      "map": "factoryNear",
+      "index": 0,
+      "to": "city",
+      "x": 300,
+      "y": 760,
+      "locked": false,
+      "frames": 17,
+      "result": "transition reached"
+    },
+    {
+      "map": "factoryNear",
+      "index": 1,
+      "to": "factoryFar",
+      "x": 780,
+      "y": 220,
+      "locked": true,
+      "frames": 235,
+      "result": "story lock retained"
+    },
+    {
+      "map": "factoryFar",
+      "index": 0,
+      "to": "factoryNear",
+      "x": 1070,
+      "y": 250,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "rescue",
+      "index": 0,
+      "to": "echo",
+      "x": 140,
+      "y": 800,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "cityInn",
+      "index": 0,
+      "to": "city",
+      "x": 850,
+      "y": 870,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "mistInn",
+      "index": 0,
+      "to": "mistbridge",
+      "x": 850,
+      "y": 870,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "recovery",
+      "index": 0,
+      "to": "city",
+      "x": 850,
+      "y": 850,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "clinic",
+      "index": 0,
+      "to": "village",
+      "x": 480,
+      "y": 630,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "observatory",
+      "index": 0,
+      "to": "city",
+      "x": 480,
+      "y": 630,
+      "locked": false,
+      "frames": 15,
+      "result": "transition reached"
+    },
+    {
+      "map": "station",
+      "index": 0,
+      "to": "echo",
+      "x": 480,
+      "y": 630,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    },
+    {
+      "map": "roadShelter",
+      "index": 0,
+      "to": "northRoad",
+      "x": 480,
+      "y": 630,
+      "locked": false,
+      "frames": 14,
+      "result": "transition reached"
+    },
+    {
+      "map": "southStation",
+      "index": 0,
+      "to": "south",
+      "x": 480,
+      "y": 630,
+      "locked": false,
+      "frames": 11,
+      "result": "transition reached"
+    },
+    {
+      "map": "riverRoad",
+      "index": 0,
+      "to": "south",
+      "x": 240,
+      "y": 100,
+      "locked": false,
+      "frames": 15,
+      "result": "transition reached"
+    },
+    {
+      "map": "riverRoad",
+      "index": 1,
+      "to": "lotin",
+      "x": 1460,
+      "y": 850,
+      "locked": false,
+      "frames": 348,
+      "result": "transition reached"
+    },
+    {
+      "map": "lotin",
+      "index": 0,
+      "to": "riverRoad",
+      "x": 60,
+      "y": 1929,
+      "locked": false,
+      "frames": 13,
+      "result": "transition reached"
+    }
+  ],
+  "assetPrompt": "透明 2x2 中世紀奇幻建築圖集：陶瓦藍百葉住宅、綠遮棚麵包店、藍瓦商人宅、茅頂農舍；俯斜視角、正面門朝下、日光、精緻石木材質；無人物、文字或整片地板。"
+}
