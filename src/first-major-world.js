@@ -12,7 +12,7 @@
 
   var campaign=typeof module==='object'&&module.exports?require('./world-story-campaign.js'):globalThis.StarshipWorldStoryCampaign;
   var dialogue=typeof module==='object'&&module.exports?require('./world-story-dialogue'):globalThis.StarshipWorldStoryDialogue;
-  var heroMotion=typeof module==='object'&&module.exports?require('./hero-motion.js'):globalThis.StarshipHeroMotion;
+  var characterMotion=typeof module==='object'&&module.exports?require('./character-motion.js'):globalThis.StarshipCharacterMotion;
 
   var maps = {
     village: { name: '獸靈之村', image: village.mapImage, width: village.WIDTH, height: village.HEIGHT, spawn: [1390,474], paths: village.paths.map(function(p){return {width:p.width,points:p.points.map(function(v){return v.slice();})};}),
@@ -210,7 +210,7 @@
     }return null;
   }
   function create(options) {
-    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},requested={},held=new Set(),active=false,paused=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[],destination='',waypointKey='',dialogKind='story',talking=null,camera={map:'',x:state.x,y:state.y},bannerUntil=0,lastMini=0,sprintMode=false,taskKey='',missionFeedback='',autoPath=[],autoIntent=null,autoTarget=null,lastView=null,heading='down',stride=0,walkingNow=false,useHeroAtlas=!options.playerId||options.playerId==='hero'||options.playerId==='celesia';
+    var canvas=options.canvas,ctx=canvas.getContext('2d'),state=normalize(options.load()),images={},requested={},held=new Set(),active=false,paused=false,frame=0,previous=0,lastSave=0,lines=null,lineIndex=0,pending=false,epoch=0,routeKey='',currentRoute=[],destination='',waypointKey='',dialogKind='story',talking=null,camera={map:'',x:state.x,y:state.y},bannerUntil=0,lastMini=0,sprintMode=false,taskKey='',missionFeedback='',autoPath=[],autoIntent=null,autoTarget=null,lastView=null,heading='down',stride=0,walkingNow=false,motionPlayer=characterMotion.canonical(options.playerId||'hero'),motionImages={},motionPending={};
     var motion=typeof window.matchMedia==='function'?window.matchMedia('(prefers-reduced-motion: reduce)'):null;
     function reduced(){return Boolean(motion&&motion.matches);}
     function storyStatus(){if(state.roaming)return {read:true,missionComplete:true,claimed:true};return options.storyStatus?options.storyStatus(state.act):{read:false,missionComplete:true,claimed:false};}
@@ -225,9 +225,10 @@
     function save(){if(state.roaming){if(options.saveRoam)options.saveRoam(normalize(state));}else options.save(normalize(state));if(options.saveWaypoints)options.saveWaypoints(state.waypoints.slice());}
     function loadImage(key,src){requested[key]=true;var img=new Image();img.onload=function(){images[key]=img;draw();};img.onerror=function(){requested[key]='failed';if(maps[key]){options.status.textContent='地圖素材載入失敗，請重新開啟探索。';if(options.loading)options.loading.hidden=true;}};img.src=src;}
     var characterArt=globalThis.StarshipExplorationCharacters,characterData=options.characterData||globalThis.StarshipGachaData||{},playerLoad;
-    function setPlayer(id){if(!characterArt||!characterArt.resolve(id,characterData))return false;useHeroAtlas=id==='hero'||id==='celesia';if(useHeroAtlas&&!requested.heroWalk)loadImage('heroWalk','./assets/exploration/hero-walk-atlas-v1.png');if(playerLoad)playerLoad.cancel();delete images.hero;playerLoad=characterArt.load(id,characterData,function(img){if(img)images.hero=img;draw();});return true;}
+    function loadMotion(id){id=characterMotion.canonical(id);if(!characterMotion.supports(id)||motionPending[id])return;motionPending[id]=true;characterMotion.load(id,function(img){if(img)motionImages[id]=img;draw();});}
+    function setPlayer(id){if(!characterMotion.supports(id)&&(!characterArt||!characterArt.resolve(id,characterData)))return false;motionPlayer=characterMotion.canonical(id);loadMotion(motionPlayer);if(!characterArt||!characterArt.resolve(id,characterData))return true;if(playerLoad)playerLoad.cancel();delete images.hero;playerLoad=characterArt.load(id,characterData,function(img){if(img)images.hero=img;draw();});return true;}
     if(options.destination){options.destination.innerHTML='<option value="">追蹤目前劇情</option>'+Object.keys(maps).map(function(id){return '<option value="'+id+'">'+maps[id].name+'</option>';}).join('');options.destination.addEventListener('change',function(){destination=options.destination.value;routeKey='';draw();});}
-    if(useHeroAtlas)loadImage('heroWalk','./assets/exploration/hero-walk-atlas-v1.png');if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
+    if(!setPlayer(options.playerId||'hero'))loadImage('hero',village.spriteSources.hero);
     function updateTravel(){updateAtlas();
       var busy=Boolean(lines)||pending||taskActive(),near=nearWaypoint(state);
 
@@ -273,7 +274,7 @@
     function draw(){
       var now=performance.now(),actors=presentation.npcs(state.map).map(function(n){var p=mapPoint(state.map,n.x,n.y);return Object.assign({},n,{x:p.x,y:p.y,patrol:n.patrol?n.patrol.map(function(v){return v*(regionScale[state.map]||1);}):null});}),changed=camera.map!==state.map;
       if(changed){camera={map:state.map,x:state.x,y:state.y};bannerUntil=now+3200;lastMini=0;if(options.scene){options.scene.classList.remove('world-arrival');void options.scene.offsetWidth;options.scene.classList.add('world-arrival');}}
-      actors.forEach(function(n){if(!requested['npc-'+n.id])loadImage('npc-'+n.id,'./assets/exploration/'+n.id+'-chibi-v1.png');});
+      actors.forEach(function(n){loadMotion(n.id);if(!requested['npc-'+n.id])loadImage('npc-'+n.id,'./assets/exploration/'+n.id+'-chibi-v1.png');});
       camera.x+=(state.x-camera.x)*(reduced()?1:.14);camera.y+=(state.y-camera.y)*(reduced()?1:.14);
 
       if(options.panel.classList){if(state.roaming&&!destination)options.panel.classList.add('world-free-roam');else options.panel.classList.remove('world-free-roam');}
@@ -289,7 +290,16 @@
       var walking=walkingNow;
       if(autoTarget){ctx.save();ctx.strokeStyle='#ffedb0';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(autoTarget.x,autoTarget.y,12,6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
       var drawn=actors.map(function(n){var p=presentation.position(n,now,reduced(),function(x,y){return fits(state.map,x,y);});return {x:p.x,y:p.y,actor:n};});drawn.push({x:state.x,y:state.y,hero:true});if(map.nativeTerrain)nativeTerrain.objects(map.nativeTerrain).forEach(function(o){drawn.push({x:o.x+o.w/2,y:nativeTerrain.depth(o),native:o});});
-      drawn.sort(function(a,b){return a.y-b.y;}).forEach(function(p){if(p.native){nativeTerrain.drawObject(ctx,p.native);return;}ctx.fillStyle='rgba(12,30,28,.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+5,p.hero?17:15,6,0,0,Math.PI*2);ctx.fill();if(!(p.hero&&useHeroAtlas&&heroMotion.draw(ctx,images.heroWalk,p.x,p.y,44,heading,stride,walking,reduced())))renderer.sprite(ctx,p.hero?images.hero:images['npc-'+p.actor.id],p.x,p.y,p.hero?44:42,p.hero?heading==='left':false,reduced()?0:p.hero&&walking?Math.sin(now/95)*2:Math.sin(now/700+(p.hero?0:p.x))*.8);if(!p.hero){presentation.label(ctx,p.actor.name,p.x,p.y-52);if(Math.hypot(state.x-p.x,state.y-p.y)<115)presentation.label(ctx,'···',p.x,p.y-73,'#b9f0da');}});
+      drawn.sort(function(a,b){return a.y-b.y;}).forEach(function(p){
+        if(p.native){nativeTerrain.drawObject(ctx,p.native);return;}
+        ctx.fillStyle='rgba(12,30,28,.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+5,p.hero?17:15,6,0,0,Math.PI*2);ctx.fill();
+        var actorId=p.hero?motionPlayer:p.actor.id;
+        if(characterMotion.supports(actorId)){
+          var facing=p.hero?heading:p.actor.patrol?characterMotion.heading(p.actor.patrol[0]*Math.sin(now/2400),p.actor.patrol[1]*Math.sin(now/2400),'down'):'down';
+          characterMotion.draw(ctx,motionImages[actorId],p.x,p.y,44,facing,p.hero?stride:now*.025,p.hero?walking:Boolean(p.actor.patrol),reduced(),actorId);
+        }else renderer.sprite(ctx,p.hero?images.hero:images['npc-'+p.actor.id],p.x,p.y,p.hero?44:42,false,0);
+        if(!p.hero){presentation.label(ctx,p.actor.name,p.x,p.y-52);if(Math.hypot(state.x-p.x,state.y-p.y)<115)presentation.label(ctx,'···',p.x,p.y-73,'#b9f0da');}
+      });
       if(state.map==='village'&&!map.nativeTerrain)presentation.fire(ctx,832,395,now,reduced());presentation.environment(ctx,map,view,now,reduced());
       // Pins use names and distinct silhouettes instead of anonymous dots.
       var named=presentation.locationLabels(map.exits,map.sites);named.forEach(function(p){if(Math.hypot(state.x-p.x,state.y-p.y)<125&&Math.hypot(state.x-p.x,state.y-p.y)>55)presentation.label(ctx,p.name,p.x,p.y+25,'#e4f0d8');});
@@ -310,7 +320,7 @@
         }
       }
       var crossed=crossExit(state,state.map,beforeX,beforeY);if(crossed.changed){state=crossed.state;stopWalking();held.clear();stopWalking();save();routeKey='';options.status.textContent='已抵達 '+maps[state.map].name;beforeX=state.x;beforeY=state.y;}
-      var moved=Math.hypot(state.x-beforeX,state.y-beforeY);walkingNow=moved>.05;if(walkingNow){heading=heroMotion.heading(state.x-beforeX,state.y-beforeY,heading);stride+=moved;if(now-lastSave>800){save();lastSave=now;}}
+      var moved=Math.hypot(state.x-beforeX,state.y-beforeY);walkingNow=moved>.05;if(walkingNow){heading=characterMotion.heading(state.x-beforeX,state.y-beforeY,heading);stride+=moved;if(now-lastSave>800){save();lastSave=now;}}
       draw();frame=requestAnimationFrame(tick);
     }
     if(options.stop)options.stop.addEventListener('click',function(){stopWalking();options.status.textContent='已停止行走。';draw();});

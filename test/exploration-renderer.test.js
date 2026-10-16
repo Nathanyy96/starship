@@ -24,13 +24,13 @@ test('camera and sprite feet stay inside the scene when close to an edge', () =>
 
 
 test('hero atlas uses direction, travelled distance and safe source rectangles',()=>{
-  const motion=require('../src/hero-motion');
+  const motion=require('../src/character-motion');
   assert.equal(motion.heading(-8,1,'down'),'left');assert.equal(motion.heading(0,-8,'right'),'up');assert.equal(motion.heading(0,0,'up'),'up');
   for(const direction of ['down','left','up','right']){
-    const frames=new Set();for(const distance of [0,23,46,69]){const r=motion.frame(direction,distance,true,false);frames.add(r);assert.ok(r[0]>=0&&r[1]>=0&&r[0]+r[2]<=1254&&r[1]+r[3]<=1254);}
+    const frames=new Set();for(const distance of [0,23,46,69]){const r=motion.frame(direction,distance,true,false);frames.add(r);assert.ok(r[0]>=0&&r[1]>=0&&r[0]+r[2]<=1&&r[1]+r[3]<=1);}
     assert.equal(frames.size,4);assert.deepEqual(motion.frame(direction,92,false,false),motion.frame(direction,400,true,true));
   }
-  const calls=[];assert.equal(motion.draw({drawImage(...args){calls.push(args);}},{naturalWidth:1254,naturalHeight:1254},20,30,104,'up',46,true,false),true);assert.equal(calls[0].length,9);assert.equal(calls[0][6],30-104+9);
+  const calls=[];assert.equal(motion.draw({drawImage(...args){calls.push(args);}},{naturalWidth:1254,naturalHeight:1254},20,30,104,'up',46,true,false),true);assert.equal(calls[0].length,9);assert.ok(Math.abs(calls[0][6]+calls[0][8]-39)<1e-6);
   assert.equal(motion.draw({},null,0,0,104,'down',0,false,false),false);
 });
 

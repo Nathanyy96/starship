@@ -7,6 +7,7 @@
   var storyArt=typeof module==='object'&&module.exports?require('./exploration-story-art'):globalThis.StarshipExplorationStoryArt;
 
   var renderer = typeof module === "object" && module.exports ? require("./exploration-renderer.js") : globalThis.StarshipExplorationRenderer;
+  var motion=typeof module==='object'&&module.exports?require('./character-motion.js'):globalThis.StarshipCharacterMotion;
   // Coordinates and corridors are traced against the existing C1-102 illustration.
   var WIDTH = 1672, HEIGHT = 939, NAV = 16;
   var mapImage = "./assets/maps/c1-102.png";
@@ -115,12 +116,17 @@
     var extraActors = (options.actors || []).filter(function (actor) { return actor.id && Number.isFinite(actor.x) && Number.isFinite(actor.y); });
     function loadImage(id, source) { var image = new Image(); image.onload = function () { images[id] = image; draw(); }; image.src = source; }
     function loadCharacter(id, fallback) {
+      loadMotion(id);
       if (characterArt && characterArt.load(id, characterData, function (image) { if (image) images[id] = image; draw(); })) return;
       if (fallback) loadImage(id, fallback);
     }
-    var playerLoad;
+    var playerLoad,motionPlayer='celesia',motionImages={},motionPending={},motionHeading='down',motionStride=0,motionWalking=false;
+    function loadMotion(id){id=motion.canonical(id);if(!motion.supports(id)||motionPending[id])return;motionPending[id]=true;motion.load(id,function(img){if(img)motionImages[id]=img;draw();});}
+
     function setPlayer(id) {
-      if (!characterArt || !characterArt.resolve(id, characterData)) return false;
+      if (!motion.supports(id) && (!characterArt || !characterArt.resolve(id, characterData))) return false;
+      motionPlayer=motion.canonical(id);loadMotion(motionPlayer);
+      if (!characterArt || !characterArt.resolve(id, characterData)) return true;
       if (playerLoad) playerLoad.cancel();
       delete images.hero;
       playerLoad = characterArt.load(id, characterData, function (image) { if (image) images.hero = image; draw(); });
@@ -132,7 +138,8 @@
     function save() { options.save(state); }
     var visualScale=worldVillage()?1.5:1;
     function sprite(id, x, y, height, flip, bob) {
-      renderer.sprite(ctx, images[id], x, y, height/visualScale, flip, bob);
+      var who=id==='hero'?motionPlayer:motion.canonical(id),h=height/visualScale;if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:'down',motionStride,id==='hero'&&motionWalking,Boolean(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches),who);
+      return renderer.sprite(ctx, images[id], x, y, h, flip, bob);
     }
     function draw() {
       var shared=worldVillage(),model=shared&&shared.maps.village;visualScale=model?1.5:1;var view = renderer.begin(canvas, ctx, model?model.width:WIDTH, model?model.height:HEIGHT, state.x*visualScale, state.y*visualScale);
@@ -167,6 +174,7 @@
     }
     function tick(now) {
       if (!active || paused) return;
+      var beforeX=state.x,beforeY=state.y;
       var dt = Math.min((now - (lastFrame || now)) / 1000, .05); lastFrame = now;
       var dx = Number(pressed.has("right")) - Number(pressed.has("left")), dy = Number(pressed.has("down")) - Number(pressed.has("up"));
       if (sceneIndex < 0 && (dx || dy)) {
@@ -174,6 +182,7 @@
         if(options.onExit&&((next.x<55&&next.y<420)||(next.y>865&&next.x<710))){state=next;save();options.onExit(next.x<55?"road":"south",next.x<55?1515:1480,next.x<55?455:895);return;}
         if (next.x !== state.x || next.y !== state.y) { state = next; if (now - lastSave > 800) { save(); lastSave = now; } }
       }
+      var walked=Math.hypot(state.x-beforeX,state.y-beforeY);motionWalking=walked>.0001;if(motionWalking){motionHeading=motion.heading(state.x-beforeX,state.y-beforeY,motionHeading);motionStride+=walked*visualScale;}
       draw(); frame = requestAnimationFrame(tick);
     }
     var artScenes=storyScenes.map(function(lines){return storyArt?storyArt.timeline("main-1-0",1,lines):[];});

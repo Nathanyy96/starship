@@ -8,6 +8,7 @@
 
   var renderer = typeof module === "object" && module.exports ? require("./exploration-renderer.js") : globalThis.StarshipExplorationRenderer;
   var TILE = 32, W = 36, H = 24;
+  var motion=typeof module==='object'&&module.exports?require('./character-motion.js'):globalThis.StarshipCharacterMotion;
   var backgrounds = { valley: "./assets/exploration/south-post-altar-v2.png", forest: "./assets/exploration/village-forest-v2.png" };
   var beastSource = "./assets/exploration/opening-beast-map-v2.png";
   var lookouts = [
@@ -124,12 +125,17 @@
     var characterArt = globalThis.StarshipExplorationCharacters, characterData = options.characterData || globalThis.StarshipGachaData || {};
     var extraActors = (options.actors || []).filter(function (actor) { return actor.id && Number.isFinite(actor.x) && Number.isFinite(actor.y); });
     function loadCharacter(id, fallback) {
+      loadMotion(id);
       if (characterArt && characterArt.load(id, characterData, function (image) { if (image) art[id] = image; draw(); })) return;
       if (fallback) { var img = new Image(); img.onload = function () { art[id] = img; draw(); }; img.src = fallback; }
     }
-    var playerLoad;
+    var playerLoad,motionPlayer='celesia',motionImages={},motionPending={},motionHeading='down',motionStride=0,motionWalking=false;
+    function loadMotion(id){id=motion.canonical(id);if(!motion.supports(id)||motionPending[id])return;motionPending[id]=true;motion.load(id,function(img){if(img)motionImages[id]=img;draw();});}
+
     function setPlayer(id) {
-      if (!characterArt || !characterArt.resolve(id, characterData)) return false;
+      if (!motion.supports(id) && (!characterArt || !characterArt.resolve(id, characterData))) return false;
+      motionPlayer=motion.canonical(id);loadMotion(motionPlayer);
+      if (!characterArt || !characterArt.resolve(id, characterData)) return true;
       if (playerLoad) playerLoad.cancel();
       delete art.hero;
       playerLoad = characterArt.load(id, characterData, function (image) { if (image) art.hero = image; draw(); });
@@ -141,7 +147,8 @@
     var beast = new Image(); beast.onload = function () { art.beast = beast; draw(); }; beast.src = beastSource;
     function save() { options.save(state); }
     function sprite(id, x, y, height, flip, bob) {
-      return renderer.sprite(ctx, art[id], x, y, height, flip, bob);
+      var who=id==='hero'?motionPlayer:motion.canonical(id),h=height;if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:'down',motionStride,id==='hero'&&motionWalking,Boolean(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches),who);
+      return renderer.sprite(ctx, art[id], x, y, h, flip, bob);
     }
     function draw() {
       var view = renderer.begin(canvas, ctx, W * TILE, H * TILE, state.x * TILE, state.y * TILE);
@@ -185,6 +192,7 @@
     }
     function tick(now) {
       if (!active || paused) return;
+      var beforeX=state.x,beforeY=state.y;
       var dt = Math.min((now - (previous || now)) / 1000, .05); previous = now;
       var dx = Number(held.has("right")) - Number(held.has("left")), dy = Number(held.has("down")) - Number(held.has("up"));
       if (!talking() && state.index>=steps.length && state.y<2 && options.onEnterVillage){options.onEnterVillage();return;}
@@ -198,6 +206,7 @@
         }
         if (now - lastSave > 800) { save(); lastSave = now; }
       }
+      var walked=Math.hypot(state.x-beforeX,state.y-beforeY);motionWalking=walked>.0001;if(motionWalking){motionHeading=motion.heading(state.x-beforeX,state.y-beforeY,motionHeading);motionStride+=walked*TILE;}
       draw(); frame = requestAnimationFrame(tick);
     }
     function showLine() {

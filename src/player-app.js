@@ -2298,8 +2298,7 @@
     byId("close-first-major").addEventListener("click",function(){if(firstMajorWorld)firstMajorWorld.close();byId("first-major-panel").hidden=true;byId("first-major-entry").hidden=false;byId("story-world-map").hidden=false;byId("open-exploration").closest(".explore-entry").hidden=false;refreshWorldEntries();byId("open-world-act-2").focus({preventScroll:true});});
     byId("close-exploration").addEventListener("click", function () { if (exploration) exploration.close(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; byId("open-exploration").focus({ preventScroll: true }); });
     byId("open-world-map").addEventListener("click", function () { openWorldMap("world-home"); });
-    byId("story-open-world-map").addEventListener("click", function () { openWorldMap("story-view"); });
-    byId("map-view-back").addEventListener("click", function () { var returnViewId = mapReturnViewId;if(returnViewId==="world-home"){enterWorldHome();return;}showView(returnViewId); byId(returnViewId === "story-view" ? "story-open-world-map" : "open-world-map").focus({ preventScroll: true }); });
+    byId("map-view-back").addEventListener("click", function () { var returnViewId = mapReturnViewId;if(returnViewId==="world-home"){enterWorldHome();return;}showView(returnViewId); byId(returnViewId === "story-view" ? "story-main-tab" : "open-world-map").focus({ preventScroll: true }); });
     byId("tutorial-reward").addEventListener("click", function (event) { if (event.target.closest("#complete-tutorial")) completeTutorial(); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });
     byId("story-main-tab").addEventListener("click", function () { currentStoryTab = "main"; currentStoryChapterId = "main-1-0"; currentStorySceneId = ""; renderStory(); });

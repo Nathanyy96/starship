@@ -120,7 +120,7 @@ test('map actions explain whether a marker opens a map or shows a place note', (
 test('map has its own view and two explicit entry buttons', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   assert.match(html, /id="open-world-map"/);
-  assert.match(html, /id="story-open-world-map"/);
+  assert.doesNotMatch(html, /id="story-open-world-map"/);
   assert.match(html, /id="map-view"/);
   assert.match(html, /id="map-view"[\s\S]*id="story-world-map"/);
   assert.doesNotMatch(html.match(/<section id="story-view"[\s\S]*?<\/section>/)?.[0] || '', /id="story-world-map"/);

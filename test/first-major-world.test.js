@@ -76,7 +76,7 @@ test('invalid positions recover and exploration away from the main story resumes
 function controllerHarness() {
   const context=vm.createContext({window:{addEventListener(){}},Image:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
 
-  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','exploration-renderer','exploration','world-presentation','hero-motion','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','character-motion-manifest','character-motion','exploration-renderer','exploration','world-presentation','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
 
   function element(){const handlers={};return {hidden:false,textContent:'',addEventListener(k,f){handlers[k]=f;},click(){handlers.click?.({});},focus(){},querySelectorAll:()=>[]};}
   const options={load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};
