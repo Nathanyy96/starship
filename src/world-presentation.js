@@ -6,16 +6,27 @@
     station:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:570,y:355,line:'繩索和回程記號先核對。驛報還沒送到的，就明寫未送達。'}],
     village:[{id:'lia',name:'莉亞',role:'療養屋',x:1350,y:490,line:'藥草和清水都在這裡。妳先照顧好自己的傷，別急著提重物。'},{id:'reyn',name:'雷恩',role:'巡林者',x:355,y:405,patrol:[0,24],line:'走林道要看地面，也要看風。溪水就從橋上過，別抄下游的近路。'},{id:'isar',name:'伊薩爾',role:'村中守望者',x:805,y:477,line:'沿亮著燈的村道走。想歇一會兒，就到火場旁坐坐。'}],
     city:[{id:'mila',name:'米菈',role:'工坊學徒',x:200,y:620,patrol:[12,6],line:'要找工坊就沿城西這條街走。搬東西的人多，轉彎記得慢一點。'},{id:'vark',name:'老瓦克',role:'工坊匠人',x:270,y:655,line:'修東西得看仔細。先別碰工作臺上的工具，沿街走走吧。'},{id:'seifra',name:'賽芙拉',role:'觀測分會',x:320,y:310,line:'分會就在這裡。有需要記錄的路況，可以先把圖紙整理好。'}],
-    mistbridge:[{id:'town-trader',spriteId:'town-trader',name:'行商',role:'商路補給',x:705,y:435,patrol:[8,0],line:'南街可通旅店，補給攤就在鎮中心附近。'},{id:'town-grower',spriteId:'town-grower',name:'採集居民',role:'鎮上居民',x:760,y:425,patrol:[0,8],line:'過河請走橋，河岸草坡有些地方很滑。'},{id:'town-caretaker',spriteId:'town-caretaker',name:'街區管理員',role:'鎮上居民',x:875,y:690,line:'這條街接回鎮中心，往南能返回白鐘城。'}],
-    lotin:[{id:'town-harbor',name:'碼頭工人',role:'港區作業',x:320,y:580,patrol:[6,0],line:'貨物留在岸上整理，過港內水道請走完整的橋面。'}],
-    south:[{id:'town-grower',name:'田間居民',role:'農地照料',x:980,y:800,patrol:[8,0],line:'田埂接回驛路，往河邊走要留意橋的位置。'}],
     echo:[{id:'cenwu',name:'岑霧',role:'山腰驛站',x:620,y:480,line:'山路上先找穩當的落腳處。到了驛站，就停下來歇歇。'}],
     banksWest:[{id:'musa',name:'穆莎',role:'岸邊採集者',x:400,y:460,line:'橋中間的斷口還在。想去另一岸，得從各自的陸路入口走。'}],
     banksEast:[{id:'kerida',name:'珂芮妲',role:'外勤測量師',x:1170,y:300,line:'地圖上的線要和腳下的地面一起看。斷掉的地方，可不能當成路。'}],
     bellcourt:[{id:'wenlan',name:'溫藍',role:'外庭物資管事',x:630,y:425,line:'外庭的石階可以慢慢走。再往外就是雲海，別離開完整的地面。'}]
   };
-  cast.city.push({id:'town-trader',name:'布匹行商',role:'街區商販',x:920,y:300,line:'主街接著住宅巷，工坊在城西那一側。'});
-  cast.village.push({id:'town-grower',name:'採集居民',role:'村中居民',x:750,y:455,line:'藥草分好以後就送到醫療屋，走村道就能到。'});
+  var residentRegions={city:'白鐘城',village:'獸靈之村',mistbridge:'霧橋鎮',lotin:'洛汀港',south:'南驛山谷',banksWest:'北斷橋西岸聚落'};
+  // Anonymous local residents use distinct art, while established story characters keep their identities.
+  [
+    [1,'city',920,300,'今天的風很舒服。走累了，可以在廣場附近歇一會兒。'],
+    [2,'city',650,500,'住宅小巷都接著主街，找路時看看街口的方向就好。'],
+    [3,'mistbridge',705,435,'這個時候的河谷很好看。走到河邊記得從橋上通過。'],
+    [4,'mistbridge',760,425,'順著街道走就能找到旅店，別繞進河岸的草坡。'],
+    [5,'mistbridge',875,690,'南邊這條街接回鎮中心，路旁的屋子也有人照料。'],
+    [6,'banksWest',320,420,'斷橋的缺口還在。到對岸要走各自的陸路入口。'],
+    [7,'lotin',320,580,'岸上的風帶著海味。沿著碼頭走，別靠水邊太近。'],
+    [8,'lotin',1000,540,'港內水道從橋上過，船邊不是能直接踩下去的路。'],
+    [9,'village',750,455,'草藥分好了就會送到醫療屋。沿村道走，很快就到了。'],
+    [10,'village',460,420,'村道接著橋和西邊商路。天色暗下來時，走有燈的地方。'],
+    [11,'south',980,800,'田埂接回驛路。過河的時候，要找完整的橋面。'],
+    [12,'south',510,550,'驛站就在附近，出發前可以先看清楚路口的方向。']
+  ].forEach(function(a){var number=('0'+a[0]).slice(-2),region=residentRegions[a[1]];if(!cast[a[1]])cast[a[1]]=[];cast[a[1]].push({id:'resident-'+number,spriteId:'resident-'+number,portraitSrc:'./assets/exploration/resident-'+number+'-portrait-v1.png',genericResident:true,name:region+'居民',role:region,x:a[2],y:a[3],line:a[4]});});
   function npcs(map){return cast[map]||[];}
   function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}
   function label(ctx,text,x,y,color){ctx.save();ctx.font='600 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#162f29';ctx.strokeText(text,x,y);ctx.fillStyle=color||'#fff0c7';ctx.fillText(text,x,y);ctx.restore();}

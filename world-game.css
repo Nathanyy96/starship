@@ -84,3 +84,12 @@
  .world-actions .exploration-interact{font-size:12px;min-height:38px;padding:8px 12px}
 }
 @media(max-width:600px){.world-minimap{width:88px;top:76px}.world-hud-header h3{font-size:20px}}
+
+/* Dialogue portraits have a bounded column, independent of source image size. */
+.world-dialog:not(.has-exploration-art) { display:grid; grid-template-columns:clamp(88px,18vw,160px) minmax(0,1fr); align-items:center; box-sizing:border-box; max-height:min(75svh,420px); overflow-y:auto; }
+.world-dialog:not(.has-exploration-art):has(.world-speaker-art[hidden]) { grid-template-columns:minmax(0,1fr); }
+.world-dialog .world-speaker-art { display:block; width:100%; height:220px; max-width:160px; object-fit:contain; align-self:end; }
+.world-dialog .world-speaker-art[hidden] { display:none; }
+.world-dialog-copy { min-width:0; }
+.world-dialog-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
+@media(max-width:600px) { .world-dialog:not(.has-exploration-art) { grid-template-columns:88px minmax(0,1fr); gap:10px; } .world-dialog .world-speaker-art { height:154px; } .world-dialog-footer { flex-wrap:wrap; } }
