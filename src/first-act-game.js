@@ -118,7 +118,7 @@
   }
   function create(options) {
     var canvas = options.canvas, ctx = canvas.getContext("2d"), state = normalize(options.load());
-    var active = false, held = new Set(), frame = 0, previous = 0, lastSave = 0, routeKey = "", currentRoute = [], art = {}, sceneIndex = -1, lineIndex = 0, optionalScene = null;
+    var active = false, paused = false, held = new Set(), frame = 0, previous = 0, lastSave = 0, routeKey = "", currentRoute = [], art = {}, sceneIndex = -1, lineIndex = 0, optionalScene = null;
     var artScenes=scenes.map(function(lines){return storyArt?storyArt.timeline("main-1-0",1,lines):[];});
     function talking() { return sceneIndex >= 0 || optionalScene !== null; }
     var characterArt = globalThis.StarshipExplorationCharacters, characterData = options.characterData || globalThis.StarshipGachaData || {};
@@ -184,7 +184,7 @@
       options.enter.hidden = state.index < steps.length;
     }
     function tick(now) {
-      if (!active) return;
+      if (!active || paused) return;
       var dt = Math.min((now - (previous || now)) / 1000, .05); previous = now;
       var dx = Number(held.has("right")) - Number(held.has("left")), dy = Number(held.has("down")) - Number(held.has("up"));
       if (!talking() && state.index>=steps.length && state.y<2 && options.onEnterVillage){options.onEnterVillage();return;}
@@ -221,7 +221,7 @@
       options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); draw(); canvas.focus({ preventScroll: true });
     }
     function onKey(e, down) {
-      if (!active || options.panel.hidden) return;
+      if (!active || paused || options.panel.hidden) return;
       if(storyArt&&storyArt.isZoomed())return;
       if (talking()) { if (down && (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") && !e.repeat) { e.preventDefault(); nextLine(); } return; }
       var keys = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
@@ -239,7 +239,7 @@
       button.addEventListener("pointerup", release); button.addEventListener("pointercancel", release); button.addEventListener("lostpointercapture", function () { held.delete(button.dataset.actMove); });
     });
     draw();
-    return { open: function () { state = normalize(options.load()); active = true; previous = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
+    return { pause:function(){paused=true;held.clear();cancelAnimationFrame(frame);if(active)save();},resume:function(){if(!active)return;paused=false;held.clear();previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);canvas.focus({preventScroll:true});},beginStory:interact,open: function () { cancelAnimationFrame(frame);sceneIndex=-1;optionalScene=null;options.dialog.hidden=true;if(storyArt)storyArt.clear(options.dialog);state = normalize(options.load()); active = true; paused = false; previous = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
       close: function () { active = false; held.clear(); sceneIndex = -1; optionalScene=null; options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); cancelAnimationFrame(frame); save(); }, setPlayer: setPlayer, state: function () { return normalize(state); } };
   }
   return { steps: steps, scenes: scenes, sprites: sprites, backgrounds: backgrounds, paths: paths, lookouts: lookouts, nearLookout: nearLookout, zoneNames: zoneNames, initial: initial, terrain: terrain, passable: passable, fits:fits, clearSegment:clearSegment, normalize: normalize, route: route, advance: advance, create: create };

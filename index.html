@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>星界之律｜遊戲大廳</title>
+  <title>星界之律｜大世界冒險</title>
   <meta name="description" content="踏上艾珥汀大陸，與旅者相遇，探索劇情、召集角色並展開冒險。">
   <link rel="canonical" href="https://starship-5cdv.onrender.com/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="zh_TW">
   <meta property="og:site_name" content="星界之律">
-  <meta property="og:title" content="星界之律｜遊戲大廳">
+  <meta property="og:title" content="星界之律｜大世界冒險">
   <meta property="og:description" content="踏上艾珥汀大陸，與旅者相遇，探索劇情、召集角色並展開冒險。">
   <meta property="og:url" content="https://starship-5cdv.onrender.com/">
   <meta property="og:image" content="https://starship-5cdv.onrender.com/assets/ui/game-icon.png?v=share-20261007">
@@ -19,16 +19,16 @@
   <meta property="og:image:height" content="387">
   <meta property="og:image:alt" content="星界之律遊戲圖標">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="星界之律｜遊戲大廳">
+  <meta name="twitter:title" content="星界之律｜大世界冒險">
   <meta name="twitter:description" content="踏上艾珥汀大陸，與旅者相遇，探索劇情、召集角色並展開冒險。">
   <meta name="twitter:image" content="https://starship-5cdv.onrender.com/assets/ui/game-icon.png?v=share-20261007">
   <meta name="twitter:image:alt" content="星界之律遊戲圖標">
   <link rel="icon" type="image/png" href="./assets/ui/game-icon.png">
   <link rel="apple-touch-icon" href="./assets/ui/game-icon.png">
 
-  <link rel="stylesheet" href="./styles.css?v=account-guards-20261015"><link rel="stylesheet" href="./exploration-story-art.css?v=play-audit-20261015">
+  <link rel="stylesheet" href="./styles.css?v=account-guards-20261015"><link rel="stylesheet" href="./exploration-story-art.css?v=world-home-20261015">
 
-<link rel="stylesheet" href="./world-game.css?v=play-audit-20261015"></head>
+<link rel="stylesheet" href="./world-game.css?v=world-home-20261015"><link rel="stylesheet" href="./world-shell.css?v=world-home-20261015"></head>
 
 <body>
   <main class="page-shell">
@@ -41,7 +41,7 @@
         <p class="subtitle">界痕、回覆台與旅者的記錄，從這裡開始。</p>
         </div>
       </div>
-      <div id="player-badge" class="player-badge" hidden><small>PLAYER / SECURE SESSION</small><strong id="player-name">尚未登入</strong><span class="player-badge-actions"><button id="sync-player" class="small-button" type="button">同步</button><button id="change-player" class="small-button" type="button">切換帳號</button></span></div>
+
     </header>
 
     <section id="player-gate" class="player-gate auth-gate">
@@ -53,7 +53,7 @@
       </div>
       <div class="auth-gate-content">
         <p class="eyebrow">STAR-LAW ID / SECURE ENTRY</p>
-        <h2 id="auth-title">要進入星界之律大廳嗎？</h2>
+        <h2 id="auth-title">準備踏上旅途了嗎？</h2>
         <p id="auth-description">玩家進度、抽卡紀錄、保底與角色收集都會綁定在你的帳號。請先選擇登入方式。</p>
         <div id="auth-choice" class="auth-choice">
           <button id="known-player-button" class="primary-action auth-choice-button" type="button"><strong>我登入過</strong><small>使用遊戲名稱與密碼</small></button>
@@ -70,40 +70,11 @@
       </div>
     </section>
 
-    <section id="game-lobby" class="game-lobby" hidden>
-      <div class="lobby-hero panel">
-        <div class="lobby-hero-copy">
-          <button id="open-world-map" class="lobby-map-entry" type="button"><svg class="lobby-map-entry-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="1.5"/><path d="M20.5 11.5 18 18l-6.5 2.5L14 14l6.5-2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.25" fill="currentColor"/></svg><span><strong>世界地圖</strong><small>查看地區與子地圖</small></span><span aria-hidden="true">→</span></button>
-          <p class="eyebrow">STAR-LAW / HOME TERMINAL</p>
-          <h2>星界之律大廳</h2>
-          <p>在回覆台之間整理線索，推進文件中的旅程，召集角色並培養已取得的夥伴。</p>
-          <div class="lobby-status"><span id="story-progress-label">序章等待開啟</span><span id="lobby-pull-label">總召集 0 次</span><span id="lobby-update-label">更新獎勵 +3,200 星砂</span></div>
-        </div>
-        <div class="lobby-hero-radar" aria-hidden="true"><span></span><i></i><img src="./assets/ui/game-icon.png" alt=""><b>ASTRALYN</b></div>
-      </div>
-      <div id="author-preview-entry" class="author-preview-entry" hidden><div><strong>作者試玩｜劇情、地圖與角色</strong><p>可查看第一至第六大版本區域概略圖，並以隔離戰鬥測試已建檔角色；不取得角色、不消耗資源，也不影響正式進度。</p></div><button id="open-author-preview" class="primary-action" type="button">開始試玩</button></div>
-      <div class="lobby-quick-actions" aria-label="快速入口">
-        <button id="open-announcements" class="lobby-quick-card announcement-quick" type="button"><span class="quick-icon" aria-hidden="true">📣</span><span class="quick-copy"><strong>公告</strong><small id="announcement-quick-status">更新內容與獎勵</small></span><span class="quick-badge">NEW</span></button>
-        <button id="open-shop" class="lobby-quick-card shop-quick" type="button"><span class="quick-icon" aria-hidden="true">✧</span><span class="quick-copy"><strong>商店</strong><small>材料、造型與資源轉換</small></span></button>
-        <button id="open-tutorial" class="lobby-quick-card tutorial-quick" type="button"><span class="quick-icon" aria-hidden="true">?</span><span class="quick-copy"><strong>新手教學</strong><small id="tutorial-quick-status">完成教學可領獎</small></span><span class="quick-badge" id="tutorial-quick-badge">GUIDE</span></button>
-      </div>
-      <div class="lobby-heading"><div><p class="eyebrow">MAIN MENU</p><h2>選擇要前往的區域</h2></div><span>1.0 主線與卡池已開放</span></div>
-      <div class="lobby-menu-grid">
-        <button id="open-story" class="lobby-menu-card story-menu" type="button"><span class="menu-index">01</span><span class="menu-icon">◈</span><strong>劇情</strong><small>閱讀界痕調查與各版本角色線</small><span class="menu-arrow">→</span></button>
-        <button id="open-gacha" class="lobby-menu-card gacha-menu" type="button"><span class="menu-index">02</span><span class="menu-icon">✦</span><strong>抽卡</strong><small>進入回覆召集，選擇限定四星</small><span class="menu-arrow">→</span></button>
-        <button id="open-characters" class="lobby-menu-card character-menu" type="button"><span class="menu-index">03</span><span class="menu-icon">◇</span><strong>角色培養</strong><small>查看已獲得角色與培養進度</small><span class="menu-arrow">→</span></button>
-        <button id="open-trial" class="lobby-menu-card trial-menu" type="button"><span class="menu-index">04</span><span class="menu-icon">✧</span><strong>星界試煉</strong><small>最多四人編隊，自走棋自動戰鬥</small><span class="menu-arrow">→</span></button>
-        <button id="open-boss" class="lobby-menu-card boss-menu" type="button"><span class="menu-index">05</span><span class="menu-icon">♢</span><strong>Boss</strong><small>取得角色 80 等突破材料與角色經驗</small><span class="menu-arrow">→</span></button>
-        <button id="open-dispatch" class="lobby-menu-card dispatch-menu" type="button"><span class="menu-index">06</span><span class="menu-icon">⌁</span><strong>星港委託</strong><small>短篇任務與特殊敵人，取得額外星砂與養成資源</small><span class="menu-arrow">→</span></button>
-        <button id="open-voyage" class="lobby-menu-card voyage-menu" type="button"><span class="menu-index">07</span><span class="menu-icon">✹</span><strong>星海迷航</strong><small>隨機航線、事件選擇與隱藏結局</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
-        <button id="open-pets" class="lobby-menu-card pet-menu" type="button"><span class="menu-index">08</span><span class="menu-icon">◌</span><strong>星伴培育</strong><small>寵物成長、裝扮、特效與玩家展示</small><span class="menu-arrow">→</span><span class="menu-new-badge">NEW</span></button>
-      </div>
-      <div class="lobby-continue panel"><div><p class="eyebrow">CONTINUE</p><strong id="lobby-continue-title">從第一章開始你的旅程</strong><p id="lobby-continue-copy">目前已開放文件 1.0 主線；後續版本尚在製作。</p></div><button id="continue-story" class="primary-action" type="button">繼續劇情</button></div>
-      <div id="milestone-rewards" class="milestone-rewards"></div>
-    </section>
+    <header id="world-shell-header" class="world-shell-header" hidden><button id="world-home-button" class="world-shell-home" type="button" aria-label="回到大世界"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/></svg><span>星界之律<small id="world-shell-player"></small></span></button><nav aria-label="遊戲主要功能"><button id="open-gacha" class="world-shell-icon" type="button" aria-label="抽卡" title="抽卡"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.8 6.3L22 12l-7.2 3.7L12 22l-2.8-6.3L2 12l7.2-3.7L12 2Z"/><path d="m18 2 1 3 3 1"/></svg><span>抽卡</span></button><button id="open-trial" class="world-shell-icon" type="button" aria-label="試煉" title="試煉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v5c0 5-3 8-7 8S5 13 5 8V3Z"/><path d="M5 5H2v3c0 3 2 4 5 4m12-7h3v3c0 3-2 4-5 4M12 16v5m-4 0h8"/></svg><span>試煉</span></button><button id="world-menu-toggle" class="world-shell-icon" type="button" aria-label="開啟遊戲選單" aria-haspopup="dialog" aria-controls="world-main-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>選單</span></button></nav></header>
+    <dialog id="world-main-menu" class="world-main-menu" aria-labelledby="world-menu-title"><header><div><h2 id="world-menu-title">旅途選單</h2><p id="world-save-status" role="status">探索位置會自動保存</p></div><button id="world-menu-close" class="world-shell-icon" type="button" aria-label="關閉遊戲選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header><nav aria-label="更多遊戲功能"><button id="open-characters" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg><span><strong>角色培養</strong><small>編隊、成長與探索角色</small></span></button><button id="open-pets" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12c0-4 3-6 6-6s6 2 6 6v6H6v-6Zm0 0L3 4l7 3m8 5 3-8-7 3"/><path d="M9 13h.01M15 13h.01m-4 3 1 1 1-1"/></svg><span><strong>星伴培育</strong><small>寵物、裝扮與互動</small></span></button><button id="open-story" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5C9 2 4 3 2 4v16c3-2 7-2 10 0 3-2 7-2 10 0V4c-2-1-7-2-10 1Zm0 0v15"/></svg><span><strong>主線旅程</strong><small>章節、目標與劇情回顧</small></span></button><button id="open-shop" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2-6H5L3 9Zm1 0v12h16V9M9 21v-7h6v7"/></svg><span><strong>商店</strong><small>材料、造型與資源</small></span></button><button id="open-boss" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 4 4 4 4-3 4 3 4-4v12l-8 6-8-6V4Z"/><path d="m8 12 2 2m6-2-2 2"/></svg><span><strong>突破首領</strong><small>挑戰與角色突破材料</small></span></button><button id="open-dispatch" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="15" rx="2"/><path d="M8 6V3h8v3M3 12h18m-11 0v3h4v-3"/></svg><span><strong>星港委託</strong><small>委託任務與養成資源</small></span></button><button id="open-voyage" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 16 9-4 9 4-9 6-9-6ZM12 2v10m0-10 7 8h-7M3 8h6"/></svg><span><strong>星海迷航</strong><small>航線探索與事件</small></span></button><button id="open-world-map" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/></svg><span><strong>世界地圖</strong><small>區域總覽與地理記錄</small></span></button><button id="open-announcements" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 9-3 8-3 10h18c0-2-3-1-3-10Zm-8 13h4"/></svg><span><strong>公告</strong><small>更新內容與獎勵</small></span></button><button id="open-tutorial" class="world-menu-entry" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 3h.01"/></svg><span><strong>新手教學</strong><small>操作說明與教學獎勵</small></span></button></nav><section class="world-menu-journey"><strong id="lobby-continue-title"></strong><p id="lobby-continue-copy"></p><button id="continue-story" class="small-button" type="button">查看主線旅程</button><div class="world-menu-record"><span id="story-progress-label"></span><span id="lobby-pull-label"></span><span id="lobby-update-label"></span></div></section><details class="world-menu-rewards"><summary>旅程獎勵</summary><div id="milestone-rewards" class="milestone-rewards"></div></details><div id="author-preview-entry" hidden><button id="open-author-preview" class="small-button" type="button">作者試玩</button></div><footer class="world-menu-account"><div id="player-badge" class="player-badge" hidden><small>PLAYER / SECURE SESSION</small><strong id="player-name">尚未登入</strong><span class="player-badge-actions"><button id="sync-player" class="small-button" type="button">同步</button><button id="change-player" class="small-button" type="button">切換帳號</button></span></div></footer></dialog>
 
     <section id="shop-view" class="game-view panel shop-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><h2>星界商店</h2><p>突破材料、特殊造型與資源轉換</p></div><span id="shop-version-label"></span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><h2>星界商店</h2><p>突破材料、特殊造型與資源轉換</p></div><span id="shop-version-label"></span></div>
       <div class="shop-balance" id="shop-balance"></div>
       <p class="shop-intro">商品以帳號資源購買；星海迷航途中取得的星海碎片只用於當次航程，不在這裡消費。</p>
       <div id="shop-message" class="message" role="status" aria-live="polite"></div>
@@ -113,7 +84,7 @@
     </section>
 
     <section id="author-preview-view" class="game-view panel author-preview-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><h2>1.1 作者試玩</h2></div><span id="author-preview-progress">載入中</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><h2>1.1 作者試玩</h2></div><span id="author-preview-progress">載入中</span></div>
       <p class="author-preview-note">展開幕次即可在原位閱讀正文、查看插圖並完成該幕互動；讀完可以收合，進度會保留。這是 1.1 閱讀方式的作者試用，尚不影響正式劇情或資源。</p>
       <section class="author-preview-story panel" aria-labelledby="author-preview-story-title"><div class="author-preview-story-heading"><div><h3 id="author-preview-story-title">劇情閱讀方式｜作者試用</h3><p>閱讀 1.0 與 1.1 現行正文；逐幕展開、收合與試按獎勵都只在此預覽。</p></div><button id="author-preview-reset" class="small-button" type="button">重設 1.1 互動</button></div><div class="author-preview-story-tabs" role="tablist" aria-label="試用劇情版本"><button id="author-story-tab-10" type="button" role="tab" data-author-story-version="1.0" aria-controls="author-preview-story-scenes-10" aria-selected="false">1.0 現行正文｜新版面預覽</button><button id="author-story-tab-11" type="button" role="tab" data-author-story-version="1.1" aria-controls="author-preview-story-scenes" aria-selected="true">1.1 現行正文｜逐幕互動</button></div><div id="author-preview-story-scenes-10" role="tabpanel" aria-labelledby="author-story-tab-10" hidden></div><div id="author-preview-story-scenes" role="tabpanel" aria-labelledby="author-story-tab-11"></div></section>
       <section class="author-preview-map panel" aria-labelledby="author-preview-map-title"><div class="author-preview-map-head"><div><h3 id="author-preview-map-title">互動地圖試玩</h3><p>點選世界、版本區域、城市與地點，檢查地理位置及路線說明。探索紀錄只保留在本次試玩。</p></div><button id="author-preview-map-reset" class="small-button" type="button">返回世界圖</button></div><p id="author-preview-map-progress" class="author-preview-map-progress" aria-live="polite"></p><div id="author-preview-map" class="story-world-map-panel"></div></section>
@@ -121,14 +92,14 @@
     </section>
 
     <section id="tutorial-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / PLAYER GUIDE</p><h2>新手教學</h2></div><span id="tutorial-status">尚未完成</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STAR-LAW / PLAYER GUIDE</p><h2>新手教學</h2></div><span id="tutorial-status">尚未完成</span></div>
       <div id="tutorial-summary" class="tutorial-summary"></div>
       <div id="tutorial-steps" class="tutorial-step-grid"></div>
       <div id="tutorial-reward" class="tutorial-reward-panel"></div>
     </section>
 
     <section id="announcement-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-LAW / NOTICE BOARD</p><h2>公告</h2></div><div class="view-toolbar-meta"><span>更新資訊與獎勵</span><button id="open-star-law-test" class="star-law-test-trigger" type="button" aria-label="開啟星律隱藏測試區" title="星律">✦</button></div></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STAR-LAW / NOTICE BOARD</p><h2>公告</h2></div><div class="view-toolbar-meta"><span>更新資訊與獎勵</span><button id="open-star-law-test" class="star-law-test-trigger" type="button" aria-label="開啟星律隱藏測試區" title="星律">✦</button></div></div>
       <div class="announcement-intro"><div><strong>星界之律｜回覆台公告</strong><p>在這裡查看版本內容、額外獎勵與重要系統變更。公告只會說明規則，不會取代你的玩家存檔。</p></div><span class="announcement-signal">LIVE UPDATE</span></div>
       <section id="star-law-test-panel" class="star-law-test-panel" hidden>
         <div class="star-law-test-backdrop" aria-hidden="true"></div>
@@ -145,7 +116,7 @@
     </section>
 
     <section id="story-view" class="game-view panel story-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">主線 1.0 已開放</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STORY ARCHIVE</p><h2>劇情選單</h2></div><span id="story-view-status">主線 1.0 已開放</span></div>
       <div class="story-tabs"><button id="story-main-tab" class="small-button active" type="button">主線 1.0</button><button id="story-side-tab" class="small-button" type="button">支線籌備中</button></div>
       <div class="first-act-entry"><div><strong>第一幕｜她本來只想趕上晚餐</strong><span>從南驛舊祭壇出發，走過界痕位移、林道相遇與村中醫療屋。</span></div><button id="play-first-act" class="secondary-action" type="button">遊玩第一幕 →</button></div>
       <div class="story-map-link"><button id="story-open-world-map" class="secondary-action" type="button">開啟地圖探索 →</button></div>
@@ -162,7 +133,7 @@
     </section>
 
     <section id="map-view" class="game-view panel map-view" hidden>
-      <div class="view-toolbar"><button id="map-view-back" class="small-button" type="button">← 回到遊戲大廳</button><div><h2>世界地圖</h2><p>選擇地區進入子地圖；地點標記可查看說明。</p></div><span>地圖探索</span></div>
+      <div class="view-toolbar"><button id="map-view-back" class="small-button" type="button">← 回到大世界</button><div><h2>世界地圖</h2><p>選擇地區進入子地圖；地點標記可查看說明。</p></div><span>地圖探索</span></div>
       <section id="story-world-map" class="story-world-map-panel" aria-labelledby="story-map-title"></section>
       <section class="explore-entry" aria-labelledby="explore-entry-title"><div><h3 id="explore-entry-title">獸靈之村｜自由探索</h3><p>使用已製作的村莊地圖，沿道路走訪療養所、巡林據點、火場、物資倉與溪橋。第一幕從林道進村後會在這裡繼續。</p></div><button id="open-exploration" class="secondary-action" type="button">進入村莊 →</button></section>
 
@@ -198,7 +169,7 @@
     </section>
 
     <section id="character-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">CHARACTER ARCHIVE</p><h2>角色培養</h2></div><span id="character-view-status">已取得 0 名</span></div>
       <div class="character-intro"><div><strong>培養星界夥伴</strong><p>4★成長倍率與經驗成本較高；3★培養成本較低。重複抽到角色時命座會立即自動增加。</p></div><div class="character-resource-note"><span>角色經驗 <b id="character-exp">0</b></span><span>專用晶核 <b id="character-core">0</b></span><span>星痕（兌換精選） <b id="character-star-marks">0</b></span></div></div>
       <div class="character-list-tools" aria-label="角色搜尋與篩選"><label class="character-search-field"><span>搜尋角色</span><input id="character-search" type="search" placeholder="輸入名稱或元素" autocomplete="off"></label><label class="character-filter-field"><span>顯示</span><select id="character-filter"><option value="all">全部角色</option><option value="owned">已取得</option><option value="rarity4">四星角色</option><option value="rarity3">三星角色</option></select></label><span id="character-list-count" class="character-list-count"></span></div>
       <div id="character-list" class="character-list"></div>
@@ -228,7 +199,7 @@
     </dialog>
 
     <section id="trial-view" class="game-view panel trial-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">ASTRAL TRIAL</p><h2>星界試煉</h2></div><span id="trial-view-status">第 1 關</span></div>
       <div class="trial-layout">
         <aside class="trial-stage-rail">
           <div class="trial-rule"><span class="eyebrow">AUTO CHESS RULE</span><strong>30 關逐關解鎖 · 最多 4 名角色</strong><small>本次大更新已重置挑戰與獎勵；每關有獨立環境與敵方特性，戰鬥依速度、技能冷卻與隊伍協同自動進行。</small></div>
@@ -247,7 +218,7 @@
     </section>
 
     <section id="boss-view" class="game-view panel trial-view boss-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">BOSS BREAKTHROUGH</p><h2>Boss</h2></div><span id="boss-view-status">選擇首領</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">BOSS BREAKTHROUGH</p><h2>Boss</h2></div><span id="boss-view-status">選擇首領</span></div>
       <div class="trial-layout boss-layout">
         <aside class="trial-stage-rail">
           <div class="trial-rule"><span class="eyebrow">LEVEL 80 BREAKTHROUGH</span><strong>六種 Boss · Lv.1–3 三檔獎勵 · 每次最多 4 名角色</strong><small>六種 Boss 分成 Lv.1–3 三個獎勵檔位，不是角色突破的硬門檻。每場勝利會給專屬材料與星界通用突破印記，通用印記可以替代任何角色的指定材料；每個 Boss 每版本最多領取 10 次獎勵，100 等尚未開放。</small></div>
@@ -267,7 +238,7 @@
     </section>
 
     <section id="dispatch-view" class="game-view panel" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>1.0 本期任務</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STARPORT DISPATCH</p><h2>星港委託</h2></div><span>1.0 本期任務</span></div>
       <div class="dispatch-layout">
         <aside class="dispatch-mission-rail">
           <div class="trial-rule"><span class="eyebrow">NEW GAMEPLAY</span><strong>每份委託每版本完成一次</strong><small>觀察敵人特性、組成適合的隊伍，完成後取得星砂與養成資源；下次大更新會重置。</small></div>
@@ -286,7 +257,7 @@
     </section>
 
     <section id="voyage-view" class="game-view panel voyage-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STAR-SEA VOYAGE</p><h2>星海迷航</h2></div><span id="voyage-view-status">本期航程尚未開始</span></div>
       <div class="voyage-intro"><div><strong>在主線之外，航行一段會自己改寫的路</strong><p id="voyage-description">隨機選擇航線，通過事件、商站、休整與戰鬥；不同選擇會帶你走向一般、隱藏或特殊結局。</p></div><div class="voyage-season-reward"><span>特殊結局獎勵</span><strong id="voyage-skin-name">星砂、經驗與星痕</strong><small id="voyage-skin-copy">造型在大廳商店購買，不由迷航免費發放。</small></div></div>
       <details class="voyage-guide" open>
         <summary><span><span class="eyebrow">HOW TO PLAY</span><strong>星海迷航遊玩指引</strong></span><span class="voyage-guide-summary">選航線 → 編隊 → 做選擇 → 打敗終端</span></summary>
@@ -309,13 +280,13 @@
     </section>
 
     <section id="pet-view" class="game-view panel pet-view" hidden>
-      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">STAR-COMPANION WORKSHOP</p><h2>星伴培育</h2></div><span id="pet-view-status">獨立寵物資料</span></div>
+      <div class="view-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">STAR-COMPANION WORKSHOP</p><h2>星伴培育</h2></div><span id="pet-view-status">獨立寵物資料</span></div>
       <div class="pet-intro"><div><strong>這裡的寵物不會影響主線與角色養成</strong><p>寵物有自己的食物、玩具、星伴代幣、等級、心情與親密度。你可以只自己收藏，也可以公開作品讓其他玩家參觀與評分。</p><div class="pet-protection-note"><strong>更新保護已修正</strong><span>先前升級會消耗當級經驗，舊保護機制把「升級後經驗歸零」誤判成資料倒退，所以顯示無法繼續升級。現在只會阻擋真正的寵物刪除、等級回退或親密度回退；正常升級與消耗經驗會正常保存。</span></div></div><div class="pet-resource-row"><span>飼料 <b id="pet-food">0</b></span><span>玩具 <b id="pet-toys">0</b></span><span>星伴代幣 <b id="pet-tokens">0</b></span><span>展示小獎勵 <b id="pet-showcase-reward">0</b></span></div></div>
       <div class="pet-layout"><section class="pet-workbench"><div id="pet-selected-card" class="pet-selected-card"></div><div class="pet-customization-panel"><div class="pet-panel-heading"><div><p class="eyebrow">CUSTOMIZATION</p><h3>外觀與特效</h3></div><label class="pet-public-toggle"><input id="pet-public-toggle" type="checkbox"><span>公開我的寵物</span></label></div><p class="pet-customization-note">選擇後會立即套用到預覽與公開展示。基礎寵物 PNG 保持原畫質，裝扮與特效以獨立圖層呈現，不會重繪或壓縮角色圖片。</p><div id="pet-outfit-list" class="pet-option-list"></div><div id="pet-effect-list" class="pet-option-list"></div><button id="save-pet-showcase" class="primary-action" type="button">儲存展示設定</button><p class="pet-privacy-note">關閉公開後，其他玩家將看不到你的展示，也不會影響你自己的寵物進度。</p></div></section><aside class="pet-catalog"><div class="pet-panel-heading"><div><p class="eyebrow">PET CATALOG</p><h3>我的星伴</h3></div><span id="pet-catalog-count">0 / 4</span></div><div id="pet-catalog-list" class="pet-catalog-list"></div><div class="pet-showcase-heading"><div><p class="eyebrow">COMMUNITY SHOWCASE</p><h3>其他玩家的寵物</h3></div><button id="refresh-pet-showcase" class="small-button" type="button">重新整理</button></div><div id="pet-showcase-list" class="pet-showcase-list"></div></aside></div><div id="pet-action-message" class="message" role="status"></div>
     </section>
 
     <div id="gacha-hall" class="gacha-hall" hidden>
-      <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到遊戲大廳</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0 角色池</span></div>
+      <div class="view-toolbar gacha-toolbar"><button class="small-button back-lobby" type="button">← 回到大世界</button><div><p class="eyebrow">SUMMON TERMINAL</p><h2>回覆召集</h2></div><span>1.0 角色池</span></div>
     <section class="resource-bar" aria-label="資源">
       <div class="resource"><span class="resource-icon sand">✦</span><span><small>星砂</small><strong id="star-sand">0</strong></span></div>
       <div class="resource"><span class="resource-icon mark">◇</span><span><small>星痕（重複4★）</small><strong id="star-marks">0</strong></span></div>
@@ -391,24 +362,24 @@
     </div>
   </main>
   <script src="./src/release-config.js?v=release-20261008"></script>
-  <script src="./src/gacha.js?v=gacha-rates-20261008"></script>
+  <script src="./src/gacha.js?v=world-home-20261015"></script>
   <script src="./src/story-1-0-current.js?v=monster-story-20261013"></script>
   <script src="./src/story-1-0-images.js"></script>
   <script src="./src/story-1-1-current.js?v=monster-story-20261013"></script>
   <script src="./src/story-1-1-images.js?v=monster-story-20261013"></script>
   <script src="./src/story-visual-review.js?v=monster-story-20261013"></script>
-<script src="./src/exploration-story-art.js?v=play-audit-20261015"></script>
+<script src="./src/exploration-story-art.js?v=world-home-20261015"></script>
   <script src="./src/story-world-map-1-0.js?v=monster-story-20261013"></script>
   <script src="./src/interactive-map.js?v=outer-shore-route-20261013"></script>
 
-  <script src="./src/first-act-scenes.js?v=play-audit-20261015"></script>
-  <script src="./src/native-terrain.js?v=play-audit-20261015"></script><script src="./src/exploration-renderer.js?v=play-audit-20261015"></script>
+  <script src="./src/first-act-scenes.js?v=world-home-20261015"></script>
+  <script src="./src/native-terrain.js?v=world-home-20261015"></script><script src="./src/exploration-renderer.js?v=world-home-20261015"></script>
   <script src="./src/exploration-characters.js?v=world-cast-20261014"></script>
-  <script src="./src/exploration.js?v=play-audit-20261015"></script>
-  <script src="./src/hero-motion.js?v=play-audit-20261015"></script><script src="./src/world-presentation.js?v=play-audit-20261015"></script>
-  <script src="./src/world-story-dialogue.js?v=play-audit-20261015"></script><script src="./src/world-story-campaign.js?v=play-audit-20261015"></script>
-  <script src="./src/first-major-world.js?v=play-audit-20261015"></script>
-  <script src="./src/first-act-game.js?v=play-audit-20261015"></script>
+  <script src="./src/exploration.js?v=world-home-20261015"></script>
+  <script src="./src/hero-motion.js?v=world-home-20261015"></script><script src="./src/world-presentation.js?v=world-home-20261015"></script>
+  <script src="./src/world-story-dialogue.js?v=world-home-20261015"></script><script src="./src/world-story-campaign.js?v=world-home-20261015"></script>
+  <script src="./src/first-major-world.js?v=world-home-20261015"></script>
+  <script src="./src/first-act-game.js?v=world-home-20261015"></script>
 
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>
   <script src="./src/first-major-kits.js?v=author-preview-roster-20261005"></script>
@@ -424,7 +395,8 @@
   <script src="./src/story-narration.js?v=20261007"></script>
 
 
-  <script src="./src/player-app.js?v=play-audit-20261015"></script>
+  <script src="./src/world-checkpoint.js?v=world-home-20261015"></script>
+  <script src="./src/player-app.js?v=world-home-20261015"></script>
 
 </body>
 </html>

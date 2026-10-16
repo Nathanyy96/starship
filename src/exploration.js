@@ -110,7 +110,7 @@
   }
   function create(options) {
     var canvas = options.canvas, ctx = canvas.getContext("2d"), state = normalize(options.load());
-    var active = false, pressed = new Set(), frame = 0, lastFrame = 0, lastSave = 0, routeKey = "", currentRoute = [], images = {}, sceneIndex = -1, lineIndex = 0;
+    var active = false, paused = false, pressed = new Set(), frame = 0, lastFrame = 0, lastSave = 0, routeKey = "", currentRoute = [], images = {}, sceneIndex = -1, lineIndex = 0;
     var characterArt = globalThis.StarshipExplorationCharacters, characterData = options.characterData || globalThis.StarshipGachaData || {};
     var extraActors = (options.actors || []).filter(function (actor) { return actor.id && Number.isFinite(actor.x) && Number.isFinite(actor.y); });
     function loadImage(id, source) { var image = new Image(); image.onload = function () { images[id] = image; draw(); }; image.src = source; }
@@ -166,7 +166,7 @@
       options.read.hidden = !(state.arrived && state.storyStep >= storyGoals.length);
     }
     function tick(now) {
-      if (!active) return;
+      if (!active || paused) return;
       var dt = Math.min((now - (lastFrame || now)) / 1000, .05); lastFrame = now;
       var dx = Number(pressed.has("right")) - Number(pressed.has("left")), dy = Number(pressed.has("down")) - Number(pressed.has("up"));
       if (sceneIndex < 0 && (dx || dy)) {
@@ -200,7 +200,7 @@
       var result = interact(state); state = result.state; if (result.changed) save(); options.status.textContent = result.title + "｜" + result.text; draw();
     }
     function onKey(e, down) {
-      if (!active || options.panel.hidden) return;
+      if (!active || paused || options.panel.hidden) return;
       if(storyArt&&storyArt.isZoomed())return;
       if (sceneIndex >= 0) { if (down && (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") && !e.repeat) { e.preventDefault(); nextLine(); } return; }
       var keys = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
@@ -219,9 +219,9 @@
       button.addEventListener("lostpointercapture", function () { pressed.delete(button.dataset.move); });
     });
     draw();
-    return { open: function () { active = true; lastFrame = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
+    return { pause:function(){paused=true;pressed.clear();cancelAnimationFrame(frame);if(active)save();},resume:function(){if(!active)return;paused=false;pressed.clear();lastFrame=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(tick);canvas.focus({preventScroll:true});},open: function () { active = true; paused = false; lastFrame = 0; draw(); frame = requestAnimationFrame(tick); canvas.focus({ preventScroll: true }); },
       close: function () { active = false; pressed.clear(); sceneIndex = -1; options.dialog.hidden = true; if(storyArt)storyArt.clear(options.dialog); cancelAnimationFrame(frame); save(); },
-      reload: function () { state = normalize(options.load()); draw(); },
+      reload: function () { sceneIndex=-1;options.dialog.hidden=true;if(storyArt)storyArt.clear(options.dialog);state = normalize(options.load()); draw(); },
       enterStory: function () { state.arrived = true; if (state.storyStep === 0) { state.x = 1518; state.y = 216; } save(); draw(); },
       setPlayer: setPlayer, state: function () { return normalize(state); } };
   }

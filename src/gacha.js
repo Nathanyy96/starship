@@ -291,6 +291,7 @@
     var source = isPlainObject(input) ? clone(input) : initialState();
     var state = initialState();
     state.version = source.version || 1;
+    state.worldPosition = isPlainObject(source.worldPosition) ? clone(source.worldPosition) : null;
     var savedResources = isPlainObject(source.resources) ? source.resources : {};
     ["starSand", "starMarks", "characterExp"].forEach(function (key) {
       if (Object.prototype.hasOwnProperty.call(savedResources, key)) state.resources[key] = savedResources[key];

@@ -13,24 +13,24 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
  }
  try{
   await page.goto(pathToFileURL(path.join(root,'index.html')).href);
-  await page.click('#new-player-button');await page.fill('#player-name-input','campaign-qa');await page.fill('#player-password-input','campaign-test-123');await page.fill('#player-password-confirm','campaign-test-123');await page.click('#auth-submit');await page.locator('#game-lobby').waitFor({state:'visible'});
+  await page.click('#new-player-button');await page.fill('#player-name-input','campaign-qa');await page.fill('#player-password-input','campaign-test-123');await page.fill('#player-password-confirm','campaign-test-123');await page.click('#auth-submit');await page.locator('#world-shell-header').waitFor({state:'visible'});await page.click('#world-menu-toggle');
   await page.click('#open-story');
   // Position fixtures shorten walking only; every prose card and formal completion uses the mounted UI.
   for(let i=0;i<9;i++){
    await page.evaluate(i=>{const s=StarshipFirstActGame.steps[i];localStorage.setItem('starship-first-act-game-v2:campaign-qa',JSON.stringify({index:i,zone:s.zone,x:s.x,y:s.y}));},i);
    await page.click('#play-first-act');await page.click('#first-act-interact');
    await clickCards('first-act',await page.evaluate(i=>StarshipFirstActGame.scenes[i].map(line=>({text:line[1],speaker:line[0]})),i));
-   if(i<8)await page.click('#first-act-back');
+   if(i<8){await page.click('#world-menu-toggle');await page.click('#open-story');}
   }
   await page.click('#first-act-enter-village');
   for(let i=0;i<2;i++){
-   await page.click('#close-exploration');
+   await page.click('#world-menu-toggle');await page.click('#open-world-map');
    await page.evaluate(i=>{const e=StarshipExploration,g=e.storyGoals[i];localStorage.setItem('starship-exploration-test-v1:campaign-qa',JSON.stringify({...e.initial(),arrived:true,storyStep:i,x:g.x,y:g.y}));},i);
    await page.click('#open-exploration');await page.click('#exploration-interact');
    await clickCards('exploration',await page.evaluate(i=>StarshipExploration.storyScenes[i].map(line=>({text:line[1],speaker:line[0]})),i));
   }
   await page.waitForFunction(k=>Boolean(JSON.parse(localStorage.getItem(k)).storyProgress.completedScenes['main-1-0:signal']),saveKey);
-  await page.click('#close-exploration');
+  await page.click('#world-menu-toggle');await page.click('#open-world-map');
   const order=await page.evaluate(()=>StarshipFirstMajorWorld.storyOrder);
   for(const act of order){
    const count=await page.evaluate(act=>StarshipFirstMajorWorld.acts[act].length,act);
@@ -43,7 +43,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
      await page.setViewportSize({width:390,height:844});await page.waitForTimeout(80);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('#first-major-panel').screenshot({path:path.join(output,'scene-'+act+'-'+index+'-mobile.png')});await page.setViewportSize({width:1280,height:900});
     }
     await clickCards('first-major',await page.evaluate(({act,index})=>StarshipFirstMajorWorld.acts[act][index].lines.map((text,i)=>({text,speaker:StarshipFirstMajorWorld.acts[act][index].speakers[i]})),{act,index}));
-    if(index<count-1)await page.click('#close-first-major');
+    if(index<count-1){await page.click('#world-menu-toggle');await page.click('#open-world-map');}
    }
    const meta=await page.evaluate(act=>StarshipFirstMajorWorld.storyMeta(act),act);
    await page.waitForFunction(({key,scene})=>Boolean(JSON.parse(localStorage.getItem(key)).storyProgress.completedScenes[scene]),{key:saveKey,scene:meta.chapterId+':'+meta.sceneId});
@@ -65,10 +65,10 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
     const after=await saved();for(const [key,n]of Object.entries({starSand:1600,characterExp:3600,starMarks:1}))assert.equal(after.resources[key]-before[key],n);
     assert.equal(await page.locator('#first-major-claim').isDisabled(),true);
    }else {assert.equal(await page.locator('#first-major-next').isDisabled(),false,meta.label+' next unlocked');}
-   await page.click('#close-first-major');console.log('PASS '+meta.label+' ('+count+' segments)');
+   await page.click('#world-menu-toggle');await page.click('#open-world-map');console.log('PASS '+meta.label+' ('+count+' segments)');
   }
   const final=await saved();assert.ok(final.storyProgress.claimedVersions['1.0']);assert.ok(final.storyProgress.claimedVersions['1.1']);assert.equal(final.storyProgress.missions11.act,5);
-  await page.reload();await page.click('#known-player-button');await page.fill('#player-name-input','campaign-qa');await page.fill('#player-password-input','campaign-test-123');await page.click('#auth-submit');await page.locator('#game-lobby').waitFor({state:'visible'});await page.click('#open-world-map');await page.selectOption('#world-story-select','15');await page.click('#open-world-campaign');assert.equal(await page.locator('#first-major-claim').isDisabled(),true);assert.deepEqual((await saved()).resources,final.resources);
+  await page.reload();await page.click('#known-player-button');await page.fill('#player-name-input','campaign-qa');await page.fill('#player-password-input','campaign-test-123');await page.click('#auth-submit');await page.locator('#world-shell-header').waitFor({state:'visible'});await page.click('#world-menu-toggle');await page.click('#open-world-map');await page.selectOption('#world-story-select','15');await page.click('#open-world-campaign');assert.equal(await page.locator('#first-major-claim').isDisabled(),true);assert.deepEqual((await saved()).resources,final.resources);
   assert.deepEqual(errors,[]);console.log(JSON.stringify({pass:true,segments,cards,choices,reload:true,wrongChoiceRetry:true,rewardOnce:true,errors}));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

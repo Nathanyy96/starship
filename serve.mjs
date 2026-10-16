@@ -7,6 +7,10 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
+const worldCheckpoint = require("./src/world-checkpoint.js");
+const worldGeometry = require("./src/first-major-world.js");
+const openingGeometry = require("./src/first-act-game.js");
+const villageGeometry = require("./src/exploration.js");
 const { banners, activeCards, authorPreviewCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
@@ -1018,6 +1022,27 @@ async function handleApi(request, response, requestUrl) {
       player.record.state = ensurePlayerMilestones(player.record.state);
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/world-position") {
+      const player = playerFromSession(database, body.token);
+      const position = worldCheckpoint.clean(body.position);
+      if (!position) throw new Error("探索位置格式不正確");
+      const p = position.state;
+      const safe = position.kind === "world" ? [[-6,-6],[-6,6],[6,-6],[6,6]].every(([dx,dy])=>worldGeometry.passable(p.map,p.x+dx,p.y+dy)) : position.kind === "opening" ? openingGeometry.fits(p.zone,p.x,p.y) : villageGeometry.passable(p.x,p.y);
+      if (!safe) throw new Error("探索位置不在可通行的地面");
+      const session = sessions.get(String(body.token));
+      if (body.sequence !== undefined) {
+        if (!Number.isSafeInteger(body.sequence) || body.sequence < 1) throw new Error("位置同步順序不正確");
+        if (body.sequence <= (session.worldSequence || 0)) { sendJson(response, 200, {ok:true, position:player.record.state.worldPosition}); return; }
+      }
+      position.updatedAt = Date.now();
+      player.record.state.worldPosition = position;
+      player.record.updatedAt = new Date(position.updatedAt).toISOString();
+      await writeDatabase(database);
+      if(body.sequence !== undefined)session.worldSequence = body.sequence;
+      sendJson(response, 200, { ok:true, position });
       return;
     }
 

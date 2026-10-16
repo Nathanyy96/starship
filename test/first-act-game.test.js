@@ -70,7 +70,7 @@ test('story menu enters the image-backed village and completes through in-game d
   assert.match(html, /id="play-first-act"/);
   assert.match(html, /id="first-act-view"/);
   assert.ok(html.indexOf('src/first-act-game.js') < html.indexOf('src/player-app.js'));
-  assert.match(app, /showView\("first-act-view"\); firstActGame\.open\(\)/);
+  assert.match(app, /showView\("first-act-view"\); worldMounted\("opening"\);firstActGame\.open\(\)/);
   assert.match(app, /showVillageExploration\(true\)/);
   assert.match(app, /exploration\.enterStory\(\)/);
   assert.match(html, /id="first-act-dialog-next"/);
