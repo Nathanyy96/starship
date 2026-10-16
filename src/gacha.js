@@ -656,6 +656,22 @@
     return { cardId: "elorna", formId: options.formId, state: this.getState() };
   };
 
+  GachaGame.prototype.getDevelopmentPlan = function (cardId) {
+    var card = this.cardById[cardId];
+    assert(card, "找不到角色：" + cardId);
+    assert((this.state.collection[cardId] || 0) > 0, "尚未取得這名角色，無法培養");
+    var progress = this.getCharacterProgress(cardId);
+    var rules = this.rules.development;
+    var cap = progress.breakthrough ? rules.maxLevel : rules.breakthroughLevel;
+    var level = progress.level, total = 0, available = this.state.resources.characterExp;
+    while (level < cap) {
+      var cost = (card.rarity === 4 ? rules.fourStarBaseCharacterExp : rules.threeStarBaseCharacterExp) + (level - 1) * (card.rarity === 4 ? rules.fourStarCharacterExpStep : rules.threeStarCharacterExpStep);
+      if (total + cost > available) break;
+      total += cost; level += 1;
+    }
+    return { fromLevel: progress.level, toLevel: level, levelsGained: level - progress.level, characterExp: total, levelCap: cap };
+  };
+
   GachaGame.prototype.developCharacter = function (options) {
     options = options || {};
     var card = this.cardById[options.cardId];
@@ -669,6 +685,15 @@
       assert(false, "角色已達 " + this.rules.development.breakthroughLevel + " 等，請先到 Boss 選單取得 " + requirement.materialName + " 或星界通用突破印記並完成突破");
     }
     var isFourStar = card.rarity === 4;
+    if (options.bulk === true) {
+      var plan = this.getDevelopmentPlan(card.id);
+      assert(plan.levelsGained > 0, "角色經驗不足，無法升級");
+      this.state.resources.characterExp -= plan.characterExp;
+      progress.level = plan.toLevel;
+      progress.affinity = Math.min(100, (Number(progress.affinity) || 0) + plan.levelsGained);
+      this.state.characterProgress[card.id] = progress;
+      return { card: clone(card), cost: { characterExp: plan.characterExp }, levelsGained: plan.levelsGained, progress: clone(progress), state: this.getState() };
+    }
     var cost = {
       characterExp: (isFourStar ? this.rules.development.fourStarBaseCharacterExp : this.rules.development.threeStarBaseCharacterExp) + (level - 1) * (isFourStar ? this.rules.development.fourStarCharacterExpStep : this.rules.development.threeStarCharacterExpStep)
     };

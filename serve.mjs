@@ -1220,7 +1220,7 @@ async function handleApi(request, response, requestUrl) {
     if (requestUrl.pathname === "/api/player/character-development") {
       const player = playerFromSession(database, body.token);
       const game = createGame(player.record.state);
-      const result = game.developCharacter({ cardId: body.cardId });
+      const result = game.developCharacter({ cardId: body.cardId, bulk: body.bulk === true });
       player.record.state = game.getState();
       player.record.updatedAt = new Date().toISOString();
       await writeDatabase(database);

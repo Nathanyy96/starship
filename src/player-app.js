@@ -1087,6 +1087,7 @@
         if (!copies) growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\" disabled>" + (Number(card.releaseVersion) > Number(data.updateVersion || "1.0") ? escapeHtml(card.releaseVersion) + " 尚未開放" : "尚未取得") + "</button>";
         else if (needBreakthrough) growthAction = "<button class=\"secondary-action growth-button breakthrough-growth-button\" data-breakthrough-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (availableBreakthrough < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>";
         else growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (atMax || state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">" + (atMax ? "已達 90 等" : "升級　" + cost.characterExp + " 經驗") + "</button>";
+        growthAction += bulkUpgradeButton(card, copies, false);
         return "<article class=\"character-growth-card compact-character-card " + (copies ? "owned" : "locked") + " rarity-" + card.rarity + "\" data-open-character=\"" + escapeHtml(card.id) + "\" tabindex=\"0\" aria-label=\"查看" + escapeHtml(card.name) + "培養資料\"><div class=\"character-growth-art\" style=\"" + style + "\"><span>" + escapeHtml(card.element) + "</span><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + "</small></div><div class=\"character-growth-body\"><div class=\"compact-character-heading\"><span class=\"rarity-label\">" + "★".repeat(card.rarity) + "</span><span class=\"compact-element\">" + escapeHtml(card.element) + "元素</span></div><h3>" + escapeHtml(card.name) + "</h3><div class=\"growth-stats\"><span>戰力 <b>" + number(power) + "</b></span><span>Lv.<b>" + progress.level + "/90</b></span><span>命座 <b>" + (progress.constellation || 0) + "/6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"growth-actions\">" + growthAction + "</div></div></article>";
       }).join("") : "<div class=\"character-list-empty\">找不到符合條件的角色，請調整搜尋或篩選。</div>";
       if (currentCharacterId) { renderCharacterDetail(currentCharacterId); }
@@ -1204,7 +1205,7 @@
       var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><p class=\"constellation-growth-note\">共通面板成長｜" + escapeHtml(growthNote) + "各命效果累積生效；生命、攻擊、防禦與速度最終取整數。技能面板倍率是展示數值，實戰依下列技能公式計算；護盾最多累積至受盾者最大生命的 28%。</p><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
       var explorerSelected = currentExplorerId() === card.id;
       var explorerControls = "<section class=\"character-variant\"><h4>地圖探索</h4><p>使用已獲得的角色在地圖上探索；劇情對話依原本人物進行。</p><button class=\"secondary-action\" data-select-explorer=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (!copies || explorerSelected ? " disabled" : "") + ">" + (!copies ? "取得角色後可設為探索角色" : explorerSelected ? "目前的探索角色" : "設為探索角色") + "</button></section>";
-      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>" + explorerControls;
+      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + bulkUpgradeButton(card, copies, true) + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>" + explorerControls;
       detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(skillDescription) + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
       detail.hidden = false;
     }
@@ -1298,14 +1299,24 @@
       if (chapterId === "main-1-0" && progress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed) state.recruitment.story10ChoiceAvailable = true;
       updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); renderCharacters(); showMessage(finalScene ? "版本獎勵：" + rewardText(storyReward) + "已儲存。" : "本幕已讀完；讀完第五幕可領版本獎勵。", false);
     }
+    var characterUpgradePending = false;
+    function bulkUpgradeButton(card, copies, fromDetail) {
+      if (!copies) return "";
+      var plan = game.getDevelopmentPlan(card.id);
+      var label = plan.levelsGained ? "一鍵升至 " + plan.toLevel + " 等・" + number(plan.characterExp) + " 經驗" : plan.fromLevel >= plan.levelCap ? (plan.levelCap < api.DEFAULT_RULES.development.maxLevel ? "請先突破" : "已達最高等級") : "經驗不足";
+      return '<button class="secondary-action' + (fromDetail ? "" : " growth-button") + '" type="button" data-bulk-develop="' + escapeHtml(card.id) + '" data-bulk-detail="' + (fromDetail ? "true" : "false") + '"' + (!plan.levelsGained || characterUpgradePending ? " disabled" : "") + '>' + label + '</button>';
+    }
     function focusDetailUpgrade() {
       var button = byId("character-detail").querySelector("[data-detail-develop]:not([disabled]), [data-detail-breakthrough]:not([disabled])");
       if (button) button.focus({ preventScroll: true });
     }
-    function developCharacter(cardId, fromDetail) {
+    function developCharacter(cardId, fromDetail, bulk) {
+      if (characterUpgradePending) return;
       currentCharacterId = cardId;
-      if (remoteMode) { apiRequest("/api/player/character-development", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage("角色升級完成，進度已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
-      try { game.developCharacter({ cardId: cardId }); saveLocalState(); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage("角色升級完成，進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
+      var plan = bulk ? game.getDevelopmentPlan(cardId) : null;
+      var successMessage = bulk ? "已升至 " + plan.toLevel + " 等，消耗 " + number(plan.characterExp) + " 經驗。" + (plan.toLevel === plan.levelCap && plan.levelCap < api.DEFAULT_RULES.development.maxLevel ? "完成突破後可繼續一鍵升級。" : "") : "角色升級完成，進度已儲存。";
+      if (remoteMode) { characterUpgradePending = true; renderCharacters(); apiRequest("/api/player/character-development", { cardId: cardId, bulk: bulk === true }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage(successMessage, false); }).catch(function (error) { showMessage(error.message, true); }).finally(function () { characterUpgradePending = false; renderCharacters(); if (fromDetail) focusDetailUpgrade(); }); return; }
+      try { game.developCharacter({ cardId: cardId, bulk: bulk === true }); saveLocalState(); renderCharacters(); renderLobby(); if (fromDetail) focusDetailUpgrade(); showMessage(successMessage, false); } catch (error) { showMessage(error.message, true); }
     }
     function breakthroughCharacter(cardId) {
       currentCharacterId = cardId;
@@ -2319,6 +2330,7 @@
     });
      byId("character-list").addEventListener("click", function (event) {
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { event.stopPropagation(); openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
+       var bulkButton = event.target.closest("[data-bulk-develop]"); if (bulkButton) { event.stopPropagation(); if (!bulkButton.disabled) developCharacter(bulkButton.getAttribute("data-bulk-develop"), bulkButton.getAttribute("data-bulk-detail") === "true", true); return; }
        var developButton = event.target.closest("[data-develop-character]"); if (developButton) { event.stopPropagation(); developCharacter(developButton.getAttribute("data-develop-character")); return; }
        var breakthroughButton = event.target.closest("[data-breakthrough-character]"); if (breakthroughButton) { event.stopPropagation(); breakthroughCharacter(breakthroughButton.getAttribute("data-breakthrough-character")); return; }
       var card = event.target.closest("[data-open-character]"); if (card) openCharacterDetail(card.getAttribute("data-open-character"));
@@ -2333,6 +2345,7 @@
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
        var skinButton = event.target.closest("[data-skin-preview]"); if (skinButton) { var skinId = skinButton.getAttribute("data-skin-preview"); currentCharacterSkinId = currentCharacterSkinId === skinId ? "" : skinId; renderCharacterDetail(currentCharacterId); return; }
        var equipButton = event.target.closest("[data-skin-equip]"); if (equipButton && !equipButton.disabled) { equipCharacterSkin(equipButton.getAttribute("data-skin-equip")); return; }
+       var bulkButton = event.target.closest("[data-bulk-develop]"); if (bulkButton) { if (!bulkButton.disabled) developCharacter(bulkButton.getAttribute("data-bulk-develop"), true, true); return; }
        var developButton = event.target.closest("[data-detail-develop]"); if (developButton) { developCharacter(developButton.getAttribute("data-detail-develop"), true); return; }
        var breakthroughButton = event.target.closest("[data-detail-breakthrough]"); if (breakthroughButton) { breakthroughCharacter(breakthroughButton.getAttribute("data-detail-breakthrough")); return; }
     });
