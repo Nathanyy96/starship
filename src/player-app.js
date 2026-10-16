@@ -2110,7 +2110,7 @@
     byId("open-announcements").addEventListener("click", function () { showView("announcement-view"); });
     byId("open-star-law-test").addEventListener("click", function () { setStarLawTestPanelVisible(!starLawTestPanelOpen); });
     byId("claim-star-law-test-reward").addEventListener("click", claimStarLawTestReward);
-    byId("continue-story").addEventListener("click", function () { showView("story-view"); });
+    byId("continue-story").addEventListener("click", enterWorldHome);
     function explorerStorageKey() { return 'starship-explorer:' + encodeURIComponent(playerKey(currentPlayerName)); }
     function currentExplorerId() {
       var saved; try { saved = window.localStorage.getItem(explorerStorageKey()); } catch (error) { /* storage may be unavailable */ }
