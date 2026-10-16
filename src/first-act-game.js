@@ -129,7 +129,7 @@
       if (characterArt && characterArt.load(id, characterData, function (image) { if (image) art[id] = image; draw(); })) return;
       if (fallback) { var img = new Image(); img.onload = function () { art[id] = img; draw(); }; img.src = fallback; }
     }
-    var playerLoad,motionPlayer='celesia',motionImages={},motionPending={},motionHeading='down',motionStride=0,motionWalking=false;
+    var playerLoad,motionPlayer='celesia',motionImages={},motionPending={},motionHeading='down',motionStride=0,motionWalking=false,storyMotion=motion.createScene();
     function loadMotion(id){id=motion.canonical(id);if(!motion.supports(id)||motionPending[id])return;motionPending[id]=true;motion.load(id,function(img){if(img)motionImages[id]=img;draw();});}
 
     function setPlayer(id) {
@@ -147,7 +147,11 @@
     var beast = new Image(); beast.onload = function () { art.beast = beast; draw(); }; beast.src = beastSource;
     function save() { options.save(state); }
     function sprite(id, x, y, height, flip, bob) {
-      var who=id==='hero'?motionPlayer:motion.canonical(id),h=height;if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:'down',motionStride,id==='hero'&&motionWalking,Boolean(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches),who);
+      var reduced=Boolean(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      var staged=talking()?storyMotion.sample(performance.now(),reduced).find(function(a){return a.id===id;}):null;
+      if(staged){x=staged.x;y=staged.y;}
+      var who=id==='hero'?motionPlayer:motion.canonical(id),h=height;
+      if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:staged?staged.facing:'down',staged?staged.distance:motionStride,id==='hero'?motionWalking:Boolean(staged&&staged.walking),reduced,who);
       return renderer.sprite(ctx, art[id], x, y, h, flip, bob);
     }
     function draw() {
@@ -211,7 +215,9 @@
     }
     function showLine() {
       var lines = optionalScene || scenes[sceneIndex], line = lines[lineIndex];
+      if(lineIndex===0)storyMotion.clear();if(!optionalScene)storyMotion.cue(line[1],sceneIndex+':'+lineIndex,{x:state.x*TILE,y:state.y*TILE},performance.now(),function(a,b){return clearSegment(state.zone,[a.x/TILE,a.y/TILE],[b.x/TILE,b.y/TILE]);});
       options.dialogTitle.textContent = line[0]; options.dialogText.textContent = line[1];
+      if(options.dialog.classList)options.dialog.classList.toggle('has-character-motion',!optionalScene&&storyMotion.sample(performance.now(),false).length>0);
       if(storyArt)storyArt.show(options.dialog,optionalScene?[]:artScenes[sceneIndex],lineIndex);
       if (characterArt) characterArt.speakerPortrait(options.dialog, line[0], characterData);
       options.dialogNext.textContent = lineIndex + 1 < lines.length ? "繼續 →" : "完成對話 ✓";

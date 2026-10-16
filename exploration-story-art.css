@@ -22,3 +22,7 @@
 .exploration-art-fullstage.is-magnified{display:block}
 .exploration-art-fullstage.is-magnified>img{max-width:none;max-height:none;width:200%;height:auto;object-fit:initial}
 @media(max-width:600px){.game-dialogue.has-exploration-art,.game-dialogue.world-dialog.has-exploration-art{width:calc(100vw - 16px)!important;height:calc(100svh - 16px)!important;padding:10px!important;gap:10px}.exploration-story-art figcaption{font-size:11px}.has-exploration-art .exploration-art-copy{max-height:36svh}.has-exploration-art .exploration-art-copy p{font-size:14px!important;line-height:1.75!important}.exploration-art-lightbox{padding:10px}}
+.game-dialogue.has-exploration-art.has-character-motion{inset:auto auto 14px 50%!important;transform:translateX(-50%)!important;width:min(900px,calc(100vw - 28px))!important;height:auto!important;max-height:38svh!important;overflow:auto!important;box-shadow:0 12px 36px #0007}
+.has-character-motion .exploration-story-art{display:none!important}
+.has-character-motion .exploration-art-copy{max-height:none;overflow:visible}
+@media(max-width:600px){.game-dialogue.has-exploration-art.has-character-motion{bottom:8px!important;max-height:42svh!important}}
