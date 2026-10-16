@@ -10,7 +10,7 @@
       {name:'檢查接應繩結',result:'你沿繩結確認受力方向，沒有留下鬆開的繩圈。'},
       {name:'查看完整地面',result:'你看清腳下與回程的位置，回到同伴能接應的地方。'}]},
     {id:'landing-signal',act:12,scene:2,anchor:'天黑後，兩岸用燈與短聲清點人數。',kind:'inspect',title:'協助兩岸清點',steps:[
-      {name:'查看近岸回燈',result:'你在近岸確認燈的位置，讓遮住燈光的物件移開。'},
+      {name:'查看近岸回燈',result:'你留在近岸調整站位，確認回燈能被同伴看見。'},
       {name:'協助回應清點',result:'你留在近岸回應清點，沒有踏上錯位的石階。'}]},
     {id:'upstream-guide',act:13,scene:0,anchor:'其他人帶繩、藥與武器，沿普通山路走向上游。',kind:'follow',actor:'reyn',name:'雷恩',title:'跟隨雷恩前往上游山路',hint:'沿同一岸的山路走，雷恩會在前方等候。'},
     {id:'listen-reply',act:15,scene:2,anchor:'「我沒有怪妳出來。',kind:'choice',title:'陪同伴把話說完',choices:[
@@ -28,7 +28,7 @@
     }
     function paint(){
       if(!view)return;view.root.hidden=!current||!(current.event.kind==='choice'||current.phase==='done');
-      if(view.root.hidden)return;view.title.textContent=current.event.title;view.copy.textContent=current.phase==='reply'?current.reply:current.phase==='done'?current.feedback:'選擇一句回應，之後繼續原劇情。';view.buttons.replaceChildren();
+      if(view.root.hidden)return;view.title.textContent=current.event.title;view.copy.textContent=current.phase==='reply'?current.reply:current.phase==='done'?current.feedback:'選擇一句回應，之後繼續交談。';view.buttons.replaceChildren();
       if(current.event.kind==='choice'&&current.phase==='choosing')current.event.choices.forEach(function(c,i){var b=view.doc.createElement('button');b.type='button';b.textContent=c.text;b.addEventListener('click',function(){choose(i);});view.buttons.appendChild(b);});
       else{var b=view.doc.createElement('button');b.type='button';b.textContent='繼續交談';b.addEventListener('click',action);view.buttons.appendChild(b);}
       var first=view.buttons.querySelector('button');if(first)first.focus({preventScroll:true});
@@ -73,8 +73,8 @@
       action:action,choose:choose,
       ui:function(){
         if(!current)return null;var e=current.event,p=options.player(),target=this.target(),distance=target?Math.ceil(Math.hypot(target.x-p.x,target.y-p.y)):0;
-        if(e.kind==='choice'||current.phase==='done')return {title:e.title,hint:current.phase==='choosing'?'選擇一句回應；主線將接回原劇情。':'回應後繼續交談。',button:'繼續交談 E',canAct:current.phase!=='choosing'};
-        if(e.kind==='follow'){var arrived=!current.path.length;return {title:e.title,hint:arrived?'已到達，走近 '+e.name+' 繼續交談。':current.waiting?e.name+' 正在等你，跟上後繼續走。':e.hint,button:arrived?'與 '+e.name+' 交談 E':'跟上 '+e.name,canAct:arrived&&distance<=48,distance:distance};}
+        if(e.kind==='choice'||current.phase==='done')return {title:e.title,hint:current.phase==='choosing'?'選擇一句回應，之後繼續同行。':'回應後繼續交談。',button:'繼續交談 E',canAct:current.phase!=='choosing'};
+        if(e.kind==='follow'){var arrived=!current.path.length;return {title:e.title,hint:arrived?'已到達，走近'+e.name+' 繼續交談。':current.waiting?e.name+'正在等你，跟上後繼續走。':e.hint,button:arrived?'與'+e.name+'交談 E':'跟上'+e.name,canAct:arrived&&distance<=48,distance:distance};}
         return {title:e.title,hint:(current.step+1)+' / '+e.steps.length+' · '+(current.feedback?current.feedback+' ':'')+'走近亮起的位置。',button:e.steps[current.step].name+' E',canAct:distance<=46,distance:distance};
       }
     };
