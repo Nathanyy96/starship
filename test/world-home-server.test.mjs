@@ -5,6 +5,7 @@ test('authenticated world position saves isolate accounts, reject obstacles and 
  async function post(route,body){const res=await fetch(url+route,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:res.status,body:await res.json()};}
  try{for(let i=0;i<100;i++){try{await fetch(url+'/api/health');break;}catch{await delay(50);}}
  const alice=(await post('/api/player/register',{name:'world-alice',password:'home-api-123'})).body,bob=(await post('/api/player/register',{name:'world-bob',password:'home-api-123'})).body;
+ assert.equal((await post('/api/player/claim-character',{token:alice.token,rewardKey:'trial-10',cardId:'reyn'})).status,400);
  const position={version:1,kind:'world',state:{map:'city',x:3454,y:858,roaming:true}};
  assert.notEqual((await post('/api/player/world-position',{position})).status,200);
  assert.equal((await post('/api/player/world-position',{token:alice.token,position,sequence:2})).status,200);
