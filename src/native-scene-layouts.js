@@ -1,5 +1,4 @@
-// Street plans, architecture, landscape and collision for the 24 playable maps.
-// Coordinates are in local world units. Entry and story IDs remain stable.
+// Authored street, terrain and landscape plans. Landscape footprints are resolved offline, never randomly placed at runtime.
 (function(root,layouts){if(typeof module==='object'&&module.exports)module.exports=layouts;root.StarshipNativeSceneLayouts=layouts;}(globalThis,{
   "village": {
     "nativeTerrain": {
@@ -26,8 +25,8 @@
           "h": 200
         },
         {
-          "sheet": "town",
-          "cell": 3,
+          "sheet": "villageHomes",
+          "cell": 2,
           "x": 2315,
           "y": 35,
           "w": 155,
@@ -39,8 +38,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 0,
+          "sheet": "villageHomes",
+          "cell": 3,
           "x": 355,
           "y": 175,
           "w": 155,
@@ -52,8 +51,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 1,
+          "sheet": "villageHomes",
+          "cell": 0,
           "x": 555,
           "y": 175,
           "w": 155,
@@ -65,8 +64,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 2,
+          "sheet": "villageHomes",
+          "cell": 1,
           "x": 755,
           "y": 175,
           "w": 155,
@@ -78,8 +77,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 3,
+          "sheet": "villageHomes",
+          "cell": 2,
           "x": 955,
           "y": 175,
           "w": 155,
@@ -91,8 +90,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 0,
+          "sheet": "villageHomes",
+          "cell": 3,
           "x": 1155,
           "y": 175,
           "w": 155,
@@ -104,8 +103,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 1,
+          "sheet": "villageHomes",
+          "cell": 0,
           "x": 1355,
           "y": 175,
           "w": 155,
@@ -117,8 +116,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 2,
+          "sheet": "villageHomes",
+          "cell": 1,
           "x": 35,
           "y": 255,
           "w": 155,
@@ -130,8 +129,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 3,
+          "sheet": "villageHomes",
+          "cell": 2,
           "x": 1835,
           "y": 255,
           "w": 155,
@@ -143,8 +142,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 0,
+          "sheet": "villageHomes",
+          "cell": 3,
           "x": 875,
           "y": 475,
           "w": 155,
@@ -156,8 +155,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 1,
+          "sheet": "villageHomes",
+          "cell": 0,
           "x": 1075,
           "y": 475,
           "w": 155,
@@ -169,8 +168,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 2,
+          "sheet": "villageHomes",
+          "cell": 1,
           "x": 1435,
           "y": 475,
           "w": 155,
@@ -182,8 +181,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 3,
+          "sheet": "villageHomes",
+          "cell": 2,
           "x": 1115,
           "y": 755,
           "w": 155,
@@ -195,8 +194,8 @@
           "residential": true
         },
         {
-          "sheet": "town",
-          "cell": 0,
+          "sheet": "villageHomes",
+          "cell": 3,
           "x": 755,
           "y": 1095,
           "w": 155,
@@ -219,25 +218,33 @@
           80,
           840,
           0,
-          230
+          230,
+          "woodland",
+          0
         ],
         [
           550,
           1030,
           1,
-          220
+          220,
+          "woodland",
+          0
         ],
         [
           1850,
           970,
           1,
-          250
+          250,
+          "woodland",
+          0
         ],
         [
           2230,
           1030,
           0,
-          240
+          240,
+          "woodland",
+          0
         ],
         [
           2250,
@@ -587,6 +594,44 @@
           "y": 31.890944917686284,
           "r": 41.791344286408275,
           "kind": 0.04043072974309325
+        }
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 2022,
+          "y": 267,
+          "w": 160,
+          "h": 125,
+          "purpose": "林地邊界"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 777,
+          "y": 789,
+          "w": 160,
+          "h": 125,
+          "purpose": "林地邊界"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 2,
+          "x": 1335,
+          "y": 1135,
+          "w": 280,
+          "h": 218,
+          "purpose": "村中藥圃"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 2020,
+          "y": 1259,
+          "w": 160,
+          "h": 125,
+          "purpose": "溪岸植被"
         }
       ]
     },
@@ -1840,7 +1885,7 @@
           "h": 150
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 1990,
           "y": 45,
@@ -1853,7 +1898,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 1,
           "x": 2245,
           "y": 45,
@@ -1866,7 +1911,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 2,
           "x": 2500,
           "y": 45,
@@ -1879,7 +1924,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 3,
           "x": 2755,
           "y": 45,
@@ -1892,7 +1937,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 3010,
           "y": 45,
@@ -1905,7 +1950,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 1,
           "x": 3265,
           "y": 45,
@@ -1918,7 +1963,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 2,
           "x": 1395,
           "y": 365,
@@ -1931,7 +1976,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 3,
           "x": 1990,
           "y": 365,
@@ -1944,7 +1989,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 35,
           "y": 445,
@@ -1957,7 +2002,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 1,
           "x": 885,
           "y": 445,
@@ -1970,7 +2015,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 2,
           "x": 2755,
           "y": 525,
@@ -1983,7 +2028,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 3,
           "x": 3010,
           "y": 605,
@@ -1996,7 +2041,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 2075,
           "y": 925,
@@ -2009,7 +2054,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 1,
           "x": 1140,
           "y": 1405,
@@ -2022,7 +2067,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 2,
           "x": 1480,
           "y": 1405,
@@ -2035,7 +2080,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 3,
           "x": 1735,
           "y": 1405,
@@ -2048,7 +2093,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 1990,
           "y": 1405,
@@ -2061,7 +2106,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 1,
           "x": 2415,
           "y": 1405,
@@ -2074,7 +2119,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 2,
           "x": 2670,
           "y": 1405,
@@ -2087,7 +2132,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 3,
           "x": 2925,
           "y": 1405,
@@ -2100,7 +2145,7 @@
           "residential": true
         },
         {
-          "sheet": "town",
+          "sheet": "whiteBell",
           "cell": 0,
           "x": 3180,
           "y": 1405,
@@ -2124,37 +2169,49 @@
           1530,
           200,
           1,
-          200
+          200,
+          "coastal",
+          2
         ],
         [
           25,
           25,
           1,
-          198
+          198,
+          "coastal",
+          2
         ],
         [
           845,
           25,
           1,
-          162
+          162,
+          "coastal",
+          2
         ],
         [
           230,
           210,
           2,
-          174
+          174,
+          "coastal",
+          2
         ],
         [
           3510,
           210,
           1,
-          162
+          162,
+          "coastal",
+          2
         ],
         [
           845,
           950,
           0,
-          186
+          186,
+          "coastal",
+          2
         ]
       ],
       "fields": [],
@@ -2812,6 +2869,53 @@
           "y": 488.8734397399239,
           "r": 29.726024582982063,
           "kind": 0.7969205675181001
+        }
+      ],
+      "landscapes": [
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 415,
+          "y": 65,
+          "w": 200,
+          "h": 156,
+          "purpose": "白石住宅庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1224,
+          "y": 129,
+          "w": 200,
+          "h": 156,
+          "purpose": "白石住宅庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1482,
+          "y": 762,
+          "w": 200,
+          "h": 156,
+          "purpose": "白石住宅庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 641,
+          "y": 1038,
+          "w": 160,
+          "h": 125,
+          "purpose": "白石住宅庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 3114,
+          "y": 1224,
+          "w": 200,
+          "h": 156,
+          "purpose": "白石住宅庭院"
         }
       ]
     },
@@ -3712,13 +3816,17 @@
           200,
           850,
           1,
-          180
+          180,
+          "woodland",
+          0
         ],
         [
           1310,
           440,
           1,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           1300,
@@ -3960,6 +4068,17 @@
           "y": 203.51728657633066,
           "r": 27.72849766490981,
           "kind": 0.6353527964092791
+        }
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 3,
+          "x": 478,
+          "y": 37,
+          "w": 220,
+          "h": 172,
+          "purpose": "田界石坡"
         }
       ]
     },
@@ -4393,7 +4512,9 @@
           280,
           890,
           0,
-          230
+          230,
+          "woodland",
+          0
         ],
         [
           2150,
@@ -4405,19 +4526,25 @@
           950,
           1150,
           3,
-          240
+          240,
+          "woodland",
+          0
         ],
         [
           2500,
           510,
           1,
-          200
+          200,
+          "woodland",
+          0
         ],
         [
           2450,
           1320,
           3,
-          170
+          170,
+          "woodland",
+          0
         ],
         [
           650,
@@ -4435,49 +4562,65 @@
           230,
           25,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           2485,
           25,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           25,
           395,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           25,
           950,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           1050,
           1200,
           0,
-          150
+          150,
+          "woodland",
+          0
         ],
         [
           1255,
           1210,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           2485,
           950,
           0,
-          186
+          186,
+          "woodland",
+          0
         ],
         [
           435,
           1135,
           1,
-          162
+          162,
+          "woodland",
+          0
         ]
       ],
       "fields": [],
@@ -5099,6 +5242,89 @@
           "r": 37.051708774641156,
           "kind": 0.5168947249185294
         }
+      ],
+      "landscapes": [
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 126,
+          "y": 193,
+          "w": 220,
+          "h": 172,
+          "purpose": "河鎮庭院"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 808,
+          "y": 22,
+          "w": 160,
+          "h": 125,
+          "purpose": "河畔蘆葦"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 209,
+          "y": 448,
+          "w": 160,
+          "h": 125,
+          "purpose": "河畔蘆葦"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 3,
+          "x": 841,
+          "y": 640,
+          "w": 160,
+          "h": 125,
+          "purpose": "丘陵坡地"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 2217,
+          "y": 405,
+          "w": 220,
+          "h": 172,
+          "purpose": "河畔蘆葦"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 3,
+          "x": 113,
+          "y": 819,
+          "w": 160,
+          "h": 125,
+          "purpose": "丘陵坡地"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 3,
+          "x": 2349,
+          "y": 1152,
+          "w": 160,
+          "h": 125,
+          "purpose": "丘陵坡地"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 623,
+          "y": 1241,
+          "w": 220,
+          "h": 172,
+          "purpose": "河鎮庭院"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 3,
+          "x": 2034,
+          "y": 1344,
+          "w": 160,
+          "h": 125,
+          "purpose": "丘陵坡地"
+        }
       ]
     },
     "paths": [
@@ -5688,13 +5914,17 @@
           80,
           580,
           1,
-          230
+          230,
+          "ruinLandscape",
+          1
         ],
         [
           460,
           760,
           0,
-          230
+          230,
+          "ruinLandscape",
+          1
         ],
         [
           820,
@@ -5706,7 +5936,9 @@
           230,
           765,
           1,
-          162
+          162,
+          "ruinLandscape",
+          1
         ]
       ],
       "fields": [],
@@ -5870,7 +6102,28 @@
           "r": 30.800881440751255,
           "kind": 0.15313169290311635
         }
-      ]
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 893,
+          "y": 40,
+          "w": 160,
+          "h": 125,
+          "purpose": "峽谷石壁"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 765,
+          "y": 882,
+          "w": 160,
+          "h": 125,
+          "purpose": "山腰林緣"
+        }
+      ],
+      "biome": "rocky"
     },
     "paths": [
       {
@@ -6190,7 +6443,9 @@
           10,
           600,
           1,
-          180
+          180,
+          "ruinLandscape",
+          1
         ],
         [
           330,
@@ -6202,19 +6457,25 @@
           1250,
           610,
           3,
-          210
+          210,
+          "ruinLandscape",
+          1
         ],
         [
           510,
           870,
           3,
-          165
+          165,
+          "ruinLandscape",
+          1
         ],
         [
           1110,
           800,
           0,
-          180
+          180,
+          "ruinLandscape",
+          1
         ]
       ],
       "fields": [],
@@ -6402,7 +6663,37 @@
           "r": 32.895902316085994,
           "kind": 0.2890880622435361
         }
-      ]
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 42,
+          "y": 40,
+          "w": 160,
+          "h": 125,
+          "purpose": "古遺構外壁"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 1213,
+          "y": 220,
+          "w": 160,
+          "h": 125,
+          "purpose": "古遺構外壁"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 3,
+          "x": 104,
+          "y": 274,
+          "w": 160,
+          "h": 125,
+          "purpose": "鐘跡庭園"
+        }
+      ],
+      "biome": "rocky"
     },
     "paths": [
       {
@@ -6735,31 +7026,41 @@
           520,
           540,
           3,
-          200
+          200,
+          "woodland",
+          0
         ],
         [
           660,
           850,
           0,
-          180
+          180,
+          "woodland",
+          0
         ],
         [
           720,
           560,
           3,
-          155
+          155,
+          "woodland",
+          0
         ],
         [
           650,
           760,
           2,
-          160
+          160,
+          "woodland",
+          0
         ],
         [
           1050,
           765,
           0,
-          186
+          186,
+          "woodland",
+          0
         ]
       ],
       "fields": [],
@@ -7029,6 +7330,62 @@
           "r": 32.394928054418415,
           "kind": 0.28370858496055007
         }
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 74,
+          "y": 40,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋西岸植被"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 2,
+          "x": 412,
+          "y": 28,
+          "w": 160,
+          "h": 125,
+          "purpose": "聚落菜圃"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 2,
+          "x": 1089,
+          "y": 14,
+          "w": 280,
+          "h": 218,
+          "purpose": "聚落菜圃"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 969,
+          "y": 239,
+          "w": 220,
+          "h": 172,
+          "purpose": "斷橋西岸植被"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 2,
+          "x": 1256,
+          "y": 273,
+          "w": 160,
+          "h": 125,
+          "purpose": "聚落菜圃"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 2,
+          "x": 1243,
+          "y": 727,
+          "w": 220,
+          "h": 172,
+          "purpose": "聚落菜圃"
+        }
       ]
     },
     "paths": [
@@ -7228,61 +7585,81 @@
           1180,
           700,
           0,
-          220
+          220,
+          "ruinLandscape",
+          1
         ],
         [
           100,
           250,
           3,
-          160
+          160,
+          "ruinLandscape",
+          1
         ],
         [
           630,
           150,
           0,
-          180
+          180,
+          "ruinLandscape",
+          1
         ],
         [
           650,
           850,
           1,
-          160
+          160,
+          "ruinLandscape",
+          1
         ],
         [
           1450,
           880,
           3,
-          150
+          150,
+          "ruinLandscape",
+          1
         ],
         [
           650,
           730,
           1,
-          160
+          160,
+          "ruinLandscape",
+          1
         ],
         [
           230,
           25,
           0,
-          150
+          150,
+          "ruinLandscape",
+          1
         ],
         [
           435,
           25,
           2,
-          174
+          174,
+          "ruinLandscape",
+          1
         ],
         [
           25,
           395,
           1,
-          162
+          162,
+          "ruinLandscape",
+          1
         ],
         [
           640,
           580,
           0,
-          186
+          186,
+          "ruinLandscape",
+          1
         ]
       ],
       "fields": [],
@@ -7540,7 +7917,73 @@
           "r": 37.80261200480163,
           "kind": 0.19922363269142807
         }
-      ]
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 42,
+          "y": 40,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋維修材料場"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 412,
+          "y": 220,
+          "w": 160,
+          "h": 125,
+          "purpose": "東岸岩坡"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 200,
+          "y": 434,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋維修材料場"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 444,
+          "y": 356,
+          "w": 280,
+          "h": 218,
+          "purpose": "東岸岩坡"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 72,
+          "y": 624,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋維修材料場"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 967,
+          "y": 603,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋維修材料場"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 304,
+          "y": 850,
+          "w": 160,
+          "h": 125,
+          "purpose": "斷橋維修材料場"
+        }
+      ],
+      "biome": "rocky"
     },
     "paths": [
       {
@@ -7729,37 +8172,49 @@
           270,
           800,
           3,
-          190
+          190,
+          "ruinLandscape",
+          1
         ],
         [
           910,
           770,
           3,
-          155
+          155,
+          "ruinLandscape",
+          1
         ],
         [
           1480,
           720,
           1,
-          180
+          180,
+          "ruinLandscape",
+          1
         ],
         [
           850,
           640,
           2,
-          160
+          160,
+          "ruinLandscape",
+          1
         ],
         [
           640,
           580,
           0,
-          186
+          186,
+          "ruinLandscape",
+          1
         ],
         [
           1460,
           580,
           0,
-          150
+          150,
+          "ruinLandscape",
+          1
         ]
       ],
       "fields": [],
@@ -8009,7 +8464,73 @@
           "r": 28.36682054400444,
           "kind": 0.7644800019916147
         }
-      ]
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 519,
+          "y": 50,
+          "w": 160,
+          "h": 125,
+          "purpose": "外庭石廊"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 1098,
+          "y": 50,
+          "w": 160,
+          "h": 125,
+          "purpose": "外庭石廊"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 3,
+          "x": 1086,
+          "y": 199,
+          "w": 160,
+          "h": 125,
+          "purpose": "鐘庭遺跡花園"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 1375,
+          "y": 432,
+          "w": 160,
+          "h": 125,
+          "purpose": "外庭石廊"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 1294,
+          "y": 628,
+          "w": 160,
+          "h": 125,
+          "purpose": "外庭石廊"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 0,
+          "x": 680,
+          "y": 779,
+          "w": 160,
+          "h": 125,
+          "purpose": "外庭石廊"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 3,
+          "x": 1309,
+          "y": 788,
+          "w": 160,
+          "h": 125,
+          "purpose": "鐘庭遺跡花園"
+        }
+      ],
+      "biome": "rocky"
     },
     "paths": [
       {
@@ -8252,31 +8773,41 @@
           610,
           60,
           1,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           1110,
           550,
           3,
-          230
+          230,
+          "woodland",
+          0
         ],
         [
           1280,
           710,
           0,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           90,
           620,
           3,
-          170
+          170,
+          "woodland",
+          0
         ],
         [
           1500,
           740,
           3,
-          170
+          170,
+          "woodland",
+          0
         ],
         [
           900,
@@ -8288,31 +8819,41 @@
           25,
           395,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           1050,
           395,
           0,
-          150
+          150,
+          "woodland",
+          0
         ],
         [
           1255,
           395,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           1460,
           395,
           1,
-          198
+          198,
+          "woodland",
+          0
         ],
         [
           1460,
           580,
           0,
-          150
+          150,
+          "woodland",
+          0
         ]
       ],
       "fields": [
@@ -8587,6 +9128,35 @@
           "r": 26.40292302472517,
           "kind": 0.9845306393690407
         }
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 27,
+          "y": 17,
+          "w": 280,
+          "h": 218,
+          "purpose": "北行林帶"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 327,
+          "y": 50,
+          "w": 160,
+          "h": 125,
+          "purpose": "山路岩壁"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 121,
+          "y": 244,
+          "w": 160,
+          "h": 125,
+          "purpose": "北行林帶"
+        }
       ]
     },
     "paths": [
@@ -8834,43 +9404,57 @@
           25,
           25,
           0,
-          150
+          150,
+          "woodland",
+          0
         ],
         [
           435,
           25,
           1,
-          198
+          198,
+          "woodland",
+          0
         ],
         [
           1255,
           25,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           1460,
           25,
           0,
-          186
+          186,
+          "woodland",
+          0
         ],
         [
           1050,
           395,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           1255,
           395,
           1,
-          198
+          198,
+          "woodland",
+          0
         ],
         [
           1255,
           580,
           0,
-          150
+          150,
+          "woodland",
+          0
         ]
       ],
       "fields": [],
@@ -9140,6 +9724,89 @@
           "r": 32.671340335160494,
           "kind": 0.4940498264040798
         }
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 183,
+          "y": 32,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊木材作業區"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 1000,
+          "y": 32,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊木材作業區"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1258,
+          "y": 210,
+          "w": 160,
+          "h": 125,
+          "purpose": "城西庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1439,
+          "y": 240,
+          "w": 160,
+          "h": 125,
+          "purpose": "城西庭院"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 992,
+          "y": 590,
+          "w": 220,
+          "h": 172,
+          "purpose": "工坊木材作業區"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1424,
+          "y": 605,
+          "w": 220,
+          "h": 172,
+          "purpose": "城西庭院"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 404,
+          "y": 755,
+          "w": 220,
+          "h": 172,
+          "purpose": "工坊木材作業區"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 1000,
+          "y": 779,
+          "w": 160,
+          "h": 125,
+          "purpose": "城西庭院"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 1341,
+          "y": 788,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊木材作業區"
+        }
       ]
     },
     "paths": [
@@ -9317,49 +9984,65 @@
           230,
           25,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           435,
           25,
           0,
-          186
+          186,
+          "woodland",
+          0
         ],
         [
           1460,
           25,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           640,
           210,
           1,
-          162
+          162,
+          "woodland",
+          0
         ],
         [
           25,
           395,
           2,
-          174
+          174,
+          "woodland",
+          0
         ],
         [
           230,
           395,
           1,
-          198
+          198,
+          "woodland",
+          0
         ],
         [
           230,
           580,
           0,
-          150
+          150,
+          "woodland",
+          0
         ],
         [
           435,
           580,
           2,
-          174
+          174,
+          "woodland",
+          0
         ]
       ],
       "fields": [],
@@ -9635,6 +10318,98 @@
           "r": 27.743785447906703,
           "kind": 0.07349964650347829
         }
+      ],
+      "landscapes": [
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 55,
+          "y": 32,
+          "w": 160,
+          "h": 125,
+          "purpose": "對岸修造材料場"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 1258,
+          "y": 210,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊河岸"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 121,
+          "y": 244,
+          "w": 160,
+          "h": 125,
+          "purpose": "對岸修造材料場"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 525,
+          "y": 381,
+          "w": 220,
+          "h": 172,
+          "purpose": "工坊河岸"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 958,
+          "y": 391,
+          "w": 160,
+          "h": 125,
+          "purpose": "對岸修造材料場"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 1439,
+          "y": 304,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊河岸"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 57,
+          "y": 600,
+          "w": 160,
+          "h": 125,
+          "purpose": "對岸修造材料場"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 619,
+          "y": 581,
+          "w": 160,
+          "h": 125,
+          "purpose": "工坊河岸"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 990,
+          "y": 677,
+          "w": 160,
+          "h": 125,
+          "purpose": "對岸修造材料場"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 2,
+          "x": 180,
+          "y": 755,
+          "w": 220,
+          "h": 172,
+          "purpose": "對岸修造材料場"
+        }
       ]
     },
     "paths": [
@@ -9784,19 +10559,25 @@
           1060,
           590,
           0,
-          240
+          240,
+          "ruinLandscape",
+          1
         ],
         [
           1220,
           130,
           3,
-          220
+          220,
+          "ruinLandscape",
+          1
         ],
         [
           1460,
           395,
           1,
-          162
+          162,
+          "ruinLandscape",
+          1
         ],
         [
           230,
@@ -9808,7 +10589,9 @@
           1255,
           765,
           2,
-          174
+          174,
+          "ruinLandscape",
+          1
         ]
       ],
       "fields": [],
@@ -10072,7 +10855,55 @@
           "r": 26.060662375297397,
           "kind": 0.06078096991404891
         }
-      ]
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 455,
+          "y": 210,
+          "w": 160,
+          "h": 125,
+          "purpose": "渡台岸邊植被"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 1120,
+          "y": 368,
+          "w": 220,
+          "h": 172,
+          "purpose": "舊渡台谷壁"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 1439,
+          "y": 240,
+          "w": 160,
+          "h": 125,
+          "purpose": "渡台岸邊植被"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 1328,
+          "y": 573,
+          "w": 220,
+          "h": 172,
+          "purpose": "渡台岸邊植被"
+        },
+        {
+          "sheet": "ruinLandscape",
+          "cell": 1,
+          "x": 1437,
+          "y": 756,
+          "w": 160,
+          "h": 125,
+          "purpose": "舊渡台谷壁"
+        }
+      ],
+      "biome": "rocky"
     },
     "paths": [
       {
@@ -11269,19 +12100,25 @@
           150,
           400,
           0,
-          220
+          220,
+          "woodland",
+          0
         ],
         [
           500,
           630,
           1,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           1150,
           260,
           0,
-          240
+          240,
+          "woodland",
+          0
         ]
       ],
       "fields": [
@@ -11539,6 +12376,26 @@
           "y": 375.7842816570774,
           "r": 34.7390054888092,
           "kind": 0.38639915315434337
+        }
+      ],
+      "landscapes": [
+        {
+          "sheet": "woodland",
+          "cell": 0,
+          "x": 395,
+          "y": 436,
+          "w": 160,
+          "h": 125,
+          "purpose": "商路林緣"
+        },
+        {
+          "sheet": "woodland",
+          "cell": 1,
+          "x": 1409,
+          "y": 281,
+          "w": 220,
+          "h": 172,
+          "purpose": "溪河岸植被"
         }
       ]
     },
@@ -11816,19 +12673,25 @@
           320,
           1530,
           1,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           670,
           2080,
           0,
-          210
+          210,
+          "woodland",
+          0
         ],
         [
           1250,
           2240,
           1,
-          210
+          210,
+          "woodland",
+          0
         ]
       ],
       "fields": [],
@@ -12777,6 +13640,107 @@
           "y": 2564.030350732617,
           "r": 36.97877094428986,
           "kind": 0.7274222106207162
+        }
+      ],
+      "landscapes": [
+        {
+          "sheet": "coastal",
+          "cell": 0,
+          "x": 291,
+          "y": 175,
+          "w": 340,
+          "h": 265,
+          "purpose": "港口漁獲作業場"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 1,
+          "x": 1209,
+          "y": 236,
+          "w": 340,
+          "h": 265,
+          "purpose": "海岸岩灘花草"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 2364,
+          "y": 175,
+          "w": 340,
+          "h": 265,
+          "purpose": "港區街坊庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 0,
+          "x": 3516,
+          "y": 236,
+          "w": 340,
+          "h": 265,
+          "purpose": "港口漁獲作業場"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 1,
+          "x": 383,
+          "y": 973,
+          "w": 340,
+          "h": 265,
+          "purpose": "海岸岩灘花草"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 0,
+          "x": 2811,
+          "y": 1035,
+          "w": 340,
+          "h": 265,
+          "purpose": "港口漁獲作業場"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 1,
+          "x": 3839,
+          "y": 1066,
+          "w": 340,
+          "h": 265,
+          "purpose": "海岸岩灘花草"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 2,
+          "x": 319,
+          "y": 2054,
+          "w": 340,
+          "h": 265,
+          "purpose": "港區街坊庭院"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 1,
+          "x": 3009,
+          "y": 1855,
+          "w": 200,
+          "h": 156,
+          "purpose": "海岸岩灘花草"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 0,
+          "x": 886,
+          "y": 2413,
+          "w": 340,
+          "h": 265,
+          "purpose": "港口漁獲作業場"
+        },
+        {
+          "sheet": "coastal",
+          "cell": 1,
+          "x": 2436,
+          "y": 2380,
+          "w": 260,
+          "h": 203,
+          "purpose": "海岸岩灘花草"
         }
       ]
     },

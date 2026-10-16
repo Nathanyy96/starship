@@ -1,0 +1,157 @@
+{
+  "village": {
+    "reference": "./assets/maps/c1-102.png",
+    "themes": [
+      "林地邊界",
+      "村中藥圃",
+      "溪岸植被"
+    ],
+    "landscapes": 4,
+    "refinedExistingFootprints": 4,
+    "biome": "village"
+  },
+  "city": {
+    "reference": "./assets/exploration/white-bell-streets-v1.png",
+    "themes": [
+      "白石住宅庭院"
+    ],
+    "landscapes": 5,
+    "refinedExistingFootprints": 6,
+    "biome": "city"
+  },
+  "south": {
+    "reference": "./assets/maps/c1-104.png",
+    "themes": [
+      "農谷果園",
+      "田界石坡",
+      "驛站菜圃"
+    ],
+    "landscapes": 1,
+    "refinedExistingFootprints": 2,
+    "biome": "country"
+  },
+  "mistbridge": {
+    "reference": "./assets/maps/c1-103.png",
+    "themes": [
+      "河鎮庭院",
+      "河畔蘆葦",
+      "丘陵坡地"
+    ],
+    "landscapes": 9,
+    "refinedExistingFootprints": 12,
+    "biome": "city"
+  },
+  "echo": {
+    "reference": "./assets/maps/a1-105.png",
+    "themes": [
+      "峽谷石壁",
+      "山腰林緣"
+    ],
+    "landscapes": 2,
+    "refinedExistingFootprints": 3,
+    "biome": "rocky"
+  },
+  "relic": {
+    "reference": "./assets/maps/a1-106.png",
+    "themes": [
+      "古遺構外壁",
+      "鐘跡庭園",
+      "峽谷山體"
+    ],
+    "landscapes": 3,
+    "refinedExistingFootprints": 4,
+    "biome": "rocky"
+  },
+  "banksWest": {
+    "reference": "./assets/maps/a1-108-two-banks-concept.png",
+    "themes": [
+      "斷橋西岸植被",
+      "聚落菜圃"
+    ],
+    "landscapes": 6,
+    "refinedExistingFootprints": 5,
+    "biome": "country"
+  },
+  "banksEast": {
+    "reference": "./assets/maps/a1-108-two-banks-concept.png",
+    "themes": [
+      "斷橋維修材料場",
+      "東岸岩坡"
+    ],
+    "landscapes": 7,
+    "refinedExistingFootprints": 10,
+    "biome": "rocky"
+  },
+  "bellcourt": {
+    "reference": "./assets/maps/s1-201-bell-court-concept.png",
+    "themes": [
+      "鐘庭遺跡花園",
+      "外庭石廊"
+    ],
+    "landscapes": 7,
+    "refinedExistingFootprints": 6,
+    "biome": "rocky"
+  },
+  "northRoad": {
+    "reference": "./assets/exploration/north-trade-road-v1.png",
+    "themes": [
+      "北行林帶",
+      "山路岩壁"
+    ],
+    "landscapes": 3,
+    "refinedExistingFootprints": 10,
+    "biome": "country"
+  },
+  "factoryNear": {
+    "reference": "./assets/exploration/white-bell-workshop-rescue-v1.png",
+    "themes": [
+      "工坊木材作業區",
+      "城西庭院"
+    ],
+    "landscapes": 9,
+    "refinedExistingFootprints": 7,
+    "biome": "city"
+  },
+  "factoryFar": {
+    "reference": "./assets/exploration/white-bell-workshop-rescue-v1.png",
+    "themes": [
+      "對岸修造材料場",
+      "工坊河岸"
+    ],
+    "landscapes": 10,
+    "refinedExistingFootprints": 8,
+    "biome": "city"
+  },
+  "rescue": {
+    "reference": "./assets/exploration/echo-rescue-landing-v1.png",
+    "themes": [
+      "舊渡台谷壁",
+      "渡台岸邊植被"
+    ],
+    "landscapes": 5,
+    "refinedExistingFootprints": 4,
+    "biome": "rocky"
+  },
+  "riverRoad": {
+    "reference": "./assets/exploration/north-trade-road-v1.png",
+    "themes": [
+      "下游農谷果園",
+      "溪河岸植被",
+      "商路林緣"
+    ],
+    "landscapes": 2,
+    "refinedExistingFootprints": 3,
+    "biome": "country"
+  },
+  "lotin": {
+    "reference": "./assets/maps/c2-201-lotin-port-concept.png",
+    "themes": [
+      "港口漁獲作業場",
+      "海岸岩灘花草",
+      "港區街坊庭院"
+    ],
+    "landscapes": 11,
+    "refinedExistingFootprints": 3,
+    "biome": "port"
+  }
+}

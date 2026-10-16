@@ -1,9 +1,30 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const w=require('../src/first-major-world'),native=require('../src/native-terrain');
+test('approved western trade road retains its original illustration and traced bridge corridors',()=>{
+ const m=w.maps.road;assert.equal(m.nativeTerrain.overview,true);
+ assert.equal(m.image,'./assets/exploration/west-trade-road-v1.png');
+ assert.equal(native.objects(m.nativeTerrain).length,0);
+ assert.ok(w.passable('road',676,435));assert.equal(w.passable('road',676,650),false);
+ assert.equal(m.paths[0].width,30);
+});
+test('regional landscape modules stay outside every walkable lane',()=>{
+ let count=0;
+ for(const [id,m]of Object.entries(w.maps))for(const o of m.nativeTerrain?.landscapes||[]){
+  assert.ok(o.purpose,id+' has an explicit landscape purpose');count++;
+  for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){
+   const a=lane.points[i-1],b=lane.points[i],steps=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/6);
+   for(let k=0;k<=steps;k++){const x=a[0]+(b[0]-a[0])*k/steps,y=a[1]+(b[1]-a[1])*k/steps,dx=Math.max(o.x-x,0,x-o.x-o.w),dy=Math.max(o.y-y,0,y-o.y-o.h);assert.ok(Math.hypot(dx,dy)>lane.width+10,id+' landscape hides a road');}
+  }
+ }
+ assert.ok(count>=80);
+ assert.ok(w.maps.village.nativeTerrain.structures.some(s=>s.sheet==='villageHomes'));
+ assert.ok(w.maps.city.nativeTerrain.structures.some(s=>s.sheet==='whiteBell'));
+ for(const id of ['echo','relic','banksEast','bellcourt','rescue'])assert.equal(w.maps[id].nativeTerrain.biome,'rocky');
+});
 test('all outdoor locations use local scene materials at their intended scale',()=>{
   for(const id of['village','city','south','riverRoad','lotin'])assert.ok(w.maps[id].nativeTerrain,id);
   assert.ok(w.maps.road.nativeTerrain);assert.equal(w.maps.road.width,1672);
-  for(const [id,file]of Object.entries(native.files)){const data=fs.readFileSync(path.join(__dirname,'../assets/exploration/native',file));assert.ok(data.readUInt32BE(16)>=1024,file);assert.equal(data[25],['ground','detail'].includes(id)?2:6,file);}
+  for(const [id,file]of Object.entries(native.files)){const data=fs.readFileSync(path.join(__dirname,'../assets/exploration/native',file));assert.ok(data.readUInt32BE(16)>=1024,file);assert.equal(data[25],['ground','detail','refinedGround','tradeRoad'].includes(id)?2:6,file);}
 });
 test('every illustrated entry has an accessible door and solid building footprint',()=>{
   for(const [id,m]of Object.entries(w.maps)){if(!m.nativeTerrain)continue;for(const p of m.nativeTerrain.structures){const b=m.buildings[m.nativeTerrain.structures.indexOf(p)];assert.equal(w.passable(id,b.x+b.w/2,b.y+b.h/2),false,id);if(p.door){assert.equal(w.passable(id,...p.door),true,id);const route=w.planWalk({...w.initial(2),map:id,x:m.spawn[0],y:m.spawn[1],roaming:true},...p.door);assert.ok(route.length,id+' door');}}}
@@ -27,7 +48,7 @@ test('the workshop side foundation cannot be mistaken for its open doorway',()=>
 
 
 test('all currently playable scenes have local geometry',()=>{
- for(const [id,m]of Object.entries(w.maps)){assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else{assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
+ for(const [id,m]of Object.entries(w.maps)){assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else if(!m.nativeTerrain.overview){assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
 });
 
 
@@ -43,7 +64,7 @@ test('hand placed roadside scenery stays off the road, door and building collisi
 });
 
 test('new roadside vignettes keep their full footprints clear of playable roads',()=>{
- for(const [id,m]of Object.entries(w.maps)){if(!m.nativeTerrain)continue;const props=m.nativeTerrain.scenery;assert.ok(props.length,id);for(const p of props){assert.equal(native.objects(m.nativeTerrain).includes(p),true);for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i],n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/10);for(let k=0;k<=n;k++){const x=a[0]+(b[0]-a[0])*k/n,y=a[1]+(b[1]-a[1])*k/n;const dx=Math.max(p.x-x,0,x-p.x-p.w),dy=Math.max(p.y-y,0,y-p.y-p.h);assert.ok(Math.hypot(dx,dy)>lane.width,id+' scenery intrudes on road');}}}}
+ for(const [id,m]of Object.entries(w.maps)){if(!m.nativeTerrain||m.nativeTerrain.overview)continue;const props=m.nativeTerrain.scenery;assert.ok(props.length,id);for(const p of props){assert.equal(native.objects(m.nativeTerrain).includes(p),true);for(const lane of m.paths)for(let i=1;i<lane.points.length;i++){const a=lane.points[i-1],b=lane.points[i],n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/10);for(let k=0;k<=n;k++){const x=a[0]+(b[0]-a[0])*k/n,y=a[1]+(b[1]-a[1])*k/n;const dx=Math.max(p.x-x,0,x-p.x-p.w),dy=Math.max(p.y-y,0,y-p.y-p.h);assert.ok(Math.hypot(dx,dy)>lane.width,id+' scenery intrudes on road');}}}}
 });
 
 test('White Bell and Beast Village have populated street-facing districts',()=>{
