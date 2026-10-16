@@ -1,6 +1,6 @@
 (function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipNativeTerrain=api;}(globalThis,function(){
   'use strict';
-  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png'},images={},cache={},version=0,requested={},failed=[];
+  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-v1.png',city:'city-props-v1.png',village:'village-props-v1.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png',scenery:'roadside-scenery-v1.png'},images={},cache={},version=0,requested={},failed=[];
   // Frames are authored against the delivered transparent sprite sheets. They
   // are individual objects, never a resized overview illustration.
   var frames={
@@ -80,6 +80,24 @@
     // Landmark-scale set dressing is hand placed at the clearings visible
     // from the main roads; these sites follow each original map's terrain.
     [[city,[[1530,200,1,200],[1880,220,2,180]]],[village,[[1760,150,0,210],[250,800,2,170]]],[maps.mistbridge,[[1100,210,1,190],[2230,390,2,170]]],[south,[[1020,270,1,190]]],[maps.echo,[[820,220,2,170]]],[maps.relic,[[530,80,1,170]]],[maps.banksWest,[[650,760,2,160]]],[maps.banksEast,[[650,730,1,160]]],[maps.bellcourt,[[850,640,2,160]]],[maps.northRoad,[[900,680,2,160]]]].forEach(function(item){item[1].forEach(function(t){item[0].nativeTerrain.trees.push(t);});});
+    // Curated small vignettes use full-resolution art at local player scale.
+    // Every entire sprite footprint clears roads, water, crops and architecture.
+    Object.keys(maps).forEach(function(id){var m=maps[id],p=m.nativeTerrain;if(!p)return;p.scenery=[];var choices=p.style==='port'?[3,1,0]:p.style==='city'?[0,1,0,3]:p.style==='ruin'?[1,0]:[0,2,1,0],limit=['city','village','mistbridge','south','lotin'].includes(id)?14:6;
+      for(var row=0;row<Math.ceil(m.height/130);row++)for(var col=0;col<Math.ceil(m.width/160);col++){
+        var n=row*17+col*31+id.length*7,cell=choices[n%choices.length],size=cell===0?125:cell===1?145:155,x=col*160+20+(n%5)*13,y=row*130+20+(n%3)*17,o=structure('scenery',cell,x,y,size,size);
+        var cx=x+size/2,cy=y+size*.8,edge=laneDistance(m,cx,cy);
+        if(edge<70||edge>230||!safePlot(m,o))continue;
+        var roadOverlap=m.paths.some(function(lane){for(var i=1;i<lane.points.length;i++){var a=lane.points[i-1],b=lane.points[i],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/8));for(var k=0;k<=steps;k++){var px=a[0]+(b[0]-a[0])*k/steps,py=a[1]+(b[1]-a[1])*k/steps,dx=Math.max(x-px,0,px-x-size),dy=Math.max(y-py,0,py-y-size);if(Math.hypot(dx,dy)<lane.width+20)return true;}}return false;});
+        if(roadOverlap)continue;
+        if(p.land&&![[x,y],[x+size,y],[x,y+size],[x+size,y+size]].every(function(v){return p.land.some(function(poly){var inside=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var a=poly[i],b=poly[j];if((a[1]>v[1])!==(b[1]>v[1])&&v[0]<(b[0]-a[0])*(v[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;});}))continue;
+        if(p.structures.concat(p.scenery).some(function(q){return x<q.x+q.w+45&&x+size+45>q.x&&y<q.y+q.h+45&&y+size+45>q.y;}))continue;
+        if(p.fields.some(function(f){return x<f[0]+f[2]+40&&x+size+40>f[0]&&y<f[1]+f[3]+40&&y+size+40>f[1];}))continue;
+        if(p.trees.some(function(t){return Math.hypot(cx-(t[0]+t[3]*.475),cy-(t[1]+t[3]*.8))<size*.65+t[3]*.3;}))continue;
+        p.scenery.push(o);
+      }
+      function rank(o){return ((Math.round(o.x)*73856093)^(Math.round(o.y)*19349663))>>>0;}
+      p.scenery.sort(function(a,b){return rank(a)-rank(b);});p.scenery=p.scenery.slice(0,limit);
+    });
     // Keep all visible structure footprints solid. Entries sit just outside the
     // front facade, rather than sharing a coordinate with roof pixels.
     Object.values(maps).filter(function(m){return m.nativeTerrain;}).forEach(function(m){
@@ -134,6 +152,6 @@
   }
   // Sort at the solid facade, so a person standing on the front steps stays visible.
   function depth(p){return p.y+p.h*(p.sheet==='nature'? .92:p.door?.76:.88);}
-  function objects(p){return p.structures.concat((p.trees||[]).map(function(t){return structure(t[2]===3?'harbor':'nature',t[2]===3?3:t[2],t[0],t[1],t[3]*.95,t[3]);}));}
+  function objects(p){return p.structures.concat(p.scenery||[]).concat((p.trees||[]).map(function(t){return structure(t[2]===3?'harbor':'nature',t[2]===3?3:t[2],t[0],t[1],t[3]*.95,t[3]);}));}
   return {install:install,paint:paint,files:files,ready:function(p){return needed(p).every(function(id){return Boolean(images[id]);});},failed:function(){return failed.slice();},objects:objects,depth:depth,drawObject:drawObject,version:function(){return version;}};
 }));
