@@ -24,3 +24,8 @@ test('all 24 maps have traversable guidance to every exit and landmark, in both 
 });
 
 test('the workshop side foundation cannot be mistaken for its open doorway',()=>{assert.equal(w.passable('city',680,1460),false);assert.equal(w.passable('city',781,1465),true);});
+
+
+test('all currently playable scenes have local geometry except the approved west trade road',()=>{
+ for(const [id,m]of Object.entries(w.maps)){if(id==='road')continue;assert.ok(m.nativeTerrain||m.floor,id+' must not use an enlarged overview');if(m.floor){assert.ok(m.furniture.length>=3,id+' authored interior');}else{assert.ok(m.nativeTerrain.structures.length,id+' landmark architecture');}}
+});
