@@ -668,20 +668,58 @@ function voyageStageByNode(node) {
 function runTrial(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const stage = trialStageById(body.stageId);
-  const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
+  if (!stage) throw new Error("找不到試煉關卡");
+  let team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
+  let teamUpper = Array.from(new Set(Array.isArray(body.teamUpper) ? body.teamUpper.map((id) => String(id)) : [])).slice(0, 4);
+  let teamLower = Array.from(new Set(Array.isArray(body.teamLower) ? body.teamLower.map((id) => String(id)) : [])).slice(0, 4);
+  if (stage.halves && teamUpper.length && teamLower.length) {
+    if (teamUpper.some((id) => teamLower.includes(id)) || teamUpper.length > 4 || teamLower.length > 4) throw new Error("上下半場需派出不同角色，每半場最多 4 名");
+    team = teamUpper.concat(teamLower);
+  } else if (!stage.halves) {
+    teamUpper = [];
+    teamLower = [];
+  } else throw new Error("上下半場各至少派出 1 名不同角色");
   if (!team.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
   if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
   if (stage.id > 1 && state.trialProgress.clearedStages.indexOf(stage.id - 1) < 0) throw new Error("請先通關前一關");
   const attempts = Number(state.trialProgress.attempts[stage.id] || 0);
-  if (attempts >= trialMaxRewards) throw new Error("本關在目前版本已完成 " + trialMaxRewards + " 次，請等待下次遊戲更新重置挑戰次數");
+  const maxAttempts = Number(stage.maxChallengeAttempts || trialMaxRewards);
+  if (attempts >= maxAttempts) throw new Error("本關已達 " + maxAttempts + " 次挑戰上限，請等待下次遊戲更新重置挑戰次數");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
-  const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
+  let battle;
+  if (stage.halves && teamUpper.length && teamLower.length) {
+    const halfResults = stage.halves.map((half, index) => simulateBattle({
+      team: index === 0 ? teamUpper : teamLower,
+      stats: effectiveStats,
+      stage: Object.assign({}, stage, { id: stage.id, name: stage.name + "・" + half.name, enemies: half.enemies }),
+      rng: Math.random,
+      captureTimeline: true
+    }));
+    const won = halfResults.every((result) => result.won);
+    battle = Object.assign({}, halfResults[0], {
+      won,
+      status: won ? "won" : halfResults.some((result) => result.status === "timeout") ? "timeout" : "defeat",
+      timedOut: halfResults.some((result) => result.timedOut),
+      stageId: stage.id,
+      stageName: stage.name,
+      rounds: halfResults.reduce((sum, result) => sum + result.rounds, 0),
+      teamPower: halfResults.reduce((sum, result) => sum + result.teamPower, 0),
+      team: halfResults.flatMap((result) => result.team),
+      enemies: halfResults.flatMap((result) => result.enemies),
+      logs: halfResults.flatMap((result, index) => ["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"].concat(result.logs)),
+      halfResults: halfResults.map((result, index) => ({ name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds })),
+      timeline: halfResults.flatMap((result, index) => (result.timeline || []).map((frame) => Object.assign({}, frame, { halfName: stage.halves[index].name })))
+    });
+  } else battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random, captureTimeline: true });
   const rewardStarSand = Number(stage.reward && stage.reward.starSand || 0);
   const rewardCharacterExp = Number(stage.reward && stage.reward.characterExp || 0);
   state.trialProgress.selectedTeam = team;
-  state.trialProgress.lastBattle = battle;
+  if (teamUpper.length && teamLower.length) {
+    state.trialProgress.selectedTeamUpper = teamUpper;
+    state.trialProgress.selectedTeamLower = teamLower;
+  }
+  state.trialProgress.lastBattle = Object.assign({}, battle, { timeline: undefined });
   if (battle.won) {
-    state.trialProgress.attempts[stage.id] = attempts + 1;
     if (state.trialProgress.clearedStages.indexOf(stage.id) < 0) {
       state.trialProgress.clearedStages.push(stage.id);
     }
@@ -690,7 +728,9 @@ function runTrial(currentState, body) {
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     state.recruitment.trial10ChoiceAvailable = false;
   }
-  return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: trialMaxRewards - state.trialProgress.attempts[stage.id] } : { starSand: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: trialMaxRewards - attempts } };
+  if (stage.maxChallengeAttempts && battle.status !== "timeout" || battle.won) state.trialProgress.attempts[stage.id] = attempts + 1;
+  const attemptsUsed = Number(state.trialProgress.attempts[stage.id] || 0);
+  return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } : { starSand: 0, characterExp: 0, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } };
 }
 
 function bossStageById(bossId) {

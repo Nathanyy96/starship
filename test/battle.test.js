@@ -192,8 +192,8 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.equal(battle.stageId, 1);
   assert.equal(typeof battle.won, "boolean");
   assert.ok(battle.logs.length > 0);
-  assert.equal(battle.reward.starSand, trialReward.starSand);
-  assert.equal(battle.reward.characterExp, trialReward.characterExp);
+  assert.equal(battle.reward.starSand, trialStages[0].reward.starSand);
+  assert.equal(battle.reward.characterExp, trialStages[0].reward.characterExp);
   assert.equal(trialReward.starSand, 75);
   assert.equal(trialReward.characterExp, 1800);
   assert.equal(battle.environment, trialStages[0].environment);
@@ -216,146 +216,8 @@ test.skip("舊版 Chodan 合拍提示", () => {
   assert.ok(battle.logs.some((line) => line.includes("三位不同隊友完成合拍")), "C6 應要求三位不同隊友技能");
 });
 
-test("星界試煉擴充為 30 關並維持逐關升難", () => {
-  assert.equal(trialStages.length, 30);
-  assert.deepEqual(trialStages.map((stage) => stage.id), Array.from({ length: 30 }, (_, index) => index + 1));
-  assert.ok(trialStages.every((stage, index) => index === 0 || stage.recommendedPower > trialStages[index - 1].recommendedPower));
-  const totalHp = (stage) => stage.enemies.reduce((sum, enemy) => sum + enemy.maxHp * (enemy.count || 1), 0);
-  const totalAttack = (stage) => stage.enemies.reduce((sum, enemy) => sum + enemy.attack * (enemy.count || 1), 0);
-  assert.ok(trialStages.every((stage, index) => index === 0 || totalHp(stage) > totalHp(trialStages[index - 1])), "30 關敵方基礎耐久不可倒退");
-  assert.ok(trialStages.every((stage, index) => index === 0 || totalAttack(stage) > totalAttack(trialStages[index - 1])), "30 關敵方攻擊不可倒退");
-  assert.equal(trialStages[29].finalStage, true);
-  assert.ok(trialStages.every((stage) => stage.environment && stage.enemyTrait && stage.modifiers));
-});
-
-test("正式試煉 30 關以角色成長分段校準", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const team = ["celesia", "reyn", "lia", "isar"];
-  function run(level, stage) {
-    const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation: 0 }]));
-    return simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, { characterProgress }), stage, rng: () => 0.5 });
-  }
-  assert.equal(trialStages[0].recommendedPower, 900);
-  assert.equal(trialStages[9].recommendedPower, 2000);
-  assert.equal(trialStages[19].recommendedPower, 3200);
-  assert.equal(trialStages[24].recommendedPower, 5500);
-  assert.equal(trialStages[29].recommendedPower, 8500);
-  assert.equal(trialStages[29].targetPower, 10500);
-  const stage20Team = ["celesia", "chodan", "magenta", "lia"];
-  const stage20Stats = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(stage20Team.map((id) => [id, { level: 20, constellation: 0 }])) });
-  assert.ok(teamPower(stage20Team, stage20Stats) < trialStages[19].recommendedPower);
-  assert.equal(simulateBattle({ team: stage20Team, stats: stage20Stats, stage: trialStages[19], rng: () => .5 }).won, false);
-  const grownStats = buildEffectiveStats(characterBattleStats, { characterProgress: Object.fromEntries(stage20Team.map((id) => [id, { level: 40, constellation: id === "lia" ? 5 : 0 }])) });
-  assert.equal(simulateBattle({ team: stage20Team, stats: grownStats, stage: trialStages[19], rng: () => .5 }).won, true);
-  assert.equal(run(1, trialStages[0]).rounds >= 8, true);
-  assert.equal(run(60, trialStages[9]).rounds >= 15 && run(60, trialStages[9]).rounds <= 45, true);
-  assert.equal(run(45, trialStages[9]).rounds <= 60, true);
-  assert.equal(run(90, trialStages[29]).won, false);
-  assert.equal(run(25, trialStages[29]).won, false);
-});
-
-test("試煉終段以滿等四星四至五命隊伍校準", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const teams = [
-    ["celesia", "magenta", "hina", "siyeon"],
-    ["celesia", "harlow", "siyeon", "magenta"],
-    ["chodan", "magenta", "hina", "siyeon"]
-  ];
-  for (const team of teams) {
-    const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 5 }]));
-    const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-    const last = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
-    assert.ok(teamPower(team, stats) >= 10000 && teamPower(team, stats) <= 12000);
-    assert.equal(last.won, true, team.join(","));
-    assert.ok(last.rounds < 180, team.join(",") + " 不得逾時");
-    const c4Progress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 4 }]));
-    const c4Stats = buildEffectiveStats(characterBattleStats, { characterProgress: c4Progress });
-    const c4Result = simulateBattle({ team, stats: c4Stats, stage: trialStages[29], rng: () => .5 });
-    assert.ok(c4Result.rounds < 180, team.join(",") + " C4 不得逾時");
-    assert.ok(last.rounds <= c4Result.rounds || !c4Result.won, team.join(",") + " C5 應有可見收益");
-  }
-  const lowTeam = teams[0];
-  const lowProgress = Object.fromEntries(lowTeam.map((id) => [id, { level: 60, constellation: 0 }]));
-  const lowStats = buildEffectiveStats(characterBattleStats, { characterProgress: lowProgress });
-  assert.equal(simulateBattle({ team: lowTeam, stats: lowStats, stage: trialStages[29], rng: () => .5 }).won, false);
-  const fullProgress = Object.fromEntries(lowTeam.map((id) => [id, { level: 90, constellation: 6 }]));
-  const fullStats = buildEffectiveStats(characterBattleStats, { characterProgress: fullProgress });
-  for (const seed of [.1, .5, .9]) {
-    const result = simulateBattle({ team: lowTeam, stats: fullStats, stage: trialStages[29], rng: () => seed });
-    assert.equal(result.won, true);
-    assert.ok(result.rounds <= 45, "滿命四星不可拖到演算上限：" + result.rounds);
-  }
-  const threeStarTeam = ["reyn", "lia", "isar", "cenwu"];
-  const threeStarProgress = Object.fromEntries(threeStarTeam.map((id) => [id, { level: 90, constellation: 6 }]));
-  const threeStarStats = buildEffectiveStats(characterBattleStats, { characterProgress: threeStarProgress });
-  const threeStarResult = simulateBattle({ team: threeStarTeam, stats: threeStarStats, stage: trialStages[29], rng: () => .5 });
-  assert.equal(threeStarResult.timedOut, false, "純三星隊伍不應被護盾拖至演算上限");
-  const healTeam = ["lia", "yuan", "siyeon", "elorna"];
-  const healProgress = Object.fromEntries(healTeam.map((id) => [id, { level: 90, constellation: 6, activeForm: "deepwater" }]));
-  const healStats = buildEffectiveStats(characterBattleStats, { characterProgress: healProgress });
-  const healOnly = simulateBattle({ team: healTeam, stats: healStats, stage: trialStages[29], rng: () => .1 });
-  assert.ok(healOnly.rounds > 120, "偏治療極端隊伍超過 120 回合是正常選擇結果");
-  assert.equal(healOnly.roundLimit, 180);
-});
-
-test("試煉21–29關循序接近終局，正常編隊不因單一關卡逾時", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const teams = [
-    ["celesia", "harlow", "siyeon", "magenta"],
-    ["chodan", "magenta", "hina", "siyeon"]
-  ];
-  for (const team of teams) {
-    for (const [stageNumber, level, low, high] of [[21, 75, 14, 45], [25, 80, 24, 65], [29, 90, 25, 70]]) {
-      const constellation = stageNumber === 21 ? 1 : 2;
-      const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));
-      const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-      for (const seed of [.1, .5, .9]) {
-        const result = simulateBattle({ team, stats, stage: trialStages[stageNumber - 1], rng: () => seed });
-        assert.equal(result.won, true, team.join(",") + " stage " + stageNumber + " seed " + seed);
-        assert.ok(result.rounds >= low && result.rounds <= high, team.join(",") + " stage " + stageNumber + " rounds " + result.rounds);
-      }
-    }
-  }
-});
-
-test("現行三十關在充分培養後都能完成且不會無限拖延", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const team = ["celesia", "chodan", "magenta", "lia"];
-  const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 5 }]));
-  const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-  for (const stage of trialStages) {
-    const result = simulateBattle({ team, stats, stage, rng: () => .5 });
-    assert.equal(result.won, true, "stage " + stage.id + " Lv90 C5");
-    assert.ok(result.rounds < 120, "stage " + stage.id + " rounds " + result.rounds);
-  }
-});
-
-test("現行1.0可取得角色也能組成符合終關基準的隊伍", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const team = ["celesia", "chodan", "magenta", "lia"];
-  const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 90, constellation: 5 }]));
-  const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-  const result = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
-  assert.equal(result.won, true);
-  assert.ok(result.rounds < 120);
-});
-
-test("第一大版本同職能替換在終關沒有異常快殺或正常輸出逾時", () => {
-  const { buildEffectiveStats } = require("../src/battle.js");
-  const groups = [
-    { base: ["celesia", "harlow", "siyeon"], ids: ["magenta", "hina", "isar", "rena"] },
-    { base: ["celesia", "magenta", "siyeon"], ids: ["reyn", "ruida", "harlow", "rovienne", "cenwu", "veyra", "eda", "mave", "chodan", "elorna"] },
-    { base: ["celesia", "magenta", "harlow"], ids: ["lia", "yuan", "siyeon", "elorna"] }
-  ];
-  for (const group of groups) for (const id of group.ids) {
-    const team = [...group.base, id];
-    const characterProgress = Object.fromEntries(team.map((unitId) => [unitId, { level: 90, constellation: 5, activeForm: id === "elorna" && group.base.includes("harlow") ? "deepwater" : "land" }]));
-    const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-    const result = simulateBattle({ team, stats, stage: trialStages[29], rng: () => .5 });
-    assert.equal(result.won, true, id);
-    assert.ok(result.rounds >= 30 && result.rounds < 180, id + "：" + result.rounds);
-  }
-});
+// The retired 30-stage numeric progression and C5 gate were replaced by the
+// 15-stage C3 and two-party encounter coverage in trial-1-2.test.js.
 
 test("突破材料 Boss 隨高等成長調整且低階材料仍可取得", () => {
   const { buildEffectiveStats } = require("../src/battle.js");
@@ -374,7 +236,7 @@ test("星海迷航使用獨立休閒敵群，不直接借用高難度試煉終�
   const voyageFinal = voyageBattleStages.find((stage) => stage.id === finalNode.stageId);
   assert.ok(voyageFinal);
   assert.equal(voyageFinal.recommendedPower, 2600);
-  assert.ok(voyageFinal.recommendedPower < trialStages[29].recommendedPower);
+  assert.ok(voyageFinal.recommendedPower < trialStages[9].recommendedPower);
   assert.equal(voyageFinal.modifiers.enemyAttack, 0.86);
   assert.equal(voyageFinal.finalStage, true);
 });
@@ -393,11 +255,9 @@ test("戰鬥達到演算上限時回傳 timeout，不誤判成失敗或通關", 
   assert.match(battle.logs.at(-1), /演算保護上限/);
 });
 
-test("試煉全部使用 1.0 已出場的圖鑑魔物與新棘背獸", () => {
-  const names = new Set(trialStages.flatMap((stage) => stage.enemies.map((enemy) => enemy.name)));
-  assert.deepEqual([...names].sort(), ["黑晶巨獸（原生型）", "黑晶異變巨獸", "黑晶棘背獸"].sort());
-  assert.ok(trialStages.every((stage) => stage.enemies.every((enemy) => enemy.image && enemy.image.endsWith(".webp"))));
-  assert.ok(trialStages.every((stage) => stage.environmentEffect.includes("訓練模擬")));
+test("試煉魔物使用遊戲立繪且具有敵方技能資料", () => {
+  assert.ok(trialStages.every(stage => stage.enemies.every(enemy => enemy.image.endsWith(".webp") && enemy.traitKey && enemy.skillName)));
+  assert.ok(trialStages.every(stage => stage.environmentEffect && stage.teamHint));
 });
 
 test("第一大版本後續十名角色有完整技能、命座與受控成長", () => {
@@ -531,7 +391,7 @@ test("第一大版本五類四人隊在C0與C6均可完成中段試煉，且無�
   for (const constellation of [0, 6]) for (const team of teams) {
     const characterProgress = Object.fromEntries(team.map((id) => [id, { level: 60, constellation }]));
     const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-    const result = simulateBattle({ team, stats, stage: trialStages[9], rng: () => .5 });
+    const result = simulateBattle({ team, stats, stage: trialStages[4], rng: () => .5 });
     assert.equal(result.won, true, team.join(",") + " C" + constellation);
     assert.ok(result.rounds < 120, team.join(",") + " C" + constellation);
   }

@@ -440,6 +440,17 @@
         addEffect(target, "damageTaken", .9, remaining);
       }
     }
+    if (combat && target.isEnemy && target.hp <= 0 && target.traitKey === "transfer" && !target.transferred) {
+      target.transferred = true;
+      var receiver = alive(combat.enemies).find(function (unit) { return unit !== target; });
+      if (receiver) {
+        var transferredShield = Math.round(receiver.maxHp * .1);
+        receiver.shield = (receiver.shield || 0) + transferredShield;
+        combat.logs.push(displayName(target) + " 護區轉移，替 " + displayName(receiver) + " 增加 " + transferredShield + " 護盾。");
+        var victim = alive(combat.team)[0];
+        if (victim) { var previousActor = combat.activeActor; combat.activeActor = receiver; var counterDamage = hit(victim, receiver.attack * .65); combat.activeActor = previousActor; combat.logs.push(displayName(receiver) + " 護區反擊造成 " + counterDamage + " 傷害。"); }
+      }
+    }
     return damage;
   }
 
@@ -469,6 +480,7 @@
     if (!actor.isEnemy && hasRole(actor.role, ["斥候", "射手", "獵人"])) {
       return living.slice().sort(function (a, b) { return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
     }
+    if (actor.isEnemy && actor.traitKey === "flank") return living.slice().sort(function (a, b) { return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
     if (actor.isEnemy && (actor.targetWeakest || hasRole(actor.traitKey, ["mark", "execute", "multi"]))) {
       return living.slice().sort(function (a, b) { return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
     }
@@ -866,10 +878,42 @@
   }
 
   function useEnemySkill(actor, allies, enemies, logs, stage) {
-    var rule = stage.trialRule || "basic";
-    // allies are the enemy formation; enemies are the player's team.
+    var rule = actor.traitKey || stage.trialRule || "basic";
+    // Each monster uses its own skill; support beasts do not inherit the boss skill.
     var target = chooseTarget(actor, enemies);
     var damage;
+    if (rule === "phase" && actor.isBoss && actor.phase === "bare") target = alive(enemies).slice().sort(function (a, b) { return a.hp / a.maxHp - b.hp / b.maxHp; })[0] || target;
+    if (rule === "brood" && (actor.broodUses || 0) < 3) {
+      var broodTarget = weakest(alive(allies).filter(function (unit) { return unit !== actor; }));
+      if (broodTarget) {
+        actor.broodUses = (actor.broodUses || 0) + 1;
+        var healed = heal(broodTarget, broodTarget.maxHp * .1);
+        var shield = Math.round(broodTarget.maxHp * .06);
+        broodTarget.shield = (broodTarget.shield || 0) + shield;
+        logs.push(displayName(actor) + " 使用「巢群回護」替 " + displayName(broodTarget) + " 回復 " + healed + " HP、增加 " + shield + " 護盾（" + actor.broodUses + "/3）。擊倒巢母可阻止後續回護。");
+        return true;
+      }
+    }
+    if (rule === "shell" && !actor.shellUsed) {
+      actor.shellUsed = true; actor.shield = Math.round(actor.maxHp * .12);
+      logs.push(displayName(actor) + " 重整一次晶殼，獲得 " + actor.shield + " 護盾。"); return true;
+    }
+    if (rule === "reflect") {
+      var strongest = null;
+      alive(enemies).forEach(function (unit) { (unit.effects || []).forEach(function (effect) {
+        if (["attackMultiplier", "defenseMultiplier"].includes(effect.name) && effect.value > 1 && (!strongest || effect.value > strongest.value)) strongest = effect;
+      }); });
+      if (strongest) { addEffect(actor, strongest.name, Math.min(1.15, strongest.value), 1); logs.push(displayName(actor) + " 折射我方增益，持續一輪。"); }
+    }
+    if (rule === "web") { target = weakest(enemies); if (target) { target.skillCooldown += 1; logs.push(displayName(actor) + " 織網，使 " + displayName(target) + " 技能冷卻延後一輪。"); } }
+    if (rule === "hunt") target = actor.huntHighAttack ? alive(enemies).slice().sort(function (a, b) { return b.attack - a.attack; })[0] : weakest(alive(enemies).filter(function (unit) { return unit.row === "back"; })) || weakest(enemies);
+    if (rule === "charge") {
+      actor.chargeActions = (actor.chargeActions || 0) + 1;
+      if (actor.chargeActions < 3) { actor.shield = Math.max(actor.shield || 0, Math.round(actor.maxHp * .06)); logs.push(displayName(actor) + " 預充（" + actor.chargeActions + "/2），下一次蓄滿後攻擊兩人；破盾可降低爆發傷害。"); return true; }
+      actor.chargeActions = 0;
+      var chargeFactor = actor.shield > 0 ? 1.6 : 1.2;
+      alive(enemies).slice(0, 2).forEach(function (unit) { var dealt = hit(unit, actor.attack * chargeFactor); logs.push(displayName(actor) + " 預充爆發對 " + displayName(unit) + " 造成 " + dealt + " 傷害。"); }); return true;
+    }
     if (rule === "copy" && !actor.copiedBuff) {
       var copied = null;
       alive(enemies).forEach(function (unit) {
@@ -905,7 +949,12 @@
       logs.push(displayName(actor) + " 使用「" + actor.skillName + "」，替首領架起分攤壁壘。" );
       return true;
     }
-    damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (rule === "overload" ? 1.42 : 1.2));
+    var targetShieldBefore = target.shield || 0;
+    damage = hit(target, actor.attack * effectValue(actor, "attackMultiplier", 1) * (rule === "phase" && actor.isBoss && actor.phase === "bare" ? 1.5 : rule === "overload" ? 1.42 : 1.2));
+    if (rule === "hunt") {
+      actor.huntHighAttack = targetShieldBefore > 0 && targetShieldBefore - (target.shield || 0) >= damage * .5;
+      logs.push(displayName(actor) + (actor.huntHighAttack ? " 下次追獵轉向最高攻擊者。" : " 下次追獵鎖定低血後排。"));
+    }
     if (rule === "corrosion" || rule === "finale") addEffect(target, "healingMultiplier", rule === "finale" ? .85 : .72, 2);
     if (rule === "noise") target.skillCooldown = Math.max(target.skillCooldown, 1) + 1;
     if (rule === "multi" || rule === "mark" || rule === "execute") addEffect(target, "marked", 1, 2);
@@ -918,6 +967,14 @@
         logs.push(displayName(actor) + " 的多點攻勢波及 " + displayName(secondTarget) + "，造成 " + secondDamage + " 傷害。");
       }
     }
+    if (rule === "flank") {
+      var flankTarget = alive(enemies).filter(function (unit) { return unit !== target; })
+        .sort(function (a, b) { return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
+      if (flankTarget) {
+        var flankDamage = hit(flankTarget, actor.attack * effectValue(actor, "attackMultiplier", 1) * .45);
+        logs.push(displayName(actor) + " 的側翼追擊波及 " + displayName(flankTarget) + "，造成 " + flankDamage + " 傷害。");
+      }
+    }
     if (rule === "decay") addEffect(actor, "attackMultiplier", 1.08, 2);
     logs.push(displayName(actor) + " 發動「" + actor.skillName + "」，對 " + displayName(target) + " 造成 " + damage + " 傷害。" + (rule === "corrosion" ? "附加潮蝕。" : rule === "finale" ? "壓低治療並削弱護盾。" : ""));
     return true;
@@ -925,15 +982,34 @@
 
   function applyStageOpening(stage, team, enemies, logs) {
     var rule = stage.trialRule || "basic";
+    if (rule === "pounce") enemies.forEach(function (enemy) { addEffect(enemy, "speedMultiplier", 1.3, 1); });
+    if (rule === "shell") enemies.forEach(function (enemy) { if (enemy.traitKey === "shell") enemy.shield = Math.round(enemy.maxHp * .12); });
     if (rule === "shield" || rule === "copy" || rule === "finale") {
       enemies.forEach(function (enemy) { enemy.shield = Math.round(enemy.maxHp * (rule === "finale" ? .2 : .14)); });
       logs.push("敵方開場護盾已啟動，必須先削減護盾再處理生命值。");
+    }
+    if (rule === "phase") {
+      var apexBoss = enemies.slice().sort(function (a, b) { return b.maxHp - a.maxHp; })[0];
+      if (apexBoss) { apexBoss.phase = "shell"; apexBoss.phaseUntil = 2; apexBoss.shield = Math.round(apexBoss.maxHp * .12); addEffect(apexBoss, "defenseMultiplier", 1.25, 2); }
+      logs.push("雙相終端進入鏡殼姿態：防禦提高並持有 12% 護盾；護盾被擊破可提早開啟裸核窗口。");
     }
     if (rule === "ambush") enemies.forEach(function (enemy) { addEffect(enemy, "speedMultiplier", 1.16, 1); });
     if (rule === "noise") team.forEach(function (unit) { unit.skillCooldown = 1; });
     if (rule === "corrosion") team.forEach(function (unit) { addEffect(unit, "healingMultiplier", 1, 999); });
     if (rule === "mark" || rule === "multi" || rule === "execute" || rule === "finale") enemies.forEach(function (enemy) { enemy.targetWeakest = true; });
     if (rule === "decay") logs.push("邊緣崩解會隨回合增加敵方攻擊，請把握爆發窗口。");
+  }
+
+  function updateApexPhase(combat, logs, shieldBroken) {
+    if (!combat || combat.stage.trialRule !== "phase") return;
+    var boss = combat.enemies.slice().sort(function (a, b) { return b.maxHp - a.maxHp; })[0];
+    if (!boss || boss.hp <= 0) return;
+    if (shieldBroken && boss.phase === "shell" && boss.shield <= 0) {
+      boss.phase = "bare"; boss.phaseUntil = combat.round + 1; removeEffects(boss, "defenseMultiplier");
+      logs.push(boss.name + " 鏡殼被擊破，提前換成裸核姿態兩輪，並反擊前排。");
+      var victim = alive(combat.team).filter(function (unit) { return unit.row === "front"; })[0] || alive(combat.team)[0];
+      if (victim) { var priorActor = combat.activeActor; combat.activeActor = boss; var damage = hit(victim, boss.attack * .65); combat.activeActor = priorActor; logs.push(boss.name + " 換相反擊 " + victim.name + "，造成 " + damage + " 傷害。"); }
+    }
   }
 
   function simulateBattle(options) {
@@ -963,7 +1039,7 @@
       return unit;
     });
     var enemies = expandEnemies(stage);
-    combat = { team: team, enemies: enemies, round: 0, followup: false, beat: null, rng: rng, misses: { team: 0, enemy: 0 } };
+    combat = { team: team, enemies: enemies, stage: stage, round: 0, followup: false, beat: null, rng: rng, misses: { team: 0, enemy: 0 } };
     enemies.forEach(function (enemy) {
       enemy.attack = Math.max(1, Math.round(enemy.attack * enemyFactor * modifiers.enemyAttack));
       enemy.defense = Math.max(1, Math.round(enemy.defense * (0.98 + (1 - luck) * 0.12) * modifiers.enemyDefense));
@@ -972,6 +1048,13 @@
     var logs = ["第 " + stage.id + " 關：「" + stage.name + "」自走棋戰鬥開始。", "環境：「" + (stage.environment || "一般試煉") + "」｜" + (stage.environmentEffect || "沒有額外環境效果。"), "敵方特性：「" + (stage.enemyTrait || "一般") + "」｜" + (stage.enemyTraitEffect || "沒有額外特性。"), "隊伍協同 " + Math.round(synergy * 100) + "%，本局變動 " + Math.round(luck * 100) + "%。"];
     combat.logs = logs;
     applyStageOpening(stage, team, enemies, logs);
+    var timeline = options.captureTimeline ? [] : null;
+    function captureFrame(actor, logStart) {
+      if (!timeline) return;
+      function unitFrame(unit) { return { id: unit.id, name: unit.name, image: unit.image || "", hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield || 0, skillUses: unit.skillUses || 0, isEnemy: Boolean(unit.isEnemy), slot: unit.slot || 0, row: unit.row || "front", effects: (unit.effects || []).map(function (effect) { return { name: effect.name, value: effect.value, turns: effect.turns }; }) }; }
+      timeline.push({ round: combat.round, actorId: actor && actor.id || "", actorName: actor ? displayName(actor) : "", actorIsEnemy: Boolean(actor && actor.isEnemy), events: typeof logStart === "number" ? logs.slice(logStart).slice(-8) : logs.slice(-4), team: team.map(unitFrame), enemies: enemies.map(unitFrame) });
+    }
+    captureFrame(null);
     var round = 0;
     // 50 回合對有護盾、治療或多階段首領的隊伍過於短，會把尚未結束的戰鬥誤報成失敗。
     // 保留演算保護上限避免真正的永迴圈，但把上限提高並回傳獨立的 timeout 狀態。
@@ -980,6 +1063,16 @@
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
       round += 1;
       combat.round = round;
+      if (stage.trialRule === "phase") enemies.forEach(function (enemy) {
+        if (!enemy.isBoss || enemy.hp <= 0 || round <= enemy.phaseUntil) return;
+        if (enemy.phase === "shell") {
+          enemy.phase = "bare"; enemy.phaseUntil = round + 1; enemy.shield = 0; removeEffects(enemy, "defenseMultiplier");
+          logs.push(enemy.name + " 鏡殼維持兩輪後轉為裸核姿態兩輪。");
+        } else {
+          enemy.phase = "shell"; enemy.phaseUntil = round + 1; enemy.shield = Math.round(enemy.maxHp * .12); addEffect(enemy, "defenseMultiplier", 1.25, 2);
+          logs.push(enemy.name + " 裸核窗口結束，重回鏡殼並獲得 " + enemy.shield + " 護盾。");
+        }
+      });
       team.concat(enemies).forEach(function (unit) { if (unit.hp > 0) tickUnit(unit); });
       if (stage.trialRule === "decay" && round > 1) enemies.forEach(function (enemy) { if (enemy.hp > 0) addEffect(enemy, "attackMultiplier", 1.035, 2); });
       var order = alive(team).concat(alive(enemies)).sort(function (a, b) {
@@ -987,7 +1080,8 @@
       });
       order.forEach(function (actor) {
         if (actor.hp <= 0 || !alive(team).length || !alive(enemies).length) return;
-        if (hasEffect(actor, "stun")) { logs.push(displayName(actor) + " 被暫停，跳過本次行動。" ); return; }
+        var actionLogStart = logs.length;
+        if (hasEffect(actor, "stun")) { logs.push(displayName(actor) + " 被暫停，跳過本次行動。" ); captureFrame(actor, actionLogStart); return; }
         var isTeam = !actor.isEnemy;
         var allies = isTeam ? team : enemies;
         var targets = isTeam ? enemies : team;
@@ -1008,6 +1102,7 @@
               logs.push(displayName(actor) + " 的「" + actor.skillName + "」失誤，本次造成 0 傷害。");
               if (actor.id === "ferye" && actor.constellation >= 4) actor.skillCooldown = Math.max(0, actor.skillCooldown - 1);
               if (actor.accuracyAid && actor.accuracyAid.refund) actor.skillCooldown = Math.max(0, actor.skillCooldown - 1);
+              captureFrame(actor, actionLogStart);
               return;
             }
           }
@@ -1026,21 +1121,24 @@
             }
             actor.skillUses += 1;
             actor.skillCooldown = actor.skillCooldownMax;
+            if (isTeam && stage.trialRule === "phase") updateApexPhase(combat, logs, true);
+            captureFrame(actor, actionLogStart);
             return;
           }
         }
         var target = chooseTarget(actor, targets);
-        if (!target) return;
+        if (!target) { captureFrame(actor, actionLogStart); return; }
         var basicMiss = .02;
         if (isTeam && actor.accuracyAid && actor.accuracyAid.charges > 0) { basicMiss = Math.max(0, basicMiss - actor.accuracyAid.reduction); actor.accuracyAid.charges -= 1; }
         if (rng() < basicMiss) {
           combat.misses[isTeam ? "team" : "enemy"] += 1;
           if (isTeam) target.missedByTeam = true;
           logs.push(displayName(actor) + " 的普通攻擊失誤，本次造成 0 傷害。");
+          captureFrame(actor, actionLogStart);
           return;
         }
         combat.activeActor = actor;
-        var damage = hit(target, actor.attack * (actor.isEnemy ? effectValue(actor, "attackMultiplier", 1) : 1));
+        var damage = hit(target, actor.attack * (actor.isEnemy ? effectValue(actor, "attackMultiplier", 1) * (stage.trialRule === "phase" && actor.isBoss && actor.phase === "bare" ? 1.5 : 1) : 1));
         combat.activeActor = null;
         if (!isTeam) {
           var maveOwner = replaced("mave");
@@ -1053,6 +1151,8 @@
         if (!isTeam && (stage.trialRule === "corrosion" || stage.trialRule === "finale")) addEffect(target, "healingMultiplier", stage.trialRule === "finale" ? .85 : .72, 2);
         if (!isTeam && (stage.trialRule === "multi" || stage.trialRule === "mark")) addEffect(target, "marked", 1, 2);
         if (target.hp <= 0) logs.push(displayName(target) + " 已離場。" );
+        if (isTeam && stage.trialRule === "phase") updateApexPhase(combat, logs, true);
+        captureFrame(actor, actionLogStart);
       });
       team.concat(enemies).forEach(expireEffects);
     }
@@ -1085,6 +1185,7 @@
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield || 0, skillUses: unit.skillUses, slot: unit.slot, row: unit.row }; }),
       enemies: enemies.map(function (unit) { return { name: unit.name, image: unit.image, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
       logs: logs.slice(-100),
+      timeline: timeline,
       reward: won ? clone(stage.reward || {}) : { starSand: 0, characterExp: 0 }
     };
   }

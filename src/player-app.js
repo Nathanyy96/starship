@@ -37,6 +37,13 @@
     var authorAtlasVisited = new Set(["W-001"]);
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
+    var currentTrialUpperTeam = [];
+    var currentTrialLowerTeam = [];
+    var currentTrialHalf = "upper";
+    var trialPlaybackIndex = 0;
+    var trialPlaybackTimer = null;
+    var trialPlaybackPaused = false;
+    var trialBattlePending = false;
     var currentBossStageId = "boss-star-warden";
     var currentBossTeam = [];
     var currentDispatchMissionId = "dispatch-library";
@@ -720,7 +727,7 @@
         var cards = payload.characters || [];
         var defaults = cards.filter(function (card) { return Number(card.version) >= 2; }).slice(0, 4).map(function (card) { return card.id; });
         var option = function (selected) { return "<option value=\"\">空位</option>" + cards.map(function (card) { return "<option value=\"" + escapeHtml(card.id) + "\"" + (selected === card.id ? " selected" : "") + ">" + escapeHtml(card.name + " · " + card.version + " · " + card.status) + "</option>"; }).join(""); };
-        byId("author-preview-2x-setup").innerHTML = "<p>" + escapeHtml(payload.note) + "</p><div class=\"author-preview-2x-controls\">" + [0,1,2,3].map(function (index) { return "<label>" + (index < 2 ? "前排 " : "後排 ") + (index + 1) + "<select data-author-2x-slot=\"" + index + "\">" + option(defaults[index]) + "</select></label>"; }).join("") + "<label>關卡<select id=\"author-preview-2x-stage\">" + payload.stages.map(function (stage) { return "<option value=\"" + stage.id + "\"" + (stage.id === 25 ? " selected" : "") + ">第 " + stage.id + " 關｜" + escapeHtml(stage.name) + "（建議戰力 " + number(stage.recommendedPower) + "）</option>"; }).join("") + "</select></label><label>等級<input id=\"author-preview-2x-level\" type=\"number\" min=\"1\" max=\"90\" value=\"90\"></label><label>命座<input id=\"author-preview-2x-constellation\" type=\"number\" min=\"0\" max=\"6\" value=\"2\"></label><button id=\"author-preview-2x-run\" class=\"primary-action\" type=\"button\">開始模擬戰鬥</button></div>";
+        byId("author-preview-2x-setup").innerHTML = "<p>" + escapeHtml(payload.note) + "</p><div class=\"author-preview-2x-controls\">" + [0,1,2,3].map(function (index) { return "<label>" + (index < 2 ? "前排 " : "後排 ") + (index + 1) + "<select data-author-2x-slot=\"" + index + "\">" + option(defaults[index]) + "</select></label>"; }).join("") + "<label>關卡<select id=\"author-preview-2x-stage\">" + payload.stages.map(function (stage) { return "<option value=\"" + stage.id + "\"" + (stage.id === 10 ? " selected" : "") + ">第 " + stage.id + " 關｜" + escapeHtml(stage.name) + "（建議戰力 " + number(stage.recommendedPower) + "）</option>"; }).join("") + "</select></label><label>等級<input id=\"author-preview-2x-level\" type=\"number\" min=\"1\" max=\"90\" value=\"90\"></label><label>命座<input id=\"author-preview-2x-constellation\" type=\"number\" min=\"0\" max=\"6\" value=\"2\"></label><button id=\"author-preview-2x-run\" class=\"primary-action\" type=\"button\">開始模擬戰鬥</button></div>";
       }).catch(function (error) { byId("author-preview-2x-setup").textContent = error.message; });
     }
     function runAuthorBattlePreview() {
@@ -1355,7 +1362,7 @@
       if (!team || !Number.isInteger(index) || !Number.isInteger(direction) || Math.abs(direction) !== 1 || index < 0 || next < 0 || next >= team.length) return;
       var current = team[index]; team[index] = team[next]; team[next] = current;
       var state = game.getState();
-      if (mode === "trial") trialProgress(state).selectedTeam = team.slice();
+      if (mode === "trial") { var trial = trialProgress(state); trial.selectedTeam = trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves ? currentTrialUpperTeam.concat(currentTrialLowerTeam) : team.slice(); if (trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves) { trial.selectedTeamUpper = currentTrialUpperTeam.slice(); trial.selectedTeamLower = currentTrialLowerTeam.slice(); } }
       else if (mode === "boss") bossProgress(state).selectedTeam = team.slice();
       else if (mode === "dispatch") dispatchProgress(state).selectedTeam = team.slice();
       else voyageProgress(state).selectedTeam = team.slice();
@@ -1413,15 +1420,18 @@
       });
       return text;
     }
-    function battleUnitMarkup(unit, state, isEnemy, index) {
+    function battleUnitMarkup(unit, state, isEnemy, index, actorId, actorIsEnemy, hitIds) {
       var card = !isEnemy ? battleCharacterById(unit.id) : null; var image = isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state, true); var name = isEnemy ? unit.name : card ? card.name : unit.id; var element = isEnemy ? "敵方" : card ? card.element : "角色"; var hp = Number(unit.hp || 0); var maxHp = Number(unit.maxHp || 0); var percent = battleHealthPercent(unit); var defeated = hp <= 0; var slot = Number(unit.slot || index + 1); var row = slot <= 2 ? "前排" : "後排"; var detail = isEnemy ? "敵方單位" : row + " " + slot + " · " + (card ? card.note || "已編入戰鬥" : "已編入戰鬥"); var skillText = !isEnemy && Number(unit.skillUses || 0) ? "技能發動 " + number(unit.skillUses) + " 次" : isEnemy ? "敵方行動" : "等待行動";
-      return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + "\"><button class=\"battle-unit-visual\" type=\"button\" data-battle-art=\"" + escapeHtml(image || "") + "\" data-battle-name=\"" + escapeHtml(name) + "\" aria-label=\"放大查看 " + escapeHtml(name) + " 立繪\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></button><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + "</em></div></div></article>";
+      var unitId = String(unit.id || unit.name || ""); var animating = unitId && unitId === actorId && Boolean(isEnemy) === Boolean(actorIsEnemy); var hit = (hitIds || []).indexOf(unitId) >= 0;
+      return "<article class=\"battle-unit-card " + (isEnemy ? "enemy-unit" : "ally-unit") + (defeated ? " defeated" : "") + (animating ? (isEnemy ? " battle-actor enemy-actor" : " battle-actor ally-actor") : "") + (hit ? " battle-hit" : "") + "\"><button class=\"battle-unit-visual\" type=\"button\" data-battle-art=\"" + escapeHtml(image || "") + "\" data-battle-name=\"" + escapeHtml(name) + "\" aria-label=\"放大查看 " + escapeHtml(name) + " 立繪\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(name + " 戰鬥立繪") + "\" loading=\"lazy\"><span>" + escapeHtml(element) + "</span></button><div class=\"battle-unit-copy\"><div class=\"battle-unit-title\"><strong>" + escapeHtml(name) + "</strong><b>" + (defeated ? "已退場" : "作戰中") + "</b></div><small>" + escapeHtml(detail) + "</small><div class=\"battle-hp-track\"><i style=\"width:" + percent + "%\"></i></div><div class=\"battle-unit-meta\"><span>HP <b>" + number(hp) + " / " + number(maxHp) + "</b></span><em>" + escapeHtml(skillText) + (Number(unit.shield || 0) ? " · 護盾 " + number(unit.shield) : "") + "</em></div></div></article>";
     }
     function battleSceneMarkup(battle, state, stage, mode) {
       if (!battle) return "";
-      var timedOut = battle.status === "timeout" || battle.timedOut === true; var resultClass = battle.won ? "battle-clear" : timedOut ? "battle-timeout" : "battle-failed"; var team = Array.isArray(battle.team) ? battle.team : []; var enemies = Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗|上限|超時/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
+      var timedOut = battle.status === "timeout" || battle.timedOut === true; var resultClass = battle.won ? "battle-clear" : timedOut ? "battle-timeout" : "battle-failed"; var timeline = Array.isArray(battle.timeline) ? battle.timeline : []; var frameIndex = timeline.length ? Math.min(trialPlaybackIndex, timeline.length - 1) : -1; var frame = frameIndex >= 0 ? timeline[frameIndex] : null; var previous = frameIndex > 0 ? timeline[frameIndex - 1] : null; var team = frame ? frame.team : Array.isArray(battle.team) ? battle.team : []; var enemies = frame ? frame.enemies : Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = frame && frame.events && frame.events.length ? frame.events : (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗|上限|超時/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
+      var actorId = frame && frame.actorId || ""; var actorIsEnemy = frame && frame.actorIsEnemy; var hitIds = [];
+      if (frame && previous) frame.team.concat(frame.enemies).forEach(function (unit) { var before = previous.team.concat(previous.enemies).find(function (item) { return item.id === unit.id; }); if (before && (before.hp !== unit.hp || before.shield !== unit.shield)) hitIds.push(String(unit.id || unit.name)); });
       var title = stage && stage.name ? stage.name : battle.stageName || "自走棋戰鬥"; var environment = battle.environment || stage && stage.environment || "一般戰鬥"; var rule = battle.enemyTrait || stage && stage.enemyTrait || "一般特性"; var misses = battle.misses || { team: 0, enemy: 0 };
-      return "<section class=\"battle-scene " + resultClass + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>參戰立繪回放 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」 · 我方失誤 " + number(misses.team || 0) + " 次／敵方失誤 " + number(misses.enemy || 0) + " 次</small></div><span class=\"battle-round-badge\">第 " + number(battle.rounds || 0) + " 回合</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit, index) { return battleUnitMarkup(unit, state, false, index); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>自動演算</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit, index) { return battleUnitMarkup(unit, state, true, index); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>戰鬥事件</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div></section>";
+      return "<section class=\"battle-scene " + resultClass + (timeline.length ? " battle-timeline-active" : "") + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (frame ? "LIVE ACTION" : battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>戰鬥演出 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」 · 我方失誤 " + number(misses.team || 0) + " 次／敵方失誤 " + number(misses.enemy || 0) + " 次</small></div><span class=\"battle-round-badge\">" + (frame ? (frame.halfName ? escapeHtml(frame.halfName) + " · " : "") + "第 " + number(frame.round) + " 回合 · 行動 " + (frameIndex + 1) + "/" + timeline.length : "第 " + number(battle.rounds || 0) + " 回合") + "</span></div><div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit, index) { return battleUnitMarkup(unit, state, false, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>" + (frame ? "正在交戰" : "自動演算") + "</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit, index) { return battleUnitMarkup(unit, state, true, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>" + (frame ? escapeHtml(frame.actorName || "戰況更新") + " 的行動" : "戰鬥事件") + "</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div>" + (timeline.length ? "<div class=\"battle-replay-controls\"><button class=\"small-button\" type=\"button\" data-trial-playback-toggle>" + (trialPlaybackTimer ? "暫停" : trialPlaybackPaused ? "繼續播放" : frameIndex >= timeline.length - 1 ? "重新播放" : "播放") + "</button><button class=\"small-button\" type=\"button\" data-trial-playback-skip>顯示結果</button><span data-trial-playback-status>逐行動同步顯示 HP、護盾與戰鬥事件</span></div>" : "") + "</section>";
     }
     function decorateTrialMythic(stage) {
       if (!stage || !stage.mythicTheme) return;
@@ -1453,7 +1463,8 @@
       var container = byId("trial-battle-result"); var battle = trialProgress(state).lastBattle;
       if (!battle || Number(battle.stageId) !== Number(currentTrialStageId)) { container.innerHTML = "<div class=\"trial-result-empty\">完成一場自走棋戰鬥後，戰報會顯示在這裡。</div>"; return; }
       var stage = trialStageById(battle.stageId) || {}; var rewardExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0); var timedOut = battle.status === "timeout" || battle.timedOut === true;
-      var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數" : "本次未通關，不會扣除挑戰次數";
+      var attemptLimit = Number(stage.maxChallengeAttempts || data.trialMaxRewards || 10); var usedAttempts = trialAttempts(state, stage.id);
+      var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : timedOut ? "本次演算超時，未扣挑戰次數" : stage.maxChallengeAttempts ? "已消耗一次挑戰，剩餘 " + Math.max(0, attemptLimit - usedAttempts) + " 次" : "本次未通關，不會扣除挑戰次數";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
       var environment = battle.environment ? "環境「" + battle.environment + "」" : "";
       var referencePower = Number(stage.recommendedPower || battle.recommendedPower || 0);
@@ -1461,58 +1472,127 @@
       var powerNote = referencePower ? "可挑戰參考 " + number(referencePower) + (stage.targetPower ? "｜終關設計基準 " + number(stage.targetPower) : "") + "｜目前 " + number(battle.teamPower || 0) + "（設計基準 " + Math.round(Number(battle.teamPower || 0) / benchmarkPower * 100) + "%）" + (!battle.won && Number(battle.teamPower || 0) < referencePower ? "｜可提升角色或調整技能搭配再試" : "") : "隊伍戰力 " + number(battle.teamPower || 0);
       container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : timedOut ? "戰鬥超時" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward) + "｜" + escapeHtml(powerNote) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "TRIAL") + "<details><summary>查看完整自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
+    function advanceTrialPlayback() {
+      var currentState = game && game.getState(); var battle = currentState && currentState.trialProgress && currentState.trialProgress.lastBattle;
+      if (!battle || !Array.isArray(battle.timeline) || trialPlaybackIndex >= battle.timeline.length - 1) { if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; trialPlaybackPaused = false; renderTrialBattleResult(currentState); return; }
+      trialPlaybackIndex += 1; renderTrialBattleResult(currentState);
+      if (trialPlaybackIndex >= battle.timeline.length - 1) { window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; trialPlaybackPaused = false; renderTrialBattleResult(currentState); }
+    }
+    function startTrialPlayback(battle) {
+      if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer);
+      trialPlaybackTimer = null; trialPlaybackIndex = 0; trialPlaybackPaused = false;
+      if (!battle || !Array.isArray(battle.timeline) || battle.timeline.length < 2) return;
+      renderTrialBattleResult(game.getState()); trialPlaybackTimer = window.setInterval(advanceTrialPlayback, 420);
+    }
+    function handleTrialPlaybackControl(event) {
+      var toggle = event.target.closest("[data-trial-playback-toggle]");
+      if (toggle) {
+        if (trialPlaybackTimer) { window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; trialPlaybackPaused = true; }
+        else {
+          var state = game && game.getState(); var battle = state && state.trialProgress && state.trialProgress.lastBattle;
+          if (!battle || !Array.isArray(battle.timeline)) return;
+          if (trialPlaybackIndex >= battle.timeline.length - 1) trialPlaybackIndex = 0;
+          trialPlaybackPaused = false; trialPlaybackTimer = window.setInterval(advanceTrialPlayback, 420); renderTrialBattleResult(state); return;
+        }
+        renderTrialBattleResult(game.getState()); return;
+      }
+      if (event.target.closest("[data-trial-playback-skip]")) {
+        var skipState = game && game.getState(); var skipBattle = skipState && skipState.trialProgress && skipState.trialProgress.lastBattle;
+        if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer);
+        trialPlaybackTimer = null; trialPlaybackPaused = false;
+        if (skipBattle && Array.isArray(skipBattle.timeline)) trialPlaybackIndex = skipBattle.timeline.length - 1;
+        if (skipState) renderTrialBattleResult(skipState);
+      }
+    }
     function renderTrial() {
       if (!game) return;
       var state = game.getState(); var progress = trialProgress(state); var current = trialStageById(currentTrialStageId) || data.trialStages[0];
       if (!trialUnlocked(state, current.id)) { current = data.trialStages.find(function (stage) { return trialUnlocked(state, stage.id); }) || data.trialStages[0]; currentTrialStageId = current.id; }
-      var attempts = trialAttempts(state, current.id); var maxRewards = data.trialMaxRewards || 10; var trialCharacterExp = Number(current.reward && current.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
+      var attempts = trialAttempts(state, current.id); var maxRewards = Number(current.maxChallengeAttempts || data.trialMaxRewards || 10); var trialCharacterExp = Number(current.reward && current.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
+      if (current.halves) {
+        currentTrialUpperTeam = Array.isArray(progress.selectedTeamUpper) ? progress.selectedTeamUpper.slice(0, 4) : [];
+        currentTrialLowerTeam = Array.isArray(progress.selectedTeamLower) ? progress.selectedTeamLower.slice(0, 4) : [];
+        if (!Array.isArray(progress.selectedTeamUpper) && !Array.isArray(progress.selectedTeamLower) && progress.selectedTeam.length > 1) { var splitRoster = Math.ceil(progress.selectedTeam.length / 2); currentTrialUpperTeam = progress.selectedTeam.slice(0, splitRoster); currentTrialLowerTeam = progress.selectedTeam.slice(splitRoster); }
+      } else if (Array.isArray(progress.selectedTeam)) currentTrialTeam = progress.selectedTeam.slice(0, 4);
       byId("trial-view-status").textContent = "第 " + current.id + " 關 · " + attempts + " / " + maxRewards + " 次";
       byId("trial-stages").innerHTML = data.trialStages.map(function (stage) {
         var count = trialAttempts(state, stage.id); var unlocked = trialUnlocked(state, stage.id); var cleared = progress.clearedStages.indexOf(stage.id) >= 0;
-        return "<button class=\"trial-stage-button " + (stage.id === current.id ? "active " : "") + (cleared ? "cleared " : "") + (!unlocked ? "locked" : "") + (stage.finalStage ? " final-stage" : "") + "\" data-trial-stage=\"" + stage.id + "\" type=\"button\"" + (!unlocked ? " disabled" : "") + "><span class=\"trial-stage-number\">" + String(stage.id).padStart(2, "0") + "</span><span><strong>" + escapeHtml(stage.name) + "</strong><small>" + escapeHtml(stage.region) + " · " + escapeHtml(stage.environment || "一般") + "</small></span><em>" + count + "/" + maxRewards + "</em></button>";
+        var stageMax = Number(stage.maxChallengeAttempts || data.trialMaxRewards || 10);
+        return "<button class=\"trial-stage-button " + (stage.id === current.id ? "active " : "") + (cleared ? "cleared " : "") + (!unlocked ? "locked" : "") + (stage.finalStage ? " final-stage" : "") + "\" data-trial-stage=\"" + stage.id + "\" type=\"button\"" + (!unlocked ? " disabled" : "") + "><span class=\"trial-stage-number\">" + String(stage.id).padStart(2, "0") + "</span><span><strong>" + escapeHtml(stage.name) + "</strong><small>" + escapeHtml(stage.region) + " · " + escapeHtml(stage.environment || "一般") + "</small></span><em>" + count + "/" + stageMax + "</em></button>";
       }).join("");
       var enemyText = current.enemies.map(function (enemy) { return enemy.name + " ×" + enemy.count; }).join("、");
-      byId("trial-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>TRIAL " + String(current.id).padStart(2, "0") + "</span><span>" + escapeHtml(current.region) + "</span>" + (current.finalStage ? "<span>FINAL</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>敵方編成：" + escapeHtml(enemyText) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般試煉") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>可挑戰參考 <b>" + number(current.recommendedPower) + "</b></span>" + (current.targetPower ? "<span>終關設計基準 <b>" + number(current.targetPower) + "</b></span>" : "") + "<span>本版本獎勵 <b>" + number(Number(current.reward && current.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂 + " + number(trialCharacterExp) + " 經驗</b></span><span>可領次數 <b>" + attempts + " / " + maxRewards + "</b></span></div>";
-      byId("trial-stage-details").insertAdjacentHTML("beforeend", "<p class=\"trial-power-note\">" + (current.targetPower ? "終關以接近滿等、平均三至四命的四星隊伍作設計基準；可挑戰參考是低配嘗試值，不保證通關。" : "可挑戰參考不是進場門檻或勝敗保證。") + "治療、護盾、技能協同與敵方特性都會改變結果。</p>");
+      byId("trial-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>TRIAL " + String(current.id).padStart(2, "0") + "</span><span>" + escapeHtml(current.region) + "</span>" + (current.finalStage ? "<span>FINAL</span>" : "") + "</div><h3>" + escapeHtml(current.name) + "</h3><p>敵方編成：" + escapeHtml(enemyText) + "</p><div class=\"trial-rule-callout\"><strong>環境｜" + escapeHtml(current.environment || "一般試煉") + "</strong><span>" + escapeHtml(current.environmentEffect || "沒有額外環境效果。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>可挑戰參考 <b>" + number(current.recommendedPower) + "</b></span>" + (current.targetPower ? "<span>終關設計基準 <b>" + number(current.targetPower) + "</b></span>" : "") + "<span>本版本獎勵 <b>" + number(Number(current.reward && current.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂 + " + number(trialCharacterExp) + " 經驗</b></span><span>挑戰次數 <b>" + attempts + " / " + maxRewards + "</b></span></div>";
+      byId("trial-stage-details").insertAdjacentHTML("beforeend", "<p class=\"trial-power-note\">" + (current.difficultyTier === "apex" ? "本關以滿級四名四星、平均 C3 的完整隊伍作為強力對戰基準；參考戰力不是入場門檻。" : "可挑戰參考不是進場門檻或勝敗保證。") + "治療、護盾、技能協同與敵方特性都會改變結果。</p>");
+      if (current.halves) byId("trial-stage-details").insertAdjacentHTML("beforeend", "<div class=\"trial-half-picker\"><strong>雙隊分半挑戰｜每半場 1–4 名不同角色</strong><button type=\"button\" data-trial-half=\"upper\" class=\"" + (currentTrialHalf === "upper" ? "active" : "") + "\">上半場 · " + currentTrialUpperTeam.length + "人</button><button type=\"button\" data-trial-half=\"lower\" class=\"" + (currentTrialHalf === "lower" ? "active" : "") + "\">下半場 · " + currentTrialLowerTeam.length + "人</button><small>目前編隊編入：" + (currentTrialHalf === "upper" ? "上半場" : "下半場") + "。同一角色不可重複派遣。</small></div>");
+      if (current.teamHint) byId("trial-stage-details").insertAdjacentHTML("beforeend", "<p class=\"trial-team-hint\"><strong>隊伍提示</strong> " + escapeHtml(current.teamHint) + "</p>");
       decorateTrialMythic(current);
       if (byId("trial-enemy-intel")) byId("trial-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">ENEMY INTEL</span><strong>敵方圖鑑</strong></div><small>先看敵人的攻防與速度，再安排隊伍協同</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       var owned = rosterCards().filter(function (card) { return state.collection[card.id] > 0 && data.characterBattleStats[card.id]; });
-      currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
-      byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
+      if (current.halves) {
+        var ownedIds = owned.map(function (card) { return card.id; });
+        currentTrialUpperTeam = currentTrialUpperTeam.filter(function (id) { return ownedIds.indexOf(id) >= 0; }).slice(0, 4);
+        currentTrialLowerTeam = currentTrialLowerTeam.filter(function (id) { return ownedIds.indexOf(id) >= 0 && currentTrialUpperTeam.indexOf(id) < 0; }).slice(0, 4);
+        currentTrialTeam = currentTrialHalf === "upper" ? currentTrialUpperTeam : currentTrialLowerTeam;
+        byId("trial-team-count").textContent = (currentTrialUpperTeam.length + currentTrialLowerTeam.length) + " / 8 · 戰力 " + number(trialPower(currentTrialUpperTeam.concat(currentTrialLowerTeam), state));
+      } else {
+        currentTrialTeam = currentTrialTeam.filter(function (id) { return owned.some(function (card) { return card.id === id; }); }).slice(0, 4);
+        byId("trial-team-count").textContent = currentTrialTeam.length + " / 4 · 戰力 " + number(trialPower(currentTrialTeam, state));
+      }
       renderFormation("trial", currentTrialTeam, state, current);
       byId("trial-team-list").innerHTML = owned.length ? owned.map(function (card) {
         var effectiveStats = effectiveBattleStats(state); var stats = effectiveStats[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveStats) : 0; var selected = currentTrialTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : "");
         return "<button class=\"trial-team-card " + (selected ? "selected" : "") + "\" data-trial-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small><small>技能｜" + escapeHtml(stats.skillName || "—") + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>";
       }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
-      var startButton = byId("start-trial-battle"); startButton.disabled = !trialUnlocked(state, current.id) || !currentTrialTeam.length || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "本版本已完成 " + maxRewards + " 次" : "開始自走棋戰鬥";
+      var startButton = byId("start-trial-battle"); startButton.disabled = !trialUnlocked(state, current.id) || (current.halves ? (!currentTrialUpperTeam.length || !currentTrialLowerTeam.length || currentTrialUpperTeam.some(function (id) { return currentTrialLowerTeam.indexOf(id) >= 0; })) : !currentTrialTeam.length) || attempts >= maxRewards; startButton.textContent = attempts >= maxRewards ? "已達挑戰上限" : current.halves ? "開始上下半場挑戰" : "開始自走棋戰鬥";
       renderTrialBattleResult(state);
     }
     function toggleTrialTeam(cardId) {
       if (!game) return;
       var index = currentTrialTeam.indexOf(cardId);
       if (index >= 0) currentTrialTeam.splice(index, 1);
+      else if (trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves && (currentTrialUpperTeam.length + currentTrialLowerTeam.length) >= 8) { showMessage("上下半場合計最多派出 8 名角色，每半場最多 4 名。", true); return; }
+      else if (trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves && (currentTrialHalf === "upper" ? currentTrialLowerTeam : currentTrialUpperTeam).indexOf(cardId) >= 0) { showMessage("上下半場要使用不同角色。", true); return; }
       else if (currentTrialTeam.length >= 4) { showMessage("一次戰鬥最多派出 4 名角色。", true); return; }
       else currentTrialTeam.push(cardId);
-      var state = game.getState(); trialProgress(state).selectedTeam = currentTrialTeam.slice(); updateGameFromState(state); saveLocalState(); renderTrial();
+      var state = game.getState(); var progress = trialProgress(state); progress.selectedTeam = trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves ? currentTrialUpperTeam.concat(currentTrialLowerTeam) : currentTrialTeam.slice(); if (trialStageById(currentTrialStageId) && trialStageById(currentTrialStageId).halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } updateGameFromState(state); saveLocalState(); renderTrial();
+    }
+    function chooseTrialHalf(event) {
+      var button = event.target.closest("[data-trial-half]");
+      if (!button) return;
+      currentTrialHalf = button.getAttribute("data-trial-half") === "lower" ? "lower" : "upper";
+      currentTrialTeam = currentTrialHalf === "upper" ? currentTrialUpperTeam : currentTrialLowerTeam;
+      renderTrial();
     }
     function runTrialBattle() {
-      if (!game || !currentPlayerName) { showGate(); return; }
+      if (!game || !currentPlayerName || trialBattlePending) { if (!game || !currentPlayerName) showGate(); return; }
       var stage = trialStageById(currentTrialStageId); if (!stage) return;
       var trialStarSand = Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0);
       var trialCharacterExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
       if (remoteMode) {
-        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
+        trialBattlePending = true; byId("start-trial-battle").disabled = true;
+        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam, teamUpper: currentTrialUpperTeam, teamLower: currentTrialLowerTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); if (payload.battle && payload.battle.timeline && payload.state.trialProgress && payload.state.trialProgress.lastBattle) payload.state.trialProgress.lastBattle.timeline = payload.battle.timeline; updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(payload.battle); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : stage.maxChallengeAttempts ? "第 " + stage.id + " 關已消耗一次挑戰，尚餘 " + Math.max(0, Number(payload.reward && payload.reward.attemptsRemaining || 0)) + " 次。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); }).finally(function () { trialBattlePending = false; renderTrial(); });
         return;
       }
       try {
-        var state = game.getState(); var progress = trialProgress(state); var attempts = trialAttempts(state, stage.id); var maxRewards = data.trialMaxRewards || 10;
+        var state = game.getState(); var progress = trialProgress(state); var attempts = trialAttempts(state, stage.id); var maxRewards = Number(stage.maxChallengeAttempts || data.trialMaxRewards || 10);
         if (!trialUnlocked(state, stage.id)) throw new Error("請先通關前一關");
         if (attempts >= maxRewards) throw new Error("本關在目前版本已完成 " + maxRewards + " 次，請等待下次遊戲更新重置挑戰次數");
-        if (!currentTrialTeam.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
-        if (currentTrialTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
-        var battle = window.StarshipBattle.simulateBattle({ team: currentTrialTeam, stats: effectiveBattleStats(state), stage: stage }); progress.selectedTeam = currentTrialTeam.slice(); progress.lastBattle = battle;
+        var battleTeam = currentTrialTeam;
+        if (stage.halves) {
+          if (!currentTrialUpperTeam.length || !currentTrialLowerTeam.length || currentTrialUpperTeam.some(function (id) { return currentTrialLowerTeam.indexOf(id) >= 0; }) || currentTrialUpperTeam.length > 4 || currentTrialLowerTeam.length > 4) throw new Error("上下半場各派 1–4 名不同角色");
+          battleTeam = currentTrialUpperTeam.concat(currentTrialLowerTeam);
+        } else if (!battleTeam.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
+        if (battleTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
+        var effectiveStats = effectiveBattleStats(state); var battle;
+        if (stage.halves) {
+          var halfBattles = stage.halves.map(function (half, index) { return window.StarshipBattle.simulateBattle({ team: index === 0 ? currentTrialUpperTeam : currentTrialLowerTeam, stats: effectiveStats, stage: Object.assign({}, stage, { name: stage.name + "・" + half.name, enemies: half.enemies }), captureTimeline: true }); });
+          var allWon = halfBattles.every(function (result) { return result.won; });
+          battle = Object.assign({}, halfBattles[0], { won: allWon, status: allWon ? "won" : halfBattles.some(function (result) { return result.status === "timeout"; }) ? "timeout" : "defeat", timedOut: halfBattles.some(function (result) { return result.timedOut; }), stageId: stage.id, stageName: stage.name, rounds: halfBattles.reduce(function (sum, result) { return sum + result.rounds; }, 0), teamPower: halfBattles.reduce(function (sum, result) { return sum + result.teamPower; }, 0), team: halfBattles.reduce(function (all, result) { return all.concat(result.team); }, []), enemies: halfBattles.reduce(function (all, result) { return all.concat(result.enemies); }, []), logs: halfBattles.reduce(function (all, result, index) { return all.concat(["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"], result.logs); }, []), halfResults: halfBattles.map(function (result, index) { return { name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds }; }), timeline: halfBattles.reduce(function (all, result, index) { return all.concat((result.timeline || []).map(function (frame) { return Object.assign({}, frame, { halfName: stage.halves[index].name }); })); }, []) });
+        } else battle = window.StarshipBattle.simulateBattle({ team: battleTeam, stats: effectiveStats, stage: stage, captureTimeline: true });
+        progress.selectedTeam = battleTeam.slice(); if (stage.halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } progress.lastBattle = battle;
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; state.recruitment.trial10ChoiceAvailable = false; }
-        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，可以調整編隊後再次挑戰。", battle.status === "defeat");
+        if (!battle.won && stage.maxChallengeAttempts && battle.status !== "timeout") progress.attempts[stage.id] = attempts + 1;
+        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(battle); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : stage.maxChallengeAttempts ? "第 " + stage.id + " 關已消耗一次挑戰，尚餘 " + Math.max(0, maxRewards - Number(progress.attempts[stage.id] || 0)) + " 次。" : "本次試煉未通關，可以調整編隊後再次挑戰。", battle.status === "defeat");
       } catch (error) { showMessage(error.message, true); }
     }
     function bossProgress(state) {
@@ -2263,7 +2343,8 @@
     byId('world-reward-close').addEventListener('click',function(){byId('world-reward-dialog').close();});
     byId('world-reward-dialog').addEventListener('close',function(){if(document.body.classList.contains('world-exploring'))resumePausedWorld();});
     byId("milestone-rewards").addEventListener("click", function (event) { var button = event.target.closest("[data-reward-key]"); if (button) claimCharacterChoice(button.getAttribute("data-reward-key"), button.getAttribute("data-card-id")); });
-     byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
+      byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
+      byId("trial-stage-details").addEventListener("click", chooseTrialHalf);
      byId("trial-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-character]"); if (button) toggleTrialTeam(button.getAttribute("data-trial-character")); });
      ["trial", "boss", "dispatch", "voyage"].forEach(function (mode) {
        byId(mode + "-formation").addEventListener("click", function (event) {
@@ -2271,7 +2352,8 @@
          if (button && !button.disabled) moveFormationMember(mode, Number(button.getAttribute("data-formation-index")), Number(button.getAttribute("data-formation-direction")));
        });
      });
-     byId("start-trial-battle").addEventListener("click", runTrialBattle);
+    byId("start-trial-battle").addEventListener("click", runTrialBattle);
+    byId("trial-battle-result").addEventListener("click", handleTrialPlaybackControl);
      byId("boss-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-stage]"); if (button) { currentBossStageId = button.getAttribute("data-boss-stage"); currentBossTeam = []; var state = game.getState(); var progress = bossProgress(state); progress.selectedBossId = currentBossStageId; progress.selectedTeam = []; updateGameFromState(state); saveLocalState(); renderBoss(); } });
      byId("boss-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-boss-character]"); if (button) toggleBossTeam(button.getAttribute("data-boss-character")); });
      byId("start-boss-battle").addEventListener("click", runBossBattle);

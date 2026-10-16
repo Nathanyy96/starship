@@ -42,7 +42,7 @@ test("1.1 author preview is gated and does not alter game resources", async () =
     for (const id of ["hina", "siyeon", "cenwu", "ruida", "yuan", "veyra", "harlow", "rena", "elorna", "eda", "mave", "rovienne"]) assert.ok(roster.body.characters.some((card) => card.id === id), `${id} missing from author preview`);
     assert.ok(roster.body.characters.some((card) => card.id === "yaoze"));
     assert.ok(roster.body.characters.some((card) => card.id === "orivelle"));
-    const simulation = await post("/api/author-preview/2-x-battle", { token: author.token, action: "battle", team: ["yaoze", "maro", "celesia"], stageId: 25, level: 90, constellation: 2 });
+    const simulation = await post("/api/author-preview/2-x-battle", { token: author.token, action: "battle", team: ["yaoze", "maro", "celesia"], stageId: 10, level: 90, constellation: 2 });
     assert.equal(simulation.status, 200);
     assert.deepEqual(simulation.body.battle.team.map((unit) => unit.id), ["yaoze", "maro", "celesia"]);
     assert.deepEqual(simulation.body.battle.reward, { starSand: 0, characterExp: 0 });

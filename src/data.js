@@ -324,18 +324,19 @@
   var updateCycle = release.cycle;
   var trialVersion = updateCycle;
   var trialMaxRewards = 20;
-  // 試煉每次成功都提供角色經驗；每關每版本最多領 20 次，
-  // 讓玩家能靠遊玩而不是靠抽卡資源養成角色。完成 30 關並使用版本內
-  // 的可重複獎勵後，足以養成一支 4★ 隊伍，不需要依賴重複抽卡。
+  // 試煉每次成功都提供角色經驗；本版本的 1–15 關每關最多挑戰三次。
   var trialReward = Object.freeze({ starSand: 75, characterExp: 1800 });
-  // 星界試煉共有 30 關，全部使用第一大版本圖鑑中已命名的物種。
-  // 讓玩家需要在治療、重裝、支援與輸出之間調整編隊，而不是只比較總戰力。
+  // 星界試煉維持 1–15 關，使用遊戲內怪物圖鑑的既有物種立繪。
   var trialStages = null;
   if (typeof require === "function") {
     try { trialStages = require("./trial-1-0.js"); } catch (error) { trialStages = null; }
   }
   if (!trialStages && typeof globalThis !== "undefined") trialStages = globalThis.StarshipTrial10 || null;
   if (!trialStages) throw new Error("找不到 1.0 試煉圖鑑資料");
+  var trial12Stages = typeof require === "function" ? require("./trial-1-2.js") : (typeof globalThis !== "undefined" ? globalThis.StarshipTrial12 : null);
+  if (trial12Stages && trial12Stages.length >= 15) trialStages = trial12Stages.slice(0, 15);
+  trialStages = trialStages.filter(function (stage) { return stage.id >= 1 && stage.id <= 15; });
+  trialStages.forEach(function (stage) { stage.maxChallengeAttempts = 3; });
 
   // 星海迷航是休閒探索玩法，不應直接借用第 18／30 關的高難度試煉終幕。
   // 這三個專用戰鬥只保留敵人特性與閱讀回饋，推薦戰力和傷害控制在一般玩家能
