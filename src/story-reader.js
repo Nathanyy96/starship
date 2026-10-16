@@ -19,15 +19,16 @@
       if (!unlocked) content = "<p>" + (is11 && !progress.claimedVersions["1.0"] ? "先完成 1.0 主線並領取版本獎勵，即可開始 1.1。" : "先完成前一幕閱讀" + (is11 ? "與互動" : "") + "，即可繼續。") + "</p>";
       else {
         content = config.bodyMarkup(scene, index);
-        if (!(last && !is11)) content += button(done ? "本幕已讀完" : "標記本幕已讀完", "complete", scene, done);
-        if (is11) {
+        if (!config.readOnly && !(last && !is11)) content += button(done ? "本幕已讀完" : "標記本幕已讀完", "complete", scene, done);
+        if (is11 && !config.readOnly) {
           if (p.act > index) content += "<p>本幕互動已完成。</p>";
           else if (p.act === index && done) {
             var task = missions.acts[index].steps[p.step];
             content += '<section class="author-preview-task"><h4>本幕互動 · ' + (p.step + 1) + " / " + missions.acts[index].steps.length + "</h4><p>" + escape(task.prompt) + '</p><div class="author-preview-choices">' + task.choices.map(function (label, choice) { return button(label, "answer", scene, false, choice); }).join("") + "</div></section>";
           } else content += "<p>標記本幕已讀完後，在這裡完成互動。</p>";
         }
-        if (last) content += '<div class="story-reward-bar"><span>本版本獎勵 · 僅領一次</span><strong>1,600 星砂 · 3,600 角色經驗 · 1 星痕</strong>' +
+        if (last && config.readOnly) content += "<p>" + (claimed ? "版本獎勵已在探索中發放。" : "完成探索劇情後，獎勵會在探索畫面發放。") + "</p>";
+        if (last && !config.readOnly) content += '<div class="story-reward-bar"><span>本版本獎勵 · 僅領一次</span><strong>1,600 星砂 · 3,600 角色經驗 · 1 星痕</strong>' +
           button(claimed ? "版本獎勵已領取" : is11 ? "領取 1.1 版本獎勵" : "完成最後一幕並領取 1.0 版本獎勵", is11 ? "claim" : "complete", scene,
             claimed || (is11 ? p.act !== missions.acts.length || !done : !chapter.scenes.slice(0, -1).every(function (s) { return progress.completedScenes[chapter.id + ":" + s.id]; }))) + "</div>";
       }

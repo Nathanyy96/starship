@@ -166,6 +166,7 @@
     function worldMounted(kind) {
       activeWorldKind=kind;pausedWorldKind=null;document.body.classList.add('world-exploring');
       if(byId('world-main-menu').open)byId('world-main-menu').close();
+      setTimeout(recoverExplorationReward,0);
     }
     function resumePausedWorld() {
       if(!pausedWorldKind)return false;
@@ -315,7 +316,7 @@
       }
       var completedScenes = state.storyProgress && state.storyProgress.completedScenes ? state.storyProgress.completedScenes : {};
       state.recruitment.story10ChoiceAvailable = Boolean(state.storyProgress && state.storyProgress.claimedVersions && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed);
-      if (state.trialProgress && state.trialProgress.clearedStages && state.trialProgress.clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) { state.recruitment.trial10ChoiceAvailable = true; }
+      state.recruitment.trial10ChoiceAvailable = false;
       var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
       var compensationVersion = data.compensationCycle || updateVersion;
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
@@ -606,7 +607,7 @@
       if (!container || !game) return;
       var state = game.getState(); var recruitment = state.recruitment || {}; var cards = ["reyn", "lia"];
       var blocks = [];
-      [{ key: "story-1-0", available: recruitment.story10ChoiceAvailable && !recruitment.story10ChoiceClaimed, title: "1.0 主線完成獎勵", copy: "讀完五幕並領取 1.0 版本獎勵後，選擇一名角色。" }, { key: "trial-10", available: recruitment.trial10ChoiceAvailable && !recruitment.trial10ChoiceClaimed, title: "星界試煉第 10 關獎勵", copy: "通關第 10 關，再選擇一名角色。" }].forEach(function (reward) {
+      [{ key: "story-1-0", available: recruitment.story10ChoiceAvailable && !recruitment.story10ChoiceClaimed, title: "1.0 主線完成獎勵", copy: "讀完五幕並領取 1.0 版本獎勵後，選擇一名角色。" }].forEach(function (reward) {
         if (!reward.available) return;
         var choices = cards.slice();
         if (reward.key === "trial-10") {
@@ -617,6 +618,7 @@
       });
       container.innerHTML = blocks.join("");
       container.hidden = !blocks.length;
+      byId("world-story-rewards").hidden = !blocks.length;
     }
     function renderLobby() {
       if (!game) return;
@@ -968,7 +970,7 @@
         byId("story-monster-catalog").innerHTML = window.StarshipStoryMonsterCatalog.render(learned);
       }
       if (data.releaseConfig && data.releaseConfig.open11 && window.StarshipStoryReader && chapter) {
-        window.StarshipStoryReader.render({ container: byId("story-reader"), state: state, chapter: chapter,
+        window.StarshipStoryReader.render({ container: byId("story-reader"), state: state, chapter: chapter, readOnly: true,
           bodyMarkup: function (scene, index) { return storyBodyMarkup(scene.body, "story-body", index + 1, chapter.id, { authorPreview: true }); },
           onAction: performLiveStoryAction });
         return;
@@ -1315,6 +1317,7 @@
       }
       try {
         var state = game.getState(); var recruitment = state.recruitment || {};
+        if (rewardKey !== "story-1-0") throw new Error("試煉角色自選獎勵已取消");
         var availableKey = rewardKey === "story-1-0" ? "story10ChoiceAvailable" : "trial10ChoiceAvailable";
         var claimedKey = rewardKey === "story-1-0" ? "story10ChoiceClaimed" : "trial10ChoiceClaimed";
         if (!recruitment[availableKey] || recruitment[claimedKey]) throw new Error("這份角色自選獎勵目前不可領取");
@@ -1508,7 +1511,7 @@
         if (!currentTrialTeam.length) throw new Error("至少派出 1 名角色才能開始戰鬥");
         if (currentTrialTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
         var battle = window.StarshipBattle.simulateBattle({ team: currentTrialTeam, stats: effectiveBattleStats(state), stage: stage }); progress.selectedTeam = currentTrialTeam.slice(); progress.lastBattle = battle;
-        if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true; }
+        if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; state.recruitment.trial10ChoiceAvailable = false; }
         updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，可以調整編隊後再次挑戰。", battle.status === "defeat");
       } catch (error) { showMessage(error.message, true); }
     }
@@ -2163,7 +2166,23 @@
       if(byId("exploration-continue-act-2"))byId("exploration-continue-act-2").disabled=!canStartWorldAct(2);
       var select=byId("world-story-select");if(select&&world){var selected=select.value||'1';select.innerHTML='<option value="1">1.0・第一幕｜南驛與入村</option>'+world.storyOrder.map(function(act){var meta=world.storyMeta(act);return '<option value="'+act+'"'+(canStartWorldAct(act)?'':' disabled')+'>'+escapeHtml(meta.label+'｜'+meta.title.replace(/^第.+?幕[｜・]/,''))+(canStartWorldAct(act)?'':'（待解鎖）')+'</option>';}).join('');select.value=selected;byId("open-world-campaign").disabled=selected!=='1'&&!canStartWorldAct(Number(selected));}
     }
-    function worldCampaignAction(act,action,choice,step){var meta=window.StarshipFirstMajorWorld.storyMeta(act),body={action:action,chapterId:meta.chapterId,sceneId:meta.sceneId};if(action==='answer'){body.choice=choice;body.act=meta.index;body.step=step;}return performLiveStoryAction(body).then(function(payload){refreshWorldEntries();return payload;});}
+    function worldCampaignAction(act,action,choice,step){var meta=window.StarshipFirstMajorWorld.storyMeta(act),body={action:action,chapterId:meta.chapterId,sceneId:meta.sceneId};if(action==='answer'){body.choice=choice;body.act=meta.index;body.step=step;}return performLiveStoryAction(body).then(function(payload){refreshWorldEntries();if(Object.keys(payload.reward||{}).some(function(k){return payload.reward[k]>0;}))showExplorationReward(payload.reward);return recoverExplorationReward().then(function(){return payload;});});}
+    var explorationRewardBusy = false;
+    function showExplorationReward(reward) {
+      if(!document.body.classList.contains('world-exploring'))return;
+      var text=reward ? Object.keys(reward).filter(function(k){return reward[k]>0;}).map(function(k){return ({starSand:'星砂',characterExp:'角色經驗',starMarks:'星痕'}[k]||k)+' × '+reward[k];}).join(' · ') : '';
+      if(text)byId('world-reward-receipt').textContent='已自動發放：'+text;
+      renderMilestoneRewards();pauseWorld();var dialog=byId('world-reward-dialog');if(!dialog.open)dialog.showModal();
+    }
+    function recoverExplorationReward() {
+      if(!game||explorationRewardBusy||!document.body.classList.contains('world-exploring'))return Promise.resolve();
+      var state=game.getState(),chapter=storyChapterById('main-1-1'),p=state.storyProgress;
+      if(!p.claimedVersions['1.1']&&p.missions11&&p.missions11.act===5&&chapter.scenes.every(function(scene){return p.completedScenes[chapter.id+':'+scene.id];})){
+        explorationRewardBusy=true;
+        return performLiveStoryAction({action:'claim',chapterId:chapter.id,sceneId:chapter.scenes[chapter.scenes.length-1].id}).then(function(payload){refreshWorldEntries();showExplorationReward(payload.reward);}).catch(function(error){showMessage('獎勵尚未同步，請使用探索畫面的領取按鈕重試：'+error.message,true);}).finally(function(){explorationRewardBusy=false;});
+      }
+      return Promise.resolve();
+    }
     function worldSaveKey(act) { return "starship-first-major-world-v1:" + encodeURIComponent(playerKey(currentPlayerName)) + ":" + act; }
     function loadFirstMajorWorld(act) { try { return JSON.parse(window.localStorage.getItem(worldSaveKey(act || 2))); } catch(error) { return null; } }
     function saveFirstMajorWorld(state) { rememberWorld("world",state);try { window.localStorage.setItem(worldSaveKey(state.act), JSON.stringify(state)); } catch(error) { byId("first-major-status").textContent="瀏覽器未能保存探索位置，離開後可能需要重走此段。"; } }
@@ -2240,6 +2259,9 @@
     byId("close-character-animation").addEventListener("click", closeCharacterAnimation);
     byId("character-animation-dialog").addEventListener("close", resetCharacterAnimationVideo);
     byId("character-animation-dialog").addEventListener("click", function (event) { if (event.target === this) closeCharacterAnimation(); });
+    byId('world-story-rewards').addEventListener('click',function(){showExplorationReward();});
+    byId('world-reward-close').addEventListener('click',function(){byId('world-reward-dialog').close();});
+    byId('world-reward-dialog').addEventListener('close',function(){if(document.body.classList.contains('world-exploring'))resumePausedWorld();});
     byId("milestone-rewards").addEventListener("click", function (event) { var button = event.target.closest("[data-reward-key]"); if (button) claimCharacterChoice(button.getAttribute("data-reward-key"), button.getAttribute("data-card-id")); });
      byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
      byId("trial-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-character]"); if (button) toggleTrialTeam(button.getAttribute("data-trial-character")); });

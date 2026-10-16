@@ -328,6 +328,7 @@
       state.breakthroughMaterials[id] = Number.isInteger(amount) && amount >= 0 ? amount : 0;
     });
     state.recruitment = Object.assign(initialState().recruitment, isPlainObject(source.recruitment) ? source.recruitment : {});
+    state.recruitment.trial10ChoiceAvailable = false;
     state.storyProgress = Object.assign(initialState().storyProgress, isPlainObject(source.storyProgress) ? source.storyProgress : {});
     state.storyProgress.completedScenes = isPlainObject(state.storyProgress.completedScenes) ? state.storyProgress.completedScenes : {};
     state.storyProgress.claimedVersions = isPlainObject(state.storyProgress.claimedVersions) ? state.storyProgress.claimedVersions : {};

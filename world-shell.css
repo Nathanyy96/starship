@@ -52,3 +52,6 @@ body.world-exploring #exploration-panel:has(#exploration-story-read:not([hidden]
 body.world-session .page-shell{padding-top:64px!important}@media(max-width:600px){body.world-session .page-shell{padding-top:60px!important}}
 
 .world-shell-home{min-width:0;max-width:calc(100% - 168px)}.world-shell-home>svg{flex:none}.world-shell-home>span{min-width:0}.world-shell-home small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.world-shell-header nav{flex:none}.world-menu-account .player-badge{flex-wrap:wrap}.world-menu-account .player-badge>strong{overflow-wrap:anywhere;max-width:100%}
+
+.world-story-rewards{position:fixed;right:20px;top:80px;z-index:50}body:not(.world-exploring) .world-story-rewards{display:none}
+#world-reward-dialog{padding:24px}#world-reward-close{margin-top:20px}

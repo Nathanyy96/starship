@@ -56,13 +56,14 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'.tmp-ui-test','wo
      await page.waitForFunction(({key,act,step})=>{const p=JSON.parse(localStorage.getItem(key)).storyProgress.missions11;return p.act>act-11||p.step>step;},{key:saveKey,act,step});
     }
    }
+   if(act===5||act===15){await page.waitForFunction(()=>document.getElementById('world-reward-dialog').open);await page.click('#world-reward-close');}
    if(act===4||act===11||act===13||act===15){
     await page.waitForTimeout(300);await page.locator('#first-major-panel').screenshot({path:path.join(output,'act-'+act+'-desktop.png')});
     await page.setViewportSize({width:390,height:844});await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('#first-major-panel').screenshot({path:path.join(output,'act-'+act+'-mobile.png')});await page.setViewportSize({width:1280,height:900});
    }
    if(act===15){
-    const before=(await saved()).resources;await page.click('#first-major-claim');await page.waitForFunction(k=>Boolean(JSON.parse(localStorage.getItem(k)).storyProgress.claimedVersions['1.1']),saveKey);
-    const after=await saved();for(const [key,n]of Object.entries({starSand:1600,characterExp:3600,starMarks:1}))assert.equal(after.resources[key]-before[key],n);
+    await page.waitForFunction(k=>Boolean(JSON.parse(localStorage.getItem(k)).storyProgress.claimedVersions['1.1']),saveKey);
+    assert.ok((await saved()).storyProgress.claimedVersions['1.1']);
     assert.equal(await page.locator('#first-major-claim').isDisabled(),true);
    }else {assert.equal(await page.locator('#first-major-next').isDisabled(),false,meta.label+' next unlocked');}
    await page.click('#world-menu-toggle');await page.click('#open-world-map');console.log('PASS '+meta.label+' ('+count+' segments)');

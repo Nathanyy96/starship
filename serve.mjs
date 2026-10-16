@@ -352,9 +352,7 @@ function ensurePlayerMilestones(currentState) {
   }
   state.recruitment.story10ChoiceAvailable = Boolean(state.storyProgress && state.storyProgress.claimedVersions && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed);
   const clearedStages = state.trialProgress && Array.isArray(state.trialProgress.clearedStages) ? state.trialProgress.clearedStages : [];
-  if (clearedStages.indexOf(10) >= 0 && !state.recruitment.trial10ChoiceClaimed) {
-    state.recruitment.trial10ChoiceAvailable = true;
-  }
+  state.recruitment.trial10ChoiceAvailable = false;
   state.updateRewards = state.updateRewards || { claimedVersions: {} };
   state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
   if (!state.updateRewards.claimedVersions[releaseConfig.compensationCycle]) {
@@ -690,7 +688,7 @@ function runTrial(currentState, body) {
     state.resources.starSand += rewardStarSand;
     state.resources.characterExp += rewardCharacterExp;
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
-    if (stage.id === 10 && !state.recruitment.trial10ChoiceClaimed) state.recruitment.trial10ChoiceAvailable = true;
+    state.recruitment.trial10ChoiceAvailable = false;
   }
   return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed: state.trialProgress.attempts[stage.id], attemptsRemaining: trialMaxRewards - state.trialProgress.attempts[stage.id] } : { starSand: 0, characterExp: 0, attemptsUsed: attempts, attemptsRemaining: trialMaxRewards - attempts } };
 }
@@ -883,7 +881,7 @@ function claimCharacterChoice(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const rewardKey = String(body.rewardKey || "");
   const cardId = String(body.cardId || "");
-  if (!["story-1-0", "trial-10"].includes(rewardKey)) throw new Error("找不到角色自選獎勵");
+  if (rewardKey !== "story-1-0") throw new Error("找不到角色自選獎勵");
   if (!["reyn", "lia"].includes(cardId)) throw new Error("只能選擇雷恩或莉亞");
   const availableKey = rewardKey === "story-1-0" ? "story10ChoiceAvailable" : "trial10ChoiceAvailable";
   const claimedKey = rewardKey === "story-1-0" ? "story10ChoiceClaimed" : "trial10ChoiceClaimed";

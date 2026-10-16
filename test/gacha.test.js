@@ -540,3 +540,15 @@ test("可從文件既有的 4★ 中選一隻，選中率是 55%", () => {
   assert.equal(selectedHit.results[0].featured, true);
   assert.equal(selectedHit.results[0].card.id, secondFeatured);
 });
+
+
+test("retired trial character eligibility is cleared without removing owned characters", () => {
+  const state = new GachaGame({ cards, banners }).getState();
+  state.recruitment.trial10ChoiceAvailable = true;
+  state.recruitment.trial10ChoiceClaimed = true;
+  state.collection.reyn = 1;
+  const restored = new GachaGame({ cards, banners, state }).getState();
+  assert.equal(restored.recruitment.trial10ChoiceAvailable, false);
+  assert.equal(restored.recruitment.trial10ChoiceClaimed, true);
+  assert.equal(restored.collection.reyn, 1);
+});
