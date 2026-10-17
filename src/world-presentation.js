@@ -29,9 +29,25 @@
     [10,'village',460,420,'村道接著橋和西邊商路。天色暗下來時，走有燈的地方。'],
     [11,'south',980,800,'田埂接回驛路。過河的時候，要找完整的橋面。'],
     [12,'south',510,550,'驛站就在附近，出發前可以先看清楚路口的方向。']
-  ].forEach(function(a){var number=('0'+a[0]).slice(-2),region=residentRegions[a[1]];if(!cast[a[1]])cast[a[1]]=[];cast[a[1]].push({id:'resident-'+number,spriteId:'resident-'+number,portraitSrc:'./assets/exploration/resident-'+number+'-portrait-v1.png',genericResident:true,name:region+'居民',role:region,x:a[2],y:a[3],line:a[4]});});
+  ].forEach(function(a){var number=('0'+a[0]).slice(-2),region=residentRegions[a[1]],jobs=['花店學徒','街區郵差','橋邊畫師','旅店幫工','巡路學徒','渡口工匠','港口嚮導','碼頭記錄員','採藥學徒','林道嚮導','田地巡守','驛站信使'],ranges=[38,88,34,42,72,40,80,36,44,76,56,90],speeds=[16,29,14,18,26,17,28,15,18,25,21,30];if(!cast[a[1]])cast[a[1]]=[];cast[a[1]].push({id:'resident-'+number,spriteId:'resident-'+number,portraitSrc:'./assets/exploration/resident-'+number+'-portrait-v1.png',genericResident:true,name:region+'・'+jobs[a[0]-1],role:jobs[a[0]-1],x:a[2],y:a[3],wander:true,wanderRange:ranges[a[0]-1],wanderSpeed:speeds[a[0]-1],line:a[4]});});
   function npcs(map){return cast[map]||[];}
-  function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}
+  var wanderRoutes=new Map();
+  function wanderRoute(npc,passable){
+    var key=npc.id+':'+npc.x+':'+npc.y+':'+npc.wanderRange,route=wanderRoutes.get(key);if(route)return route;
+    var seed=Array.from(npc.id).reduce(function(n,c){return n*31+c.charCodeAt(0);},0),radius=npc.wanderRange||65,angles=[0,Math.PI/2,Math.PI,Math.PI*1.5,Math.PI/4,Math.PI*1.25,Math.PI*.75,Math.PI*1.75],arms=[];
+    for(var scale of [1,.72,.45])for(var i=0;i<angles.length&&arms.length<2;i++){
+      var a=angles[(i+seed)%angles.length],p={x:npc.x+Math.cos(a)*radius*scale,y:npc.y+Math.sin(a)*radius*scale};
+      if(arms.some(function(q){return Math.hypot(q.x-p.x,q.y-p.y)<radius*.65;}))continue;
+      var clear=true;for(var j=1;j<=12;j++)if(passable&&!passable(npc.x+(p.x-npc.x)*j/12,npc.y+(p.y-npc.y)*j/12)){clear=false;break;}
+      if(clear)arms.push(p);
+    }
+    route=arms.length?[{x:npc.x,y:npc.y},arms[0],{x:npc.x,y:npc.y},arms[1]||arms[0]]:[{x:npc.x,y:npc.y}];wanderRoutes.set(key,route);return route;
+  }
+  function position(npc,time,reduced,passable){
+    if(reduced)return {x:npc.x,y:npc.y};
+    if(npc.wander&&passable){var points=wanderRoute(npc,passable);if(points.length>1){var lengths=points.map(function(p,i){var q=points[(i+1)%points.length];return Math.hypot(q.x-p.x,q.y-p.y);}),distance=lengths.reduce(function(a,b){return a+b;},0),offset=Array.from(npc.id).reduce(function(n,c){return n+c.charCodeAt(0);},0)%distance,travel=(time*(npc.wanderSpeed||22)/1000+offset)%distance;for(var k=0;k<points.length;k++){if(travel<=lengths[k]){var from=points[k],to=points[(k+1)%points.length],t=lengths[k]?travel/lengths[k]:0;return {x:from.x+(to.x-from.x)*t,y:from.y+(to.y-from.y)*t,dx:to.x-from.x,dy:to.y-from.y,walking:true};}travel-=lengths[k];}}}
+    var phase=(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};
+  }
   function label(ctx,text,x,y,color){ctx.save();ctx.font='600 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#162f29';ctx.strokeText(text,x,y);ctx.fillStyle=color||'#fff0c7';ctx.fillText(text,x,y);ctx.restore();}
   // A doorway can also be a story landmark. Prefer its actionable entrance
   // label rather than drawing two different names on the same ground anchor.
