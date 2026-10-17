@@ -1493,10 +1493,8 @@ body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not(
 @media (prefers-reduced-motion: reduce) { .battle-duel.effect-bow .battle-duel-impact::before, .battle-duel.effect-star .battle-duel-impact::before, .battle-duel.effect-heavy .battle-duel-impact i, .battle-duel.effect-staff .battle-duel-impact i { animation: none; opacity: .8; } }
 @media (prefers-reduced-motion: reduce) { .battle-duel.effect-survey .battle-duel-impact i, .battle-duel.effect-survey .battle-duel-impact::before { animation: none; opacity: .8; } }
 
-/* The combat stage owns the character art; formation rows remain tactical data. */
-.battle-timeline-active .battle-unit-card { grid-template-columns: minmax(0,1fr); }
-.battle-timeline-active .battle-unit-visual { display: none; }
-.battle-timeline-active .battle-unit-copy { min-height: 62px; }
+/* The formation rows retain the original character and monster portraits. */
+.battle-timeline-active .battle-unit-card.battle-actor, .battle-timeline-active .battle-hit .battle-unit-visual { animation: none; }
 
 /* Normal-proportion combat figures replace both chibi figures and duplicate portraits. */
 .battle-duel { min-height: 350px; }
@@ -1517,3 +1515,28 @@ body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not(
 .battle-action-sprite.hina-skin { background-image: url('./assets/combat/hina-skin-normal-actions-v2.webp'); }
 .battle-action-sprite.chodan-skin { background-image: url('./assets/combat/chodan-skin-normal-actions-v2.webp'); }
 .battle-action-sprite.siyeon-skin { background-image: url('./assets/combat/siyeon-skin-normal-actions-v2.webp'); }
+
+/* Entire formations remain visible while only the acting and affected units move. */
+.battle-arena { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 68px minmax(0,1fr); align-items: end; gap: 6px; min-height: 238px; margin-top: 14px; padding: 14px 14px 38px; overflow: hidden; border-radius: 12px; background: radial-gradient(ellipse at 50% 79%, rgba(124,164,220,.16), transparent 58%), linear-gradient(180deg,#132444,#091326 69%,#172239); isolation: isolate; }
+.battle-arena::before { position: absolute; inset: auto 0 34px; height: 26px; border-top: 1px solid rgba(186,210,242,.25); background: linear-gradient(180deg,rgba(158,183,224,.08),rgba(0,0,0,.2)); content: ""; transform: perspective(200px) rotateX(28deg); }
+.battle-arena-side { z-index: 1; min-width: 0; }
+.battle-arena-side > span { display: block; margin-bottom: 3px; color: #9db9d8; font-size: .62rem; font-weight: 700; letter-spacing: .08em; }
+.battle-arena .ally-formation > span { color: #8dece1; }.battle-arena .enemy-formation > span { color: #f4aaaa; }
+.battle-arena-roster { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: end; gap: 3px; min-height: 154px; }
+.battle-arena-fighter { display: flex; align-items: center; flex-direction: column; min-width: 0; padding: 4px 2px 3px; border-radius: 8px; transition: background .2s ease, opacity .2s ease; }
+.battle-arena-fighter.acting { background: rgba(255,221,133,.1); }.battle-arena-fighter.targeted { background: rgba(255,126,126,.12); }.battle-arena-fighter.down { opacity: .46; filter: grayscale(.75); }
+.battle-arena-figure { display: grid; place-items: end center; width: 100%; height: 116px; }
+.battle-arena .battle-action-sprite, .battle-arena-fighter img { display: block; width: min(100%,112px); height: auto; aspect-ratio: 1; object-fit: contain; object-position: center bottom; }
+.battle-arena .battle-action-sprite.attack { animation: combat-attack-frames .62s steps(1,end) both, battle-arena-advance .62s ease-out both; }
+.battle-arena .battle-action-sprite.hurt { animation: combat-hurt-frames .62s steps(1,end) both; }
+.battle-arena .battle-action-sprite.guard { background-position: 0 100%; }.battle-arena .battle-action-sprite.down { background-position: 100% 100%; }
+.battle-arena-fighter.acting img { animation: battle-arena-advance .62s ease-out both; }.battle-arena-fighter.targeted img { animation: battle-duel-recoil .55s ease-out both; }
+.battle-arena-fighter strong { display: block; max-width: 100%; margin-top: 2px; overflow: hidden; color: #f4f7ff; font-size: .63rem; text-overflow: ellipsis; white-space: nowrap; }
+.battle-arena-health { width: 80%; height: 3px; margin-top: 4px; overflow: hidden; border-radius: 3px; background: rgba(0,0,0,.55); }.battle-arena-health i { display: block; height: 100%; background: #77e5d8; }.enemy-formation .battle-arena-health i { background: #f19b91; }
+.battle-arena-center { z-index: 2; display: grid; place-items: center; align-self: center; height: 92px; color: #ffe4aa; text-align: center; }.battle-arena-center i { position: absolute; width: 60px; height: 60px; border: 2px solid rgba(255,213,141,.7); border-radius: 50%; opacity: 0; }.battle-arena-center b { z-index: 1; font-size: .77rem; text-shadow: 0 2px 8px #160c1b; }
+.battle-arena.hit .battle-arena-center i { animation: battle-duel-burst .58s ease-out both; }.battle-arena.support .battle-arena-center i, .battle-arena.guard .battle-arena-center i { border-color: #8be2e7; opacity: .75; }.battle-arena.effect-survey .battle-arena-center i { border-color: #6ce4d7; border-style: dashed; }.battle-arena.effect-bass .battle-arena-center i { border-color: #ff76bd; }.battle-arena.effect-heavy .battle-arena-center i { border-color: #ffc184; }
+.battle-arena p { position: absolute; z-index: 3; right: 0; bottom: 0; left: 0; margin: 0; padding: 8px 12px; overflow: hidden; color: #e9f0fc; background: rgba(4,10,23,.9); font-size: .64rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes battle-arena-advance { 0%,100% { transform: translateX(0); } 48% { transform: translateX(var(--arena-step,13px)); } }.battle-arena.enemy-turn .acting { --arena-step: -13px; }
+@media (max-width: 980px) { .battle-arena-roster { grid-template-columns: repeat(2,minmax(0,1fr)); }.battle-arena { min-height: 312px; }.battle-arena-figure { height: 98px; }.battle-arena .battle-action-sprite, .battle-arena-fighter img { width: min(100%,94px); } }
+@media (max-width: 640px) { .battle-arena { grid-template-columns: minmax(0,1fr) 42px minmax(0,1fr); gap: 2px; min-height: 278px; padding: 10px 5px 40px; }.battle-arena-roster { gap: 0; min-height: 188px; }.battle-arena-figure { height: 79px; }.battle-arena .battle-action-sprite, .battle-arena-fighter img { width: min(100%,78px); }.battle-arena-fighter strong { font-size: .54rem; }.battle-arena-center i { width: 38px; height: 38px; }.battle-arena-center b { font-size: .62rem; }.battle-arena-side > span { font-size: .56rem; } }
+@media (prefers-reduced-motion: reduce) { .battle-arena .battle-action-sprite.attack, .battle-arena .battle-action-sprite.hurt, .battle-arena-fighter.acting img, .battle-arena-fighter.targeted img, .battle-arena.hit .battle-arena-center i { animation: none; }.battle-arena .battle-action-sprite.attack { background-position: 33.333% 50%; }.battle-arena .battle-action-sprite.hurt { background-position: 33.333% 100%; }.battle-arena.hit .battle-arena-center i { opacity: .8; } }
