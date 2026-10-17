@@ -4,12 +4,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const motion=require('../src/character-motion');
-test('Celesia overworld uses a normal-proportion four-direction atlas',()=>{
-  const entry=motion.manifest.celesia;
-  assert.match(entry.src,/celesia-walk-natural-v1\.png$/);
-  assert.equal(entry.frames.length,16);
-  assert.ok(entry.displayScale>1);
-  assert.ok(fs.existsSync(path.join(__dirname,'..',entry.src)));
+test('Celesia overworld uses the authored normal-proportion cutout',()=>{
+  const source=require('../src/exploration-characters').worldSource('celesia');
+  assert.equal(motion.supports('celesia'),false);
+  assert.ok(fs.existsSync(path.join(__dirname,'..',source)));
+  assert.equal(fs.readFileSync(path.join(__dirname,'..',source))[25],6);
 });
 
 test('scripted walks follow five original story cues on passable ground in 1.0 and 1.1',()=>{
@@ -37,9 +36,9 @@ test('ordinary dialogue and blocked terrain never create a scripted walk',()=>{
   assert.equal(scene.cue(motion.sceneCues[0].text,'b',{x:0,y:0},0,()=>false),false);assert.equal(scene.sample(100).length,0);
 });
 
-test('all 1.0–1.1 named characters have sixteen new directional frames and existing PNGs',()=>{
+test('remaining 1.0–1.1 named characters have directional frames and existing PNGs',()=>{
   const roster=require('../docs/character-motion-roster-20261015.json');
-  assert.equal(roster.length,18);
+  assert.equal(roster.length,17);
   for(const {id} of roster){
     const entry=motion.manifest[id];assert.ok(entry,id);assert.equal(entry.frames.length,16);
     const png=fs.readFileSync(path.join(__dirname,'..',entry.src));

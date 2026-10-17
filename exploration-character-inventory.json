@@ -102,7 +102,7 @@
     "name": "瑟蕾雅",
     "original": "./assets/cards/celesia.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/hero-chibi-v1.png"
+    "worldCutout": "./assets/exploration/celesia-world-cutout-v1.png"
   },
   {
     "id": "reyn",
@@ -130,7 +130,7 @@
     "name": "蕾娜",
     "original": "./assets/cards/rena.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/rena-chibi-v1.png"
+    "worldCutout": "./assets/exploration/rena-world-cutout-v1.png"
   },
   {
     "id": "eda",
@@ -144,7 +144,7 @@
     "name": "薇珂",
     "original": "./assets/cards/veyra.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/veyra-chibi-v1.png"
+    "worldCutout": "./assets/exploration/veyra-world-cutout-v1.png"
   },
   {
     "id": "harlow",
@@ -158,7 +158,7 @@
     "name": "艾洛娜",
     "original": "./assets/cards/elorna.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/elorna-chibi-v1.png"
+    "worldCutout": "./assets/exploration/elorna-world-cutout-v1.png"
   },
   {
     "id": "chodan",

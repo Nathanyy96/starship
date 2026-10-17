@@ -10,7 +10,8 @@ test('every playable and story character has an exploration identity and existin
   for (const id of [...Object.keys(data.cards), ...Object.keys(data.storyCharacters)]) assert.ok(cast[id], id);
   for (const entry of Object.values(cast)) {
     assert.ok(fs.existsSync(path.join(__dirname, '..', entry.original)), entry.id);
-    assert.equal(fs.readFileSync(path.join(__dirname, '..', entry.chibi))[25], 6, entry.id + ' RGBA chibi');
+    const worldSource=art.worldSource(entry.id);
+    assert.equal(fs.readFileSync(path.join(__dirname, '..', worldSource || entry.chibi))[25], 6, entry.id + ' RGBA world art');
     assert.equal(art.byName(entry.name, data).id, entry.id);
   }
   assert.equal(art.resolve('hero', data).id, 'celesia');

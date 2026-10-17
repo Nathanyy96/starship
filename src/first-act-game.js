@@ -31,7 +31,7 @@
     ]
   };
   var sprites = {
-    hero: "./assets/exploration/hero-chibi-v1.png",
+    hero: "./assets/exploration/celesia-world-cutout-v1.png",
     lia: "./assets/exploration/lia-chibi-v1.png",
     reyn: "./assets/exploration/reyn-chibi-v1.png",
     isar: "./assets/exploration/isar-chibi-v1.png"
@@ -152,7 +152,7 @@
       if(staged){x=staged.x;y=staged.y;}
       var who=id==='hero'?motionPlayer:motion.canonical(id),h=height;
       if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:staged?staged.facing:'down',staged?staged.distance:motionStride,id==='hero'?motionWalking:Boolean(staged&&staged.walking),reduced,who);
-      return renderer.sprite(ctx, art[id], x, y, h, flip, bob);
+      return renderer.sprite(ctx, art[id], x, y, id === 'hero' && characterArt && characterArt.worldSource(motionPlayer) ? h * 1.55 : h, flip, bob);
     }
     function draw() {
       var view = renderer.begin(canvas, ctx, W * TILE, H * TILE, state.x * TILE, state.y * TILE);

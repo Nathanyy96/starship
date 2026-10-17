@@ -6,6 +6,8 @@
   "use strict";
   var aliases = { hero: "celesia" };
   var existing = { celesia: "hero", lia: "lia", reyn: "reyn", isar: "isar" };
+  var worldCutouts = { celesia: true, veyra: true, rena: true, elorna: true };
+  function worldSource(id) { return worldCutouts[id] ? "./assets/exploration/" + id + "-world-cutout-v1.png" : ""; }
   var refreshed = { celesia: true, veyra: true, harlow: true, rena: true, elorna: true };
   function portraitSource(entry) {
     if (!entry || !entry.original) return "";
@@ -25,6 +27,7 @@
     if (!entry) return null;
     return Object.assign({}, entry, { sources: originalOverride && originalOverride !== entry.original
       ? [{ url: originalOverride, kind: "original" }]
+      : worldSource(id) ? [{ url: worldSource(id), kind: "world" }]
       : [{ url: entry.chibi, kind: "chibi" }, { url: entry.original, kind: "original" }].filter(function (x) { return x.url; }) });
   }
   function byName(name, data) {
@@ -34,7 +37,7 @@
     options = options || {};
     var entry = resolve(id, data, options.originalOverride);
     if (!entry) return null;
-    if (options.preferOriginal && entry.original) entry.sources = [{ url: portraitSource(entry), kind: "original" }, { url: entry.chibi, kind: "chibi" }];
+    if (options.preferOriginal && entry.original) entry.sources = [{ url: portraitSource(entry), kind: "original" }];
     var ImageType = options.ImageClass || (typeof Image !== "undefined" && Image);
     if (!ImageType) return entry;
     var stopped = false, index = 0;
@@ -63,5 +66,5 @@
       img.dataset.displayKind = meta.displayKind;
     }, { preferOriginal: true });
   }
-  return { catalog: catalog, resolve: resolve, byName: byName, load: load, speakerPortrait: speakerPortrait, portraitSource: portraitSource };
+  return { catalog: catalog, resolve: resolve, byName: byName, load: load, speakerPortrait: speakerPortrait, portraitSource: portraitSource, worldSource: worldSource };
 }));
