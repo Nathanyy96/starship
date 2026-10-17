@@ -6,6 +6,11 @@
   "use strict";
   var aliases = { hero: "celesia" };
   var existing = { celesia: "hero", lia: "lia", reyn: "reyn", isar: "isar" };
+  var refreshed = { celesia: true, veyra: true, harlow: true, rena: true, elorna: true };
+  function portraitSource(entry) {
+    if (!entry || !entry.original) return "";
+    return entry.original + (refreshed[entry.id] ? "?v=first-major-author-art-20261017" : "");
+  }
   function catalog(data) {
     data = data || {};
     var result = {};
@@ -29,6 +34,7 @@
     options = options || {};
     var entry = resolve(id, data, options.originalOverride);
     if (!entry) return null;
+    if (options.preferOriginal && entry.original) entry.sources = [{ url: portraitSource(entry), kind: "original" }, { url: entry.chibi, kind: "chibi" }];
     var ImageType = options.ImageClass || (typeof Image !== "undefined" && Image);
     if (!ImageType) return entry;
     var stopped = false, index = 0;
@@ -55,7 +61,7 @@
       img.src = meta.loadedSource; img.hidden = false;
       panel.classList.add("has-world-portrait");
       img.dataset.displayKind = meta.displayKind;
-    });
+    }, { preferOriginal: true });
   }
-  return { catalog: catalog, resolve: resolve, byName: byName, load: load, speakerPortrait: speakerPortrait };
+  return { catalog: catalog, resolve: resolve, byName: byName, load: load, speakerPortrait: speakerPortrait, portraitSource: portraitSource };
 }));

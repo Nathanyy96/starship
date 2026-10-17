@@ -47,6 +47,13 @@ test('alternate story costumes preserve their original instead of showing the ba
   assert.deepEqual(result.sources, [{ url: './assets/story-characters/isar-ascended.png', kind: 'original' }]);
 });
 
+test('dialogue portraits prefer the authored full-size art', () => {
+  const images = [];
+  class FakeImage { constructor() { images.push(this); } }
+  art.load('celesia', data, () => {}, { ImageClass: FakeImage, preferOriginal: true });
+  assert.equal(images[0].src, data.cards.celesia.image + '?v=first-major-author-art-20261017');
+});
+
 test('narration clears the previous speaker portrait', () => {
   const classes = new Set(['has-world-portrait']);
   let cancelled = false, removed = false;
