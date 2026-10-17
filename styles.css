@@ -1475,6 +1475,9 @@ body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not(
 .battle-action-sprite.harlow { background-image: url('./assets/combat/harlow-normal-actions-v1.webp'); }
 .battle-action-sprite.rena { background-image: url('./assets/combat/rena-normal-actions-v1.webp'); }
 .battle-action-sprite.elorna { background-image: url('./assets/combat/elorna-normal-actions-v1.webp'); }
+.battle-action-sprite.eda { background-image: url('./assets/combat/eda-normal-actions-v1.webp'); }
+.battle-action-sprite.mave { background-image: url('./assets/combat/mave-normal-actions-v1.webp'); }
+.battle-action-sprite.rovienne { background-image: url('./assets/combat/rovienne-normal-actions-v1.webp'); }
 
 .battle-duel.effect-bass .battle-duel-impact i { border-color: #ff76bd; border-width: 4px; border-radius: 46% 54% 60% 40%; animation: battle-duel-burst .6s ease-out both; }
 .battle-duel.effect-beat .battle-duel-impact i { border-color: #b8cafa; border-style: dashed; opacity: .9; animation: battle-beat-ring .62s ease-out both; }
@@ -1493,6 +1496,9 @@ body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not(
 .battle-duel.effect-survey .battle-duel-impact::before { position: absolute; width: 86px; height: 2px; background: #a5f6ed; box-shadow: 0 0 12px #75dfd5; content: ""; transform: rotate(-18deg); animation: battle-arrow .58s ease-out both; }
 .battle-duel.effect-ward .battle-duel-impact i { border-width: 4px; box-shadow: 0 0 16px rgba(139,226,231,.7); }
 .battle-duel.effect-dagger .battle-duel-impact i { border-color: #ff8d9e; border-radius: 32%; transform: rotate(45deg); }
+.battle-arena.effect-calibration .battle-arena-center i { box-shadow: 0 0 25px #b7dbff, 0 0 40px #e5c88e; background: #d9eaff; }
+.battle-arena.effect-index .battle-arena-center i { box-shadow: 0 0 25px #c796ff, 0 0 40px #8556d9; background: #c9a3f8; }
+.battle-arena.effect-unload .battle-arena-center i { box-shadow: 0 0 25px #82b7ff, 0 0 40px #d4c697; background: #a8c9ed; }
 @media (prefers-reduced-motion: reduce) { .battle-duel.effect-bow .battle-duel-impact::before, .battle-duel.effect-star .battle-duel-impact::before, .battle-duel.effect-heavy .battle-duel-impact i, .battle-duel.effect-staff .battle-duel-impact i { animation: none; opacity: .8; } }
 @media (prefers-reduced-motion: reduce) { .battle-duel.effect-survey .battle-duel-impact i, .battle-duel.effect-survey .battle-duel-impact::before { animation: none; opacity: .8; } }
 
