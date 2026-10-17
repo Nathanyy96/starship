@@ -4,6 +4,13 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const motion=require('../src/character-motion');
+test('Celesia overworld uses a normal-proportion four-direction atlas',()=>{
+  const entry=motion.manifest.celesia;
+  assert.match(entry.src,/celesia-walk-natural-v1\.png$/);
+  assert.equal(entry.frames.length,16);
+  assert.ok(entry.displayScale>1);
+  assert.ok(fs.existsSync(path.join(__dirname,'..',entry.src)));
+});
 
 test('scripted walks follow five original story cues on passable ground in 1.0 and 1.1',()=>{
   const opening=require('../src/first-act-game'),world=require('../src/first-major-world');let count=0;
