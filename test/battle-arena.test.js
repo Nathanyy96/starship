@@ -68,3 +68,22 @@ test("future cast uses distinct normal proportion action atlases without changin
     assert.ok(html.includes(`battle-action-sprite ${id} attack`), id);
   }
 });
+
+test("2.0 cast previews use their own skill effects and action atlases", () => {
+  const css = fs.readFileSync(path.resolve(__dirname, "..", "styles.css"), "utf8");
+  for (const [id, effect] of [["risan", "tidechart"], ["yaoze", "beacon"], ["maro", "clinic"]]) {
+    const atlas = path.resolve(__dirname, "..", "assets", "combat", `${id}-normal-actions-v1.webp`);
+    assert.ok(fs.statSync(atlas).size > 100_000, `${id} atlas should contain full action art`);
+    assert.ok(css.includes(`.battle-action-sprite.${id} { background-image: url('./assets/combat/${id}-normal-actions-v1.webp')`));
+    const team = [{ id, hp: 100, maxHp: 100, shield: 0, slot: 3 }];
+    const enemies = [{ id: "enemy-0", name: "敵人", image: data.trialStages[9].enemies[0].image, hp: 100, maxHp: 100, shield: 0 }];
+    const previous = { team: structuredClone(team), enemies: structuredClone(enemies) };
+    if (id === "risan") enemies[0].hp = 80;
+    else team[0].shield = 20;
+    const event = `${id}使用「${data.characterBattleStats[id].skillName}」`;
+    const html = battleArenaMarkup({ team, enemies, actorId: id, actorIsEnemy: false, events: [event] }, previous, {});
+    assert.ok(html.includes(`battle-action-sprite ${id} attack`), id);
+    assert.ok(html.includes(`effect-${effect}`), id);
+    assert.equal(Number(data.cards[id].releaseVersion), 2);
+  }
+});
