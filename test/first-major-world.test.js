@@ -76,7 +76,7 @@ test('invalid positions recover and exploration away from the main story resumes
 function controllerHarness() {
   const context=vm.createContext({window:{addEventListener(){}},Image:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
 
-  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','character-motion-manifest','character-motion','exploration-renderer','exploration','world-presentation','guild-commissions','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
+  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','character-motion-manifest','character-motion','exploration-renderer','exploration','world-presentation','story-interactions','guild-commissions','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..','src',name+'.js'),'utf8'),context);
 
   function element(){const handlers={};return {hidden:false,textContent:'',addEventListener(k,f){handlers[k]=f;},click(){handlers.click?.({});},focus(){},querySelectorAll:()=>[]};}
   const options={load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};
@@ -168,10 +168,11 @@ test('travel controls share unlocks across acts, reload by account, and block tr
 });
 
 
-test('named NPCs use existing chibi assets, stand on reachable ground and patrol safely',()=>{
+test('named NPCs use existing map assets, stand on reachable ground and patrol safely',()=>{
   const p=require('../src/world-presentation');
   for(const [id,map] of Object.entries(world.maps))for(const original of p.npcs(id)){const npc={...original,...world.mapPoint(id,original.x,original.y),patrol:original.patrol?.map(n=>n*(map.scale||1))};
-    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',(npc.spriteId||npc.id)+'-chibi-v1.png')));
+    const spriteId=npc.spriteId||npc.id;
+    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',spriteId+'-chibi-v1.png'))||fs.existsSync(path.join(__dirname,'../assets/exploration/motion',spriteId+'-walk-natural-v1.png')),spriteId);
     assert.ok(world.passable(id,npc.x,npc.y),npc.id);
     assert.ok(world.route({...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]},npc).length,npc.id);
     for(const time of [0,2000,5000,10000]){const at=p.position(npc,time,false,(x,y)=>world.passable(id,x,y));assert.ok(world.passable(id,at.x,at.y),npc.id);}

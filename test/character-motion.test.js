@@ -69,7 +69,7 @@ test('selected explorer uses the new atlas in opening, village and world after s
   const loaded=[],draws=[];
   class Img{constructor(){loaded.push(this);this.naturalWidth=1254;this.naturalHeight=1254;}}
   const context=vm.createContext({Image:Img,window:{addEventListener(){}},HTMLInputElement:class{},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){}});
-  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','character-motion-manifest','character-motion','exploration-renderer','exploration','first-act-game','world-presentation','guild-commissions','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../src',name+'.js'),'utf8'),context);
+  for(const name of ['story-1-0-current','story-1-1-current','world-story-dialogue','world-story-campaign','first-act-scenes','character-motion-manifest','character-motion','exploration-renderer','exploration','first-act-game','world-presentation','story-interactions','guild-commissions','first-major-world'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../src',name+'.js'),'utf8'),context);
   function options(){
     const element=()=>({hidden:false,textContent:'',addEventListener(){},focus(){},querySelectorAll:()=>[]});
     const o={playerId:'magenta',load:()=>null,save(){},canStart:()=>true,onComplete:()=>Promise.resolve()};

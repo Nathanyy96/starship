@@ -1,16 +1,19 @@
 (function(root,factory){var api=factory(typeof module==='object'&&module.exports?require('./native-scene-layouts'):root.StarshipNativeSceneLayouts);if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipNativeTerrain=api;}(globalThis,function(layouts){
   'use strict';
-  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-front-v2.png',harborFront:'harbor-warehouse-front-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-front-v2.png',city:'city-buildings-front-v3.png',village:'village-props-front-v2.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',frontierInn:'frontier-inn-front-v1.png',frontierSupply:'frontier-supply-front-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png',scenery:'roadside-scenery-v1.png',town:'town-buildings-front-v4.png',townDetail:'town-detail-props-v1.png',regional:'regional-scenery-v1.png',orchard:'orchard-tree-v1.png',whiteBell:'white-bell-buildings-front-v3.png',northGate:'white-bell-north-gate-v1.png'},images={},cache={},version=0,requested={},failed=[];
+  var files={ground:'ground-materials-v1.png',harbor:'harbor-props-front-v2.png',harborFront:'harbor-warehouse-front-v1.png',nature:'nature-props-v1.png',landmarks:'landmark-props-front-v2.png',city:'city-buildings-front-v3.png',village:'village-props-front-v2.png',detail:'detail-materials-v1.png',workshop:'workshop-building-v1.png',healer:'healer-building-v1.png',frontier:'frontier-props-v1.png',frontierInn:'frontier-inn-front-v1.png',frontierSupply:'frontier-supply-front-v1.png',firepit:'village-firepit-v1.png',fields:'wheat-field-v1.png',scenery:'roadside-scenery-v1.png',town:'town-buildings-front-v4.png',townDetail:'town-detail-props-v1.png',regional:'regional-scenery-v1.png',orchard:'orchard-tree-v1.png',whiteBell:'white-bell-buildings-front-v3.png',northGate:'white-bell-north-gate-v1.png',villageHomes:'forest-village-homes-v1.png',woodland:'woodland-landscapes-v1.png',ruinLandscape:'ruin-landscapes-v1.png',coastal:'coastal-landscapes-v1.png',refinedGround:'refined-ground-v1.png',tradeRoad:'../west-trade-road-v1.png'},images={},cache={},version=0,requested={},failed=[];
   // Frames are authored against the delivered transparent sprite sheets. They
   // are individual objects, never a resized overview illustration.
   var frames={
     harbor:[[0,0,627,627],[627,0,627,627],[0,627,627,627],[627,627,627,627]],
     nature:[[0,0,660,680],[710,0,544,700],[0,640,650,614],[620,720,634,534]],
     landmarks:[[0,0,627,627],[627,0,627,627],[0,627,627,627],[627,627,627,627]],
-    orchard:[[220,0,1100,1000]],northGate:[[0,0,1536,1024]]
+    orchard:[[220,0,1100,1000]],northGate:[[0,0,1536,1024]],
+    ruinLandscape:[[0,0,768,540],[768,0,768,540],[0,540,768,484],[768,540,768,484]],
+    coastal:[[0,0,768,500],[768,0,768,535],[0,500,768,524],[768,535,768,489]],
+    refinedGround:[[0,0,627,596],[627,0,627,627],[0,596,627,658],[627,627,627,627]]
   };
   function imageId(p){if(p.sheet==='harbor'&&p.cell===0)return 'harborFront';if(p.sheet==='frontier'&&p.cell===0)return 'frontierInn';if(p.sheet==='frontier'&&p.cell===1)return 'frontierSupply';return p.sheet;}
-  function needed(p){var ids=['ground','detail','nature'];objects(p).forEach(function(o){var id=imageId(o);if(!ids.includes(id))ids.push(id);});if(p.fields&&p.fields.length)ids.push('fields');if(p.fire)ids.push('firepit');if(p.fountain&&!ids.includes('landmarks'))ids.push('landmarks');return ids;}
+  function needed(p){if(p.overview)return ['tradeRoad'];var ids=['ground','detail','nature','refinedGround'];objects(p).forEach(function(o){var id=imageId(o);if(!ids.includes(id))ids.push(id);});if(p.fields&&p.fields.length)ids.push('fields');if(p.fire)ids.push('firepit');if(p.fountain&&!ids.includes('landmarks'))ids.push('landmarks');return ids;}
   function ensure(p){if(typeof Image==='undefined')return;needed(p).forEach(function(id){if(requested[id])return;requested[id]=true;var img=new Image();img.onload=function(){images[id]=img;cache={};version++;};img.onerror=function(){failed.push(id);};img.src='./assets/exploration/native/'+files[id];});}
 
   function structure(sheet,cell,x,y,w,h){return {sheet:sheet,cell:cell,x:x,y:y,w:w,h:h};}
@@ -46,7 +49,7 @@
   function paint(key,width,height,test,settings){
     if(typeof document==='undefined')return null;ensure(settings.native);
     var token=key+':'+version+':'+Boolean(settings.groundOnly);if(cache[token])return cache[token];
-    var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),p=settings.native,paths=settings.paths||[],tiles=patterns(c),detail=patterns(c,'detail'),roadOverlay=document.createElement('canvas');roadOverlay.width=width;roadOverlay.height=height;
+    var sheet=document.createElement('canvas');sheet.width=width;sheet.height=height;var c=sheet.getContext('2d'),p=settings.native,paths=settings.paths||[],tiles=patterns(c),detail=patterns(c,'detail'),refined=patterns(c,'refinedGround'),roadOverlay=document.createElement('canvas');roadOverlay.width=width;roadOverlay.height=height;if(p.overview){if(!images.tradeRoad)return null;c.drawImage(images.tradeRoad,0,0,width,height);cache[token]=sheet;return sheet;}
     c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.fillStyle=p.style==='port'?tiles[3]:tiles[2];c.fillRect(0,0,width,height);
     // Lift the dark material atlas with a warm daylight tint before drawing
     // rivers, crops and buildings on top; this keeps texture instead of flat fill.
@@ -79,6 +82,6 @@
   }
   // Sort at the solid facade, so a person standing on the front steps stays visible.
   function depth(p){return p.y+p.h*(p.sheet==='nature'? .92:p.door?.76:.88);}
-  function objects(p){return p.structures.concat(p.arches||[],p.scenery||[]).concat((p.trees||[]).map(function(t){return structure(t[2]===3?'harbor':'nature',t[2]===3?3:t[2],t[0],t[1],t[3]*.95,t[3]);}));}
+  function objects(p){return p.structures.concat(p.arches||[],p.scenery||[],p.landscapes||[]).concat((p.trees||[]).map(function(t){return structure(t[4]||(t[2]===3?'harbor':'nature'),t[4]?t[5]:(t[2]===3?3:t[2]),t[0],t[1],t[3]*.95,t[3]);}));}
   return {install:install,paint:paint,files:files,ready:function(p){return needed(p).every(function(id){return Boolean(images[id]);});},failed:function(){return failed.slice();},objects:objects,depth:depth,drawObject:drawObject,bridgeAt:bridgeAt,version:function(){return version;}};
 }));
