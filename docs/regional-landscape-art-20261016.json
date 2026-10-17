@@ -1,0 +1,40 @@
+{
+  "tool": "built-in image_gen",
+  "sourceDirectory": "Codex generated_images/01a11f3a-2174-73c1-bb04-7a3a1a9a91af",
+  "assets": [
+    {
+      "file": "assets/exploration/native/forest-village-homes-v1.png",
+      "source": "exec-0ffe81e1-6157-4ce8-8c4e-e93d827d1681.png",
+      "prompt": "獸靈之村原圖 c1-102 的木台、棚屋、綠布與草頂；四款不同住宅，固定俯視斜角，透明背景，無文字與人物"
+    },
+    {
+      "file": "assets/exploration/native/woodland-landscapes-v1.png",
+      "source": "exec-064e0c88-3b0b-46f1-bbbf-449998d37127.png",
+      "prompt": "依獸靈原圖林地生態製作四種組景：林緣、蘆葦岸地、藥圃、苔石坡；不包含可走道路"
+    },
+    {
+      "file": "assets/exploration/native/ruin-landscapes-v1.png",
+      "source": "exec-82c2ec29-94cc-4df0-b1cd-d86a84601b13.png",
+      "prompt": "四種遺構與山地組景：殘柱石台、松林岩壁、水車木料場、古鐘花園；透明背景，固定遊戲俯視斜角"
+    },
+    {
+      "file": "assets/exploration/native/coastal-landscapes-v1.png",
+      "source": "exec-1d7de73b-7c97-4be9-a3e9-836486240a2d.png",
+      "prompt": "四種生活組景：港口魚貨與漁網、海岸岩灘花草、白石住宅庭院、採收果園；透明背景，無人物與道路"
+    },
+    {
+      "file": "assets/exploration/native/refined-ground-v1.png",
+      "source": "exec-51ffa900-6a8e-4d7e-90b4-1be641d7127d.png",
+      "prompt": "四格平面細節材質：暖白石鋪面、細礫土路、鮮綠草地、石灰岩碎土；無文字、無景物、正俯視"
+    },
+    {
+      "file": "assets/exploration/native/../room-rugs-v1.png",
+      "source": "exec-43c6e6aa-9712-485c-9df4-60a5c0940330.png",
+      "prompt": "四種正俯視奇幻織毯：旅店酒紅花紋、醫療草本、觀測星圖、山地編織；透明背景，無家具與文字"
+    }
+  ],
+  "reusedAsset": {
+    "file": "assets/exploration/native/white-bell-buildings-v1.png",
+    "source": "既有工作區 ImageGen 透明白鐘住宅素材，已檢視後採用；未採用其他未完成場景程式或候選整圖"
+  }
+}

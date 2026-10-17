@@ -1,0 +1,10 @@
+.story-interlude{position:absolute;z-index:35;inset:auto 20px 20px;max-width:760px;margin:0 auto;padding:20px 24px;background:#15372e;color:#f1ecd7;border:1px solid #a9a47c;border-radius:8px}
+.story-interlude[hidden]{display:none!important}
+.story-interlude h4{margin:0 0 10px;font-size:20px;color:#f3dfa4}
+.story-interlude p{margin:0 0 18px;font-size:15px;line-height:1.8;color:#e2e9da;max-width:65ch}
+.story-interlude-actions{display:flex;flex-wrap:wrap;gap:10px}
+.story-interlude-actions button{flex:1 1 220px;min-height:48px;padding:12px 16px;border:1px solid #9caf90;border-radius:6px;background:#244b3c;color:#fff3cc;font:inherit;text-align:left;cursor:pointer}
+.story-interlude-actions button:hover{background:#365e49;border-color:#f3dfa4}
+.story-interlude-actions button:focus-visible{outline:3px solid #f3dfa4;outline-offset:3px}
+.story-interlude-actions button:active{background:#173c2b}
+@media(max-width:600px){.story-interlude{inset:auto 10px 14px;padding:16px;max-height:48%;overflow:auto}.story-interlude h4{font-size:18px}.story-interlude p{font-size:14px}.story-interlude-actions{gap:8px}.story-interlude-actions button{flex-basis:100%;font-size:14px}}
