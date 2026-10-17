@@ -107,7 +107,11 @@ test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯�
     assert.equal(card.portraitImage, `./assets/cards/complete/${id}.svg`);
     assert.equal(fs.existsSync(path.join(__dirname, "..", card.image)), true);
     const svg = fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8");
-    return svg.includes('viewBox="0 0 1024 1536"') &&
+    const png = fs.readFileSync(path.join(__dirname, "..", card.image));
+    const width = png.readUInt32BE(16);
+    const height = png.readUInt32BE(20);
+    const updatedArt = ["celesia", "veyra", "harlow", "rena", "elorna"].includes(id);
+    return svg.includes(updatedArt ? `viewBox="0 0 ${width} ${height}"` : 'viewBox="0 0 1024 1536"') &&
       svg.includes(`data-character-id="${id}"`) &&
       svg.includes(`href="../${path.basename(card.image)}"`) &&
       svg.includes("<image ") &&

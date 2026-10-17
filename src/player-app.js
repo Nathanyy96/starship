@@ -82,7 +82,7 @@
     // All character surfaces must use the same clean portrait source as the
     // design documents.  The version query is intentional: deployed browsers
     // may still have an older labeled card cached at the same asset URL.
-    var characterPortraitAssetVersion = "first-major-roster-20261001";
+    var characterPortraitAssetVersion = "first-major-author-art-20261017";
     function characterPortraitSource(card, state, useEquippedSkin) {
       // SVG wrappers reference sibling PNGs; browsers do not load those external
       // references when the SVG is used as a CSS background or an <img> source.
