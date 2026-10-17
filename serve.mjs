@@ -700,6 +700,7 @@ function runTrial(currentState, body) {
       won,
       status: won ? "won" : halfResults.some((result) => result.status === "timeout") ? "timeout" : "defeat",
       timedOut: halfResults.some((result) => result.timedOut),
+      challengeComplete: halfResults.length === stage.halves.length && halfResults.every((result) => result.status !== "timeout"),
       stageId: stage.id,
       stageName: stage.name,
       rounds: halfResults.reduce((sum, result) => sum + result.rounds, 0),
@@ -728,7 +729,7 @@ function runTrial(currentState, body) {
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     state.recruitment.trial10ChoiceAvailable = false;
   }
-  if (stage.maxChallengeAttempts && battle.status !== "timeout" || battle.won) state.trialProgress.attempts[stage.id] = attempts + 1;
+  if (stage.halves ? battle.challengeComplete : ((stage.maxChallengeAttempts && battle.status !== "timeout") || battle.won)) state.trialProgress.attempts[stage.id] = attempts + 1;
   const attemptsUsed = Number(state.trialProgress.attempts[stage.id] || 0);
   return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } : { starSand: 0, characterExp: 0, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } };
 }
