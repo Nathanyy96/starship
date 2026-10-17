@@ -129,7 +129,7 @@ test("角色介面不會回退到舊式 labeled-png", () => {
   const legacyApp = fs.readFileSync(path.join(__dirname, "..", "src", "app.js"), "utf8");
   const server = fs.readFileSync(path.join(__dirname, "..", "serve.mjs"), "utf8");
   assert.match(playerApp, /card\.image \|\| card\.backgroundImage \|\| card\.portraitImage/);
-  assert.match(legacyApp, /portraitImage \|\| card\.image \|\| card\.backgroundImage/);
+  assert.match(legacyApp, /card\.image \|\| card\.backgroundImage \|\| card\.portraitImage/);
   assert.match(server, /retiredLabeledPortraitRoot/);
   assert.doesNotMatch(playerApp, /labeled-png/);
   assert.doesNotMatch(legacyApp, /labeled-png/);
