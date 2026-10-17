@@ -55,3 +55,16 @@ test("enemy area attacks animate every affected ally without moving the rest", (
   assert.equal((html.match(/battle-arena-fighter[^\"]* targeted/g) || []).length, 2);
   assert.ok(html.includes("crystal-beast attack"));
 });
+
+test("future cast uses distinct normal proportion action atlases without changing release gating", () => {
+  const css = fs.readFileSync(path.resolve(__dirname, "..", "styles.css"), "utf8");
+  for (const id of ["eda", "mave", "rovienne"]) {
+    const atlas = path.resolve(__dirname, "..", "assets", "combat", `${id}-normal-actions-v1.webp`);
+    assert.ok(fs.statSync(atlas).size > 100_000, `${id} atlas should contain full action art`);
+    assert.ok(css.includes(`.battle-action-sprite.${id} { background-image: url('./assets/combat/${id}-normal-actions-v1.webp')`));
+    const team = [{ id, hp: 100, maxHp: 100, shield: 0, slot: 3 }];
+    const enemies = [{ id: "enemy-0", name: "敵人", image: data.trialStages[9].enemies[0].image, hp: 100, maxHp: 100, shield: 0 }];
+    const html = battleArenaMarkup({ team, enemies, actorId: id, actorIsEnemy: false, events: [`${id}攻擊敵人`] }, { team: structuredClone(team), enemies: structuredClone(enemies) }, {});
+    assert.ok(html.includes(`battle-action-sprite ${id} attack`), id);
+  }
+});
