@@ -26,14 +26,21 @@ test("stage 10 arena keeps every combatant visible while only the actor and targ
   const frame = { team, enemies, actorId: "magenta", actorIsEnemy: false, events: ["瑪珍塔攻擊鏡核巡獸"] };
   const html = battleArenaMarkup(frame, previous, {});
   assert.equal((html.match(/class="battle-arena-fighter/g) || []).length, 7);
-  assert.equal((html.match(/battle-arena-fighter acting/g) || []).length, 1);
-  assert.equal((html.match(/battle-arena-fighter targeted/g) || []).length, 1);
+  assert.equal((html.match(/battle-arena-fighter[^\"]* acting/g) || []).length, 1);
+  assert.equal((html.match(/battle-arena-fighter[^\"]* targeted/g) || []).length, 1);
   assert.equal((html.match(/battle-action-sprite [^\"]+ attack/g) || []).length, 1);
+  for (const slot of [1, 2, 3, 4]) assert.ok(html.includes(`position-slot-${slot}`));
   assert.ok(html.includes("magenta attack"));
   assert.ok(html.includes("spine-beast hurt"), html.match(/battle-action-sprite[^\"]+/g).join(" | "));
   assert.ok(html.includes("我方") && html.includes("敵方"));
   const css = fs.readFileSync(path.resolve(__dirname, "..", "styles.css"), "utf8");
   assert.ok(!css.includes(".battle-timeline-active .battle-unit-visual { display: none; }"));
+  assert.match(css, /\.ally-formation \.position-slot-1 \{ grid-area: 1 \/ 2/);
+  assert.match(css, /\.ally-formation \.position-slot-2 \{ grid-area: 2 \/ 2/);
+  assert.match(css, /\.ally-formation \.position-slot-3 \{ grid-area: 1 \/ 1/);
+  assert.match(css, /\.ally-formation \.position-slot-4 \{ grid-area: 2 \/ 1/);
+  assert.match(css, /\.enemy-formation \.battle-arena-roster \{ grid-template-columns: minmax\(0,1fr\)/);
+  assert.match(css, /\.battle-arena \{[^}]*min-height: 590px/);
 });
 
 test("enemy area attacks animate every affected ally without moving the rest", () => {
@@ -44,7 +51,7 @@ test("enemy area attacks animate every affected ally without moving the rest", (
   team[2].hp = 75;
   const html = battleArenaMarkup({ team, enemies, actorId: "enemy-0", actorIsEnemy: true, events: ["雙相終端發動範圍攻擊"] }, previous, {});
   assert.equal((html.match(/class="battle-arena-fighter/g) || []).length, 7);
-  assert.equal((html.match(/battle-arena-fighter acting/g) || []).length, 1);
-  assert.equal((html.match(/battle-arena-fighter targeted/g) || []).length, 2);
+  assert.equal((html.match(/battle-arena-fighter[^\"]* acting/g) || []).length, 1);
+  assert.equal((html.match(/battle-arena-fighter[^\"]* targeted/g) || []).length, 2);
   assert.ok(html.includes("crystal-beast attack"));
 });

@@ -81,15 +81,15 @@ test("equipped normal-proportion costumes have matching combat frames", () => {
   }
 });
 
-test("next 1.2 characters have their own normal-proportion combat poses", () => {
+test("1.2–1.3 characters have their own normal-proportion combat poses", () => {
   const path = require("node:path");
   const css = fs.readFileSync(path.resolve(__dirname, "..", "styles.css"), "utf8");
   const player = fs.readFileSync(path.resolve(__dirname, "..", "src", "player-app.js"), "utf8");
-  for (const id of ["veyra", "harlow"]) {
+  for (const id of ["veyra", "harlow", "rena", "elorna"]) {
     const asset = `${id}-normal-actions-v1.webp`;
     const file = path.resolve(__dirname, "..", "assets", "combat", asset);
     assert.ok(fs.statSync(file).size > 100_000, asset);
     assert.ok(css.includes(asset), asset);
-    assert.match(player, new RegExp(`${id}: "(?:survey|barrier)"`));
+    assert.match(player, new RegExp(`${id}: "(?:survey|barrier|dagger|guard)"`));
   }
 });
