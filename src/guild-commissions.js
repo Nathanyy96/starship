@@ -1,0 +1,8 @@
+(function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.StarshipGuildCommissions=api;}(globalThis,function(){
+  'use strict';
+  var ids=['letter','hunt','survey','supply'];
+  function clean(raw){raw=raw&&typeof raw==='object'?raw:{};var jobs={};ids.forEach(function(id){jobs[id]=['available','active','ready','done'].includes(raw.jobs&&raw.jobs[id])?raw.jobs[id]:'available';});return {version:1,jobs:jobs,team:Array.isArray(raw.team)?Array.from(new Set(raw.team.filter(function(id){return typeof id==='string';}))).slice(0,4):[],survey:Array.isArray(raw.survey)?Array.from(new Set(raw.survey.filter(function(id){return ['river','workshop','steps'].includes(id);}))) :[]};}
+  function update(raw,action,id){var state=clean(raw);if(action==='accept'&&ids.includes(id)&&state.jobs[id]==='available')state.jobs[id]='active';if(action==='complete'&&ids.includes(id)&&state.jobs[id]==='ready')state.jobs[id]='done';if(action==='deliver'&&id==='letter'&&state.jobs.letter==='active')state.jobs.letter='ready';if(action==='win'&&id==='hunt'&&state.jobs.hunt==='active')state.jobs.hunt='ready';if(action==='inventory'&&id==='supply'&&state.jobs.supply==='active')state.jobs.supply='ready';if(action==='survey'&&state.jobs.survey==='active'&&['river','workshop','steps'].includes(id)){if(!state.survey.includes(id))state.survey.push(id);if(state.survey.length===3)state.jobs.survey='ready';}return state;}
+  function setTeam(raw,ids,owned){var state=clean(raw),allowed=new Set(owned||[]);state.team=Array.from(new Set((ids||[]).filter(function(id){return allowed.has(id);}))).slice(0,4);return state;}
+  return {clean:clean,update:update,setTeam:setTeam};
+}));

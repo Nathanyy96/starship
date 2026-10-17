@@ -5,6 +5,9 @@ test('authenticated world position saves isolate accounts, reject obstacles and 
  async function post(route,body){const res=await fetch(url+route,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:res.status,body:await res.json()};}
  try{for(let i=0;i<100;i++){try{await fetch(url+'/api/health');break;}catch{await delay(50);}}
  const alice=(await post('/api/player/register',{name:'world-alice',password:'home-api-123'})).body,bob=(await post('/api/player/register',{name:'world-bob',password:'home-api-123'})).body;
+ const unlocked=(await post('/api/player/world-waypoints',{token:alice.token,waypoints:['city-plaza','village-anchor','unknown']})).body;
+ assert.deepEqual(unlocked.waypoints,['city-plaza','village-anchor']);
+ assert.deepEqual((await post('/api/player/world-waypoints',{token:alice.token,waypoints:['city-plaza']})).body.waypoints,unlocked.waypoints);
  assert.equal((await post('/api/player/claim-character',{token:alice.token,rewardKey:'trial-10',cardId:'reyn'})).status,400);
  const position={version:1,kind:'world',state:{map:'city',x:3454,y:858,roaming:true}};
  assert.notEqual((await post('/api/player/world-position',{position})).status,200);
@@ -14,7 +17,9 @@ test('authenticated world position saves isolate accounts, reject obstacles and 
  assert.equal((await post('/api/player/world-position',{token:alice.token,position:{...position,state:{...position.state,x:680,y:1460}},sequence:3})).status,400);
  const session=(await post('/api/player/session',{token:alice.token})).body;
  assert.deepEqual(session.state.resources,alice.state.resources);assert.deepEqual(session.state.collection,alice.state.collection);assert.equal(session.state.worldPosition.state.map,'city');
+ assert.deepEqual(session.state.worldWaypoints,unlocked.waypoints);
  assert.equal((await post('/api/player/session',{token:bob.token})).body.state.worldPosition,null);
+ assert.deepEqual((await post('/api/player/session',{token:bob.token})).body.state.worldWaypoints,[]);
  const login=(await post('/api/player/login',{name:'world-alice',password:'home-api-123'})).body;assert.equal(login.state.worldPosition.state.map,'city');
  assert.equal(JSON.parse(fs.readFileSync(path.join(directory,'players.json'),'utf8')).players['world-alice'].state.worldPosition.state.map,'city');
  }finally{server.kill();}

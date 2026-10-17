@@ -166,6 +166,9 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
   Object.keys(oldScenes).forEach((sceneKey) => {
     if (!nextScenes[sceneKey]) throw new Error("更新保護中止：玩家 " + playerKey + " 的已完成劇情不可被移除");
   });
+  const oldWaypoints = Array.isArray(previousState.worldWaypoints) ? previousState.worldWaypoints : [];
+  const nextWaypoints = new Set(Array.isArray(nextState.worldWaypoints) ? nextState.worldWaypoints : []);
+  if (oldWaypoints.some((id) => !nextWaypoints.has(id))) throw new Error("更新保護中止：已啟用的傳送點不可被移除");
   const oldTutorial = previousState.tutorialProgress && typeof previousState.tutorialProgress === "object" ? previousState.tutorialProgress : {};
   const nextTutorial = nextState.tutorialProgress && typeof nextState.tutorialProgress === "object" ? nextState.tutorialProgress : {};
   if (oldTutorial.rewardClaimed === true && nextTutorial.rewardClaimed !== true) {
@@ -227,16 +230,21 @@ async function readDatabase() {
 }
 
 async function writeDatabase(database, previousDatabase) {
-  assertDatabaseContinuity(previousDatabase || databaseBaselines.get(database), database);
+  const baseline = previousDatabase || databaseBaselines.get(database);
+  assertDatabaseContinuity(baseline, database);
   if (!usePostgres) {
     writeFileDatabase(database);
     return;
   }
   await ensurePostgresSchema();
+  // Most requests touch one account. Avoid rewriting every JSONB state for each save.
+  const changedPlayers = Object.entries(database.players || {}).filter(([key, record]) =>
+    !baseline?.players?.[key] || JSON.stringify(record) !== JSON.stringify(baseline.players[key]));
+  if (!changedPlayers.length) return;
   const client = await getPostgresPool().connect();
   try {
     await client.query("BEGIN");
-    for (const [key, record] of Object.entries(database.players || {})) {
+    for (const [key, record] of changedPlayers) {
       await client.query(`
         INSERT INTO starship_players (player_key, name, password_hash, created_at, updated_at, last_login_at, state)
         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
@@ -258,6 +266,7 @@ async function writeDatabase(database, previousDatabase) {
       ]);
     }
     await client.query("COMMIT");
+    databaseBaselines.set(database, cloneDatabase(database));
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -292,6 +301,11 @@ function freshPlayerState() {
   return createGame(state).getState();
 }
 
+function mergeWorldWaypoints(...lists) {
+  const allowed = new Set(worldGeometry.waypoints.map((point) => point.id));
+  return Array.from(new Set(lists.flatMap((list) => Array.isArray(list) ? list : []).filter((id) => allowed.has(id))));
+}
+
 function snapshotPlayerProgress(currentState) {
   const source = currentState && typeof currentState === "object" ? currentState : {};
   return {
@@ -324,6 +338,7 @@ function restorePlayerProgress(state, snapshot) {
 function ensurePlayerMilestones(currentState) {
   const preservedProgress = snapshotPlayerProgress(currentState);
   const state = createGame(currentState || freshPlayerState()).getState();
+  state.worldWaypoints = mergeWorldWaypoints(state.worldWaypoints, state.worldPosition?.state?.waypoints);
   restorePlayerProgress(state, preservedProgress);
   const completedScenes = state.storyProgress && state.storyProgress.completedScenes;
   if (completedScenes) {
@@ -360,6 +375,13 @@ function ensurePlayerMilestones(currentState) {
     state.resources.characterExp += updateReward.characterExp;
     state.resources.starMarks += updateReward.starMarks || 0;
     state.updateRewards.claimedVersions[releaseConfig.compensationCycle] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, starMarks: updateReward.starMarks || 0, grantedAt: new Date().toISOString() };
+  }
+  if (!state.updateRewards.claimedVersions[releaseConfig.explorationUpdateCycle]) {
+    const update = releaseConfig.explorationUpdateReward;
+    const repair = releaseConfig.explorationRepairReward;
+    const total = { starSand: update.starSand + repair.starSand, characterExp: update.characterExp + repair.characterExp, starMarks: update.starMarks + repair.starMarks };
+    for (const [resource, amount] of Object.entries(total)) state.resources[resource] += amount;
+    state.updateRewards.claimedVersions[releaseConfig.explorationUpdateCycle] = { ...total, update, repair, grantedAt: new Date().toISOString() };
   }
   if (state.trialProgress.version !== currentUpdateVersion) {
     state.trialProgress.version = currentUpdateVersion;
@@ -1048,7 +1070,6 @@ async function handleApi(request, response, requestUrl) {
       if (!verifyPassword(body.password, existing.record.passwordHash)) throw new Error("遊戲名稱或密碼不正確");
       existing.record.lastLoginAt = new Date().toISOString();
       existing.record.updatedAt = existing.record.lastLoginAt;
-      await writeDatabase(database);
       existing.record.state = ensurePlayerMilestones(existing.record.state);
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, token: createSession(existing.key), player: publicPlayer(existing.record), state: existing.record.state });
@@ -1077,10 +1098,21 @@ async function handleApi(request, response, requestUrl) {
       }
       position.updatedAt = Date.now();
       player.record.state.worldPosition = position;
+      player.record.state.worldWaypoints = mergeWorldWaypoints(player.record.state.worldWaypoints, position.state.waypoints);
       player.record.updatedAt = new Date(position.updatedAt).toISOString();
       await writeDatabase(database);
       if(body.sequence !== undefined)session.worldSequence = body.sequence;
       sendJson(response, 200, { ok:true, position });
+      return;
+    }
+
+    if (requestUrl.pathname === "/api/player/world-waypoints") {
+      const player = playerFromSession(database, body.token);
+      const merged = mergeWorldWaypoints(player.record.state.worldWaypoints, player.record.state.worldPosition?.state?.waypoints, body.waypoints);
+      player.record.state.worldWaypoints = merged;
+      player.record.updatedAt = new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response, 200, { ok: true, waypoints: merged });
       return;
     }
 

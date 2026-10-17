@@ -15,6 +15,22 @@ test('automatic regional exits connect westward and southward without advancing 
   assert.equal(world.crossExit(result.state,to,result.state.x,result.state.y).changed,false,'no immediate return loop');
  }
 });
+test('regional exits follow the atlas compass and return to their paired road',()=>{
+ const atlas={south:[61,83],village:[72,60],road:[58,59],city:[43,60],northRoad:[45,49],mistbridge:[48,38],echo:[59,27],relic:[50,13],banksWest:[68,38],banksEast:[76,28],bellcourt:[23,18],riverRoad:[72,87],lotin:[88,89]};
+ // The broken east bank is reached by a mountain bypass; the Bell Court is a portal.
+ const exceptions=new Set(['banksEast>echo','relic>bellcourt','bellcourt>relic']);
+ for(const [from,position] of Object.entries(atlas))for(const exit of world.maps[from].exits){
+  const destination=atlas[exit.to];if(!destination)continue;
+  const returnExit=world.maps[exit.to].exits.find(back=>back.to===from);
+  assert.ok(returnExit,from+' has a return from '+exit.to);
+  assert.ok(Math.hypot(returnExit.spawn[0]-exit.x,returnExit.spawn[1]-exit.y)<100,from+' paired arrival');
+  assert.ok(Math.hypot(exit.spawn[0]-returnExit.x,exit.spawn[1]-returnExit.y)<100,exit.to+' paired arrival');
+  if(exceptions.has(from+'>'+exit.to))continue;
+  const facing=[exit.x/world.maps[from].width-.5,exit.y/world.maps[from].height-.5];
+  const direction=[destination[0]-position[0],destination[1]-position[1]];
+  assert.ok(facing[0]*direction[0]+facing[1]*direction[1]>0,from+'→'+exit.to+' faces the wrong compass side');
+ }
+});
 test('dialogue identifies the actual speakers and preserves complete narration',()=>{
  const scene=world.acts[5][3],pair=scene.lines.map((text,i)=>[scene.speakers[i],text]);
  assert.equal(pair.find(p=>p[1]==='「下次先叫我。」')[0],'雷恩');

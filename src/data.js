@@ -603,6 +603,12 @@
     reward: "1.1 五幕閱讀及十二步互動完成後，可在最後一幕領取一次 1,600 星砂、3,600 角色經驗、1 星痕；先前重大修正補償不會重複發放。",
     highlights: ["新增 Hina、Siyeon、岑霧、芮妲、榆安；限定池承接原有保底", "四星機率調整：前 20 抽 0%，21–30 抽 10%，31–40 抽 15%，41–49 抽指數提高，50 抽必出；既有保底抽數及精選保證保留", "試煉、Boss、委託、迷航及商店本期次數重置；星伴培育與已擁有資產保留", "梅芙、赫洛造型暫停售；既有收藏保留", "雙隊切磋暫緩，未納入本次更新；2.x 仍只供作者試玩"]
   })].concat(announcements));
+  announcements = Object.freeze([Object.freeze({
+    id: "white-bell-exploration-2026-10-16", badge: "探索大更新・修復補償", date: "2026-10-16", title: "白鐘城與大世界探索更新",
+    copy: "重整可玩地圖的道路、城鎮建築與場景，白鐘城冒險家協會新增送信、討伐、考察與工坊補給盤點試玩。協會委託目前不發放正式帳號資源。角色、培養、原有資源、已開傳送點與劇情進度保留。",
+    reward: "每帳號一次，登入後合併發放：更新獎勵 5,000 星砂、5,000 角色經驗、2 星痕；修復補償 3,000 星砂、3,000 角色經驗、1 星痕。",
+    highlights: ["白鐘城主街新增協會與走動居民，四種地方委託可試玩", "已啟用的傳送點同步至帳號，舊本機紀錄會合併保留", "保留主線與資產；不重置本期試煉、Boss、商店或星伴進度", "角色外觀仍保留現有地圖素材，精緻比例版本待同場景對照驗收"]
+  })].concat(announcements));
   var storyChapters = [
     {
       id: "main-1-0", type: "main", version: "1.0", title: "界痕初響", region: "獸靈之村",
@@ -2123,6 +2129,9 @@
     updateVersion: release.version,
     releaseConfig: release,
     compensationCycle: release.compensationCycle,
+    explorationUpdateCycle: release.explorationUpdateCycle,
+    explorationUpdateReward: release.explorationUpdateReward,
+    explorationRepairReward: release.explorationRepairReward,
     updateCycle: updateCycle,
     updateReward: Object.freeze({ starSand: 6000, characterExp: 6000, starMarks: 3 })
   };

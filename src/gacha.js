@@ -292,6 +292,7 @@
     var state = initialState();
     state.version = source.version || 1;
     state.worldPosition = isPlainObject(source.worldPosition) ? clone(source.worldPosition) : null;
+    state.worldWaypoints = Array.isArray(source.worldWaypoints) ? Array.from(new Set(source.worldWaypoints.filter(function (id) { return typeof id === "string"; }))).slice(0, 40) : [];
     var savedResources = isPlainObject(source.resources) ? source.resources : {};
     ["starSand", "starMarks", "characterExp"].forEach(function (key) {
       if (Object.prototype.hasOwnProperty.call(savedResources, key)) state.resources[key] = savedResources[key];

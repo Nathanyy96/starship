@@ -1,0 +1,347 @@
+{
+  "baseline": "workshop-street-playable-sample-v1.png",
+  "scope": "24 current exploration maps + two opening zones; atlas geography unchanged",
+  "scenes": [
+    {
+      "key": "village",
+      "maps": [
+        "village"
+      ],
+      "name": "獸靈之村",
+      "original": "./assets/maps/c1-102.png",
+      "width": 2508,
+      "height": 1409,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/village-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1672,
+      "actualHeight": 941,
+      "bytes": 4316716
+    },
+    {
+      "key": "road",
+      "maps": [
+        "road"
+      ],
+      "name": "西行商路・兩日行程",
+      "original": "./assets/exploration/west-trade-road-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/road-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1673,
+      "actualHeight": 940,
+      "bytes": 4326200
+    },
+    {
+      "key": "city",
+      "maps": [
+        "city"
+      ],
+      "name": "白鐘城・東門至城西",
+      "original": "./assets/exploration/white-bell-streets-v1.png",
+      "width": 3678,
+      "height": 2066,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/city-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1672,
+      "actualHeight": 941,
+      "bytes": 4431606
+    },
+    {
+      "key": "south",
+      "maps": [
+        "south"
+      ],
+      "name": "南驛山谷・農地與驛路",
+      "original": "./assets/maps/c1-104.png",
+      "width": 1536,
+      "height": 1024,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/south-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1536,
+      "actualHeight": 1024,
+      "bytes": 4426306
+    },
+    {
+      "key": "mistbridge",
+      "maps": [
+        "mistbridge"
+      ],
+      "name": "霧橋鎮",
+      "original": "./assets/maps/c1-103.png",
+      "width": 2675,
+      "height": 1506,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/mistbridge-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1672,
+      "actualHeight": 941,
+      "bytes": 4374779
+    },
+    {
+      "key": "echo",
+      "maps": [
+        "echo"
+      ],
+      "name": "山腰驛站／迴音谷",
+      "original": "./assets/maps/a1-105.png",
+      "width": 1536,
+      "height": 1024,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/echo-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1536,
+      "actualHeight": 1024,
+      "bytes": 4173881
+    },
+    {
+      "key": "relic",
+      "maps": [
+        "relic"
+      ],
+      "name": "霧橋第七遺構",
+      "original": "./assets/maps/a1-106.png",
+      "width": 1536,
+      "height": 1024,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/relic-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1536,
+      "actualHeight": 1024,
+      "bytes": 4134502
+    },
+    {
+      "key": "banksWest",
+      "maps": [
+        "banksWest",
+        "banksEast"
+      ],
+      "name": "北斷橋・西岸聚落／北斷橋・東岸工區",
+      "original": "./assets/maps/a1-108-two-banks-concept.png",
+      "width": 1536,
+      "height": 1024,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/banksWest-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1536,
+      "actualHeight": 1024,
+      "bytes": 4294890
+    },
+    {
+      "key": "bellcourt",
+      "maps": [
+        "bellcourt"
+      ],
+      "name": "彼岸鐘庭・外庭",
+      "original": "./assets/maps/s1-201-bell-court-concept.png",
+      "width": 1672,
+      "height": 941,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/bellcourt-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1672,
+      "actualHeight": 941,
+      "bytes": 3848428
+    },
+    {
+      "key": "northRoad",
+      "maps": [
+        "northRoad"
+      ],
+      "name": "北行商路・白鐘至霧橋",
+      "original": "./assets/exploration/north-trade-road-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/northRoad-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "factoryNear",
+      "maps": [
+        "factoryNear",
+        "factoryFar"
+      ],
+      "name": "城西工坊・近端／城西工坊・對岸",
+      "original": "./assets/exploration/white-bell-workshop-rescue-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/factoryNear-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "rescue",
+      "maps": [
+        "rescue"
+      ],
+      "name": "迴音谷・舊渡台",
+      "original": "./assets/exploration/echo-rescue-landing-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/rescue-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "cityInn",
+      "maps": [
+        "cityInn"
+      ],
+      "name": "白鐘城・東門旅店",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "interior-path",
+      "asset": "./assets/exploration/scenes/cityInn-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "mistInn",
+      "maps": [
+        "mistInn"
+      ],
+      "name": "霧橋鎮・旅店後廳",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "interior-path",
+      "asset": "./assets/exploration/scenes/mistInn-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "recovery",
+      "maps": [
+        "recovery"
+      ],
+      "name": "白鐘城・老瓦克休養處",
+      "original": "./assets/exploration/vark-recovery-room-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "interior-path",
+      "asset": "./assets/exploration/scenes/recovery-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "clinic",
+      "maps": [
+        "clinic"
+      ],
+      "name": "獸靈之村・醫療屋與廚房",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 960,
+      "height": 720,
+      "kind": "interior",
+      "asset": "./assets/exploration/scenes/clinic-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "observatory",
+      "maps": [
+        "observatory"
+      ],
+      "name": "白鐘城・城西觀測分會",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 960,
+      "height": 720,
+      "kind": "interior",
+      "asset": "./assets/exploration/scenes/observatory-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "station",
+      "maps": [
+        "station"
+      ],
+      "name": "山腰驛站・內部與補給間",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 960,
+      "height": 720,
+      "kind": "interior",
+      "asset": "./assets/exploration/scenes/station-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "roadShelter",
+      "maps": [
+        "roadShelter"
+      ],
+      "name": "北行商路・第一晚避雨棚屋",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 960,
+      "height": 720,
+      "kind": "interior",
+      "asset": "./assets/exploration/scenes/roadShelter-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "southStation",
+      "maps": [
+        "southStation"
+      ],
+      "name": "南驛山谷・驛務休整處",
+      "original": "./assets/exploration/journey-inn-interior-v1.png",
+      "width": 960,
+      "height": 720,
+      "kind": "interior",
+      "asset": "./assets/exploration/scenes/southStation-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "riverRoad",
+      "maps": [
+        "riverRoad"
+      ],
+      "name": "南行驛路・下游商路",
+      "original": "./assets/exploration/north-trade-road-v1.png",
+      "width": 1672,
+      "height": 939,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/riverRoad-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "lotin",
+      "maps": [
+        "lotin"
+      ],
+      "name": "洛汀港・陸路與港區",
+      "original": "./assets/maps/c2-201-lotin-port-concept.png",
+      "width": 4608,
+      "height": 3072,
+      "kind": "outdoor",
+      "asset": "./assets/exploration/scenes/lotin-playable-v1.png",
+      "status": "candidate-awaiting-ground-and-door-retrace",
+      "actualWidth": 1536,
+      "actualHeight": 1024,
+      "bytes": 4242031
+    },
+    {
+      "key": "opening-valley",
+      "maps": [],
+      "name": "南驛山谷・舊祭壇",
+      "original": "./assets/exploration/south-post-altar-v2.png",
+      "width": 1152,
+      "height": 768,
+      "kind": "opening",
+      "asset": "./assets/exploration/scenes/opening-valley-playable-v1.png",
+      "status": "planned"
+    },
+    {
+      "key": "opening-forest",
+      "maps": [],
+      "name": "獸靈之村外・林道",
+      "original": "./assets/exploration/village-forest-v2.png",
+      "width": 1152,
+      "height": 768,
+      "kind": "opening",
+      "asset": "./assets/exploration/scenes/opening-forest-playable-v1.png",
+      "status": "planned"
+    }
+  ],
+  "note": "候選圖不可直接替換正式場景：生成地標有偏移，需要重新描繪道路、碰撞、出口及人物。開場空氣牆與指引修正優先獨立發布於99d4758。"
+}

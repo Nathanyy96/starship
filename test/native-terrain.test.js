@@ -1,5 +1,26 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const w=require('../src/first-major-world'),native=require('../src/native-terrain');
+test('bridge decking appears on crossings and not on roads that follow a riverbank',()=>{
+ const river=w.maps.city.nativeTerrain.water;
+ assert.equal(native.bridgeAt(river,[1800,1850],[2670,1860],2300,1855),false);
+ assert.equal(native.bridgeAt(river,[2300,1660],[2300,2030],2300,1845),true);
+ const echo=w.maps.echo;
+ assert.equal(native.bridgeAt(echo.nativeTerrain.water,[1080,825],[980,789],1030,807),true);
+});
+test('playable roads have no long parallel overlaps masquerading as junctions',()=>{
+ for(const [id,m] of Object.entries(w.maps)){
+  const segments=m.paths.flatMap((path,pi)=>path.points.slice(1).map((b,i)=>({pi,i,a:path.points[i],b,width:path.width})));
+  for(let i=0;i<segments.length;i++)for(let j=i+1;j<segments.length;j++){
+   const a=segments[i],b=segments[j];if(a.pi===b.pi&&Math.abs(a.i-b.i)<2)continue;
+   let dx=a.b[0]-a.a[0],dy=a.b[1]-a.a[1],ex=b.b[0]-b.a[0],ey=b.b[1]-b.a[1],length=Math.hypot(dx,dy),other=Math.hypot(ex,ey);
+   if(length<15||other<15||Math.abs((dx*ex+dy*ey)/(length*other))<.94)continue;
+   dx/=length;dy/=length;
+   const gap=Math.abs((b.a[0]-a.a[0])*dy-(b.a[1]-a.a[1])*dx),start=(b.a[0]-a.a[0])*dx+(b.a[1]-a.a[1])*dy,end=(b.b[0]-a.a[0])*dx+(b.b[1]-a.a[1])*dy;
+   const overlap=Math.min(length,Math.max(start,end))-Math.max(0,Math.min(start,end));
+   assert.ok(overlap<=45||gap>=Math.min(a.width,b.width)*1.3,id+' overlapping lanes '+a.pi+':'+a.i+' / '+b.pi+':'+b.i);
+  }
+ }
+});
 test('all outdoor locations use local scene materials at their intended scale',()=>{
   for(const id of['village','city','south','riverRoad','lotin'])assert.ok(w.maps[id].nativeTerrain,id);
   assert.ok(w.maps.road.nativeTerrain);assert.equal(w.maps.road.width,1672);
@@ -20,7 +41,7 @@ test('front steps remain in front of the building at the collision boundary',()=
  for(const m of Object.values(w.maps)){if(!m.nativeTerrain)continue;for(const p of m.nativeTerrain.structures){const b=m.buildings[m.nativeTerrain.structures.indexOf(p)];assert.ok(native.depth(p)<=b.y+b.h+.001);if(p.door)assert.ok(native.depth(p)<p.door[1]-12);}}
 });
 test('all 24 maps have traversable guidance to every exit and landmark, in both directions',()=>{
- let count=0;for(const [id,m] of Object.entries(w.maps)){const start={...w.initial(2),map:id,x:m.spawn[0],y:m.spawn[1],roaming:true};for(const target of [...m.exits,...m.sites]){for(const [from,to] of [[start,target],[{...start,x:target.x,y:target.y},{x:start.x,y:start.y}]]){const route=w.planWalk(from,to.x,to.y);assert.ok(route.length,id+':'+target.name);let s=from;for(const point of route){s=w.move(s,point.x-s.x,point.y-s.y);assert.ok(Math.hypot(s.x-point.x,s.y-point.y)<.1,id+':'+target.name+' blocked guidance');}}count++;}}assert.equal(count,93);
+ let count=0;for(const [id,m] of Object.entries(w.maps)){const start={...w.initial(2),map:id,x:m.spawn[0],y:m.spawn[1],roaming:true};for(const target of [...m.exits,...m.sites]){for(const [from,to] of [[start,target],[{...start,x:target.x,y:target.y},{x:start.x,y:start.y}]]){const route=w.planWalk(from,to.x,to.y);assert.ok(route.length,id+':'+target.name);let s=from;for(const point of route){s=w.move(s,point.x-s.x,point.y-s.y);assert.ok(Math.hypot(s.x-point.x,s.y-point.y)<.1,id+':'+target.name+' blocked guidance');}}count++;}}assert.equal(count,93+Object.values(w.maps).flatMap(m=>m.sites).filter(s=>s.quest).length);
 });
 
 test('the workshop side foundation cannot be mistaken for its open doorway',()=>{assert.equal(w.passable('city',680,1460),false);assert.equal(w.passable('city',781,1465),true);});

@@ -68,10 +68,10 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     fs.writeFileSync(databasePath, JSON.stringify(database), "utf8");
 
     const first = (await post("/api/player/session", { token: registration.token })).state;
-    assert.equal(first.resources.starSand, 10200);
-    assert.equal(first.resources.starMarks, 20);
+    assert.equal(first.resources.starSand, 18200);
+    assert.equal(first.resources.starMarks, 23);
     assert.deepEqual(Object.keys(first.resources).sort(), ["characterExp", "starMarks", "starSand"]);
-    assert.equal(first.resources.characterExp, 15850);
+    assert.equal(first.resources.characterExp, 23850);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
@@ -81,6 +81,7 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     assert.ok(first.updateRewards.claimedVersions[updateVersion]);
     assert.ok(first.updateRewards.claimedVersions["2026-10-01-official-1-0"]);
     assert.ok(first.updateRewards.claimedVersions[compensationCycle]);
+    assert.deepEqual({starSand:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].starSand,characterExp:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].characterExp,starMarks:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].starMarks},{starSand:8000,characterExp:8000,starMarks:3});
     assert.deepEqual({ starSand: first.updateRewards.claimedVersions[compensationCycle].starSand, characterExp: first.updateRewards.claimedVersions[compensationCycle].characterExp, starMarks: first.updateRewards.claimedVersions[compensationCycle].starMarks }, { starSand: 6000, characterExp: 6000, starMarks: 3 });
     assert.deepEqual(first.trialProgress.clearedStages, []);
     assert.deepEqual(first.trialProgress.attempts, {});

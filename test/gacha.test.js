@@ -267,8 +267,8 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.length >= 7, true);
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
   assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
-  assert.equal(announcements.length, releaseConfig.open11 ? 3 : 2);
-  assert.equal(announcements[0].id, releaseConfig.open11 ? "release-1-1" : "major-combat-repair-2026-10-05");
+  assert.equal(announcements.length, releaseConfig.open11 ? 4 : 3);
+  assert.equal(announcements[0].id, "white-bell-exploration-2026-10-16");
   assert.equal(announcements.some((item) => item.id === "release-1-0"), true);
   const gacha = game();
   const before = gacha.getState().resources;

@@ -28,7 +28,7 @@
 
   <link rel="stylesheet" href="./styles.css?v=account-guards-20261015"><link rel="stylesheet" href="./exploration-story-art.css?v=cast-motion-v3">
 
-<link rel="stylesheet" href="./world-game.css?v=world-home-20261015"><link rel="stylesheet" href="./world-shell.css?v=world-home-20261015"></head>
+<link rel="stylesheet" href="./world-game.css?v=white-bell-guild-20261016"><link rel="stylesheet" href="./world-shell.css?v=world-home-20261015"></head>
 
 <body>
   <main class="page-shell">
@@ -157,6 +157,7 @@
     <section id="first-major-tools" class="world-tools" aria-label="旅途與傳送設定" hidden><h4>地圖與傳送</h4><div id="first-major-atlas" class="world-atlas"></div><label class="world-destination" hidden>目的地 <select id="first-major-destination" aria-label="探索目的地"></select></label><div class="world-travel" hidden><h4>傳送點</h4><div class="world-travel-controls"><label for="first-major-travel-list">快速返回</label><select id="first-major-travel-list" aria-label="傳送目的地"></select><button id="first-major-travel" class="secondary-action" type="button" disabled>傳送</button></div><p id="first-major-travel-hint" role="status"></p></div><button id="first-major-reset" class="small-button" type="button">回到本區入口</button></section>
     <div id="first-major-dialog" class="first-act-dialog game-dialogue world-dialog" role="dialog" aria-modal="true" aria-labelledby="first-major-dialog-title" hidden><img id="first-major-portrait" class="world-speaker-art" alt=""><div class="world-dialog-copy"><span id="first-major-dialog-location"></span><h3 id="first-major-dialog-title"></h3><p id="first-major-dialog-text"></p><div class="world-dialog-footer"><small id="first-major-dialog-count"></small><button id="first-major-dialog-next" class="secondary-action" type="button">繼續 →</button></div></div></div>
     <section id="first-major-task" class="world-story-task" aria-label="本幕主線互動" hidden></section>
+    <section id="first-major-guild" class="world-story-task world-guild-task" aria-label="白鐘城冒險家協會委託" hidden></section>
   </div>
   <footer class="world-status"><p id="first-major-status" role="status">循路探索，靠近人物與地點按 E 互動。</p><span id="first-major-position"></span><button id="first-major-sync" class="secondary-action" type="button" hidden>保存本幕進度</button><button id="first-major-next" class="secondary-action" type="button" hidden>繼續下一幕 →</button><button id="first-major-claim" class="secondary-action" type="button" hidden>領取 1.1 版本獎勵</button></footer>
 
@@ -375,12 +376,13 @@
   <script src="./src/interactive-map.js?v=outer-shore-route-20261013"></script>
 
   <script src="./src/first-act-scenes.js?v=world-home-20261015"></script>
-  <script src="./src/native-scene-layouts.js?v=districts-20261015"></script><script src="./src/native-terrain.js?v=local-scenes-20261015-v2"></script><script src="./src/character-motion-manifest.js?v=cast-motion-v3"></script><script src="./src/character-motion.js?v=cast-motion-v3"></script><script src="./src/exploration-renderer.js?v=local-scenes-20261015-v2"></script>
+  <script src="./src/native-scene-layouts.js?v=districts-20261015"></script><script src="./src/native-terrain.js?v=frontal-buildings-20261016"></script><script src="./src/character-motion-manifest.js?v=cast-motion-v3"></script><script src="./src/character-motion.js?v=cast-motion-v3"></script><script src="./src/exploration-renderer.js?v=local-scenes-20261015-v2"></script>
   <script src="./src/exploration-characters.js?v=world-cast-20261014"></script>
   <script src="./src/exploration.js?v=cast-motion-v2"></script>
   <script src="./src/world-presentation.js?v=world-home-20261015"></script>
   <script src="./src/world-story-dialogue.js?v=world-home-20261015"></script><script src="./src/world-story-campaign.js?v=world-home-20261015"></script>
-  <script src="./src/first-major-world.js?v=cast-motion-v3"></script>
+  <script src="./src/guild-commissions.js?v=white-bell-sample-1"></script>
+  <script src="./src/first-major-world.js?v=white-bell-sample-1"></script>
   <script src="./src/first-act-game.js?v=cast-motion-v3"></script>
 
   <script src="./src/trial-1-0.js?v=author-preview-roster-20261005"></script>

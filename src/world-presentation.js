@@ -15,6 +15,9 @@
     bellcourt:[{id:'wenlan',name:'溫藍',role:'外庭物資管事',x:630,y:425,line:'外庭的石階可以慢慢走。再往外就是雲海，別離開完整的地面。'}]
   };
   cast.city.push({id:'town-trader',name:'布匹行商',role:'街區商販',x:920,y:300,line:'主街接著住宅巷，工坊在城西那一側。'});
+  cast.city.push({id:'guild-scout',spriteId:'town-caretaker',name:'協會斥候',role:'冒險者小隊',x:1180,y:386,patrol:[22,0],line:'北門路標先由我們確認安全，接了討伐委託再去看目標。'});
+  cast.city.push({id:'guild-medic',spriteId:'town-grower',name:'同行補給員',role:'冒險者小隊',x:1200,y:386,patrol:[22,0],line:'我們一起從協會出發。補給和撤退路線都要先說好。'});
+  cast.city.push({id:'market-helper',spriteId:'town-trader',name:'市集幫手',role:'白鐘居民',x:1160,y:370,patrol:[12,0],line:'南驛家書請交給收件人。貨車經過主街時記得靠邊。'});
   cast.village.push({id:'town-grower',name:'採集居民',role:'村中居民',x:750,y:455,line:'藥草分好以後就送到醫療屋，走村道就能到。'});
   function npcs(map){return cast[map]||[];}
   function position(npc,time,reduced,passable){var phase=reduced?0:(1-Math.cos(time/2400))*.5,dx=npc.patrol?npc.patrol[0]*phase:0,dy=npc.patrol?npc.patrol[1]*phase:0,x=npc.x+dx,y=npc.y+dy;return !passable||passable(x,y)?{x:x,y:y}:{x:npc.x,y:npc.y};}

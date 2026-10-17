@@ -23,7 +23,8 @@ function fresh() { return new GachaGame({ banners: data.banners }).getState(); }
 test("1.1 候選卡池、章節、公告一致；2.x 不進正式卡池", () => {
   assert.equal(data.updateVersion, "1.1");
   assert.equal(chapter11.scenes.length, 5);
-  assert.equal(data.announcements[0].id, "release-1-1");
+  assert.equal(data.announcements[0].id, "white-bell-exploration-2026-10-16");
+  assert.ok(data.announcements.some(item => item.id === "release-1-1"));
   for (const id of ["hina", "siyeon", "cenwu", "ruida", "yuan"]) assert.ok(data.activeCards.some(c => c.id === id), id);
   assert.ok(data.activeCards.every(c => Number(c.releaseVersion) <= 1.1));
   assert.deepEqual(data.banners[0].featured4Stars.map(c => c.id), ["hina", "siyeon"]);
