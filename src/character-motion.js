@@ -17,6 +17,7 @@
     {text:'Hina走到上游',id:'hina',approach:false},
     {text:'雷恩走到側面的高石',id:'reyn',approach:false}
   ];
+  var cutoutCueNames={reyn:'雷恩'};
   function createScene(){
     var seen={},actors={};
     return {
@@ -31,7 +32,7 @@
           var near={x:anchor.x+dx*30,y:anchor.y+dy*30},far={x:anchor.x+dx*94,y:anchor.y+dy*94};
           if(!clear(anchor,near)||!clear(near,far))continue;
           var from=cue.approach?far:near,to=cue.approach?near:far;
-          actors[cue.id]={id:cue.id,name:manifest[cue.id].name,from:from,to:to,start:now,duration:1680};return true;
+          actors[cue.id]={id:cue.id,name:manifest[cue.id]?manifest[cue.id].name:cutoutCueNames[cue.id],from:from,to:to,start:now,duration:1680};return true;
         }
         return false;
       },

@@ -13,9 +13,9 @@
   var mapImage = "./assets/maps/c1-102.png";
   var spriteSources = {
     hero: "./assets/exploration/celesia-world-cutout-v1.png",
-    lia: "./assets/exploration/lia-chibi-v1.png",
-    reyn: "./assets/exploration/reyn-chibi-v1.png",
-    isar: "./assets/exploration/isar-chibi-v1.png"
+    lia: "./assets/exploration/lia-world-cutout-v1.png",
+    reyn: "./assets/exploration/reyn-world-cutout-v1.png",
+    isar: "./assets/exploration/isar-world-cutout-v1.png"
   };
   var paths = [
     { width: 54, points: [[1535,155],[1510,212],[1405,282],[1320,315],[1230,350],[1125,365],[1030,390],[945,420],[845,455]] },
@@ -139,7 +139,7 @@
     var visualScale=worldVillage()?1.5:1;
     function sprite(id, x, y, height, flip, bob) {
       var who=id==='hero'?motionPlayer:motion.canonical(id),h=height/visualScale;if(motion.supports(who))return motion.draw(ctx,motionImages[who],x,y,h,id==='hero'?motionHeading:'down',motionStride,id==='hero'&&motionWalking,Boolean(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches),who);
-      return renderer.sprite(ctx, images[id], x, y, id === 'hero' && characterArt && characterArt.worldSource(motionPlayer) ? h * 1.55 : h, flip, bob);
+      return renderer.sprite(ctx, images[id], x, y, characterArt && characterArt.worldSource(who) ? h * 1.55 : h, flip, bob);
     }
     function draw() {
       var shared=worldVillage(),model=shared&&shared.maps.village;visualScale=model?1.5:1;var view = renderer.begin(canvas, ctx, model?model.width:WIDTH, model?model.height:HEIGHT, state.x*visualScale, state.y*visualScale);

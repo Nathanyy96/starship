@@ -38,7 +38,7 @@ test('ordinary dialogue and blocked terrain never create a scripted walk',()=>{
 
 test('remaining 1.0–1.1 named characters have directional frames and existing PNGs',()=>{
   const roster=require('../docs/character-motion-roster-20261015.json');
-  assert.equal(roster.length,17);
+  assert.equal(roster.length,11);
   for(const {id} of roster){
     const entry=motion.manifest[id];assert.ok(entry,id);assert.equal(entry.frames.length,16);
     const png=fs.readFileSync(path.join(__dirname,'..',entry.src));
@@ -54,11 +54,11 @@ test('remaining 1.0–1.1 named characters have directional frames and existing 
 test('scene subscribers reuse the same loaded atlas, cancellation and retries work',()=>{
   const created=[];class Img{constructor(){created.push(this);}}
   const delivered=[];
-  motion.load('vark',i=>delivered.push(['opening',i]),{ImageClass:Img});
-  const cancelled=motion.load('vark',()=>assert.fail('cancelled callback'),{ImageClass:Img});cancelled.cancel();
-  motion.load('vark',i=>delivered.push(['world',i]),{ImageClass:Img});
+  motion.load('chodan',i=>delivered.push(['opening',i]),{ImageClass:Img});
+  const cancelled=motion.load('chodan',()=>assert.fail('cancelled callback'),{ImageClass:Img});cancelled.cancel();
+  motion.load('chodan',i=>delivered.push(['world',i]),{ImageClass:Img});
   assert.equal(created.length,1);created[0].onload();
-  motion.load('vark',i=>delivered.push(['village',i]),{ImageClass:Img});
+  motion.load('chodan',i=>delivered.push(['village',i]),{ImageClass:Img});
   assert.equal(created.length,1);assert.equal(delivered.length,3);assert.ok(delivered.every(v=>v[1]===created[0]));
   motion.load('oun',()=>{},{ImageClass:Img});created[1].onerror();
   motion.load('oun',()=>{},{ImageClass:Img});assert.equal(created.length,3);

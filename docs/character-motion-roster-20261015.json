@@ -1,20 +1,5 @@
 [
   {
-    "id": "reyn",
-    "name": "雷恩",
-    "source": "assets/exploration/reyn-chibi-v1.png"
-  },
-  {
-    "id": "lia",
-    "name": "莉亞",
-    "source": "assets/exploration/lia-chibi-v1.png"
-  },
-  {
-    "id": "isar",
-    "name": "伊薩爾",
-    "source": "assets/exploration/isar-chibi-v1.png"
-  },
-  {
     "id": "chodan",
     "name": "Chodan",
     "source": "assets/exploration/chodan-chibi-v1.png"
@@ -55,11 +40,6 @@
     "source": "assets/exploration/sevin-chibi-v1.png"
   },
   {
-    "id": "seifra",
-    "name": "賽芙拉",
-    "source": "assets/exploration/seifra-chibi-v1.png"
-  },
-  {
     "id": "noyas",
     "name": "諾亞斯",
     "source": "assets/exploration/noyas-chibi-v1.png"
@@ -73,15 +53,5 @@
     "id": "oun",
     "name": "奧恩",
     "source": "assets/exploration/oun-chibi-v1.png"
-  },
-  {
-    "id": "mila",
-    "name": "米菈",
-    "source": "assets/exploration/mila-chibi-v1.png"
-  },
-  {
-    "id": "vark",
-    "name": "老瓦克",
-    "source": "assets/exploration/vark-chibi-v1.png"
   }
 ]

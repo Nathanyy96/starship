@@ -25,9 +25,9 @@ function harness() {
   return { images, events, handle };
 }
 
-test('missing chibi falls back to original once, and total failure terminates', () => {
+test('missing world cutout falls back to original once, and total failure terminates', () => {
   const h = harness();
-  assert.match(h.images[0].src, /lia-chibi/);
+  assert.match(h.images[0].src, /lia-world-cutout/);
   h.images[0].onerror();
   assert.equal(h.images[1].src, art.catalog(data).lia.original);
   h.images[1].onload();

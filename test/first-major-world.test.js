@@ -172,7 +172,8 @@ test('named NPCs use existing map assets, stand on reachable ground and patrol s
   const p=require('../src/world-presentation');
   for(const [id,map] of Object.entries(world.maps))for(const original of p.npcs(id)){const npc={...original,...world.mapPoint(id,original.x,original.y),patrol:original.patrol?.map(n=>n*(map.scale||1))};
     const spriteId=npc.spriteId||npc.id;
-    assert.ok(fs.existsSync(path.join(__dirname,'../assets/exploration',spriteId+'-chibi-v1.png'))||fs.existsSync(path.join(__dirname,'../assets/exploration/motion',spriteId+'-walk-natural-v1.png')),spriteId);
+    const cutout=require('../src/exploration-characters').worldSource(npc.id);
+    assert.ok(cutout&&fs.existsSync(path.join(__dirname,'..',cutout))||fs.existsSync(path.join(__dirname,'../assets/exploration',spriteId+'-chibi-v1.png'))||fs.existsSync(path.join(__dirname,'../assets/exploration/motion',spriteId+'-walk-natural-v1.png')),spriteId);
     assert.ok(world.passable(id,npc.x,npc.y),npc.id);
     assert.ok(world.route({...world.initial(2),map:id,x:map.spawn[0],y:map.spawn[1]},npc).length,npc.id);
     for(const time of [0,2000,5000,10000]){const at=p.position(npc,time,false,(x,y)=>world.passable(id,x,y));assert.ok(world.passable(id,at.x,at.y),npc.id);}

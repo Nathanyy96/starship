@@ -6,7 +6,7 @@
   "use strict";
   var aliases = { hero: "celesia" };
   var existing = { celesia: "hero", lia: "lia", reyn: "reyn", isar: "isar" };
-  var worldCutouts = { celesia: true, veyra: true, rena: true, elorna: true };
+  var worldCutouts = { celesia: true, veyra: true, rena: true, elorna: true, reyn: true, lia: true, isar: true, mila: true, vark: true, seifra: true, harlow: true };
   function worldSource(id) { return worldCutouts[id] ? "./assets/exploration/" + id + "-world-cutout-v1.png" : ""; }
   var refreshed = { celesia: true, veyra: true, harlow: true, rena: true, elorna: true };
   function portraitSource(entry) {
@@ -18,7 +18,7 @@
     var result = {};
     Object.keys(data.storyCharacters || {}).forEach(function (id) { var x = data.storyCharacters[id]; result[id] = { id: id, name: x.name, original: x.portrait, kind: "story" }; });
     Object.keys(data.cards || {}).forEach(function (id) { var x = data.cards[id]; result[id] = { id: id, name: x.name, original: x.image || x.backgroundImage, kind: "playable" }; });
-    Object.keys(result).forEach(function (id) { result[id].chibi = "./assets/exploration/" + (existing[id] || id) + "-chibi-v1.png"; });
+    Object.keys(result).forEach(function (id) { if (!worldCutouts[id]) result[id].chibi = "./assets/exploration/" + (existing[id] || id) + "-chibi-v1.png"; });
     return result;
   }
   function resolve(id, data, originalOverride) {
@@ -27,7 +27,7 @@
     if (!entry) return null;
     return Object.assign({}, entry, { sources: originalOverride && originalOverride !== entry.original
       ? [{ url: originalOverride, kind: "original" }]
-      : worldSource(id) ? [{ url: worldSource(id), kind: "world" }]
+      : worldSource(id) ? [{ url: worldSource(id), kind: "world" }, { url: portraitSource(entry), kind: "original" }]
       : [{ url: entry.chibi, kind: "chibi" }, { url: entry.original, kind: "original" }].filter(function (x) { return x.url; }) });
   }
   function byName(name, data) {

@@ -11,7 +11,7 @@
     "name": "賽芙拉",
     "original": "./assets/story-characters/seifra.png",
     "kind": "story",
-    "chibi": "./assets/exploration/seifra-chibi-v1.png"
+    "worldCutout": "./assets/exploration/seifra-world-cutout-v1.png"
   },
   {
     "id": "noyas",
@@ -39,14 +39,14 @@
     "name": "米菈",
     "original": "./assets/story-characters/mila.png",
     "kind": "story",
-    "chibi": "./assets/exploration/mila-chibi-v1.png"
+    "worldCutout": "./assets/exploration/mila-world-cutout-v1.png"
   },
   {
     "id": "vark",
     "name": "老瓦克",
     "original": "./assets/story-characters/vark.png",
     "kind": "story",
-    "chibi": "./assets/exploration/vark-chibi-v1.png"
+    "worldCutout": "./assets/exploration/vark-world-cutout-v1.png"
   },
   {
     "id": "cenwu",
@@ -109,21 +109,21 @@
     "name": "雷恩",
     "original": "./assets/cards/reyn.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/reyn-chibi-v1.png"
+    "worldCutout": "./assets/exploration/reyn-world-cutout-v1.png"
   },
   {
     "id": "lia",
     "name": "莉亞",
     "original": "./assets/cards/lia.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/lia-chibi-v1.png"
+    "worldCutout": "./assets/exploration/lia-world-cutout-v1.png"
   },
   {
     "id": "isar",
     "name": "伊薩爾",
     "original": "./assets/cards/isar.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/isar-chibi-v1.png"
+    "worldCutout": "./assets/exploration/isar-world-cutout-v1.png"
   },
   {
     "id": "rena",
@@ -151,7 +151,7 @@
     "name": "赫洛",
     "original": "./assets/cards/harlow.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/harlow-chibi-v1.png"
+    "worldCutout": "./assets/exploration/harlow-world-cutout-v1.png"
   },
   {
     "id": "elorna",

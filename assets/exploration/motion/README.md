@@ -1,6 +1,6 @@
 # Character walking atlases v2
 
-Seventeen named characters still use the older walking atlases. Celesia now uses the author's full-proportion illustration as a transparent world cutout. Each remaining transparent PNG contains sixteen painted Q-style frames: front, left, back, right; four walking poses per direction. Their roster is recorded in `docs/character-motion-roster-20261015.json`.
+Eleven named characters still use the older walking atlases. Celesia, Veyra, Rena, Elorna, Reyn, Lia, Isar, Mila, Vark, Seifra, and Harlow now use author-art-derived transparent world cutouts. Each remaining transparent atlas contains sixteen painted Q-style frames: front, left, back, right; four walking poses per direction. Their roster is recorded in `docs/character-motion-roster-20261015.json`.
 
 `scripts/build-character-motion-manifest.cjs` reads alpha components to record individual source rectangles and a common body scale. Run with the project's `sharp` dependency available.
 
