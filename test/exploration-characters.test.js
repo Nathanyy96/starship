@@ -11,6 +11,8 @@ test('every playable and story character has an exploration identity and existin
   for (const entry of Object.values(cast)) {
     assert.ok(fs.existsSync(path.join(__dirname, '..', entry.original)), entry.id);
     const worldSource=art.worldSource(entry.id);
+    assert.ok(worldSource, entry.id + ' uses a normal-proportion world cutout');
+    assert.equal(entry.chibi, undefined, entry.id + ' has no Q-style fallback');
     assert.equal(fs.readFileSync(path.join(__dirname, '..', worldSource || entry.chibi))[25], 6, entry.id + ' RGBA world art');
     assert.equal(art.byName(entry.name, data).id, entry.id);
   }

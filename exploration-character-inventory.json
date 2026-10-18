@@ -4,7 +4,7 @@
     "name": "塞維恩",
     "original": "./assets/story-characters/sevin.png",
     "kind": "story",
-    "chibi": "./assets/exploration/sevin-chibi-v1.png"
+    "worldCutout": "./assets/exploration/sevin-world-cutout-v1.png"
   },
   {
     "id": "seifra",
@@ -18,21 +18,21 @@
     "name": "諾亞斯",
     "original": "./assets/story-characters/noyas.png",
     "kind": "story",
-    "chibi": "./assets/exploration/noyas-chibi-v1.png"
+    "worldCutout": "./assets/exploration/noyas-world-cutout-v1.png"
   },
   {
     "id": "kailin",
     "name": "凱琳",
     "original": "./assets/story-characters/kailin.png",
     "kind": "story",
-    "chibi": "./assets/exploration/kailin-chibi-v1.png"
+    "worldCutout": "./assets/exploration/kailin-world-cutout-v1.png"
   },
   {
     "id": "oun",
     "name": "奧恩",
     "original": "./assets/story-characters/oun.png",
     "kind": "story",
-    "chibi": "./assets/exploration/oun-chibi-v1.png"
+    "worldCutout": "./assets/exploration/oun-world-cutout-v1.png"
   },
   {
     "id": "mila",
@@ -53,49 +53,49 @@
     "name": "岑霧",
     "original": "./assets/cards/cenwu.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/cenwu-chibi-v1.png"
+    "worldCutout": "./assets/exploration/cenwu-world-cutout-v1.png"
   },
   {
     "id": "ruida",
     "name": "芮妲",
     "original": "./assets/cards/ruida.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/ruida-chibi-v1.png"
+    "worldCutout": "./assets/exploration/ruida-world-cutout-v1.png"
   },
   {
     "id": "yuan",
     "name": "榆安",
     "original": "./assets/cards/yuan.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/yuan-chibi-v1.png"
+    "worldCutout": "./assets/exploration/yuan-world-cutout-v1.png"
   },
   {
     "id": "musa",
     "name": "穆莎",
     "original": "./assets/story-characters/musa.png",
     "kind": "story",
-    "chibi": "./assets/exploration/musa-chibi-v1.png"
+    "worldCutout": "./assets/exploration/musa-world-cutout-v1.png"
   },
   {
     "id": "kerida",
     "name": "珂芮妲",
     "original": "./assets/story-characters/kerida.png",
     "kind": "story",
-    "chibi": "./assets/exploration/kerida-chibi-v1.png"
+    "worldCutout": "./assets/exploration/kerida-world-cutout-v1.png"
   },
   {
     "id": "dori",
     "name": "朵梨",
     "original": "./assets/story-characters/dori.png",
     "kind": "story",
-    "chibi": "./assets/exploration/dori-chibi-v1.png"
+    "worldCutout": "./assets/exploration/dori-world-cutout-v1.png"
   },
   {
     "id": "wenlan",
     "name": "溫藍",
     "original": "./assets/story-characters/wenlan.png",
     "kind": "story",
-    "chibi": "./assets/exploration/wenlan-chibi-v1.png"
+    "worldCutout": "./assets/exploration/wenlan-world-cutout-v1.png"
   },
   {
     "id": "celesia",
@@ -137,7 +137,7 @@
     "name": "艾妲",
     "original": "./assets/cards/eda.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/eda-chibi-v1.png"
+    "worldCutout": "./assets/exploration/eda-world-cutout-v1.png"
   },
   {
     "id": "veyra",
@@ -165,244 +165,244 @@
     "name": "Chodan",
     "original": "./assets/cards/chodan.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/chodan-chibi-v1.png"
+    "worldCutout": "./assets/exploration/chodan-world-cutout-v1.png"
   },
   {
     "id": "magenta",
     "name": "Magenta",
     "original": "./assets/cards/magenta.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/magenta-chibi-v1.png"
+    "worldCutout": "./assets/exploration/magenta-world-cutout-v1.png"
   },
   {
     "id": "hina",
     "name": "Hina",
     "original": "./assets/cards/hina.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/hina-chibi-v1.png"
+    "worldCutout": "./assets/exploration/hina-world-cutout-v1.png"
   },
   {
     "id": "siyeon",
     "name": "Siyeon",
     "original": "./assets/cards/siyeon.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/siyeon-chibi-v1.png"
+    "worldCutout": "./assets/exploration/siyeon-world-cutout-v1.png"
   },
   {
     "id": "mave",
     "name": "梅芙",
     "original": "./assets/cards/mave.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/mave-chibi-v1.png"
+    "worldCutout": "./assets/exploration/mave-world-cutout-v1.png"
   },
   {
     "id": "rovienne",
     "name": "羅薇恩",
     "original": "./assets/cards/rovienne.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/rovienne-chibi-v1.png"
+    "worldCutout": "./assets/exploration/rovienne-world-cutout-v1.png"
   },
   {
     "id": "risan",
     "name": "璃珊",
     "original": "./assets/cards/risan.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/risan-chibi-v1.png"
+    "worldCutout": "./assets/exploration/risan-world-cutout-v1.png"
   },
   {
     "id": "yaoze",
     "name": "曜澤",
     "original": "./assets/cards/yaoze.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/yaoze-chibi-v1.png"
+    "worldCutout": "./assets/exploration/yaoze-world-cutout-v1.png"
   },
   {
     "id": "maro",
     "name": "瑪洛",
     "original": "./assets/cards/maro.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/maro-chibi-v1.png"
+    "worldCutout": "./assets/exploration/maro-world-cutout-v1.png"
   },
   {
     "id": "evelyn",
     "name": "伊芙琳",
     "original": "./assets/cards/evelyn.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/evelyn-chibi-v1.png"
+    "worldCutout": "./assets/exploration/evelyn-world-cutout-v1.png"
   },
   {
     "id": "mirea",
     "name": "澪歌",
     "original": "./assets/cards/mirea.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/mirea-chibi-v1.png"
+    "worldCutout": "./assets/exploration/mirea-world-cutout-v1.png"
   },
   {
     "id": "ferye",
     "name": "菲芮",
     "original": "./assets/cards/ferye.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/ferye-chibi-v1.png"
+    "worldCutout": "./assets/exploration/ferye-world-cutout-v1.png"
   },
   {
     "id": "noreia",
     "name": "諾芮亞",
     "original": "./assets/cards/noreia.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/noreia-chibi-v1.png"
+    "worldCutout": "./assets/exploration/noreia-world-cutout-v1.png"
   },
   {
     "id": "orivelle",
     "name": "奧薇拉",
     "original": "./assets/cards/orivelle.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/orivelle-chibi-v1.png"
+    "worldCutout": "./assets/exploration/orivelle-world-cutout-v1.png"
   },
   {
     "id": "jiera",
     "name": "霽羅",
     "original": "./assets/cards/jiera.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/jiera-chibi-v1.png"
+    "worldCutout": "./assets/exploration/jiera-world-cutout-v1.png"
   },
   {
     "id": "rotea",
     "name": "蘿堤亞",
     "original": "./assets/cards/rotea.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/rotea-chibi-v1.png"
+    "worldCutout": "./assets/exploration/rotea-world-cutout-v1.png"
   },
   {
     "id": "sumine",
     "name": "澄音",
     "original": "./assets/cards/sumine.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/sumine-chibi-v1.png"
+    "worldCutout": "./assets/exploration/sumine-world-cutout-v1.png"
   },
   {
     "id": "lorne",
     "name": "洛恩",
     "original": "./assets/cards/lorne.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/lorne-chibi-v1.png"
+    "worldCutout": "./assets/exploration/lorne-world-cutout-v1.png"
   },
   {
     "id": "cenya",
     "name": "岑芽",
     "original": "./assets/cards/cenya.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/cenya-chibi-v1.png"
+    "worldCutout": "./assets/exploration/cenya-world-cutout-v1.png"
   },
   {
     "id": "norell",
     "name": "諾嵐",
     "original": "./assets/cards/norell.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/norell-chibi-v1.png"
+    "worldCutout": "./assets/exploration/norell-world-cutout-v1.png"
   },
   {
     "id": "aster",
     "name": "艾斯特",
     "original": "./assets/cards/aster.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/aster-chibi-v1.png"
+    "worldCutout": "./assets/exploration/aster-world-cutout-v1.png"
   },
   {
     "id": "aurelia",
     "name": "奧蕾雅",
     "original": "./assets/cards/aurelia.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/aurelia-chibi-v1.png"
+    "worldCutout": "./assets/exploration/aurelia-world-cutout-v1.png"
   },
   {
     "id": "kairen",
     "name": "凱嵐",
     "original": "./assets/cards/kairen.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/kairen-chibi-v1.png"
+    "worldCutout": "./assets/exploration/kairen-world-cutout-v1.png"
   },
   {
     "id": "sorae",
     "name": "索萊",
     "original": "./assets/cards/sorae.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/sorae-chibi-v1.png"
+    "worldCutout": "./assets/exploration/sorae-world-cutout-v1.png"
   },
   {
     "id": "talia",
     "name": "塔莉亞",
     "original": "./assets/cards/talia.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/talia-chibi-v1.png"
+    "worldCutout": "./assets/exploration/talia-world-cutout-v1.png"
   },
   {
     "id": "neve",
     "name": "涅芙",
     "original": "./assets/cards/neve.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/neve-chibi-v1.png"
+    "worldCutout": "./assets/exploration/neve-world-cutout-v1.png"
   },
   {
     "id": "kael",
     "name": "凱爾",
     "original": "./assets/cards/kael.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/kael-chibi-v1.png"
+    "worldCutout": "./assets/exploration/kael-world-cutout-v1.png"
   },
   {
     "id": "elyra",
     "name": "伊萊拉",
     "original": "./assets/cards/elyra.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/elyra-chibi-v1.png"
+    "worldCutout": "./assets/exploration/elyra-world-cutout-v1.png"
   },
   {
     "id": "vestra",
     "name": "維斯妲",
     "original": "./assets/cards/vestra.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/vestra-chibi-v1.png"
+    "worldCutout": "./assets/exploration/vestra-world-cutout-v1.png"
   },
   {
     "id": "brann",
     "name": "布蘭",
     "original": "./assets/cards/brann.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/brann-chibi-v1.png"
+    "worldCutout": "./assets/exploration/brann-world-cutout-v1.png"
   },
   {
     "id": "eirin",
     "name": "伊芮恩",
     "original": "./assets/cards/eirin.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/eirin-chibi-v1.png"
+    "worldCutout": "./assets/exploration/eirin-world-cutout-v1.png"
   },
   {
     "id": "sava",
     "name": "薩芙",
     "original": "./assets/cards/sava.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/sava-chibi-v1.png"
+    "worldCutout": "./assets/exploration/sava-world-cutout-v1.png"
   },
   {
     "id": "niela",
     "name": "妮拉",
     "original": "./assets/cards/niela.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/niela-chibi-v1.png"
+    "worldCutout": "./assets/exploration/niela-world-cutout-v1.png"
   },
   {
     "id": "hervan",
     "name": "赫爾凡",
     "original": "./assets/cards/hervan.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/hervan-chibi-v1.png"
+    "worldCutout": "./assets/exploration/hervan-world-cutout-v1.png"
   },
   {
     "id": "daria",
     "name": "達莉雅",
     "original": "./assets/cards/daria.png",
     "kind": "playable",
-    "chibi": "./assets/exploration/daria-chibi-v1.png"
+    "worldCutout": "./assets/exploration/daria-world-cutout-v1.png"
   }
 ]

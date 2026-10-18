@@ -17,7 +17,7 @@
     {text:'Hina走到上游',id:'hina',approach:false},
     {text:'雷恩走到側面的高石',id:'reyn',approach:false}
   ];
-  var cutoutCueNames={reyn:'雷恩'};
+  var cutoutCueNames={reyn:'雷恩',siyeon:'Siyeon',hina:'Hina'};
   function createScene(){
     var seen={},actors={};
     return {

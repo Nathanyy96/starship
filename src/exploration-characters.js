@@ -6,7 +6,7 @@
   "use strict";
   var aliases = { hero: "celesia" };
   var existing = { celesia: "hero", lia: "lia", reyn: "reyn", isar: "isar" };
-  var worldCutouts = { celesia: true, veyra: true, rena: true, elorna: true, reyn: true, lia: true, isar: true, mila: true, vark: true, seifra: true, harlow: true };
+  var worldCutouts = { sevin: true, seifra: true, noyas: true, kailin: true, oun: true, mila: true, vark: true, cenwu: true, ruida: true, yuan: true, musa: true, kerida: true, dori: true, wenlan: true, celesia: true, reyn: true, lia: true, isar: true, rena: true, eda: true, veyra: true, harlow: true, elorna: true, chodan: true, magenta: true, hina: true, siyeon: true, mave: true, rovienne: true, risan: true, yaoze: true, maro: true, evelyn: true, mirea: true, ferye: true, noreia: true, orivelle: true, jiera: true, rotea: true, sumine: true, lorne: true, cenya: true, norell: true, aster: true, aurelia: true, kairen: true, sorae: true, talia: true, neve: true, kael: true, elyra: true, vestra: true, brann: true, eirin: true, sava: true, niela: true, hervan: true, daria: true };
   function worldSource(id) { return worldCutouts[id] ? "./assets/exploration/" + id + "-world-cutout-v1.png" : ""; }
   var refreshed = { celesia: true, veyra: true, harlow: true, rena: true, elorna: true };
   function portraitSource(entry) {

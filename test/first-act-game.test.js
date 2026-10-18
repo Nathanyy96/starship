@@ -56,7 +56,7 @@ test('every opening guide segment is traversable, including fractional saved pos
   }
 });
 
-test('map cast uses transparent chibi sprites', () => {
+test('opening map cast uses transparent world cutouts', () => {
   for (const source of Object.values(game.sprites)) {
     const file = path.join(__dirname, '..', source.replace(/^\.\//, ''));
     assert.ok(fs.existsSync(file), source);
