@@ -5,7 +5,8 @@ import { seal, unseal, projectDatabase } from "./player-backup.mjs";
 // are included in errors, filenames, logs, or the scheduler's response.
 function b2Url(value) {
   const url = new URL(value);
-  if (url.protocol !== "https:" || !url.hostname.endsWith(".backblazeb2.com") || url.username || url.password) throw new Error("Invalid B2 endpoint");
+  const officialHost = url.hostname.endsWith(".backblazeb2.com") || url.hostname.endsWith(".backblaze.com");
+  if (url.protocol !== "https:" || !officialHost || url.username || url.password) throw new Error("Invalid B2 endpoint");
   return url;
 }
 

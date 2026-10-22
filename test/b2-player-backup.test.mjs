@@ -12,7 +12,7 @@ function mockB2({ corrupt = false, uploadFailure = false, hostile = false } = {}
   const fetcher = async (url, options) => {
     calls.push({ url: String(url), options });
     if (String(url).includes("b2_authorize_account")) return Response.json({ authorizationToken: "auth", apiInfo: { storageApi: { apiUrl: hostile ? "https://attacker.example" : "https://api001.backblazeb2.com", downloadUrl: "https://f001.backblazeb2.com", allowed: { buckets: [{ id: "bucket" }] } } } });
-    if (String(url).includes("b2_get_upload_url")) return Response.json({ uploadUrl: "https://pod-001.backblazeb2.com/upload", authorizationToken: "upload-auth" });
+    if (String(url).includes("b2_get_upload_url")) return Response.json({ uploadUrl: "https://pod-001.backblaze.com/upload", authorizationToken: "upload-auth" });
     if (String(url).endsWith("/upload")) {
       if (uploadFailure) return new Response("secret diagnostics", { status: 503 });
       uploaded = Buffer.from(options.body);
