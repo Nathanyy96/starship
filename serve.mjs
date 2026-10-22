@@ -959,6 +959,11 @@ function claimCharacterChoice(currentState, body) {
 }
 
 async function handleApi(request, response, requestUrl) {
+  // Keep Render awake without waking Neon's database compute on every ping.
+  if (requestUrl.pathname === "/api/ping" && request.method === "GET") {
+    sendJson(response, 200, { ok: true, service: "starship-gacha" });
+    return;
+  }
   if (requestUrl.pathname === "/api/health" && request.method === "GET") {
     await ensurePostgresSchema();
     sendJson(response, 200, {
@@ -987,6 +992,16 @@ async function handleApi(request, response, requestUrl) {
     const digest = value => crypto.createHash("sha256").update(value).digest();
     if (!configuredToken || !crypto.timingSafeEqual(digest(configuredToken), digest(suppliedToken))) {
       sendJson(response, 403, { ok: false, error: "備份入口未啟用或權限不足" });
+      return;
+    }
+    if (body.destination === "b2") {
+      try {
+        if (!usePostgres) throw new Error("PostgreSQL required");
+        const { scheduledB2Backup } = await import("./tools/b2-player-backup.mjs");
+        sendJson(response, 200, await scheduledB2Backup(readDatabase));
+      } catch {
+        sendJson(response, 502, { ok: false, error: "B2 encrypted backup or restore verification failed" });
+      }
       return;
     }
     const { projectDatabase } = await import("./tools/player-backup.mjs");

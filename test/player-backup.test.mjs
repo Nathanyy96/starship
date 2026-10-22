@@ -120,6 +120,13 @@ test("線上備份入口要求獨立 token、未授權拒絕、唯讀且完整�
       await delay(100);
     }
     assert.ok(ready, "server must start");
+    assert.deepEqual(await (await fetch(`http://127.0.0.1:${port}/api/ping`)).json(), { ok: true, service: "starship-gacha" });
+    const cloudBackup = token => fetch(`http://127.0.0.1:${port}/api/admin/player-backup`, {
+      method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token }, body: JSON.stringify({ destination: "b2" }) });
+    assert.equal((await cloudBackup("")).status, 403);
+    const unavailable = await cloudBackup("test-read-only-token");
+    assert.equal(unavailable.status, 502);
+    assert.deepEqual(await unavailable.json(), { ok: false, error: "B2 encrypted backup or restore verification failed" });
     const request = token => fetch(`http://127.0.0.1:${port}/api/admin/player-backup`, {
       method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token }, body: "{}" });
     assert.equal((await request("")).status, 403);
