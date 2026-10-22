@@ -50,6 +50,9 @@
     var currentDispatchTeam = [];
     var currentVoyageTeam = [];
     var currentVoyageRouteId = "";
+    var voyagePending = null;
+    var voyageNeedsSync = false;
+    var voyageFeedback = { text: "", error: false };
     var currentPetId = "star-fox";
     var currentPetOutfitId = "default";
     var currentPetEffectId = "starlit";
@@ -122,12 +125,14 @@
     function apiRequest(path, body, skipSession) {
       var requestBody = Object.assign({}, body || {});
       if (!skipSession && currentPlayerToken) { requestBody.token = currentPlayerToken; }
-      return window.fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody) }).then(function (response) {
+      var controller = new AbortController();
+      var timeout = window.setTimeout(function () { controller.abort(); }, 30000);
+      return window.fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody), signal: controller.signal }).then(function (response) {
         return response.json().catch(function () { return {}; }).then(function (payload) {
-          if (!response.ok || payload.ok === false) { throw new Error(payload.error || "後端連線失敗"); }
+          if (!response.ok || payload.ok !== true) { var error = new Error(payload.error || "後端連線失敗，請同步進度後重試"); error.status = response.ok ? 0 : response.status; throw error; }
           return payload;
         });
-      });
+      }).finally(function () { window.clearTimeout(timeout); });
     }
     function showMessage(text, isError) {
       var message = byId("message"); message.textContent = text; message.className = isError ? "message error" : "message";
@@ -272,6 +277,7 @@
       byId("player-name-input").focus();
     }
     function showGate() {
+      voyagePending = null; voyageNeedsSync = false; voyageFeedback = { text: "", error: false };
       if (authorNarration) authorNarration.stop();
       pauseWorld();flushWorldHome(true);
       [firstMajorWorld,firstActGame,exploration].forEach(function(c){if(c)c.close();});
@@ -1631,7 +1637,7 @@
       var trialCharacterExp = Number(stage.reward && stage.reward.characterExp || data.trialReward && data.trialReward.characterExp || 0);
       if (remoteMode) {
         trialBattlePending = true; byId("start-trial-battle").disabled = true;
-        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam, teamUpper: currentTrialUpperTeam, teamLower: currentTrialLowerTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); if (payload.battle && payload.battle.timeline && payload.state.trialProgress && payload.state.trialProgress.lastBattle) payload.state.trialProgress.lastBattle.timeline = payload.battle.timeline; updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(payload.battle); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : stage.maxChallengeAttempts ? "第 " + stage.id + " 關已消耗一次挑戰，尚餘 " + Math.max(0, Number(payload.reward && payload.reward.attemptsRemaining || 0)) + " 次。" : "本次試煉未通關，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); }).finally(function () { trialBattlePending = false; renderTrial(); });
+        apiRequest("/api/player/trial-battle", { stageId: stage.id, team: currentTrialTeam, teamUpper: currentTrialUpperTeam, teamLower: currentTrialLowerTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); if (payload.battle && payload.battle.timeline && payload.state.trialProgress && payload.state.trialProgress.lastBattle) payload.state.trialProgress.lastBattle.timeline = payload.battle.timeline; updateGameFromState(payload.state); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(payload.battle); showMessage(payload.battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，不扣次數，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); }).finally(function () { trialBattlePending = false; renderTrial(); });
         return;
       }
       try {
@@ -1652,8 +1658,7 @@
         } else battle = window.StarshipBattle.simulateBattle({ team: battleTeam, stats: effectiveStats, stage: stage, captureTimeline: true });
         progress.selectedTeam = battleTeam.slice(); if (stage.halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } progress.lastBattle = battle;
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; state.recruitment.trial10ChoiceAvailable = false; }
-        if (!battle.won && (stage.halves ? battle.challengeComplete : stage.maxChallengeAttempts && battle.status !== "timeout")) progress.attempts[stage.id] = attempts + 1;
-        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(battle); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : stage.maxChallengeAttempts ? "第 " + stage.id + " 關已消耗一次挑戰，尚餘 " + Math.max(0, maxRewards - Number(progress.attempts[stage.id] || 0)) + " 次。" : "本次試煉未通關，可以調整編隊後再次挑戰。", battle.status === "defeat");
+        updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(battle); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，不扣次數，可以調整編隊後再次挑戰。", battle.status === "defeat");
       } catch (error) { showMessage(error.message, true); }
     }
     function bossProgress(state) {
@@ -1851,6 +1856,7 @@
       container.innerHTML = parts.join("");
     }
     function renderVoyage() {
+      byId("voyage-view").querySelectorAll("[data-voyage-lock]").forEach(function (button) { button.disabled = button.getAttribute("data-voyage-lock") === "disabled"; button.removeAttribute("data-voyage-lock"); });
       if (!game || !byId("voyage-route-list")) return;
       var state = game.getState(); var progress = voyageProgress(state); var config = data.voyageConfig || {}; var routes = config.routes || [];
       var currentNode = progress.status === "active" ? (voyageNodeById(progress.route[progress.nodeIndex]) || null) : null;
@@ -1863,7 +1869,7 @@
       else if (progress.selectedRouteId && voyageRouteById(progress.selectedRouteId)) currentVoyageRouteId = progress.selectedRouteId;
       else if (!voyageRouteById(currentVoyageRouteId) && routes.length) currentVoyageRouteId = routes[0].id;
       byId("voyage-view-status").textContent = progress.status === "active" ? (activeRoute ? activeRoute.name : "航程進行中") : progress.status === "complete" ? "航程完成 · 可再次探索" : progress.status === "failed" ? "航程中止 · 可重新開航" : "本期航程尚未開始";
-      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); var locked = Boolean(activeRoute); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\" aria-pressed=\"" + (selected ? "true" : "false") + "\"" + (locked ? " disabled\"" : "") + "><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small><em>" + (locked ? "航程進行中，暫不能更換" : selected ? "✓ 已選擇這條航線" : "點擊查看並選擇") + "</em></button>"; }).join("");
+      byId("voyage-route-list").innerHTML = routes.map(function (route) { var selected = (activeRoute && activeRoute.id === route.id) || (!activeRoute && currentVoyageRouteId === route.id); var locked = Boolean(activeRoute); return "<button class=\"voyage-route-card " + (selected ? "selected" : "") + "\" data-voyage-route=\"" + escapeHtml(route.id) + "\" type=\"button\" aria-pressed=\"" + (selected ? "true" : "false") + "\"" + (locked ? " disabled" : "") + "><span>" + escapeHtml(route.name) + "</span><small>" + escapeHtml(route.description) + "</small><em>" + (locked ? "航程進行中，暫不能更換" : selected ? "✓ 已選擇這條航線" : "點擊查看並選擇") + "</em></button>"; }).join("");
       var startButton = byId("start-voyage"); startButton.disabled = progress.status === "active"; startButton.textContent = progress.status === "active" ? "航程進行中" : progress.status === "failed" ? "重新開航（建立新路線）" : "開始航程（未選則隨機）";
       if (progress.status === "idle" || progress.status === "failed" || progress.status === "complete") {
         byId("voyage-node-list").innerHTML = "<div class=\"voyage-empty-state\"><span class=\"eyebrow\">CHOOSE A ROUTE</span><strong>先選一條航線，出發後事件會在途中出現</strong><p>每個結局獎勵每期只領一次；完成後可以再跑其他航線，找出不同條件。</p></div>";
@@ -1890,36 +1896,82 @@
       byId("voyage-team-list").innerHTML = owned.length ? owned.map(function (card) { var stats = effectiveBattleStats(state)[card.id]; var individualPower = window.StarshipBattle ? window.StarshipBattle.teamPower([card.id], effectiveBattleStats(state)) : 0; var selected = currentVoyageTeam.indexOf(card.id) >= 0; var image = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (image ? ";--card-image:url('" + escapeHtml(image) + "')" : ""); return "<button class=\"trial-team-card voyage-team-card " + (selected ? "selected" : "") + "\" data-voyage-character=\"" + escapeHtml(card.id) + "\" type=\"button\"><span class=\"trial-team-art\" style=\"" + style + "\"><b>" + escapeHtml(card.element) + "</b><strong>" + escapeHtml(card.name) + "</strong></span><span class=\"trial-team-copy\"><strong>" + escapeHtml(card.name) + "</strong><small class=\"character-power-line\">戰力 " + number(individualPower) + "</small><small>" + escapeHtml(stats.role) + " · HP " + number(stats.maxHp) + "</small><small>攻 " + stats.attack + "／防 " + stats.defense + "／速 " + stats.speed + "</small></span><i>" + (selected ? "已編入" : "加入編隊") + "</i></button>"; }).join("") : "<div class=\"empty\">目前沒有可參戰角色。</div>";
       renderVoyageGuide(state, progress, currentNode, currentStage);
       renderVoyageResult(state);
+      renderVoyageFeedback();
     }
     function toggleVoyageTeam(cardId) {
+      if (voyagePending || voyageNeedsSync) return;
       var index = currentVoyageTeam.indexOf(cardId);
       if (index >= 0) currentVoyageTeam.splice(index, 1);
       else if (currentVoyageTeam.length >= 4) { showMessage("一次戰鬥最多派出 4 名角色。", true); return; }
       else currentVoyageTeam.push(cardId);
       var state = game.getState(); voyageProgress(state).selectedTeam = currentVoyageTeam.slice(); updateGameFromState(state); saveLocalState(); renderVoyage();
     }
+    function renderVoyageFeedback() {
+      var target = byId("voyage-action-feedback");
+      if (!target) { target = document.createElement("div"); target.id = "voyage-action-feedback"; target.className = "voyage-action-feedback"; byId("voyage-node-actions").before(target); }
+      target.innerHTML = "<p role=\"" + (voyageFeedback.error ? "alert" : "status") + "\">" + escapeHtml(voyageFeedback.text) + "</p>" + (voyageNeedsSync ? "<button type=\"button\" class=\"small-button\" data-voyage-sync>同步航程進度</button>" : "");
+      target.hidden = !voyageFeedback.text && !voyageNeedsSync;
+      byId("voyage-node-actions").setAttribute("aria-busy", voyagePending ? "true" : "false");
+      byId("voyage-view").querySelectorAll("button").forEach(function (button) {
+        if (button.classList.contains("back-lobby") || button.hasAttribute("data-battle-art")) return;
+        var locked = Boolean(voyagePending || voyageNeedsSync && !button.hasAttribute("data-voyage-sync"));
+        if (locked) { if (!button.hasAttribute("data-voyage-lock")) button.setAttribute("data-voyage-lock", button.disabled ? "disabled" : "enabled"); button.disabled = true; }
+        else if (button.hasAttribute("data-voyage-lock")) { button.disabled = button.getAttribute("data-voyage-lock") === "disabled"; button.removeAttribute("data-voyage-lock"); }
+      });
+    }
+    function voyageRequest(body, localAction, loading, success, syncing) {
+      if (!game || !currentPlayerName) { showGate(); return; }
+      if (voyagePending || voyageNeedsSync && !syncing) return;
+      var request = { name: currentPlayerName, token: currentPlayerToken };
+      var clientGame = game;
+      function isCurrent() { return voyagePending === request && request.name === currentPlayerName && request.token === currentPlayerToken; }
+      voyagePending = request; voyageFeedback = { text: loading, error: false }; renderVoyageFeedback();
+      var promise = remoteMode ? apiRequest(syncing ? "/api/player/session" : "/api/player/voyage", body) : Promise.resolve().then(function () { return isCurrent() ? localAction(clientGame) : null; });
+      promise.then(function (payload) {
+        if (!isCurrent() || !payload) return;
+        if (!payload.state || !payload.state.voyageProgress) throw new Error("航程回應不完整，請同步進度");
+        updateGameFromState(payload.state); if (!remoteMode) saveLocalState();
+        voyageNeedsSync = false;
+        voyageFeedback = { text: success(payload), error: false };
+        renderLobby(); renderCharacters();
+      }).catch(function (error) {
+        if (!isCurrent()) return;
+        if (/登入狀態.*(失效|過期)|找不到登入帳號/.test(error.message)) { clearSession(); showGate(); showGateMessage("登入已過期，請重新登入後繼續航程。", true); return; }
+        voyageNeedsSync = syncing || remoteMode && (!error.status || /節點|重整|進行中的/.test(error.message));
+        voyageFeedback = { text: voyageNeedsSync ? "操作結果尚未確認，請先同步航程進度再繼續。" : error.message, error: true };
+      }).finally(function () {
+        if (!isCurrent()) return;
+        voyagePending = null; renderVoyage();
+      });
+    }
+    function voyageOutcome(payload) {
+      var progress = payload.state.voyageProgress;
+      if (payload.ending) return "航程完成：" + (payload.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(payload.ending.reward));
+      if (payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut)) return "本節戰鬥達到演算上限，未判定勝利；可重新開航。";
+      return payload.battle ? payload.battle.won ? "節點突破成功，可以繼續前進。" : "本節戰敗，航程已結束；可以重新開航。" : "事件選擇已保存。";
+    }
     function runVoyageAction(choice) {
       if (!game || !currentPlayerName) { showGate(); return; }
-      var state = game.getState(); var progress = voyageProgress(state);
+      if (voyagePending || voyageNeedsSync) return;
+      var state = game.getState(), progress = voyageProgress(state);
       if (progress.status !== "active") {
-        if (remoteMode) { apiRequest("/api/player/voyage", { action: "start", routeId: currentVoyageRouteId || undefined, team: currentVoyageTeam }).then(function (payload) { updateGameFromState(payload.state); renderVoyage(); showMessage("星海迷航已開始，請依節點選擇你的航線。", false); }).catch(function (error) { showMessage(error.message, true); }); }
-        else { try { var started = game.startVoyage({ routeId: currentVoyageRouteId || undefined, team: currentVoyageTeam }); updateGameFromState(started.state); saveLocalState(); renderVoyage(); showMessage("星海迷航已開始，請依節點選擇你的航線。", false); } catch (error) { showMessage(error.message, true); } }
-        return;
+        var startBody = { action: "start", routeId: currentVoyageRouteId || undefined, team: currentVoyageTeam.slice() };
+        voyageRequest(startBody, function (client) { return client.startVoyage(startBody); }, "正在建立並保存航程……", function () { return "航程已建立，請依節點繼續。"; }); return;
       }
-      var node = voyageNodeById(progress.route[progress.nodeIndex]); if (!node) return;
-      var battle = null; var stage = voyageBattleStage(node);
-      try {
-        if (stage) {
-          if (!currentVoyageTeam.length) throw new Error("至少派出 1 名角色才能進入迷航戰鬥");
-          if (currentVoyageTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
-          battle = window.StarshipBattle.simulateBattle({ team: currentVoyageTeam, stats: effectiveBattleStats(state), stage: stage });
-        }
-        if (remoteMode) {
-          apiRequest("/api/player/voyage", { action: "resolve", nodeId: node.id, choice: choice || undefined, team: currentVoyageTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderVoyage(); renderLobby(); renderCharacters(); showMessage(payload.ending ? "航程完成：" + (payload.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(payload.ending.reward)) : payload.battle && payload.battle.won ? "節點突破成功，繼續向下一段航道前進。" : timedOut ? "節點戰鬥超過演算上限，未判定突破；可以重新開航。" : payload.battle ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(payload.battle && !payload.battle.won && !timedOut)); }).catch(function (error) { showMessage(error.message, true); });
-          return;
-        }
-        var result = game.advanceVoyage({ nodeId: node.id, choice: choice, team: currentVoyageTeam, battle: battle }); updateGameFromState(result.state); saveLocalState(); renderVoyage(); renderLobby(); renderCharacters(); showMessage(result.ending ? "航程完成：" + (result.ending.alreadyClaimed ? "本期結局獎勵已領取過。" : rewardText(result.ending.reward)) : battle && battle.status === "timeout" ? "節點戰鬥超過演算上限，未判定突破；可以重新開航。" : battle && !battle.won ? "節點戰鬥失敗，可以重新開航。" : "事件選擇已記錄。", Boolean(battle && !battle.won && battle.status !== "timeout"));
-      } catch (error) { showMessage(error.message, true); }
+      var node = voyageNodeById(progress.route[progress.nodeIndex]); if (!node) { voyageFeedback = { text: "找不到目前航程節點，請同步進度。", error: true }; voyageNeedsSync = true; renderVoyageFeedback(); return; }
+      var stage = voyageBattleStage(node), team = currentVoyageTeam.slice();
+      if (stage && (!team.length || team.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; }))) {
+        voyageFeedback = { text: "請先編入至少一名已取得且已開放的角色。", error: true }; renderVoyageFeedback(); return;
+      }
+      var body = { action: "resolve", nodeId: node.id, choice: choice || undefined, team: team };
+      voyageRequest(body, function (client) {
+        var battle = null;
+        if (stage) battle = window.StarshipBattle.simulateBattle({ team: team, stats: effectiveBattleStats(state), stage: stage });
+        return client.advanceVoyage({ nodeId: node.id, choice: choice, team: team, battle: battle });
+      }, stage ? "正在結算戰鬥並保存結果，請勿重複送出……" : "正在保存事件選擇……", voyageOutcome);
+    }
+    function syncVoyage() {
+      voyageRequest({}, function (client) { return { state: client.getState() }; }, "正在讀取已保存的航程……", function () { return "已同步，可繼續航程。"; }, true);
     }
     function petProgressState(state) {
       state.petProgress = state.petProgress || { version: data.petVersion || "2.1-companion-workshop", selectedPetId: "star-fox", selectedOutfitId: "default", selectedEffectId: "starlit", pets: {}, resources: { petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0 }, daily: { date: null, groomed: false, challengeCount: 0 }, showcase: { isPublic: false, featuredPetId: "star-fox", outfitId: "default", effectId: "starlit" }, ratedShowcases: {} };
@@ -2430,20 +2482,13 @@
       var routeId = button.getAttribute("data-voyage-route");
       var state = game.getState();
       if (voyageProgress(state).status === "active") { showMessage("目前航程進行中，完成或重新開航後才能更換航線。", true); return; }
-      currentVoyageRouteId = routeId;
-      voyageProgress(state).selectedRouteId = routeId;
-      if (remoteMode) {
-        apiRequest("/api/player/voyage", { action: "select-route", routeId: routeId }).then(function (payload) {
-          currentVoyageRouteId = payload.selectedRouteId || routeId;
-          updateGameFromState(payload.state);
-          renderVoyage();
-        }).catch(function (error) { showMessage(error.message, true); });
-      } else {
-        updateGameFromState(state);
-        saveLocalState();
-        renderVoyage();
-      }
+      if (voyagePending || voyageNeedsSync) return;
+      voyageRequest({ action: "select-route", routeId: routeId }, function (client) {
+        state.voyageProgress.selectedRouteId = routeId;
+        return { state: state };
+      }, "正在保存航線選擇……", function () { currentVoyageRouteId = routeId; return "已選擇航線，可以出發。"; });
     });
+    byId("voyage-view").addEventListener("click", function (event) { if (event.target.closest("[data-voyage-sync]")) syncVoyage(); });
     byId("start-voyage").addEventListener("click", function () { runVoyageAction(""); });
     byId("voyage-node-actions").addEventListener("click", function (event) { var choice = event.target.closest("[data-voyage-choice]"); if (choice && !choice.disabled) { runVoyageAction(choice.getAttribute("data-voyage-choice")); return; } var advance = event.target.closest("[data-voyage-advance]"); if (advance) runVoyageAction(""); });
     byId("voyage-team-list").addEventListener("click", function (event) { var button = event.target.closest("[data-voyage-character]"); if (button) toggleVoyageTeam(button.getAttribute("data-voyage-character")); });

@@ -751,7 +751,7 @@ function runTrial(currentState, body) {
     state.trialProgress.bestStage = Math.max(state.trialProgress.bestStage, stage.id);
     state.recruitment.trial10ChoiceAvailable = false;
   }
-  if (stage.halves ? battle.challengeComplete : ((stage.maxChallengeAttempts && battle.status !== "timeout") || battle.won)) state.trialProgress.attempts[stage.id] = attempts + 1;
+  if (battle.won) state.trialProgress.attempts[stage.id] = attempts + 1;
   const attemptsUsed = Number(state.trialProgress.attempts[stage.id] || 0);
   return { state: createGame(state).getState(), battle, reward: battle.won ? { starSand: rewardStarSand, characterExp: rewardCharacterExp, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } : { starSand: 0, characterExp: 0, attemptsUsed, attemptsRemaining: maxAttempts - attemptsUsed } };
 }
@@ -849,6 +849,7 @@ function runVoyage(currentState, body) {
   const progress = state.voyageProgress;
   if (progress.status !== "active") throw new Error("目前沒有進行中的星海迷航航程");
   const node = voyageNodeById(progress.route[progress.nodeIndex]);
+  if (body.nodeId !== node.id) throw new Error("星海迷航節點已變更，請同步目前航程後再繼續");
   const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : progress.selectedTeam)).slice(0, 4);
   let battle = null;
   if (node.type === "combat" || node.type === "boss") {

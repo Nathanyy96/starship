@@ -339,6 +339,9 @@
     state.trialProgress.attempts = isPlainObject(state.trialProgress.attempts) ? state.trialProgress.attempts : {};
     Object.keys(state.trialProgress.attempts).forEach(function (id) {
       state.trialProgress.attempts[id] = Number.isInteger(state.trialProgress.attempts[id]) && state.trialProgress.attempts[id] >= 0 ? state.trialProgress.attempts[id] : 0;
+      // An uncleared stage cannot have rewarded victories. Refund only these
+      // provable legacy defeat charges; retain all cleared-stage counters.
+      if (state.trialProgress.clearedStages.indexOf(Number(id)) < 0) state.trialProgress.attempts[id] = 0;
     });
     state.trialProgress.bestStage = Number.isInteger(state.trialProgress.bestStage) && state.trialProgress.bestStage >= 0 ? state.trialProgress.bestStage : 0;
     state.bossProgress = Object.assign(initialState().bossProgress, isPlainObject(source.bossProgress) ? source.bossProgress : {});
