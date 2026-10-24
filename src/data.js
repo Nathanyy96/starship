@@ -322,7 +322,7 @@
   });
 
   var updateCycle = release.cycle;
-  var trialVersion = updateCycle;
+  var trialVersion = release.challengeCycle || updateCycle;
   var trialMaxRewards = 20;
   // 試煉每次成功都提供角色經驗；本版本的 1–15 關每關最多挑戰三次。
   var trialReward = Object.freeze({ starSand: 75, characterExp: 1800 });
@@ -350,7 +350,7 @@
   // 80 等突破專用 Boss。不同角色會對應不同素材來源；每個 Boss 每版本最多領取 10 次，
   // 六種素材來源分成 Lv.1–3 三個獎勵檔位，讓玩家可以透過戰鬥穩定準備突破材料，
   // 同時保留隊伍搭配與重複挑戰的空間。每個檔位安排兩個 Boss，避免刪除既有角色的素材來源。
-  var bossVersion = updateCycle;
+  var bossVersion = release.challengeCycle || updateCycle;
   var bossMaxRewards = 10;
   var bossStages = [
     { id: "boss-star-warden", name: "星序守望者", region: "星序觀測環", description: "守望者以錯位星序建立護盾，指揮與減防角色能更快找到破口。", recommendedPower: 1500, environment: "錯位星序", environmentEffect: "敵方護盾耗盡後可重整，持續輸出與破防較有價值", enemyTrait: "星序護盾", enemyTraitEffect: "每名敵人開場持有最大生命 14% 的護盾，耗盡後最多重整兩次", trialRule: "shield", modifiers: { enemyDefense: 1.06, teamAttack: 1.03 }, enemies: [{ name: "星序守衛", maxHp: 2700, attack: 190, defense: 145, speed: 82, count: 2 }, { name: "星序守望者", maxHp: 5200, attack: 260, defense: 215, speed: 96, count: 1 }], reward: { materialId: "star-crest", materialName: "星序碎晶", amount: 1, characterExp: 360 } },
@@ -407,7 +407,7 @@
     });
   });
 
-  var dispatchVersion = updateCycle;
+  var dispatchVersion = release.challengeCycle || updateCycle;
   var dispatchMissions = [
     { id: "dispatch-library", name: "潮汐書庫抄錄", region: "潮汐書庫", description: "把失散的索引頁送回書庫外環，適合均衡隊伍。", recommendedPower: 1350, environment: "書頁風", environmentEffect: "我方速度提高 8%，更容易先於敵人行動", modifiers: { teamSpeed: 1.08 }, enemyTrait: "索引散落", enemyTraitEffect: "敵人生命偏低但數量較多", trialRule: "echo", enemies: [{ name: "索引書獸", maxHp: 1600, attack: 160, defense: 105, speed: 96, count: 2 }, { name: "散頁核", maxHp: 2100, attack: 145, defense: 130, speed: 62, count: 1 }], reward: { starSand: 180, characterExp: 1680 } },
     { id: "dispatch-lighthouse", name: "白帆岬補燈", region: "白帆岬", description: "替燈塔補上夜間回覆信標，重裝或支援角色能穩定完成。", recommendedPower: 1900, environment: "白帆夜潮", environmentEffect: "隊伍防禦提高 8%，治療量降低 10%", modifiers: { teamDefense: 1.08, healing: 0.9 }, enemyTrait: "潮夜巡獵", enemyTraitEffect: "敵方會優先攻擊生命比例最低的角色，能越過前排", trialRule: "mark", enemies: [{ name: "夜潮獵影", maxHp: 2300, attack: 205, defense: 142, speed: 125, count: 2 }, { name: "白帆燈核", maxHp: 2900, attack: 185, defense: 168, speed: 70, count: 1 }], reward: { starSand: 380, characterExp: 1500 } },
@@ -416,7 +416,7 @@
 
   // 星海迷航：獨立於主線的短局隨機航程。每期抽取一條航線，
   // 玩家在事件、商店、休整和戰鬥之間做選擇，最後依探索條件進入不同結局。
-  var voyageVersion = updateCycle;
+  var voyageVersion = release.challengeCycle || updateCycle;
   var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；舊版已取得者保留", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "大廳商店購買；角色開放後可選為上場造型", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
   var newSeasonSkins = [
@@ -608,6 +608,12 @@
     copy: "重整可玩地圖的道路、城鎮建築與場景，白鐘城冒險家協會新增送信、討伐、考察與工坊補給盤點試玩。協會委託目前不發放正式帳號資源。角色、培養、原有資源、已開傳送點與劇情進度保留。",
     reward: "每帳號一次，登入後合併發放：更新獎勵 5,000 星砂、5,000 角色經驗、2 星痕；修復補償 3,000 星砂、3,000 角色經驗、1 星痕。",
     highlights: ["白鐘城主街新增協會與走動居民，四種地方委託可試玩", "已啟用的傳送點同步至帳號，舊本機紀錄會合併保留", "保留主線與資產；不重置本期試煉、Boss、商店或星伴進度", "角色外觀仍保留現有地圖素材，精緻比例版本待同場景對照驗收"]
+  })].concat(announcements));
+  announcements = Object.freeze([Object.freeze({
+    id: "challenge-reset-20261025", badge: "關卡更新", date: "2026-10-25", title: "試煉、首領、委託與迷航重新開放挑戰",
+    copy: "本次重置試煉通關與次數、突破首領次數、星港委託領取紀錄及星海迷航航程。未完成的迷航需重新出航。",
+    reward: "帳號、劇情進度、角色與培養、貨幣材料、抽卡保底、造型及星伴收藏保留。本次不另發補償。",
+    highlights: ["四項關卡只重置一次，重新登入可接續更新後的挑戰", "商店購買與兌換次數、星伴培育及互動紀錄保留", "正式內容維持1.1"]
   })].concat(announcements));
   var storyChapters = [
     {

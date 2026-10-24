@@ -23,12 +23,12 @@ const playerDatabaseBackupPath = playerDatabasePath + ".bak";
 const port = Number(process.env.PORT || 8080);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
-const currentUpdateVersion = updateCycle;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
 const authorPreviewPlayerKey = "happycow";
 const story11Missions = require("./src/story-1-1-missions.js");
 const releaseConfig = require("./src/release-config.js");
+const currentUpdateVersion = releaseConfig.challengeCycle || updateCycle;
 const storyReleaseProgress = require("./src/story-release-progress.js");
 const databaseBaselines = new WeakMap();
 function createGame(state) {
@@ -390,6 +390,8 @@ function ensurePlayerMilestones(currentState) {
     state.trialProgress.bestStage = 0;
     state.trialProgress.lastBattle = null;
     state.trialProgress.selectedTeam = [];
+    state.trialProgress.selectedTeamUpper = [];
+    state.trialProgress.selectedTeamLower = [];
   }
   state.bossProgress = state.bossProgress || { version: bossVersion, selectedBossId: "boss-star-warden", selectedTeam: [], attempts: {}, lastBattle: null };
   if (state.bossProgress.version !== bossVersion) {
@@ -970,6 +972,7 @@ async function handleApi(request, response, requestUrl) {
     sendJson(response, 200, {
       ok: true,
       service: "starship-gacha",
+      challengeCycle: currentUpdateVersion,
       persistence: usePostgres ? "postgres" : "file",
       maintenance: process.env.STARSHIP_MAINTENANCE === "true",
       testRewardsEnabled: testRewardsEnabled()

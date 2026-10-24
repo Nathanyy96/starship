@@ -347,13 +347,16 @@
         Object.keys(totalGift).forEach(function (resource) { state.resources[resource] += totalGift[resource]; });
         state.updateRewards.claimedVersions[data.explorationUpdateCycle] = Object.assign({ update: updateGift, repair: repairGift, grantedAt: new Date().toISOString() }, totalGift);
       }
-      if (state.trialProgress && state.trialProgress.version !== updateVersion) {
-        state.trialProgress.version = updateVersion;
+      var trialVersion = data.trialVersion || updateVersion;
+      if (state.trialProgress && state.trialProgress.version !== trialVersion) {
+        state.trialProgress.version = trialVersion;
         state.trialProgress.attempts = {};
         state.trialProgress.clearedStages = [];
         state.trialProgress.bestStage = 0;
         state.trialProgress.lastBattle = null;
         state.trialProgress.selectedTeam = [];
+        state.trialProgress.selectedTeamUpper = [];
+        state.trialProgress.selectedTeamLower = [];
       }
       state.bossProgress = state.bossProgress || { version: data.bossVersion || updateVersion, selectedBossId: "boss-star-warden", selectedTeam: [], attempts: {}, lastBattle: null };
       if (state.bossProgress.version !== (data.bossVersion || updateVersion)) {
@@ -363,9 +366,10 @@
         state.bossProgress.selectedTeam = [];
         state.bossProgress.selectedBossId = "boss-star-warden";
       }
-      state.dispatchProgress = state.dispatchProgress || { version: updateVersion, selectedTeam: [], claimed: {}, lastMission: null };
-      if (state.dispatchProgress.version !== updateVersion) {
-        state.dispatchProgress.version = updateVersion;
+      var dispatchVersion = data.dispatchVersion || updateVersion;
+      state.dispatchProgress = state.dispatchProgress || { version: dispatchVersion, selectedTeam: [], claimed: {}, lastMission: null };
+      if (state.dispatchProgress.version !== dispatchVersion) {
+        state.dispatchProgress.version = dispatchVersion;
         state.dispatchProgress.selectedTeam = [];
         state.dispatchProgress.claimed = {};
         state.dispatchProgress.lastMission = null;

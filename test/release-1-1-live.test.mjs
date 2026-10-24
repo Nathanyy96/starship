@@ -23,7 +23,8 @@ function fresh() { return new GachaGame({ banners: data.banners }).getState(); }
 test("1.1 候選卡池、章節、公告一致；2.x 不進正式卡池", () => {
   assert.equal(data.updateVersion, "1.1");
   assert.equal(chapter11.scenes.length, 5);
-  assert.equal(data.announcements[0].id, "white-bell-exploration-2026-10-16");
+  assert.equal(data.announcements[0].id, "challenge-reset-20261025");
+  assert.ok(data.announcements.some(item => item.id === "white-bell-exploration-2026-10-16"));
   assert.ok(data.announcements.some(item => item.id === "release-1-1"));
   for (const id of ["hina", "siyeon", "cenwu", "ruida", "yuan"]) assert.ok(data.activeCards.some(c => c.id === id), id);
   assert.ok(data.activeCards.every(c => Number(c.releaseVersion) <= 1.1));
@@ -106,7 +107,7 @@ test("正式 API 舊帳號遷移、逐幕任務、併發重送、防重領與重
     assert.deepEqual(migrated.state.cosmetics, seeded.cosmetics);
     assert.deepEqual(migrated.state.pity, seeded.pity);
     assert.deepEqual(migrated.state.bannerExchanges, seeded.bannerExchanges);
-    assert.equal(migrated.state.trialProgress.version, data.updateCycle);
+    assert.equal(migrated.state.trialProgress.version, data.trialVersion);
     assert.deepEqual(migrated.state.trialProgress.clearedStages, []);
     let token = registration.token;
     for (const scene of chapter10.scenes) await post("/api/player/story-progress", { token, chapterId: chapter10.id, sceneId: scene.id, action: "complete" });

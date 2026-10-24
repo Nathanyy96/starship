@@ -11,6 +11,8 @@
   return Object.freeze({
     approved11: approved11, open11: open11, version: open11 ? "1.1" : "1.0",
     cycle: open11 ? "release-1-1" : "2026-10-05-major-combat-repair-1-0",
+    // Author-approved reset of trial, Boss, commissions and voyage only.
+    challengeCycle: "challenge-reset-20261025",
     compensationCycle: "2026-10-05-major-combat-repair-1-0",
     explorationUpdateCycle: "2026-10-16-white-bell-exploration",
     explorationUpdateReward: Object.freeze({ starSand: 5000, characterExp: 5000, starMarks: 2 }),

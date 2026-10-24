@@ -36,7 +36,7 @@ test("trial charges only victories, refunds provable legacy defeat charges, and 
     const teamUpper = ["magenta", "siyeon", "chodan", "hina"];
     const teamLower = ["mave", "harlow", "elorna", "celesia"];
     for (const id of teamUpper.concat(teamLower)) state.collection[id] = 1;
-    state.trialProgress.version = data.updateCycle;
+    state.trialProgress.version = data.trialVersion;
     state.trialProgress.clearedStages = Array.from({ length: 10 }, (_, index) => index + 1);
     state.trialProgress.bestStage = 10;
     state.trialProgress.attempts = { 1: 2, 11: 3 };
