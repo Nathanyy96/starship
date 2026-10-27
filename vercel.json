@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node tools/prepare-vercel.mjs",
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 300,
+      "includeFiles": ["src/**", "tools/player-backup.mjs", "tools/b2-player-backup.mjs"],
+      "excludeFiles": ["assets/**", "public/**", "video/**", "docs/**", "test/**", "test-legacy/**", "*.docx"]
+    }
+  },
+  "rewrites": [{ "source": "/api/:path*", "destination": "/api" }],
+  "headers": [
+    { "source": "/assets/:path*", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/src/:path*", "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] }
+  ]
+}

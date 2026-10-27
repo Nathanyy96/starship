@@ -1,0 +1,9 @@
+.git
+node_modules
+public
+data
+*.docx
+video
+docs
+test
+test-legacy

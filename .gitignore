@@ -1,6 +1,11 @@
 data/players.json
 data/players.json.tmp
 data/players.json.bak
+node_modules/
+public/
+.vercel/
+.env
+.env.local
 _docx_qa_*/
 tools/__pycache__/
 # Local roster and document render experiments.

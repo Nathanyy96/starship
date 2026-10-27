@@ -4,6 +4,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
@@ -25,6 +26,7 @@ const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 3000000 });
 const sessions = new Map();
+const transactionContext = new AsyncLocalStorage();
 const authorPreviewPlayerKey = "happycow";
 const story11Missions = require("./src/story-1-1-missions.js");
 const releaseConfig = require("./src/release-config.js");
@@ -59,7 +61,10 @@ function parseByteRange(rangeHeader, fileSize) {
   return { start, end };
 }
 
-fs.mkdirSync(dataDirectory, { recursive: true });
+if (!process.env.DATABASE_URL) {
+  if (process.env.VERCEL) throw new Error("Vercel requires DATABASE_URL; file persistence is disabled");
+  fs.mkdirSync(dataDirectory, { recursive: true });
+}
 
 const usePostgres = Boolean(process.env.DATABASE_URL);
 let postgresPool = null;
@@ -71,7 +76,10 @@ function getPostgresPool() {
     postgresPool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
-      max: 5
+      max: 5,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 15000,
+      allowExitOnIdle: true
     });
   }
   return postgresPool;
@@ -89,7 +97,14 @@ async function ensurePostgresSchema() {
         updated_at TIMESTAMPTZ NOT NULL,
         last_login_at TIMESTAMPTZ,
         state JSONB NOT NULL
-      )
+      );
+      CREATE TABLE IF NOT EXISTS starship_sessions (
+        token_hash TEXT PRIMARY KEY,
+        player_key TEXT NOT NULL,
+        expires_at BIGINT NOT NULL,
+        world_sequence BIGINT NOT NULL DEFAULT 0
+      );
+      CREATE INDEX IF NOT EXISTS starship_sessions_expiry ON starship_sessions (expires_at)
     `).catch((error) => {
       postgresSchemaPromise = null;
       throw error;
@@ -214,7 +229,7 @@ function normalizedTimestamp(value) {
 async function readDatabase() {
   if (!usePostgres) return readFileDatabase();
   await ensurePostgresSchema();
-  const result = await getPostgresPool().query("SELECT player_key, name, password_hash, created_at, updated_at, last_login_at, state FROM starship_players");
+  const result = await (transactionContext.getStore()?.client || getPostgresPool()).query("SELECT player_key, name, password_hash, created_at, updated_at, last_login_at, state FROM starship_players");
   const database = emptyDatabase();
   result.rows.forEach((row) => {
     database.players[row.player_key] = {
@@ -241,9 +256,10 @@ async function writeDatabase(database, previousDatabase) {
   const changedPlayers = Object.entries(database.players || {}).filter(([key, record]) =>
     !baseline?.players?.[key] || JSON.stringify(record) !== JSON.stringify(baseline.players[key]));
   if (!changedPlayers.length) return;
-  const client = await getPostgresPool().connect();
+  const transactionClient = transactionContext.getStore()?.client;
+  const client = transactionClient || await getPostgresPool().connect();
   try {
-    await client.query("BEGIN");
+    if (!transactionClient) await client.query("BEGIN");
     for (const [key, record] of changedPlayers) {
       await client.query(`
         INSERT INTO starship_players (player_key, name, password_hash, created_at, updated_at, last_login_at, state)
@@ -265,13 +281,13 @@ async function writeDatabase(database, previousDatabase) {
         JSON.stringify(record.state || freshPlayerState())
       ]);
     }
-    await client.query("COMMIT");
+    if (!transactionClient) await client.query("COMMIT");
     databaseBaselines.set(database, cloneDatabase(database));
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (!transactionClient) await client.query("ROLLBACK");
     throw error;
   } finally {
-    client.release();
+    if (!transactionClient) client.release();
   }
 }
 
@@ -495,14 +511,29 @@ function verifyPassword(password, encoded) {
   }
 }
 
-function createSession(key) {
+function sessionHash(token) {
+  return crypto.createHash("sha256").update(String(token || "")).digest("hex");
+}
+
+async function createSession(key) {
   const token = crypto.randomBytes(32).toString("hex");
-  sessions.set(token, { key, expiresAt: Date.now() + sessionLifetimeMs });
+  const expiresAt = Date.now() + sessionLifetimeMs;
+  if (usePostgres) {
+    const client = transactionContext.getStore()?.client || getPostgresPool();
+    await client.query("DELETE FROM starship_sessions WHERE expires_at <= $1", [Date.now()]);
+    await client.query("INSERT INTO starship_sessions(token_hash, player_key, expires_at) VALUES ($1,$2,$3)", [sessionHash(token), key, expiresAt]);
+  } else sessions.set(token, { key, expiresAt });
   return token;
 }
 
-function playerFromSession(database, token) {
-  const session = sessions.get(String(token || ""));
+async function playerFromSession(database, token) {
+  let session;
+  if (usePostgres) {
+    const result = await (transactionContext.getStore()?.client || getPostgresPool()).query(
+      "UPDATE starship_sessions SET expires_at=$2 WHERE token_hash=$1 AND expires_at>$3 RETURNING player_key, world_sequence", [sessionHash(token), Date.now() + sessionLifetimeMs, Date.now()]);
+    const row = result.rows[0];
+    if (row) session = { key: row.player_key, worldSequence: Number(row.world_sequence), expiresAt: Date.now() + sessionLifetimeMs };
+  } else session = sessions.get(String(token || ""));
   if (!session) throw new Error("登入狀態已失效，請重新登入");
   if (session.expiresAt <= Date.now()) {
     sessions.delete(String(token || ""));
@@ -511,10 +542,16 @@ function playerFromSession(database, token) {
   const record = database.players[session.key];
   if (!record || !record.passwordHash) throw new Error("找不到登入帳號，請重新登入");
   session.expiresAt = Date.now() + sessionLifetimeMs;
-  return { key: session.key, record };
+  return { key: session.key, record, session };
 }
 
 function sendJson(response, statusCode, value) {
+  const context = transactionContext.getStore();
+  if (context) {
+    context.reply = () => sendJson(response, statusCode, value);
+    context.failed = statusCode >= 400;
+    return;
+  }
   response.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
@@ -524,6 +561,14 @@ function sendJson(response, statusCode, value) {
 }
 
 function readBody(request) {
+  // Vercel may parse JSON before invoking the Node handler.
+  if (request.body !== undefined) {
+    try {
+      const serialized = typeof request.body === "string" ? request.body : Buffer.isBuffer(request.body) ? request.body.toString("utf8") : JSON.stringify(request.body);
+      if (Buffer.byteLength(serialized) > 1024 * 1024) throw new Error("請求內容過大");
+      return Promise.resolve(JSON.parse(serialized || "{}"));
+    } catch (error) { return Promise.reject(error); }
+  }
   return new Promise((resolve, reject) => {
     let body = "";
     request.on("data", (chunk) => {
@@ -1017,7 +1062,7 @@ async function handleApi(request, response, requestUrl) {
   databaseBaselines.set(database, cloneDatabase(database));
   try {
     if (requestUrl.pathname === "/api/author-preview/2-x-battle") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       if (player.key !== authorPreviewPlayerKey) {
         sendJson(response, 403, { ok: false, error: "1.0–2.5 角色試玩目前只開放給作者帳號。" });
         return;
@@ -1043,7 +1088,7 @@ async function handleApi(request, response, requestUrl) {
       return;
     }
     if (requestUrl.pathname === "/api/author-preview/1-1") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       if (player.key !== authorPreviewPlayerKey) {
         sendJson(response, 403, { ok: false, error: "這個試玩入口目前只開放給作者帳號。" });
         return;
@@ -1078,7 +1123,7 @@ async function handleApi(request, response, requestUrl) {
       record.state = ensurePlayerMilestones(record.state);
       database.players[playerKey(name)] = record;
       await writeDatabase(database);
-      sendJson(response, 200, { ok: true, created: !existing, migrated, token: createSession(playerKey(name)), player: publicPlayer(record), state: record.state });
+      sendJson(response, 200, { ok: true, created: !existing, migrated, token: await createSession(playerKey(name)), player: publicPlayer(record), state: record.state });
       return;
     }
 
@@ -1092,12 +1137,12 @@ async function handleApi(request, response, requestUrl) {
       existing.record.updatedAt = existing.record.lastLoginAt;
       existing.record.state = ensurePlayerMilestones(existing.record.state);
       await writeDatabase(database);
-      sendJson(response, 200, { ok: true, token: createSession(existing.key), player: publicPlayer(existing.record), state: existing.record.state });
+      sendJson(response, 200, { ok: true, token: await createSession(existing.key), player: publicPlayer(existing.record), state: existing.record.state });
       return;
     }
 
     if (requestUrl.pathname === "/api/player/session") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       player.record.state = ensurePlayerMilestones(player.record.state);
       await writeDatabase(database);
       sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state });
@@ -1105,13 +1150,13 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/world-position") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const position = worldCheckpoint.clean(body.position);
       if (!position) throw new Error("探索位置格式不正確");
       const p = position.state;
       const safe = position.kind === "world" ? [[-6,-6],[-6,6],[6,-6],[6,6]].every(([dx,dy])=>worldGeometry.passable(p.map,p.x+dx,p.y+dy)) : position.kind === "opening" ? openingGeometry.fits(p.zone,p.x,p.y) : villageGeometry.passable(p.x,p.y);
       if (!safe) throw new Error("探索位置不在可通行的地面");
-      const session = sessions.get(String(body.token));
+      const session = player.session;
       if (body.sequence !== undefined) {
         if (!Number.isSafeInteger(body.sequence) || body.sequence < 1) throw new Error("位置同步順序不正確");
         if (body.sequence <= (session.worldSequence || 0)) { sendJson(response, 200, {ok:true, position:player.record.state.worldPosition}); return; }
@@ -1121,13 +1166,16 @@ async function handleApi(request, response, requestUrl) {
       player.record.state.worldWaypoints = mergeWorldWaypoints(player.record.state.worldWaypoints, position.state.waypoints);
       player.record.updatedAt = new Date(position.updatedAt).toISOString();
       await writeDatabase(database);
-      if(body.sequence !== undefined)session.worldSequence = body.sequence;
+      if (body.sequence !== undefined) {
+        if (usePostgres) await transactionContext.getStore().client.query('UPDATE starship_sessions SET world_sequence=$2 WHERE token_hash=$1', [sessionHash(body.token), body.sequence]);
+        else session.worldSequence = body.sequence;
+      }
       sendJson(response, 200, { ok:true, position });
       return;
     }
 
     if (requestUrl.pathname === "/api/player/world-waypoints") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const merged = mergeWorldWaypoints(player.record.state.worldWaypoints, player.record.state.worldPosition?.state?.waypoints, body.waypoints);
       player.record.state.worldWaypoints = merged;
       player.record.updatedAt = new Date().toISOString();
@@ -1137,7 +1185,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/story-progress") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const completed = completeStoryScene(player.record.state, body);
       player.record.state = completed.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1147,7 +1195,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/tutorial-complete") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = completeTutorial(player.record.state);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1157,7 +1205,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/star-law-test-reward") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = claimStarLawTestReward(player.record.state);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1167,7 +1215,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/claim-character") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = claimCharacterChoice(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1177,7 +1225,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/trial-battle") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = runTrial(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1187,7 +1235,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/boss-battle") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = runBoss(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1197,7 +1245,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/dispatch") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = runDispatch(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1207,7 +1255,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/voyage") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = runVoyage(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1217,7 +1265,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/shop" || requestUrl.pathname === "/api/player/character-skin") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = requestUrl.pathname === "/api/player/shop"
         ? game.shopAction({ kind: body.kind, id: body.id, payment: body.payment })
@@ -1230,7 +1278,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/pet-action") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = petAction(player.record.state, body);
       player.record.state = result.state;
       player.record.updatedAt = new Date().toISOString();
@@ -1240,7 +1288,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/pet-showcase") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const result = runPetShowcase(database, player, body);
       await writeDatabase(database);
       sendJson(response, 200, Object.assign({ ok: true, player: publicPlayer(player.record) }, result));
@@ -1252,7 +1300,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/pull" || requestUrl.pathname === "/api/player/select-featured" || requestUrl.pathname === "/api/player/exchange-featured") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       let result;
       if (requestUrl.pathname === "/api/player/pull") {
@@ -1270,7 +1318,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/character-development") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = game.developCharacter({ cardId: body.cardId, bulk: body.bulk === true });
       player.record.state = game.getState();
@@ -1281,7 +1329,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/character-form") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = game.setCharacterForm({ cardId: body.cardId, formId: body.formId });
       player.record.state = game.getState();
@@ -1292,7 +1340,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/character-breakthrough") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = game.breakthroughCharacter({ cardId: body.cardId });
       player.record.state = game.getState();
@@ -1303,7 +1351,7 @@ async function handleApi(request, response, requestUrl) {
     }
 
     if (requestUrl.pathname === "/api/player/character-constellation") {
-      const player = playerFromSession(database, body.token);
+      const player = await playerFromSession(database, body.token);
       const game = createGame(player.record.state);
       const result = game.enhanceConstellation({ cardId: body.cardId });
       player.record.state = game.getState();
@@ -1339,20 +1387,28 @@ async function handleApi(request, response, requestUrl) {
 
 let apiWriteQueue = Promise.resolve();
 async function serializedApi(request, response, requestUrl) {
-  let lockClient;
-  try {
-    if (usePostgres) {
-      lockClient = await getPostgresPool().connect();
-      await lockClient.query("SELECT pg_advisory_lock(173112026)");
-    }
-    await handleApi(request, response, requestUrl);
-  } finally {
-    if (lockClient) {
-      try { await lockClient.query("SELECT pg_advisory_unlock(173112026)"); } finally { lockClient.release(); }
-    }
+  if (!usePostgres || requestUrl.pathname === "/api/admin/player-backup") {
+    return handleApi(request, response, requestUrl);
   }
+  await ensurePostgresSchema();
+  const lockClient = await getPostgresPool().connect();
+  const context = { client: lockClient, reply: null, failed: false };
+  try {
+    await lockClient.query("BEGIN");
+    // Transaction lock works with Neon pooled connections and across instances.
+    await lockClient.query("SELECT pg_advisory_xact_lock(173112026)");
+    await transactionContext.run(context, () => handleApi(request, response, requestUrl));
+    await lockClient.query(context.failed ? "ROLLBACK" : "COMMIT");
+  } catch (error) {
+    await lockClient.query("ROLLBACK").catch(() => {});
+    throw error;
+  } finally {
+    lockClient.release();
+  }
+  // Respond only after durable commit; never acknowledge an uncommitted save.
+  context.reply?.();
 }
-const server = http.createServer((request, response) => {
+export default async function requestHandler(request, response) {
   const requestUrl = new URL(request.url || "/", "http://localhost");
   if (requestUrl.pathname.startsWith("/api/")) {
     if (request.method === "POST" && process.env.STARSHIP_MAINTENANCE === "true" && requestUrl.pathname !== "/api/admin/player-backup") {
@@ -1363,7 +1419,8 @@ const server = http.createServer((request, response) => {
       apiWriteQueue = apiWriteQueue.then(() => serializedApi(request, response, requestUrl)).catch(() => {
         if (!response.headersSent) sendJson(response, 500, { ok: false, error: "操作暫時失敗，請重新載入後重試" });
       });
-    } else handleApi(request, response, requestUrl).catch((error) => sendJson(response, 500, { ok: false, error: error.message || "伺服器錯誤" }));
+      await apiWriteQueue;
+    } else await handleApi(request, response, requestUrl).catch((error) => sendJson(response, 500, { ok: false, error: error.message || "伺服器錯誤" }));
     return;
   }
   if (requestUrl.pathname === "/src/release-config.js") {
@@ -1427,9 +1484,9 @@ const server = http.createServer((request, response) => {
       response.destroy();
     }).pipe(response);
   });
-});
+}
 
-server.listen(port, host, () => {
+if (!process.env.VERCEL) http.createServer(requestHandler).listen(port, host, () => {
   console.log("星界之律抽卡系統：http://" + host + ":" + port + "/");
   if (!process.env.STARSHIP_ADMIN_KEY && process.env.NODE_ENV !== "production") {
     console.log("開發模式管理密鑰：dev-admin-key；公開部署前請設定 STARSHIP_ADMIN_KEY。");
