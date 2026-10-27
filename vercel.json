@@ -5,8 +5,8 @@
   "functions": {
     "api/index.mjs": {
       "maxDuration": 300,
-      "includeFiles": ["src/**", "tools/player-backup.mjs", "tools/b2-player-backup.mjs"],
-      "excludeFiles": ["assets/**", "public/**", "video/**", "docs/**", "test/**", "test-legacy/**", "*.docx"]
+      "includeFiles": "{src/**,tools/player-backup.mjs,tools/b2-player-backup.mjs}",
+      "excludeFiles": "{assets/**,public/**,video/**,docs/**,test/**,test-legacy/**,*.docx}"
     }
   },
   "rewrites": [{ "source": "/api/:path*", "destination": "/api" }],
