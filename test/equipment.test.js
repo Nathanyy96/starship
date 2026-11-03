@@ -9,7 +9,7 @@ test('legacy saves preserve resources, pity, collection and story while starting
  for(const key of ['resources','collection','pity','characterProgress'])assert.deepEqual(restored[key],old[key]);
  assert.deepEqual(restored.equipment,eq.initial());
 });
-test('all Boss tiers follow their exact rarity bands and higher tiers increase cherished drops',()=>{
+test('all equipment difficulty tiers follow their exact rarity bands and higher tiers increase cherished drops',()=>{
  for(let tier=1;tier<=3;tier++){
   const counts=[0,0,0];for(let i=0;i<10000;i++){let calls=0;const item=eq.roll({id:'boss',bossLevel:tier},()=>calls++?0:(i+.5)/10000);counts[item.rarity-1]++;assert.equal(item.level,0);}
   assert.deepEqual(counts,eq.getRates(tier).map(p=>p*100));

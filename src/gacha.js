@@ -11,6 +11,7 @@
   function rootRelease() { return typeof globalThis !== "undefined" ? globalThis.StarshipReleaseConfig : null; }
   var revisedRates = Boolean(release && release.open11);
   var equipment = typeof module === 'object' && module.exports ? require('./equipment.js') : globalThis.StarshipEquipment;
+  var equipmentDungeon = typeof module === 'object' && module.exports ? require('./equipment-dungeon.js') : globalThis.StarshipEquipmentDungeon;
   var petSystem = typeof module === 'object' && module.exports ? require('./pet-system.js') : globalThis.StarshipPetSystem;
   var starAscension = typeof module === 'object' && module.exports ? require('./star-ascension.js') : globalThis.StarshipStarAscension;
 
@@ -297,6 +298,7 @@
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
     state.equipment = equipment.normalize(source.equipment,state.collection);
+    state.equipmentDungeon = equipmentDungeon.normalize(source.equipmentDungeon);
     state.characterProgress = isPlainObject(source.characterProgress) ? source.characterProgress : {};
     Object.keys(state.characterProgress).forEach(function (id) {
       var progress = isPlainObject(state.characterProgress[id]) ? state.characterProgress[id] : {};

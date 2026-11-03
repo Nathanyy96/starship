@@ -11,6 +11,8 @@ const { GachaGame } = require("./src/gacha.js");
 const activities = require('./src/tower-system.js');
 const hubUpdate = require('./src/hub-update.js');
 const equipment = require('./src/equipment.js');
+const equipmentDungeon = require('./src/equipment-dungeon.js');
+const monsterCatalog = require('./src/monster-catalog.js');
 const { banners, activeCards, authorPreviewCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
@@ -431,7 +433,9 @@ export function ensurePlayerMilestones(currentState) {
   }
   const migratedState = createGame(state).getState();
   restorePlayerProgress(migratedState, preservedProgress);
-  return hubUpdate.apply(createGame(migratedState).getState());
+  const ready = hubUpdate.apply(createGame(migratedState).getState());
+  ready.equipmentDungeon = equipmentDungeon.normalize(ready.equipmentDungeon,Date.now());
+  return ready;
 }
 
 function findPlayer(database, name) {
@@ -765,7 +769,7 @@ function runBoss(currentState, body) {
     const universalAmount = Math.max(0, Number(reward.universalAmount) || 1);
     state.breakthroughMaterials["universal-core"] = (Number(state.breakthroughMaterials["universal-core"]) || 0) + universalAmount;
     state.resources.characterExp += Math.max(0, Number(reward.characterExp) || 0);
-    battle.equipmentDrop = equipment.grantBossDrop(state,stage,Math.random);
+
   }
   const attemptsUsed = Number(state.bossProgress.attempts[stage.id] || attempts);
   if(requestId){state.equipment.bossReceipts.push({id:requestId,bossId:stage.id});state.equipment.bossReceipts=state.equipment.bossReceipts.slice(-256);}
@@ -1080,6 +1084,11 @@ if(requestUrl.pathname==='/api/player/activities'){
       const result=activities.action(createGame(player.record.state).getState(),body,Math.random,Date.now());
       player.record.state=result.state;player.record.updatedAt=new Date().toISOString();await writeDatabase(database);
       sendJson(response,200,{ok:true,...result});return;
+    }
+if(requestUrl.pathname==='/api/player/equipment-dungeon'){
+      const player=await playerFromSession(database,body.token);
+      const result=equipmentDungeon.action(player.record.state,body,{now:Date.now(),rng:Math.random,equipment,battle:{simulateBattle,buildEffectiveStats},data:require('./src/data.js'),catalog:monsterCatalog});
+      player.record.state=result.state;player.record.updatedAt=new Date().toISOString();await writeDatabase(database);sendJson(response,200,{ok:true,...result});return;
     }
 if (requestUrl.pathname === '/api/player/equipment') {
       const player=await playerFromSession(database,body.token);

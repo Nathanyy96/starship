@@ -47,6 +47,11 @@ test('Postgres sessions survive another instance and restart; concurrent saves a
     assert.ok(account.token);
     const token=account.token;
     assert.deepEqual((await post(b,'session',{token})).state.resources,account.state.resources);
+    const synced=(await post(b,'session',{token})).state;
+    const domain={token,level:1,team:['celesia'],expectedRevision:synced.equipmentDungeon.revision,requestId:'cross-instance-domain-request-001'};
+    const parallel=await Promise.all([a,b].map(server=>fetch(server.origin+'/api/player/equipment-dungeon',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(domain)})));
+    assert.deepEqual(parallel.map(r=>r.status).sort(),[200,400]);
+    const equipped=(await post(b,'session',{token})).state;assert.equal(equipped.equipmentDungeon.stamina,90);assert.ok(equipped.equipment.items.length>=5&&equipped.equipment.items.length<=8);
     const retired=await fetch(a.origin+'/api/player/world-position',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token})});
     assert.equal(retired.status,410);
     const simultaneous=await Promise.all([post(a,'session',{token}),post(b,'session',{token})]);
@@ -54,6 +59,8 @@ test('Postgres sessions survive another instance and restart; concurrent saves a
     const exited=new Promise(r=>b.child.once('exit',r));b.child.kill();await exited;
     const c=await launch();
     const resumed=await post(c,'session',{token});
+    assert.equal(resumed.state.equipmentDungeon.stamina,90);
+    assert.deepEqual(resumed.state.equipment.items,equipped.equipment.items);
     assert.equal(resumed.state.worldPosition,undefined);
     assert.equal(resumed.state.worldWaypoints,undefined);
     assert.deepEqual(resumed.state.resources,account.state.resources);

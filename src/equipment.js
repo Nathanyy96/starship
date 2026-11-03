@@ -25,13 +25,13 @@
   }
   function getRates(bossLevel){return rates[Math.max(0,Math.min(2,(Number(bossLevel)||1)-1))|0].slice();}
   function random(rng){var n=(rng||Math.random)();assert(Number.isFinite(n)&&n>=0&&n<1,'裝備隨機值無效');return n;}
-  function roll(boss,rng){
-    var table=getRates(boss.bossLevel),n=random(rng)*100,rarity=3,cumulative=0;
+  function roll(source,rng){
+    var table=getRates(source.difficulty||source.bossLevel),n=random(rng)*100,rarity=3,cumulative=0;
     for(var i=0;i<table.length;i++){cumulative+=table[i];if(n<cumulative){rarity=i+1;break;}}
-    return {slot:slots[Math.floor(random(rng)*slots.length)].id,setId:sets[Math.floor(random(rng)*sets.length)].id,rarity:rarity,level:0,sourceBossId:String(boss.id),equippedBy:null};
+    var item={slot:slots[Math.floor(random(rng)*slots.length)].id,setId:sets[Math.floor(random(rng)*sets.length)].id,rarity:rarity,level:0,equippedBy:null};item[source.kind==='equipment-dungeon'?'sourceDungeonId':'sourceBossId']=String(source.id);return item;
   }
-  function grantBossDrop(state,boss,rng){
-    assert(boss&&typeof boss.id==='string','缺少 Boss 掉落來源');var next=normalize(state.equipment,state.collection),item=roll(boss,rng);
+  function grantDrop(state,source,rng){
+    assert(source&&typeof source.id==='string','缺少裝備掉落來源');var next=normalize(state.equipment,state.collection),item=roll(source,rng);
     item.id='relic-'+next.nextId++;next.items.push(item);next.lastDrop=Object.assign({},item);next.revision++;state.equipment=next;return Object.assign({},item);
   }
   function value(item){var slot=slotById(item.slot);return slot?Math.round(slot.base*item.rarity*(1+.015*item.level)):0;}
@@ -61,5 +61,5 @@
   function apply(stats,state){
     Object.keys(stats||{}).forEach(function(id){var b=bonuses(state,id);Object.keys(b.flat).forEach(function(key){if(b.percent[key]||b.flat[key])stats[id][key]=Math.round((Number(stats[id][key])||0)*(1+b.percent[key])+b.flat[key]);});});return stats;
   }
-  return {slots:slots,sets:sets,rarityNames:names,statLabels:labels,initial:initial,normalize:normalize,getRates:getRates,roll:roll,grantBossDrop:grantBossDrop,value:value,name:name,cost:cost,action:action,bonuses:bonuses,apply:apply};
+  return {slots:slots,sets:sets,rarityNames:names,statLabels:labels,initial:initial,normalize:normalize,getRates:getRates,roll:roll,grantDrop:grantDrop,grantBossDrop:grantDrop,value:value,name:name,cost:cost,action:action,bonuses:bonuses,apply:apply};
 }));

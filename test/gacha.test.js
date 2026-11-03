@@ -247,7 +247,7 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
   assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
   assert.equal(announcements.length, 1);
-  assert.equal(announcements[0].id, "hub-20261102");
+  assert.equal(announcements[0].id, "equipment-dungeon-20261102");
   assert.equal(announcements.some((item) => item.id === "release-1-0"), false);
   const gacha = game();
   const before = gacha.getState().resources;

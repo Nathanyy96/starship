@@ -7,11 +7,12 @@
     'game-lobby':{art:'lobby-starport-v1',name:'星港大廳',group:'home'},
     'character-view':{art:'lobby-starport-v1',name:'旅者休憩廳',tag:'TRAVELER LOUNGE',copy:'整理隊伍的力量，為下一場旅程做好準備。',group:'roles',links:[['equipment-view','搭配裝備'],['pet-banner-view','星伴配屬']]},
     'gacha-hall':{art:'summon-observatory-v1',name:'星願觀測殿',tag:'WISH OBSERVATORY',copy:'與新的夥伴相遇，讓星光回應你的召集。',group:'summon',links:[['pet-banner-view','切換星伴召集'],['character-view','查看角色收藏']]},
-    'equipment-view':{art:'relic-workshop-v1',name:'聖遺工坊',tag:'RELIC ATELIER',copy:'六格聖遺、自由套裝，打造自己的戰鬥搭配。',group:'relics',links:[['boss-view','挑戰 Boss · 取得裝備'],['character-view','角色培養']]},
+    'equipment-dungeon-view':{art:'challenge-sanctum-v1',name:'裝備秘境',tag:'RELIC DOMAIN',copy:'每日體力，挑戰守衛，收集聖遺。',group:'relics',links:[['equipment-view','裝備庫'],['character-view','角色培養']]},
+    'equipment-view':{art:'relic-workshop-v1',name:'聖遺工坊',tag:'RELIC ATELIER',copy:'六格聖遺、自由套裝，打造自己的戰鬥搭配。',group:'relics',links:[['equipment-dungeon-view','裝備秘境 · 取得裝備'],['character-view','角色培養']]},
     'pet-banner-view':{art:'companion-garden-v1',name:'星伴祈願庭',tag:'COMPANION GARDEN',copy:'尋找同行的星伴，讓陪伴化為戰鬥的力量。',group:'pets',links:[['pet-view','前往培育工坊'],['gacha-hall','角色召集']]},
     'pet-view':{art:'companion-garden-v1',name:'星伴暖房',tag:'COMPANION CONSERVATORY',copy:'餵食、陪伴與培育，每一次成長都會帶進戰鬥。',group:'pets',links:[['pet-banner-view','召集與戰鬥配屬']]},
     'trial-view':{art:'challenge-sanctum-v1',name:'星界試煉聖域',tag:'ASTRAL SANCTUM',copy:'選擇關卡、配置前後排，見證夥伴們的自動戰鬥。',group:'battle',links:[['boss-view','挑戰突破首領'],['equipment-view','調整裝備'],['journey-view','旅途目標']]},
-    'boss-view':{art:'challenge-sanctum-v1',name:'首領征討之門',tag:'BOSS GATE',copy:'選擇首領與獎勵檔位，收集突破材料及隨機聖遺。',group:'battle',links:[['equipment-view','查看聖遺收藏'],['pet-banner-view','搭配支援星伴']]},
+    'boss-view':{art:'challenge-sanctum-v1',name:'首領征討之門',tag:'BOSS GATE',copy:'選擇首領與獎勵檔位，收集角色突破材料與經驗；裝備另到獨立秘境取得。',group:'battle',links:[['equipment-view','查看聖遺收藏'],['pet-banner-view','搭配支援星伴']]},
     'dispatch-view':{art:'harbor-concourse-v1',name:'星港委託所',tag:'COMMISSION CONCOURSE',copy:'接受委託，派出適合的隊伍完成挑戰。',group:'battle',links:[['voyage-view','準備星海迷航'],['character-view','查看可用角色']]},
     'voyage-view':{art:'harbor-concourse-v1',name:'星海啟航港',tag:'VOYAGE HARBOR',copy:'準備遠行的隊伍，在航程中做出自己的選擇。',group:'battle',links:[['dispatch-view','星港委託'],['equipment-view','出航前調整裝備']]},
     'shop-view':{art:'harbor-concourse-v1',name:'星港商廊',tag:'HARBOR EXCHANGE',copy:'查看本期可兌換物資，為喜歡的夥伴添置收藏。',group:'other',links:[['character-view','角色培養'],['journey-view','查看旅途目標']]},
@@ -31,7 +32,7 @@
   }
   function goals(state){var p=progress(state);return [
     {view:'trial-view',art:'challenge-sanctum-v1',icon:'battle',title:'踏入星界試煉',status:'已通關 '+p.trial+' 個關卡',copy:'安排前後排並挑戰關卡。通關可獲取關卡標示的資源。',action:'選擇試煉關卡'},
-    {view:'boss-view',art:'challenge-sanctum-v1',icon:'gear',title:'收集六格聖遺',status:'收藏 '+p.relics+' 件 · 穿戴 '+p.worn+' 件',copy:p.relics?'已有裝備可搭配，也能挑戰更高檔位的 Boss 尋找稀有聖遺。':'從 Boss 有效勝利取得第一件裝備，再回工坊穿戴與強化。',action:'挑戰 Boss'},
+    {view:'equipment-dungeon-view',art:'challenge-sanctum-v1',icon:'gear',title:'收集六格聖遺',status:'收藏 '+p.relics+' 件 · 穿戴 '+p.worn+' 件',copy:p.relics?'已有裝備可搭配，也能挑戰更高難度的裝備秘境尋找稀有聖遺。':'從裝備秘境取得第一批裝備，再回工坊穿戴與強化。',action:'挑戰秘境'},
     {view:'character-view',art:'lobby-starport-v1',icon:'people',title:'培育旅途夥伴',status:'已取得 '+p.roles+' 名角色',copy:'角色經驗可用於角色升級或聖遺強化，自由選擇培養方向。',action:'前往角色培養'},
     {view:'pet-banner-view',art:'companion-garden-v1',icon:'pet',title:'尋找同行星伴',status:'已取得 '+p.pets+' 種 · 配屬 '+p.bound+' 名角色',copy:'星伴能力與機制會參與實戰，培育升級可提高效能；覺醒尚未開放。',action:p.bound?'調整星伴搭配':'召集與配屬星伴'},
     {view:'dispatch-view',art:'harbor-concourse-v1',icon:'star',title:'接受星港委託',status:'委託與迷航各自保存進度',copy:'挑選委託挑戰，或另組遠行隊伍，展開星海迷航。',action:'查看可用委託'},

@@ -1,3 +1,5 @@
+> 裝備來源最新修正：Boss掉裝備已停用，改獨立每日體力秘境。依[equipment-dungeon-skill-upgrades-20261102.md](equipment-dungeon-skill-upgrades-20261102.md)；下文舊Boss來源僅供追溯。
+
 # 停用轉址｜equipment-20261101.md
 
 用途：保留既有連結。2026-11-02清理，舊正文已移出日常入口。
