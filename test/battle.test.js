@@ -12,7 +12,7 @@ test("瑟蕾雅 C2 只計同輪不同隊友，C6 保留標記期間的累積人�
     "    simulateBattle: simulateBattle,",
     "    audit: { setCombat: function (value) { combat = value; }, afterHit: afterHit }, simulateBattle: simulateBattle,"
   );
-  const sandbox = { module: { exports: {} } };
+  const sandbox = { module: { exports: {} }, StarshipPetSystem: require("../src/pet-system.js") };
   vm.runInNewContext(source, sandbox);
   const audit = sandbox.module.exports.audit;
   const owner = { id: "celesia", constellation: 6, hp: 100, maxHp: 100, attack: 100, defense: 0, effects: [], skillCooldown: 2 };
@@ -199,7 +199,7 @@ test("星界試煉使用最多四名角色並以自動戰鬥回傳戰報", () =>
   assert.equal(battle.environment, trialStages[0].environment);
   assert.equal(battle.enemyTrait, trialStages[0].enemyTrait);
   assert.ok(battle.enemies.every((enemy) => enemy.image === trialStages[0].enemies[0].image));
-  assert.equal(trialMaxRewards, 20);
+  assert.equal(trialMaxRewards, 2);
 });
 
 test("星界試煉隊伍戰力只計算資料層中已開放角色", () => {

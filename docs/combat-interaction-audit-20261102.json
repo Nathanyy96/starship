@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-11-02T20:01:24.133Z",
+  "scope": "Existing attack/skill engine: 26 characters x 7 target pets x C0/C6, each against 56 generic species projections, 15 existing trials, 6 existing Boss stages and one lethal fixture. Four-unit teams equip four distinct pets.",
+  "cases": 28392,
+  "replays": 364,
+  "skillFrames": 284128,
+  "supportFrames": 6427,
+  "statuses": {
+    "won": 26103,
+    "defeat": 2287,
+    "timeout": 2
+  },
+  "timeouts": [
+    {
+      "character": "chodan",
+      "petId": "mirror-sprout",
+      "constellation": 6,
+      "stage": 11,
+      "rounds": 60,
+      "atProductionLimit": {
+        "status": "won",
+        "rounds": 80
+      }
+    },
+    {
+      "character": "chodan",
+      "petId": "aurora-fawn",
+      "constellation": 6,
+      "stage": 13,
+      "rounds": 60,
+      "atProductionLimit": {
+        "status": "won",
+        "rounds": 104
+      }
+    }
+  ],
+  "rulesHash": "5f183e43797e3c009f356acc3773b390d884a9b122ca0cfbd34c582b782c4cd8",
+  "excluded": [
+    "New energy/ultimate system",
+    "18 planned four-star pets and C4 effects",
+    "56 species-specific skills",
+    "Full tower balance and art acceptance"
+  ]
+}

@@ -8,10 +8,9 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 const require = createRequire(import.meta.url);
 const { GachaGame } = require("./src/gacha.js");
-const worldCheckpoint = require("./src/world-checkpoint.js");
-const worldGeometry = require("./src/first-major-world.js");
-const openingGeometry = require("./src/first-act-game.js");
-const villageGeometry = require("./src/exploration.js");
+const activities = require('./src/tower-system.js');
+const hubUpdate = require('./src/hub-update.js');
+const equipment = require('./src/equipment.js');
 const { banners, activeCards, authorPreviewCards, version2Cards, storyChapters, storySceneAliases, storyChapterAliases, storyVersionReward, characterBattleStats, trialStages, trialMaxRewards, dispatchMissions, tutorialReward, updateVersion, updateCycle, updateReward, bossStages, bossVersion, bossMaxRewards, characterBreakthroughs, voyageConfig, voyageBattleStages, voyageVersion, shopCatalog, petDefinitions, petVersion, petOutfits, petEffects, petChallenges } = require("./src/data.js");
 const { simulateBattle, buildEffectiveStats } = require("./src/battle.js");
 
@@ -28,10 +27,8 @@ const starLawTestReward = Object.freeze({ starSand: 100000, characterExp: 300000
 const sessions = new Map();
 const transactionContext = new AsyncLocalStorage();
 const authorPreviewPlayerKey = "happycow";
-const story11Missions = require("./src/story-1-1-missions.js");
 const releaseConfig = require("./src/release-config.js");
 const currentUpdateVersion = releaseConfig.challengeCycle || updateCycle;
-const storyReleaseProgress = require("./src/story-release-progress.js");
 const databaseBaselines = new WeakMap();
 function createGame(state) {
   return new GachaGame({ banners, state, breakthroughRequirements: characterBreakthroughs, voyageConfig, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges });
@@ -176,14 +173,6 @@ function assertPlayerStateContinuity(previousState, nextState, playerKey) {
     }
   });
 
-  const oldScenes = previousState.storyProgress && previousState.storyProgress.completedScenes && typeof previousState.storyProgress.completedScenes === "object" ? previousState.storyProgress.completedScenes : {};
-  const nextScenes = nextState.storyProgress && nextState.storyProgress.completedScenes && typeof nextState.storyProgress.completedScenes === "object" ? nextState.storyProgress.completedScenes : {};
-  Object.keys(oldScenes).forEach((sceneKey) => {
-    if (!nextScenes[sceneKey]) throw new Error("更新保護中止：玩家 " + playerKey + " 的已完成劇情不可被移除");
-  });
-  const oldWaypoints = Array.isArray(previousState.worldWaypoints) ? previousState.worldWaypoints : [];
-  const nextWaypoints = new Set(Array.isArray(nextState.worldWaypoints) ? nextState.worldWaypoints : []);
-  if (oldWaypoints.some((id) => !nextWaypoints.has(id))) throw new Error("更新保護中止：已啟用的傳送點不可被移除");
   const oldTutorial = previousState.tutorialProgress && typeof previousState.tutorialProgress === "object" ? previousState.tutorialProgress : {};
   const nextTutorial = nextState.tutorialProgress && typeof nextState.tutorialProgress === "object" ? nextState.tutorialProgress : {};
   if (oldTutorial.rewardClaimed === true && nextTutorial.rewardClaimed !== true) {
@@ -317,10 +306,7 @@ function freshPlayerState() {
   return createGame(state).getState();
 }
 
-function mergeWorldWaypoints(...lists) {
-  const allowed = new Set(worldGeometry.waypoints.map((point) => point.id));
-  return Array.from(new Set(lists.flatMap((list) => Array.isArray(list) ? list : []).filter((id) => allowed.has(id))));
-}
+
 
 function snapshotPlayerProgress(currentState) {
   const source = currentState && typeof currentState === "object" ? currentState : {};
@@ -351,10 +337,9 @@ function restorePlayerProgress(state, snapshot) {
   });
 }
 
-function ensurePlayerMilestones(currentState) {
+export function ensurePlayerMilestones(currentState) {
   const preservedProgress = snapshotPlayerProgress(currentState);
   const state = createGame(currentState || freshPlayerState()).getState();
-  state.worldWaypoints = mergeWorldWaypoints(state.worldWaypoints, state.worldPosition?.state?.waypoints);
   restorePlayerProgress(state, preservedProgress);
   const completedScenes = state.storyProgress && state.storyProgress.completedScenes;
   if (completedScenes) {
@@ -386,21 +371,10 @@ function ensurePlayerMilestones(currentState) {
   state.recruitment.trial10ChoiceAvailable = false;
   state.updateRewards = state.updateRewards || { claimedVersions: {} };
   state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
-  if (!state.updateRewards.claimedVersions[releaseConfig.compensationCycle]) {
-    state.resources.starSand += updateReward.starSand;
-    state.resources.characterExp += updateReward.characterExp;
-    state.resources.starMarks += updateReward.starMarks || 0;
-    state.updateRewards.claimedVersions[releaseConfig.compensationCycle] = { starSand: updateReward.starSand, characterExp: updateReward.characterExp, starMarks: updateReward.starMarks || 0, grantedAt: new Date().toISOString() };
-  }
-  if (!state.updateRewards.claimedVersions[releaseConfig.explorationUpdateCycle]) {
-    const update = releaseConfig.explorationUpdateReward;
-    const repair = releaseConfig.explorationRepairReward;
-    const total = { starSand: update.starSand + repair.starSand, characterExp: update.characterExp + repair.characterExp, starMarks: update.starMarks + repair.starMarks };
-    for (const [resource, amount] of Object.entries(total)) state.resources[resource] += amount;
-    state.updateRewards.claimedVersions[releaseConfig.explorationUpdateCycle] = { ...total, update, repair, grantedAt: new Date().toISOString() };
-  }
-  if (state.trialProgress.version !== currentUpdateVersion) {
-    state.trialProgress.version = currentUpdateVersion;
+
+
+  if (state.trialProgress.version !== (releaseConfig.trialCycle||currentUpdateVersion)) {
+    state.trialProgress.version = releaseConfig.trialCycle||currentUpdateVersion;
     state.trialProgress.attempts = {};
     state.trialProgress.clearedStages = [];
     state.trialProgress.bestStage = 0;
@@ -457,7 +431,7 @@ function ensurePlayerMilestones(currentState) {
   }
   const migratedState = createGame(state).getState();
   restorePlayerProgress(migratedState, preservedProgress);
-  return createGame(migratedState).getState();
+  return hubUpdate.apply(createGame(migratedState).getState());
 }
 
 function findPlayer(database, name) {
@@ -663,57 +637,11 @@ function updateAdminState(currentState, body) {
   return createGame(state).getState();
 }
 
-function storyChapterById(chapterId) {
-  const chapter = storyChapters.find((item) => item.id === chapterId);
-  if (!chapter) throw new Error("找不到劇情章節");
-  return chapter;
-}
 
-function storySceneById(chapter, sceneId) {
-  const scene = chapter.scenes.find((item) => item.id === sceneId);
-  if (!scene) throw new Error("找不到劇情幕次");
-  return scene;
-}
 
-function completeStoryScene(currentState, body) {
-  const state = ensurePlayerMilestones(currentState);
-  const chapter = storyChapterById(body.chapterId);
-  if (chapter.releaseOpen === false) throw new Error("這個版本的劇情已建檔，但尚未開放");
-  if (body.action === "select") {
-    state.storyProgress.currentChapter = chapter.id;
-    return { state: createGame(state).getState(), alreadyClaimed: false, reward: { starSand: 0 }, chapter, scene: null };
-  }
-  const scene = storySceneById(chapter, body.sceneId);
-  if (chapter.id === "main-1-1") {
-    const result = storyReleaseProgress.apply(state, chapter, body);
-    return Object.assign({}, result, { state: createGame(result.state).getState(), chapter, scene });
-  }
-  const key = chapter.id + ":" + scene.id;
-  const storyReward = { starSand: 0, characterExp: 0, starMarks: 0 };
-  state.storyProgress = state.storyProgress || { currentChapter: chapter.id, completedScenes: {} };
-  state.storyProgress.completedScenes = state.storyProgress.completedScenes || {};
-  state.storyProgress.claimedVersions = state.storyProgress.claimedVersions || {};
-  state.storyProgress.currentChapter = chapter.id;
-  const wasCompleted = Boolean(state.storyProgress.completedScenes[key]);
-  if (!wasCompleted) state.storyProgress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: 0, characterExp: 0 };
-  if (chapter.id === "main-1-0" && scene.id === chapter.scenes.at(-1).id && !state.storyProgress.claimedVersions[storyVersionReward.version]) {
-    if (!chapter.scenes.every((item) => state.storyProgress.completedScenes[chapter.id + ":" + item.id])) throw new Error("請先讀完本版本的前四幕");
-    const oldClaims = Object.entries(state.storyProgress.completedScenes).filter(([oldKey]) => oldKey.startsWith("main-1-0:"));
-    const oldSand = oldClaims.reduce((sum, [, claim]) => sum + Math.max(0, Number(claim.starSand) || 0), 0);
-    const oldExp = oldClaims.reduce((sum, [, claim]) => sum + Math.max(0, Number(claim.characterExp) || 0), 0);
-    storyReward.starSand = Math.max(0, storyVersionReward.starSand - oldSand);
-    storyReward.characterExp = Math.max(0, storyVersionReward.characterExp - oldExp);
-    storyReward.starMarks = storyVersionReward.starMarks;
-    state.resources.starSand += storyReward.starSand;
-    state.resources.characterExp += storyReward.characterExp;
-    state.resources.starMarks += storyReward.starMarks;
-    state.storyProgress.claimedVersions[storyVersionReward.version] = { claimedAt: new Date().toISOString(), reward: storyReward };
-  }
-  if (chapter.id === "main-1-0" && state.storyProgress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed) {
-    state.recruitment.story10ChoiceAvailable = true;
-  }
-  return { state: createGame(state).getState(), alreadyClaimed: wasCompleted && !Object.values(storyReward).some(Boolean), reward: storyReward, chapter, scene };
-}
+
+
+
 
 function completeTutorial(currentState) {
   const state = ensurePlayerMilestones(currentState);
@@ -752,7 +680,7 @@ function runTrial(currentState, body) {
   if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
   if (stage.id > 1 && state.trialProgress.clearedStages.indexOf(stage.id - 1) < 0) throw new Error("請先通關前一關");
   const attempts = Number(state.trialProgress.attempts[stage.id] || 0);
-  const maxAttempts = Number(stage.maxChallengeAttempts || trialMaxRewards);
+  const maxAttempts = trialMaxRewards;
   if (attempts >= maxAttempts) throw new Error("本關已達 " + maxAttempts + " 次挑戰上限，請等待下次遊戲更新重置挑戰次數");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
   let battle;
@@ -775,6 +703,7 @@ function runTrial(currentState, body) {
       rounds: halfResults.reduce((sum, result) => sum + result.rounds, 0),
       teamPower: halfResults.reduce((sum, result) => sum + result.teamPower, 0),
       team: halfResults.flatMap((result) => result.team),
+      companions: halfResults.flatMap((result) => result.companions || []),
       enemies: halfResults.flatMap((result) => result.enemies),
       logs: halfResults.flatMap((result, index) => ["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"].concat(result.logs)),
       halfResults: halfResults.map((result, index) => ({ name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds })),
@@ -812,6 +741,11 @@ function bossStageById(bossId) {
 function runBoss(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const stage = bossStageById(body.bossId);
+  const requestId=body.requestId;
+  if(requestId!==undefined){
+    if(typeof requestId!=='string'||!/^[a-zA-Z0-9-]{16,80}$/.test(requestId))throw new Error('Boss 請求識別碼無效');
+    if(state.equipment.bossReceipts.some(receipt=>receipt.id===requestId))throw new Error('這場 Boss 戰鬥已結算，請同步進度');
+  }
   const team = Array.from(new Set(Array.isArray(body.team) ? body.team.map((id) => String(id)) : [])).slice(0, 4);
   if (!team.length) throw new Error("至少派出 1 名角色才能挑戰 Boss");
   if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
@@ -831,8 +765,10 @@ function runBoss(currentState, body) {
     const universalAmount = Math.max(0, Number(reward.universalAmount) || 1);
     state.breakthroughMaterials["universal-core"] = (Number(state.breakthroughMaterials["universal-core"]) || 0) + universalAmount;
     state.resources.characterExp += Math.max(0, Number(reward.characterExp) || 0);
+    battle.equipmentDrop = equipment.grantBossDrop(state,stage,Math.random);
   }
   const attemptsUsed = Number(state.bossProgress.attempts[stage.id] || attempts);
+  if(requestId){state.equipment.bossReceipts.push({id:requestId,bossId:stage.id});state.equipment.bossReceipts=state.equipment.bossReceipts.slice(-256);}
   return {
     state: createGame(state).getState(),
     battle,
@@ -1016,7 +952,7 @@ async function handleApi(request, response, requestUrl) {
     await ensurePostgresSchema();
     sendJson(response, 200, {
       ok: true,
-      service: "starship-gacha",
+      service: "starship-gacha", build: releaseConfig.build, version: releaseConfig.appVersion || releaseConfig.version, playMode: "hub",
       challengeCycle: currentUpdateVersion,
       persistence: usePostgres ? "postgres" : "file",
       maintenance: process.env.STARSHIP_MAINTENANCE === "true",
@@ -1061,54 +997,8 @@ async function handleApi(request, response, requestUrl) {
   const database = await readDatabase();
   databaseBaselines.set(database, cloneDatabase(database));
   try {
-    if (requestUrl.pathname === "/api/author-preview/2-x-battle") {
-      const player = await playerFromSession(database, body.token);
-      if (player.key !== authorPreviewPlayerKey) {
-        sendJson(response, 403, { ok: false, error: "1.0–2.5 角色試玩目前只開放給作者帳號。" });
-        return;
-      }
-      const previewCards = authorPreviewCards;
-      const allowed = new Set(previewCards.map((card) => card.id));
-      if (body.action !== "battle") {
-        sendJson(response, 200, { ok: true, characters: previewCards.map((card) => ({ id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" })), stages: trialStages.map((stage) => ({ id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower })), note: "隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
-        return;
-      }
-      const team = Array.isArray(body.team) ? body.team : [];
-      const stageId = Number(body.stageId);
-      const level = Number(body.level);
-      const constellation = Number(body.constellation);
-      if (team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some((id) => !allowed.has(id))) throw new Error("試玩隊伍須由 1.0–2.5 的 1–4 名不同角色組成");
-      if (!Number.isInteger(stageId) || stageId < 1 || stageId > trialStages.length) throw new Error("請選擇有效的試煉關卡");
-      if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) throw new Error("試玩等級須為 1–90、命座須為 C0–C6");
-      const characterProgress = Object.fromEntries(team.map((id) => [id, { level, constellation }]));
-      const stats = buildEffectiveStats(characterBattleStats, { characterProgress });
-      const battle = simulateBattle({ team, stats, stage: trialStages[stageId - 1] });
-      battle.reward = { starSand: 0, characterExp: 0 };
-      sendJson(response, 200, { ok: true, battle, note: "模擬結果不寫入正式帳號，也不發放獎勵。" });
-      return;
-    }
-    if (requestUrl.pathname === "/api/author-preview/1-1") {
-      const player = await playerFromSession(database, body.token);
-      if (player.key !== authorPreviewPlayerKey) {
-        sendJson(response, 403, { ok: false, error: "這個試玩入口目前只開放給作者帳號。" });
-        return;
-      }
-      player.record.state.storyProgress = player.record.state.storyProgress || {};
-      let progress = story11Missions.normalize(player.record.state.storyProgress.authorPreview11 || player.record.authorPreview11);
-      let result = null;
-      if (body.action === "reset") progress = story11Missions.normalize();
-      else if (body.action === "answer") {
-        result = story11Missions.advance(progress, body.choice);
-        progress = result.progress;
-      }
-      player.record.state.storyProgress.authorPreview11 = progress;
-      delete player.record.authorPreview11;
-      if (body.action === "reset" || body.action === "answer") await writeDatabase(database);
-      const act = story11Missions.acts[progress.act];
-      const step = act && act.steps[progress.step];
-      sendJson(response, 200, { ok: true, progress: { act: progress.act, step: progress.step, total: story11Missions.acts.length, mistakes: progress.mistakes, facts: progress.facts, feedback: result ? result.feedback : "", correct: result ? result.correct : null }, task: step ? { title: act.title, question: step.prompt, choices: step.choices } : null });
-      return;
-    }
+    if(requestUrl.pathname === "/api/author-preview/2-x-battle"){sendJson(response,410,{ok:false,error:'舊大世界已退役，請重新載入大廳版本。'});return;}
+    if(requestUrl.pathname === "/api/author-preview/1-1"){sendJson(response,410,{ok:false,error:'舊大世界已退役，請重新載入大廳版本。'});return;}
     if (requestUrl.pathname === "/api/player/register") {
       const name = normalizePlayerName(body.name);
       if (!name) throw new Error("請輸入遊戲名稱");
@@ -1149,50 +1039,11 @@ async function handleApi(request, response, requestUrl) {
       return;
     }
 
-    if (requestUrl.pathname === "/api/player/world-position") {
-      const player = await playerFromSession(database, body.token);
-      const position = worldCheckpoint.clean(body.position);
-      if (!position) throw new Error("探索位置格式不正確");
-      const p = position.state;
-      const safe = position.kind === "world" ? [[-6,-6],[-6,6],[6,-6],[6,6]].every(([dx,dy])=>worldGeometry.passable(p.map,p.x+dx,p.y+dy)) : position.kind === "opening" ? openingGeometry.fits(p.zone,p.x,p.y) : villageGeometry.passable(p.x,p.y);
-      if (!safe) throw new Error("探索位置不在可通行的地面");
-      const session = player.session;
-      if (body.sequence !== undefined) {
-        if (!Number.isSafeInteger(body.sequence) || body.sequence < 1) throw new Error("位置同步順序不正確");
-        if (body.sequence <= (session.worldSequence || 0)) { sendJson(response, 200, {ok:true, position:player.record.state.worldPosition}); return; }
-      }
-      position.updatedAt = Date.now();
-      player.record.state.worldPosition = position;
-      player.record.state.worldWaypoints = mergeWorldWaypoints(player.record.state.worldWaypoints, position.state.waypoints);
-      player.record.updatedAt = new Date(position.updatedAt).toISOString();
-      await writeDatabase(database);
-      if (body.sequence !== undefined) {
-        if (usePostgres) await transactionContext.getStore().client.query('UPDATE starship_sessions SET world_sequence=$2 WHERE token_hash=$1', [sessionHash(body.token), body.sequence]);
-        else session.worldSequence = body.sequence;
-      }
-      sendJson(response, 200, { ok:true, position });
-      return;
-    }
+    if(requestUrl.pathname === "/api/player/world-position"){sendJson(response,410,{ok:false,error:'舊大世界已退役，請重新載入大廳版本。'});return;}
 
-    if (requestUrl.pathname === "/api/player/world-waypoints") {
-      const player = await playerFromSession(database, body.token);
-      const merged = mergeWorldWaypoints(player.record.state.worldWaypoints, player.record.state.worldPosition?.state?.waypoints, body.waypoints);
-      player.record.state.worldWaypoints = merged;
-      player.record.updatedAt = new Date().toISOString();
-      await writeDatabase(database);
-      sendJson(response, 200, { ok: true, waypoints: merged });
-      return;
-    }
+    if(requestUrl.pathname === "/api/player/world-waypoints"){sendJson(response,410,{ok:false,error:'舊大世界已退役，請重新載入大廳版本。'});return;}
 
-    if (requestUrl.pathname === "/api/player/story-progress") {
-      const player = await playerFromSession(database, body.token);
-      const completed = completeStoryScene(player.record.state, body);
-      player.record.state = completed.state;
-      player.record.updatedAt = new Date().toISOString();
-      await writeDatabase(database);
-      sendJson(response, 200, { ok: true, player: publicPlayer(player.record), state: player.record.state, alreadyClaimed: completed.alreadyClaimed, reward: completed.reward, correct: completed.correct, feedback: completed.feedback, chapter: { id: completed.chapter.id, title: completed.chapter.title }, scene: completed.scene ? { id: completed.scene.id, title: completed.scene.title } : null });
-      return;
-    }
+    if(requestUrl.pathname === "/api/player/story-progress"){sendJson(response,410,{ok:false,error:'舊大世界已退役，請重新載入大廳版本。'});return;}
 
     if (requestUrl.pathname === "/api/player/tutorial-complete") {
       const player = await playerFromSession(database, body.token);
@@ -1224,6 +1075,32 @@ async function handleApi(request, response, requestUrl) {
       return;
     }
 
+if(requestUrl.pathname==='/api/player/activities'){
+      const player=await playerFromSession(database,body.token);
+      const result=activities.action(createGame(player.record.state).getState(),body,Math.random,Date.now());
+      player.record.state=result.state;player.record.updatedAt=new Date().toISOString();await writeDatabase(database);
+      sendJson(response,200,{ok:true,...result});return;
+    }
+if (requestUrl.pathname === '/api/player/equipment') {
+      const player=await playerFromSession(database,body.token);
+      const game=createGame(player.record.state);
+      const result=game.equipmentAction({action:body.action,itemId:body.itemId,cardId:body.cardId,expectedRevision:body.expectedRevision});
+      player.record.state=result.state;player.record.updatedAt=new Date().toISOString();
+      await writeDatabase(database);
+      sendJson(response,200,{ok:true,state:result.state,item:result.item,cost:result.cost});return;
+    }
+if(requestUrl.pathname==='/api/player/star-ascension'){
+      const player=await playerFromSession(database,body.token),game=createGame(player.record.state);
+      const result=game.ascendCharacter({cardId:body.cardId,expectedRevision:body.expectedRevision});
+      player.record.state=result.state;player.record.updatedAt=new Date().toISOString();await writeDatabase(database);
+      sendJson(response,200,{ok:true,...result});return;
+    }
+if(requestUrl.pathname==='/api/player/pet-summon'){
+      const player=await playerFromSession(database,body.token),game=createGame(player.record.state);
+      const result=game.petSummonAction({action:body.action,bannerId:body.bannerId,petId:body.petId,cardId:body.cardId,count:body.count,expectedRevision:body.expectedRevision});
+      player.record.state=result.state;player.record.updatedAt=new Date().toISOString();await writeDatabase(database);
+      sendJson(response,200,{ok:true,state:result.state,results:result.results,cost:result.cost});return;
+    }
     if (requestUrl.pathname === "/api/player/trial-battle") {
       const player = await playerFromSession(database, body.token);
       const result = runTrial(player.record.state, body);
@@ -1428,8 +1305,21 @@ export default async function requestHandler(request, response) {
     response.end("globalThis.StarshipReleaseConfig = " + JSON.stringify(releaseConfig) + ";");
     return;
   }
-  const relativePath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
+  let relativePath;
+  try {
+    relativePath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
+    if (relativePath.includes('\0')) throw new Error('Invalid path');
+  } catch {
+    response.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Invalid URL");
+    return;
+  }
   const filePath = path.resolve(root, "." + relativePath);
+  // Compare resolved paths: the writable store may have a custom directory name.
+  // Windows path lookup is case insensitive and accepts both slash styles.
+  const pathKey = value => process.platform === 'win32' ? value.toLowerCase() : value;
+  const inside = (target, directory) => pathKey(target) === pathKey(directory) || pathKey(target).startsWith(pathKey(directory) + path.sep);
+  const hiddenPath = relativePath.split(/[\\/]/).some(segment => segment.startsWith('.') || segment.includes(':'));
 
   if (filePath === retiredLabeledPortraitRoot || filePath.startsWith(retiredLabeledPortraitRoot + path.sep)) {
     response.writeHead(410, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
@@ -1437,7 +1327,7 @@ export default async function requestHandler(request, response) {
     return;
   }
 
-  if (relativePath.startsWith("/data/") || (filePath !== root && !filePath.startsWith(root + path.sep))) {
+  if (hiddenPath || inside(filePath, dataDirectory) || inside(filePath, path.join(root, 'data')) || !inside(filePath, root)) {
     response.writeHead(403);
     response.end("Forbidden");
     return;

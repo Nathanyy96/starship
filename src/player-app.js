@@ -2,39 +2,36 @@
   "use strict";
 
   function start() {
+    try{window.StarshipSaveMigration.cleanBrowser(window.localStorage);}catch(error){}
+    var hub = window.StarshipHub;
+    if (hub) hub.mount();
+    var featureUI = hub && window.StarshipFeatureShell;
+    if (featureUI) featureUI.mount();
+    var equipmentUI=window.StarshipEquipmentUI.create({getState:function(){return game&&game.getState();},getCards:rosterCards,onHome:enterLobby,onBoss:function(){showView('boss-view');},onAction:equipmentRequest});
+    var petBannerUI=window.StarshipPetBannerUI.create({getState:function(){return game&&game.getState();},getOwner:function(){return currentPlayerName;},getCards:rosterCards,getPets:function(){return data.petDefinitions;},onHome:enterLobby,onWorkshop:openPetWorkshop,onAction:petSummonRequest});
+    byId('pet-view').querySelector('.view-toolbar').insertAdjacentHTML('beforeend','<button class="small-button" id="open-pet-summon" type="button">星伴召集與戰鬥配屬 →</button>');
+    var sceneShell=window.StarshipSceneShell&&window.StarshipSceneShell.create({getState:function(){return game&&game.getState();},getOwner:function(){return currentPlayerName;},onNavigate:showView});
+    var activitiesUI=window.StarshipActivitiesUI.create({getState:function(){return game&&game.getState();},getOwner:function(){return currentPlayerName;},onHome:enterLobby,renderBattle:function(frame,previous){return battleArenaMarkup(frame,previous,game.getState());},onAction:activitiesRequest});
+    var monsterAtlasUI=window.StarshipMonsterAtlas.create({onHome:enterLobby});
+    var starAscensionPending=null;
+    if(sceneShell)hub.views.push('journey-view');
     var api = window.StarshipGacha;
     var data = window.StarshipGachaData;
     if (!api || !data) {
       throw new Error("抽卡核心尚未載入");
     }
     var releaseVersionLabel = document.getElementById("live-release-version");
-    if (releaseVersionLabel) releaseVersionLabel.textContent = data.updateVersion || "1.0";
+    if (releaseVersionLabel) releaseVersionLabel.textContent = data.releaseConfig.appVersion || data.updateVersion;
 
     var serverCandidate = window.location.protocol !== "file:" && typeof window.fetch === "function";
     var remoteMode = false;
     var playerNameKey = "starship-player-name";
     var currentPlayerName = "";
     var currentPlayerToken = "";
-    var authorPreviewRequestId = 0;
-    var authorPreviewLastAct = null;
-    var authorPreviewRewardDemo = { "1.0": false, "1.1": false };
+
     var authMode = "login";
     var selectedBannerId = (data.banners.find(function (banner) { return banner.active !== false; }) || data.banners[0]).id;
-    var currentStoryChapterId = "main-1-0";
-    var currentStorySceneId = "";
-    var currentStoryTab = "main";
-    var currentStoryMapFilter = "all";
-    var currentStoryMapLocationId = "";
-    var currentAtlasMapId = "W-001";
-    var currentAtlasPointId = "";
-    var mapReturnViewId = "world-home";
-    var exploration = null;
-    var firstMajorWorld = null;
-    var worldStoryStatus = {};
-    var firstActGame = null;
-    var authorAtlasMapId = "W-001";
-    var authorAtlasPointId = "";
-    var authorAtlasVisited = new Set(["W-001"]);
+
     var currentTrialStageId = 1;
     var currentTrialTeam = [];
     var currentTrialUpperTeam = [];
@@ -65,11 +62,6 @@
     var characterSearchTerm = "";
     var characterListFilter = "all";
     var game = null;
-    var authorNarration = window.StarshipStoryNarration && window.StarshipStoryNarration.create({
-      synth: window.speechSynthesis,
-      Utterance: window.SpeechSynthesisUtterance,
-      onChange: updateAuthorNarrationControls
-    });
 
     function rosterCards() {
       var owned = game ? game.getState().collection : {};
@@ -143,115 +135,11 @@
     function setControlsEnabled(enabled) {
       ["banner-select", "featured-select", "pull-one", "pull-ten", "exchange-featured", "reset-save"].forEach(function (id) { byId(id).disabled = !enabled; });
     }
-    var activeWorldKind = null, pausedWorldKind = null, lastWorldCheckpoint = null, worldSyncTimer = 0, worldSyncBusy = false, lastWorldSyncAt = 0, newWorldArrival = false, worldLocalSaved = true, worldSyncSequence = 0;
-    function worldController(kind) { return kind === 'world' ? firstMajorWorld : kind === 'opening' ? firstActGame : exploration; }
-    function worldHomeKey() { return 'starship-world-home-v1:' + encodeURIComponent(playerKey(currentPlayerName)); }
-    function readWorldHome() { try { return window.StarshipWorldCheckpoint.clean(JSON.parse(localStorage.getItem(worldHomeKey()))); } catch (error) { return null; } }
-    function worldSaveMessage(text) { if (byId('world-save-status')) byId('world-save-status').textContent = text; }
-    function flushWorldHome(keepalive) {
-      clearTimeout(worldSyncTimer); worldSyncTimer = 0;
-      if (!lastWorldCheckpoint || !currentPlayerName || !game) return;
-      if (!remoteMode) { saveLocalState(); worldSaveMessage('位置已保存在此裝置'); return; }
-      if (worldSyncBusy && !keepalive) { worldSyncTimer = setTimeout(flushWorldHome, 1500); return; }
-      var owner = currentPlayerName, token = currentPlayerToken, position = lastWorldCheckpoint;
-      worldSyncBusy = true; lastWorldSyncAt = Date.now();
-      window.fetch('/api/player/world-position', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token,position:position,sequence:++worldSyncSequence}),keepalive:Boolean(keepalive)}).then(function(response){ if(!response.ok)throw new Error('save failed');return response.json(); }).then(function(payload){
-        if(owner!==currentPlayerName||token!==currentPlayerToken)return;
-        if(lastWorldCheckpoint.updatedAt===position.updatedAt){lastWorldCheckpoint=payload.position;try{localStorage.setItem(worldHomeKey(),JSON.stringify(lastWorldCheckpoint));}catch(error){}if(game&&game.state)game.state.worldPosition=lastWorldCheckpoint;}
-        worldSaveMessage('探索位置已同步至帳號');
-      }).catch(function(){if(owner===currentPlayerName&&token===currentPlayerToken)worldSaveMessage(worldLocalSaved?'位置已留在此裝置；連線恢復後將再同步':'位置尚未同步；請保持遊戲開啟並恢復連線');}).finally(function(){if(owner===currentPlayerName&&token===currentPlayerToken)worldSyncBusy=false;});
-    }
-    function rememberWorld(kind, state) {
-      if (!currentPlayerName || !game || activeWorldKind !== kind) return;
-      var next = window.StarshipWorldCheckpoint.clean({version:1,kind:kind,state:state,updatedAt:Date.now()});
-      if(!next)return;
-      lastWorldCheckpoint=next;if(game.state)game.state.worldPosition=next;
-      try{localStorage.setItem(worldHomeKey(),JSON.stringify(next));worldLocalSaved=true;worldSaveMessage(remoteMode?'位置已保存在此裝置，等待同步':'位置已保存在此裝置');}catch(error){worldLocalSaved=false;worldSaveMessage('此裝置無法保存位置；正在嘗試帳號同步');}
-      if(!worldSyncTimer)worldSyncTimer=setTimeout(flushWorldHome,Math.max(900,8000-(Date.now()-lastWorldSyncAt)));
-    }
-    function pauseWorld() {
-      if(!activeWorldKind)return;
-      var kind=activeWorldKind,controller=worldController(kind);if(controller&&controller.pause)controller.pause();
-      if(controller&&controller.state)rememberWorld(kind,controller.state());
-      pausedWorldKind=kind;activeWorldKind=null;
-    }
-    function worldMounted(kind) {
-      activeWorldKind=kind;pausedWorldKind=null;document.body.classList.add('world-exploring');
-      if(byId('world-main-menu').open)byId('world-main-menu').close();
-      setTimeout(recoverExplorationReward,0);
-    }
-    function resumePausedWorld() {
-      if(!pausedWorldKind)return false;
-      var kind=pausedWorldKind,controller=worldController(kind);if(!controller)return false;
-      hideGameViews();byId(kind==='opening'?'first-act-view':'map-view').hidden=false;
-      if(kind!=='opening'){byId('first-major-panel').hidden=kind!=='world';byId('exploration-panel').hidden=kind!=='village';byId('story-world-map').hidden=true;byId('first-major-entry').hidden=true;byId('open-exploration').closest('.explore-entry').hidden=true;}
-      worldMounted(kind);controller.resume();window.scrollTo(0,0);return true;
-    }
-    function restoreWorldHome(payload) {
-      clearTimeout(worldSyncTimer);worldSyncTimer=0;worldSyncBusy=false;worldSyncSequence=0;lastWorldSyncAt=0;activeWorldKind=null;pausedWorldKind=null;
-      var local=readWorldHome(),cloud=window.StarshipWorldCheckpoint.clean(payload&&payload.state&&payload.state.worldPosition);
-      lastWorldCheckpoint=cloud&&(!local||cloud.updatedAt>=local.updatedAt)?cloud:local;
-      newWorldArrival=Boolean(payload&&payload.created&&!payload.migrated&&!lastWorldCheckpoint);
-      if(!lastWorldCheckpoint){
-        var roaming=loadFirstMajorWorld('roam'),opening=loadFirstAct(),villageSave=loadExploration(),completed=game.getState().storyProgress.completedScenes||{};
-        if(!newWorldArrival&&roaming)lastWorldCheckpoint=window.StarshipWorldCheckpoint.clean({version:1,kind:'world',state:roaming});
-        else if(!newWorldArrival&&villageSave&&villageSave.arrived)lastWorldCheckpoint=window.StarshipWorldCheckpoint.clean({version:1,kind:'village',state:villageSave});
-        else if(!newWorldArrival&&completed['main-1-0:signal']){var start=window.StarshipFirstMajorWorld.initial(2);start.roaming=true;lastWorldCheckpoint=window.StarshipWorldCheckpoint.clean({version:1,kind:'world',state:start});}
-        else {var start=opening||window.StarshipFirstActGame.initial();if(newWorldArrival){start=Object.assign({},start,{x:10.5,y:8.5,index:0,zone:'valley'});}lastWorldCheckpoint=window.StarshipWorldCheckpoint.clean({version:1,kind:'opening',state:start});}
-      }
-      if(lastWorldCheckpoint){var c=lastWorldCheckpoint;if(c.kind==='opening')localStorage.setItem(firstActKey(),JSON.stringify(c.state));else if(c.kind==='village')localStorage.setItem(explorationKey(),JSON.stringify(c.state));else localStorage.setItem(worldSaveKey(c.state.roaming?'roam':c.state.act),JSON.stringify(c.state));}
-    }
-    function enterWorldHome() {
-      if(!currentPlayerName||!game){showGate();return;}
-      if(activeWorldKind){var current=worldController(activeWorldKind);if(current&&current.resume)current.resume();return;}
-      if(resumePausedWorld())return;
-      if(!lastWorldCheckpoint)restoreWorldHome({state:game.getState()});
-      var c=lastWorldCheckpoint;
-      if(c&&c.kind==='opening'){byId('play-first-act').click();if(newWorldArrival&&firstActGame.beginStory){newWorldArrival=false;firstActGame.beginStory();}}
-      else if(c&&c.kind==='village'){showView('map-view',true);showVillageExploration(false);}
-      else if(c){var p=c.state;if(!p.roaming&&canStartWorldAct(p.act))showFirstMajorWorld(p.act);else showFirstMajorWorld(2,p.map,p.x,p.y);}
-      else byId('play-first-act').click();
-      window.scrollTo(0,0);
-    }
-    window.addEventListener('pagehide',function(){var controller=worldController(activeWorldKind);if(activeWorldKind&&controller&&controller.state)rememberWorld(activeWorldKind,controller.state());flushWorldHome(true);});
-    document.addEventListener('visibilitychange',function(){if(document.hidden){pauseWorld();flushWorldHome(true);}else if(document.body.classList.contains('world-exploring')&&!byId('world-main-menu').open)resumePausedWorld();});
-    window.addEventListener('online',function(){flushWorldHome();});
 
-    function hideGameViews() {
-      closeCharacterAnimation();
-      ["game-lobby", "shop-view", "story-view", "first-act-view", "map-view", "author-preview-view", "character-view", "trial-view", "boss-view", "dispatch-view", "voyage-view", "pet-view", "gacha-hall", "tutorial-view", "announcement-view"].forEach(function (id) { if (byId(id)) byId(id).hidden = true; });
-    }
-    function showView(viewId, asWorld) {
-      if(viewId === "game-lobby") { enterWorldHome(); return; }
-      pauseWorld();document.body.classList.remove("world-exploring");
-      if(byId("world-main-menu").open)byId("world-main-menu").close();
-      if (viewId !== "author-preview-view" && authorNarration) authorNarration.stop();
-      if (viewId !== "map-view" && exploration) { exploration.pause(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; }
-      if (viewId !== "map-view" && firstMajorWorld) { firstMajorWorld.pause(); byId("first-major-panel").hidden = true; byId("first-major-entry").hidden = false; byId("story-world-map").hidden = false; }
-      if (viewId !== "first-act-view" && firstActGame) firstActGame.pause();
-      if (!currentPlayerName || !game) {
-        showGate();
-        return;
-      }
-      hideGameViews();
-      byId(viewId).hidden = false;
-      if (viewId === "game-lobby") { renderLobby(); }
-      if (viewId === "tutorial-view") { renderTutorial(); }
-      if (viewId === "announcement-view") { renderAnnouncements(); setStarLawTestPanelVisible(false); }
-      if (viewId === "story-view") { renderStory(); }
-      if (viewId === "map-view" && !asWorld) { renderStoryWorldMap(storyChapterById(currentStoryChapterId)); }
-      if (viewId === "author-preview-view") { loadAuthorPreview(); loadAuthorBattlePreview(); renderAuthorMapPreview(); renderAuthorStoryPreview(); prepareAuthorNarrationControls(); }
-      if (viewId === "character-view") { renderCharacters(); }
-      if (viewId === "shop-view") { renderShop(); }
-      if (viewId === "trial-view") { renderTrial(); }
-      if (viewId === "boss-view") { renderBoss(); }
-      if (viewId === "dispatch-view") { renderDispatch(); }
-      if (viewId === "voyage-view") { renderVoyage(); }
-      if (viewId === "pet-view") { renderPets(); loadPetShowcases(); }
-      if (viewId === "gacha-hall") { render(); }
-      refreshWorldEntries();
-      window.scrollTo({top:0,behavior:"instant"});
-    }
+    function enterLobby(){if(!currentPlayerName||!game){showGate();return;}showView('game-lobby');}
+
+    function hideGameViews(){closeCharacterAnimation();hub.views.forEach(function(id){if(byId(id))byId(id).hidden=true;});['shop-view','map-view','character-view','trial-view','boss-view','dispatch-view','voyage-view','pet-view','gacha-hall','tutorial-view','announcement-view'].forEach(function(id){if(byId(id))byId(id).hidden=true;});}
+    function showView(viewId){if(!currentPlayerName||!game){showGate();return;}if(!byId(viewId))return;if(byId('world-main-menu').open)byId('world-main-menu').close();hideGameViews();byId(viewId).hidden=false;var renders={'game-lobby':renderLobby,'character-view':renderCharacters,'trial-view':renderTrial,'boss-view':renderBoss,'dispatch-view':renderDispatch,'voyage-view':renderVoyage,'pet-view':renderPets,'shop-view':renderShop,'tutorial-view':renderTutorial,'announcement-view':renderAnnouncements,'gacha-hall':render};if(renders[viewId])renders[viewId]();if(viewId==='equipment-view')equipmentUI.render();if(viewId==='pet-banner-view')petBannerUI.render();if(viewId==='activities-view')activitiesUI.render();if(viewId==='monster-atlas-view')monsterAtlasUI.render();if(sceneShell)sceneShell.enter(viewId);window.scrollTo(0,0);}
     function setHallVisible(visible) {
       if (visible) { showView("gacha-hall"); } else { byId("gacha-hall").hidden = true; }
     }
@@ -278,10 +166,6 @@
     }
     function showGate() {
       voyagePending = null; voyageNeedsSync = false; voyageFeedback = { text: "", error: false };
-      if (authorNarration) authorNarration.stop();
-      pauseWorld();flushWorldHome(true);
-      [firstMajorWorld,firstActGame,exploration].forEach(function(c){if(c)c.close();});
-      clearTimeout(worldSyncTimer);worldSyncTimer=0;activeWorldKind=null;pausedWorldKind=null;lastWorldCheckpoint=null;
       byId("world-shell-header").hidden=true;document.body.classList.remove("world-session","world-exploring");if(byId("world-main-menu").open)byId("world-main-menu").close();
       currentPlayerName = "";
       currentPlayerToken = "";
@@ -334,19 +218,8 @@
       var compensationVersion = data.compensationCycle || updateVersion;
       state.updateRewards = state.updateRewards || { claimedVersions: {} };
       state.updateRewards.claimedVersions = state.updateRewards.claimedVersions || {};
-      if (!state.updateRewards.claimedVersions[compensationVersion]) {
-        var releaseReward = data.updateReward || { starSand: 6000, characterExp: 6000, starMarks: 3 };
-        state.resources.starSand += Number(releaseReward.starSand || 0);
-        state.resources.characterExp += Number(releaseReward.characterExp || 0);
-        state.resources.starMarks += Number(releaseReward.starMarks || 0);
-        state.updateRewards.claimedVersions[compensationVersion] = { starSand: releaseReward.starSand, characterExp: releaseReward.characterExp, starMarks: releaseReward.starMarks || 0, grantedAt: new Date().toISOString() };
-      }
-      if (data.explorationUpdateCycle && !state.updateRewards.claimedVersions[data.explorationUpdateCycle]) {
-        var updateGift = data.explorationUpdateReward, repairGift = data.explorationRepairReward;
-        var totalGift = { starSand: updateGift.starSand + repairGift.starSand, characterExp: updateGift.characterExp + repairGift.characterExp, starMarks: updateGift.starMarks + repairGift.starMarks };
-        Object.keys(totalGift).forEach(function (resource) { state.resources[resource] += totalGift[resource]; });
-        state.updateRewards.claimedVersions[data.explorationUpdateCycle] = Object.assign({ update: updateGift, repair: repairGift, grantedAt: new Date().toISOString() }, totalGift);
-      }
+
+
       var trialVersion = data.trialVersion || updateVersion;
       if (state.trialProgress && state.trialProgress.version !== trialVersion) {
         state.trialProgress.version = trialVersion;
@@ -408,12 +281,11 @@
         state.petProgress.showcase = state.petProgress.showcase || {};
         state.petProgress.showcase.ratedBy = {};
       }
-      var migratedState = createClientGame(state).getState();
+      var migratedState = window.StarshipHubUpdate.apply(createClientGame(state).getState());
       preserveCharacterData(input, migratedState);
       return createClientGame(migratedState).getState();
     }
     function syncViewState(state) {
-      currentStoryChapterId = state.storyProgress && state.storyProgress.currentChapter ? state.storyProgress.currentChapter : "main-1-0";
       var trial = state.trialProgress || {};
       if (!trialStageById(currentTrialStageId)) currentTrialStageId = Number(trial.lastBattle && trial.lastBattle.stageId) || 1;
       if (Array.isArray(trial.selectedTeam)) currentTrialTeam = trial.selectedTeam.slice(0, 4);
@@ -437,7 +309,6 @@
       currentPlayerToken = payload && payload.token ? payload.token : "local-session";
       storeName(name);
       game = createClientGame(ensurePlayerState(payload && payload.state ? payload.state : localGet(name) || undefined));
-      syncWorldWaypointsOnLogin(payload && payload.state);
       byId("player-gate").hidden = true;
       byId("player-badge").hidden = false;
       byId("player-name").textContent = name;
@@ -445,7 +316,7 @@
       syncViewState(savedState);
       if (!remoteMode) { saveLocalState(); }
       document.body.classList.add("world-session");byId("world-shell-header").hidden=false;byId("world-shell-player").textContent=name;
-      restoreWorldHome(payload);refreshWorldEntries();renderLobby();enterWorldHome();
+      renderLobby();enterLobby();
       setControlsEnabled(true);
       render();
     }
@@ -533,16 +404,7 @@
       if (aliases[state.storyProgress.currentChapter]) state.storyProgress.currentChapter = aliases[state.storyProgress.currentChapter];
       return state.storyProgress;
     }
-    function storyChapterById(id) {
-      var canonicalId = (data.storyChapterAliases && data.storyChapterAliases[id]) || id;
-      return data.storyChapters.find(function (chapter) { return chapter.id === canonicalId; }) || data.storyChapters.find(function (chapter) { return chapter.id === id; });
-    }
-    function storySceneById(chapter, id) { return chapter && chapter.scenes.find(function (scene) { return scene.id === id; }); }
-    function sceneKey(chapterId, sceneId) { return chapterId + ":" + sceneId; }
-    function storyChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen === true; }); }
-    function lockedStoryChapterList() { return data.storyChapters.filter(function (chapter) { return chapter.type === currentStoryTab && chapter.legacyHidden !== true && chapter.releaseOpen === false; }); }
-    function sceneClaimed(state, chapterId, sceneId) { return Boolean(storyProgress(state).completedScenes[sceneKey(chapterId, sceneId)]); }
-    function storyVersionClaimed(state) { return Boolean(storyProgress(state).claimedVersions && storyProgress(state).claimedVersions["1.0"]); }
+
     function developmentCost(card, level) {
       var rules = api.DEFAULT_RULES.development;
       var isFourStar = card && card.rarity === 4;
@@ -561,6 +423,10 @@
       byId("tutorial-status").textContent = done ? "已完成 · 獎勵已領取" : "尚未完成";
       byId("tutorial-summary").innerHTML = "<div><span class=\"eyebrow\">START HERE</span><strong>先了解星界之律的主要循環，再開始你的旅程。</strong><p>這份教學會把登入保存、劇情獎勵、回覆召集、角色培養、戰力判讀、自走棋試煉、星海迷航與星伴培育整理在同一頁。已經熟悉系統的玩家也能直接完成並領取一次獎勵。</p></div><span class=\"tutorial-progress-mark\">" + (done ? "✓ 已完成" : (data.tutorialSteps || []).length + " 個重點") + "</span>";
       byId("tutorial-steps").innerHTML = (data.tutorialSteps || []).map(function (step, index) { return "<article class=\"tutorial-step-card\"><span class=\"tutorial-step-index\">" + String(index + 1).padStart(2, "0") + "</span><span class=\"tutorial-step-icon\">" + escapeHtml(step.icon) + "</span><h3>" + escapeHtml(step.title) + "</h3><p>" + escapeHtml(step.copy) + "</p></article>"; }).join("");
+      if(hub){
+        var storyTip=byId('tutorial-steps').querySelectorAll('.tutorial-step-card')[(data.tutorialSteps||[]).findIndex(function(step){return step.id==='story';})];
+        if(storyTip){storyTip.querySelector('h3').textContent='故事書與世界圖冊';storyTip.querySelector('p').textContent='故事書採最新世界重啟稿，圖文正在編排，閱讀獎勵尚未開放。不閱讀也能遊玩召集、養成與挑戰；世界圖冊只供查閱，不進入大世界。';}
+      }
       byId("tutorial-reward").innerHTML = "<div><span class=\"eyebrow\">FIRST FLIGHT REWARD</span><strong>完成新手教學可獲得 " + escapeHtml(rewardText(reward)) + "</strong><p>獎勵只會發放一次，並直接儲存到目前登入的玩家帳號。</p></div><button class=\"primary-action\" id=\"complete-tutorial\" type=\"button\"" + (done ? " disabled" : "") + ">" + (done ? "已完成並領取" : "完成教學並領取獎勵") + "</button>";
     }
     function renderAnnouncements() {
@@ -626,12 +492,13 @@
         showMessage(result.alreadyClaimed ? "新手教學獎勵已經領取過。" : "新手教學完成：已獲得 " + rewardText(result.reward) + "。", false);
       } catch (error) { showMessage(error.message, true); }
     }
-    function renderMilestoneRewards() {
+
+function renderMilestoneRewards() {
       var container = byId("milestone-rewards");
       if (!container || !game) return;
       var state = game.getState(); var recruitment = state.recruitment || {}; var cards = ["reyn", "lia"];
       var blocks = [];
-      [{ key: "story-1-0", available: recruitment.story10ChoiceAvailable && !recruitment.story10ChoiceClaimed, title: "1.0 主線完成獎勵", copy: "讀完五幕並領取 1.0 版本獎勵後，選擇一名角色。" }].forEach(function (reward) {
+      [{ key: "story-1-0", available: recruitment.story10ChoiceAvailable && !recruitment.story10ChoiceClaimed, title: "1.0 主線完成獎勵", copy: "你在舊版已取得的自選資格保留，可選擇一名角色。" }].forEach(function (reward) {
         if (!reward.available) return;
         var choices = cards.slice();
         if (reward.key === "trial-10") {
@@ -642,447 +509,12 @@
       });
       container.innerHTML = blocks.join("");
       container.hidden = !blocks.length;
-      byId("world-story-rewards").hidden = !blocks.length;
     }
-    function renderLobby() {
-      if (!game) return;
-      byId("author-preview-entry").hidden = playerKey(currentPlayerName) !== "happycow";
-      var state = game.getState(); var progress = storyProgress(state); var openChapters = data.storyChapters.filter(function (item) { return item.releaseOpen === true; }); var completed = openChapters.reduce(function (sum, item) { return sum + item.scenes.filter(function (scene) { return Boolean(progress.completedScenes[sceneKey(item.id, scene.id)]); }).length; }, 0); var total = openChapters.reduce(function (sum, chapter) { return sum + chapter.scenes.length; }, 0); var chapter = storyChapterById(progress.currentChapter) || data.storyChapters[0];
-      if (chapter.releaseOpen === false) chapter = storyChapterList()[0];
-      byId("story-progress-label").textContent = "劇情完成 " + completed + " / " + total + " 幕";
-      byId("lobby-pull-label").textContent = "總召集 " + state.totalPulls + " 次";
-      var updateVersion = data.updateCycle || data.trialVersion || "2.0-2.5";
-      var updateClaimed = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[data.compensationCycle || updateVersion];
-      var explorationGift = state.updateRewards && state.updateRewards.claimedVersions && state.updateRewards.claimedVersions[data.explorationUpdateCycle];
-      if (byId("lobby-update-label")) byId("lobby-update-label").textContent = explorationGift ? "探索大更新與修復補償：8,000 星砂、8,000 角色經驗、3 星痕（已發放）" : "探索大更新與修復補償：登入後發放";
-      var tutorialDone = tutorialProgress(state).rewardClaimed === true;
-      var tutorialQuick = byId("open-tutorial");
-      if (tutorialQuick) tutorialQuick.classList.toggle("completed", tutorialDone);
-      if (byId("tutorial-quick-status")) byId("tutorial-quick-status").textContent = tutorialDone ? "已完成 · 可重看規則" : "完成教學可領獎";
-      if (byId("tutorial-quick-badge")) byId("tutorial-quick-badge").textContent = tutorialDone ? "DONE" : "GUIDE";
-      byId("lobby-continue-title").textContent = (chapter.versionLabel || chapter.version) + "｜" + chapter.title;
-      byId("lobby-continue-copy").textContent = chapter.summary;
-      renderMilestoneRewards();
-    }
-    function renderAuthorMapPreview() {
-      var container = byId("author-preview-map");
-      if (!container) return;
-      if (!globalThis.StarshipInteractiveMap) { container.textContent = "互動地圖資料尚未載入。"; return; }
-      container.innerHTML = globalThis.StarshipInteractiveMap.render(authorAtlasMapId, authorAtlasPointId, { authorPreview: true });
-      byId("author-preview-map-progress").textContent = "本次已查看 " + authorAtlasVisited.size + " 個地圖／地點 · 當前：" + globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].name + (authorAtlasPointId ? " · " + (globalThis.StarshipInteractiveMap.maps[authorAtlasMapId].points || []).filter(function (point) { return point[0] === authorAtlasPointId; }).map(function (point) { return point[1]; })[0] : "");
-    }
-    function renderAuthorPreview(payload) {
-      var progress = payload.progress;
-      byId("author-preview-progress").textContent = progress.act >= progress.total ? "試玩完成" : "第 " + (progress.act + 1) + " 幕 / " + progress.total + " · 檢查 " + (progress.step + 1);
-      var target = byId("author-preview-story-scenes");
-      var scenes = target.querySelectorAll("[data-author-act]");
-      scenes.forEach(function (scene, index) {
-        var status = scene.querySelector("[data-author-scene-status]");
-        var slot = scene.querySelector("[data-author-mission-slot]");
-        status.textContent = index < progress.act ? "互動已完成" : index === progress.act ? "目前幕次 · 檢查 " + (progress.step + 1) : "可先閱讀 · 互動待解鎖";
-        if (index < progress.act) slot.innerHTML = "<p class=\"author-preview-mission-state\">本幕互動已完成。正文與插圖可隨時重新展開閱讀。</p>";
-        else if (index > progress.act) slot.innerHTML = "<p class=\"author-preview-mission-state\">先完成前一幕互動，即可在這裡操作本幕選項。</p>";
-        else if (payload.task) {
-          var task = payload.task;
-          slot.innerHTML = "<section class=\"author-preview-task\" aria-label=\"本幕互動\"><h4>本幕互動｜" + escapeHtml(task.title) + "</h4><p>已確認 " + (progress.facts || []).length + " 項；錯選不清除已完成步驟。</p><strong>" + escapeHtml(task.question) + "</strong><div class=\"author-preview-choices\">" + task.choices.map(function (choice, choiceIndex) { return "<button type=\"button\" data-author-choice=\"" + choiceIndex + "\">" + escapeHtml(choice) + "</button>"; }).join("") + "</div><p class=\"author-preview-feedback" + (progress.correct === false ? " needs-retry" : "") + "\" role=\"status\">" + escapeHtml(progress.correct === false ? "此選項未通過安全檢查，留在本幕重試。" + (progress.feedback || "") : progress.feedback || "") + "</p></section>";
-        } else slot.innerHTML = "<p class=\"author-preview-mission-state\">五幕互動已完成。可在本幕末尾試按領獎位置；試用不會發放資源。</p>";
-      });
-      var claim = byId("author-preview-claim-11");
-      claim.disabled = progress.act < progress.total || authorPreviewRewardDemo["1.1"];
-      claim.textContent = authorPreviewRewardDemo["1.1"] ? "已試按領獎位置" : progress.act >= progress.total ? "試按領取 1.1 劇情獎勵" : "完成五幕互動後可試按領獎";
-      if (authorPreviewLastAct === null || progress.act < authorPreviewLastAct) scenes.forEach(function (scene, index) { scene.open = index === Math.min(progress.act, scenes.length - 1); });
-      else if (progress.act > authorPreviewLastAct) {
-        var next = scenes[Math.min(progress.act, scenes.length - 1)];
-        if (next) { next.open = true; if (!target.hidden) window.requestAnimationFrame(function () { next.scrollIntoView({ behavior: "smooth", block: "start" }); }); }
-      }
-      authorPreviewLastAct = progress.act;
-    }
-    function authorPreviewStoryRequest(action, choice) {
-      if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/1-1", { action: action, choice: choice });
-      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("這個試玩入口目前只開放給作者帳號。"));
-      var missions = window.StarshipStory11Missions;
-      if (!missions) return Promise.reject(new Error("作者試玩任務資料尚未載入。"));
-      var storageKey = "starship-author-preview-1-1:" + encodeURIComponent(playerKey(currentPlayerName));
-      var progress = missions.normalize();
-      try { progress = missions.normalize(JSON.parse(window.localStorage.getItem(storageKey) || "{}")); } catch (error) { /* 保留可用的初始進度 */ }
-      var result = null;
-      if (action === "reset") progress = missions.normalize();
-      else if (action === "answer") {
-        try { result = missions.advance(progress, choice); progress = result.progress; } catch (error) { return Promise.reject(error); }
-      }
-      if (action === "reset" || action === "answer") {
-        try { window.localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (error) { /* 無法儲存時仍可當次試玩 */ }
-      }
-      var act = missions.acts[progress.act];
-      var step = act && act.steps[progress.step];
-      return Promise.resolve({ ok: true, progress: { act: progress.act, step: progress.step, total: missions.acts.length, mistakes: progress.mistakes, facts: progress.facts, feedback: result ? result.feedback : "", correct: result ? result.correct : null }, task: step ? { title: act.title, question: step.prompt, choices: step.choices } : null });
-    }
-    function authorPreviewBattleRequest(body) {
-      if (remoteMode && currentPlayerToken !== "local-session") return apiRequest("/api/author-preview/2-x-battle", body);
-      if (playerKey(currentPlayerName) !== "happycow") return Promise.reject(new Error("1.0–2.5 角色試玩目前只開放給作者帳號。"));
-      var cards = data.authorPreviewCards;
-      var allowed = new Set(cards.map(function (card) { return card.id; }));
-      if (body.action !== "battle") return Promise.resolve({ ok: true, characters: cards.map(function (card) { return { id: card.id, name: card.name, version: card.releaseVersion, rarity: card.rarity, status: Number(card.releaseVersion) < 2 ? "專屬技能已驗收" : data.characterBattleStats[card.id].signature ? "專屬技能草案" : "通用技能暫代" }; }), stages: data.trialStages.map(function (stage) { return { id: stage.id, name: stage.name, recommendedPower: stage.recommendedPower }; }), note: "本機隔離模擬：不取得角色、不消耗資源、不記錄通關或發放獎勵；2.x 專屬機制仍待逐人完成。" });
-      var team = body.team, level = body.level, constellation = body.constellation, stageId = body.stageId;
-      if (!Array.isArray(team) || team.length < 1 || team.length > 4 || new Set(team).size !== team.length || team.some(function (id) { return !allowed.has(id); })) return Promise.reject(new Error("試玩隊伍須由 1.0–2.5 的 1–4 名不同角色組成。"));
-      if (!Number.isInteger(stageId) || stageId < 1 || stageId > data.trialStages.length) return Promise.reject(new Error("請選擇有效的試煉關卡。"));
-      if (!Number.isInteger(level) || level < 1 || level > 90 || !Number.isInteger(constellation) || constellation < 0 || constellation > 6) return Promise.reject(new Error("試玩等級須為 1–90、命座須為 C0–C6。"));
-      var characterProgress = {};
-      team.forEach(function (id) { characterProgress[id] = { level: level, constellation: constellation }; });
-      var stats = window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, { characterProgress: characterProgress });
-      var battle = window.StarshipBattle.simulateBattle({ team: team, stats: stats, stage: data.trialStages[stageId - 1] });
-      battle.reward = { starSand: 0, characterExp: 0 };
-      return Promise.resolve({ ok: true, battle: battle, note: "本機模擬結果不寫入正式帳號，也不發放獎勵。" });
-    }
-    function loadAuthorPreview(action, choice) {
-      var requestId = ++authorPreviewRequestId;
-      byId("author-preview-reset").disabled = true;
-      byId("author-preview-story-scenes").querySelectorAll("[data-author-choice]").forEach(function (button) { button.disabled = true; });
-      authorPreviewStoryRequest(action || "view", choice).then(function (payload) { if (requestId === authorPreviewRequestId) renderAuthorPreview(payload); }).catch(function (error) { if (requestId === authorPreviewRequestId) { var slot = byId("author-preview-story-scenes").querySelector("[data-author-act]:open [data-author-mission-slot]"); if (slot) slot.innerHTML = "<p class=\"author-preview-feedback needs-retry\" role=\"alert\">" + escapeHtml(error.message) + "</p>"; } }).finally(function () { if (requestId === authorPreviewRequestId) byId("author-preview-reset").disabled = false; });
-    }
-    function loadAuthorBattlePreview() {
-      authorPreviewBattleRequest({ action: "view" }).then(function (payload) {
-        var cards = payload.characters || [];
-        var defaults = cards.filter(function (card) { return Number(card.version) >= 2; }).slice(0, 4).map(function (card) { return card.id; });
-        var option = function (selected) { return "<option value=\"\">空位</option>" + cards.map(function (card) { return "<option value=\"" + escapeHtml(card.id) + "\"" + (selected === card.id ? " selected" : "") + ">" + escapeHtml(card.name + " · " + card.version + " · " + card.status) + "</option>"; }).join(""); };
-        byId("author-preview-2x-setup").innerHTML = "<p>" + escapeHtml(payload.note) + "</p><div class=\"author-preview-2x-controls\">" + [0,1,2,3].map(function (index) { return "<label>" + (index < 2 ? "前排 " : "後排 ") + (index + 1) + "<select data-author-2x-slot=\"" + index + "\">" + option(defaults[index]) + "</select></label>"; }).join("") + "<label>關卡<select id=\"author-preview-2x-stage\">" + payload.stages.map(function (stage) { return "<option value=\"" + stage.id + "\"" + (stage.id === 10 ? " selected" : "") + ">第 " + stage.id + " 關｜" + escapeHtml(stage.name) + "（建議戰力 " + number(stage.recommendedPower) + "）</option>"; }).join("") + "</select></label><label>等級<input id=\"author-preview-2x-level\" type=\"number\" min=\"1\" max=\"90\" value=\"90\"></label><label>命座<input id=\"author-preview-2x-constellation\" type=\"number\" min=\"0\" max=\"6\" value=\"2\"></label><button id=\"author-preview-2x-run\" class=\"primary-action\" type=\"button\">開始模擬戰鬥</button></div>";
-      }).catch(function (error) { byId("author-preview-2x-setup").textContent = error.message; });
-    }
-    function runAuthorBattlePreview() {
-      var team = Array.from(document.querySelectorAll("[data-author-2x-slot]")).map(function (select) { return select.value; }).filter(Boolean);
-      var result = byId("author-preview-2x-result");
-      result.textContent = "正在演算……";
-      authorPreviewBattleRequest({ action: "battle", team: team, stageId: Number(byId("author-preview-2x-stage").value), level: Number(byId("author-preview-2x-level").value), constellation: Number(byId("author-preview-2x-constellation").value) }).then(function (payload) {
-        var battle = payload.battle;
-        var teamMarkup = battle.team.map(function (unit) { return "<p>" + escapeHtml(unit.row === "front" ? "前排 " : "後排 ") + escapeHtml((data.cards[unit.id] && data.cards[unit.id].name) || unit.id) + "：HP " + number(unit.hp) + "/" + number(unit.maxHp) + "；技能 " + unit.skillUses + " 次</p>"; }).join("");
-        var enemyMarkup = battle.enemies.map(function (unit) { return "<p>敵方 " + escapeHtml(unit.name) + "：HP " + number(unit.hp) + "/" + number(unit.maxHp) + "</p>"; }).join("");
-        result.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : battle.timedOut ? "timeout" : "lost") + "\"><div><strong>" + (battle.won ? "通關" : battle.timedOut ? "超時" : "未通關") + " · 第 " + battle.stageId + " 關 · " + battle.rounds + " 回合</strong><small>隊伍戰力 " + number(battle.teamPower) + "；建議戰力 " + number(battle.recommendedPower) + "。" + escapeHtml(payload.note) + "</small></div></div><div class=\"battle-log\">" + teamMarkup + enemyMarkup + "</div><details><summary>查看戰鬥紀錄</summary><div class=\"battle-log\">" + battle.logs.map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
-      }).catch(function (error) { result.textContent = error.message; });
-    }
-    function storyVersionLabel(chapter) { return chapter.versionLabel || chapter.version; }
-    function renderAuthorStoryPreview() {
-      var source10 = window.StarshipStory10Current;
-      var source11 = window.StarshipStory11Current;
-      var target10 = byId("author-preview-story-scenes-10");
-      var target11 = byId("author-preview-story-scenes");
-      if (!target10 || !target11 || !source10 || !source11) return;
-      if (!target10.children.length) target10.innerHTML = source10.scenes.map(function (scene, index) {
-        return "<details class=\"author-preview-story-scene\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small>點按展開／收合</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-0", { authorPreview: true }) + (index === source10.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.0 版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-10\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.0\">試按領取 1.0 劇情獎勵</button><small>版面試用：不領取、不更改正式進度或資源。</small></div>" : "") + "</details>";
-      }).join("");
-      if (!target11.children.length) target11.innerHTML = source11.scenes.map(function (scene, index) {
-        return "<details class=\"author-preview-story-scene\" data-author-act=\"" + index + "\"" + (index === 0 ? " open" : "") + "><summary><span>" + escapeHtml(scene.title) + "</span><small data-author-scene-status>載入互動進度中</small></summary>" + storyBodyMarkup(scene.body, "story-body", index + 1, "main-1-1", { authorPreview: true }) + "<div data-author-mission-slot=\"" + index + "\" class=\"author-preview-mission-slot\"></div>" + (index === source11.scenes.length - 1 ? "<div class=\"author-preview-reward\"><p>1.1 暫定版本獎勵｜+1,600 星砂、+3,600 角色經驗、+1 星痕</p><button id=\"author-preview-claim-11\" class=\"primary-action\" type=\"button\" data-author-preview-claim=\"1.1\" disabled>完成五幕互動後可試按領獎</button><small>作者試用只檢查按鈕位置和流程，不發放正式獎勵。</small></div>" : "") + "</details>";
-      }).join("");
-      if (window.StarshipStoryMonsterCatalog && !target11.querySelector("[data-author-monster-catalog]")) target11.insertAdjacentHTML("beforeend", '<details data-author-monster-catalog><summary>作者查看魔物完整設定（含 1.1 劇透）</summary>' + window.StarshipStoryMonsterCatalog.render(true) + '</details>');
-    }
-    function authorNarrationMarkup(version, index) {
-      return '<div class="author-narration" data-narration-key="' + version + ':' + index + '"><div class="author-narration-actions" role="group" aria-label="本幕語音控制"><button class="small-button" type="button" data-narration-action="play">▶ 語音朗讀</button><button class="small-button" type="button" data-narration-action="pause" disabled>暫停</button><button class="small-button" type="button" data-narration-action="stop" disabled>停止</button><label>聲音 <select data-narration-voice aria-label="本幕朗讀聲音"></select></label><label>語速 <select data-narration-rate aria-label="本幕朗讀語速"><option value="0.85">0.85×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option><option value="1.3">1.3×</option></select></label></div><p data-narration-status role="status" aria-live="polite"></p></div>';
-    }
-    function prepareAuthorNarrationControls() {
-      ["1.0", "1.1"].forEach(function (version) {
-        var container = byId(version === "1.0" ? "author-preview-story-scenes-10" : "author-preview-story-scenes");
-        container.querySelectorAll(".author-preview-story-scene").forEach(function (scene, index) {
-          if (!scene.querySelector(".author-narration")) scene.querySelector("summary").insertAdjacentHTML("afterend", authorNarrationMarkup(version, index));
-        });
-      });
-      refreshAuthorNarrationVoices();
-    }
-    function refreshAuthorNarrationVoices() {
-      var voices = authorNarration ? authorNarration.voices() : [];
-      document.querySelectorAll("[data-narration-voice]").forEach(function (select) {
-        var previous = select.value;
-        select.innerHTML = voices.length ? voices.map(function (voice) { return '<option value="' + escapeHtml(voice.voiceURI) + '">' + escapeHtml(voice.name + "（" + voice.lang + "）") + '</option>'; }).join("") : '<option value="">未找到中文聲音</option>';
-        if (voices.some(function (voice) { return voice.voiceURI === previous; })) select.value = previous;
-      });
-      updateAuthorNarrationControls();
-    }
-    function updateAuthorNarrationControls() {
-      var state = authorNarration ? authorNarration.getState() : { key: "", status: "idle" };
-      var supported = authorNarration && authorNarration.supported;
-      var hasVoice = supported && authorNarration.voices().length > 0;
-      document.querySelectorAll("[data-narration-key]").forEach(function (toolbar) {
-        var active = toolbar.getAttribute("data-narration-key") === state.key;
-        var busy = active && (state.status === "playing" || state.status === "paused");
-        var play = toolbar.querySelector('[data-narration-action="play"]');
-        play.disabled = !hasVoice;
-        play.textContent = busy ? "↻ 重新朗讀" : "▶ 語音朗讀";
-        var pause = toolbar.querySelector('[data-narration-action="pause"]');
-        pause.disabled = !busy;
-        pause.textContent = active && state.status === "paused" ? "繼續" : "暫停";
-        toolbar.querySelector('[data-narration-action="stop"]').disabled = !busy;
-        toolbar.querySelector("[data-narration-voice]").disabled = busy || !hasVoice;
-        toolbar.querySelector("[data-narration-rate]").disabled = busy || !hasVoice;
-        var status = !supported ? "此瀏覽器不支援語音朗讀，請改用支援的瀏覽器。" : !hasVoice ? "未找到中文聲音；請安裝裝置的中文語音後重新開啟。" : "瀏覽器中文語音試聽；Qwen 說書人尚未接入。";
-        if (active && state.status === "error") status = state.message;
-        else if (active && state.status === "ended") status = "本幕朗讀完畢。";
-        else if (busy) status = (state.status === "paused" ? "已暫停" : "正在朗讀") + " · 第 " + Math.min(state.index + 1, state.total) + " / " + state.total + " 段";
-        toolbar.querySelector("[data-narration-status]").textContent = status;
-      });
-    }
-    function showAuthorStoryVersion(version) {
-      if (authorNarration) authorNarration.stop();
-      var is10 = version === "1.0";
-      byId("author-preview-story-scenes-10").hidden = !is10;
-      byId("author-preview-story-scenes").hidden = is10;
-      byId("author-story-tab-10").setAttribute("aria-selected", String(is10));
-      byId("author-story-tab-11").setAttribute("aria-selected", String(!is10));
-    }
-    function storyBodyMarkup(text, className, actNumber, chapterId, options) {
-      var blocks = String(text || "").replace(/\r\n/g, "\n").split(/\n{2,}/).map(function (block) { return block.trim(); }).filter(Boolean);
-      var bodyClass = className || "story-body";
-      var imageSet = chapterId === "main-1-1" ? window.StarshipStory11Images : chapterId === "main-1-0" ? window.StarshipStory10Images : [];
-      var visualReview = window.StarshipStoryVisualReview;
-      if (visualReview) imageSet = visualReview.imagesFor(chapterId, imageSet);
-      var images = actNumber ? (imageSet || []).filter(function (item) { return item.act === actNumber; }) : [];
-      var portraits = options && options.authorPreview && visualReview ? visualReview.portraits.filter(function (item) { return item.chapter === chapterId && item.act === actNumber; }) : [];
-      var used = {};
-      var shownPortraits = {};
-      function sceneArt(item) {
-        var figure = '<figure class="story-scene-art"><img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + '" loading="lazy"><figcaption>' + escapeHtml(item.caption || ("第 " + actNumber + " 幕劇情插圖")) + '</figcaption></figure>';
-        if (item.sequence && !item.essential && item.sequence !== 1 && item.sequence !== 3 && item.sequence !== 12 && item.sequence !== 13) {
-          var label = String(item.caption || "救援細節").split("｜").slice(1).join("｜");
-          return '<details class="story-art-detail"><summary>查看救援細節：' + escapeHtml(label) + '</summary>' + figure + '</details>';
-        }
-        return figure;
-      }
-      var html = blocks.map(function (block) {
-        var timeline = /^【時間線|^章節定位/.test(block);
-        var art = images.map(function (item, index) { if (!used[index] && block.indexOf(item.anchor) >= 0) { used[index] = true; return sceneArt(item); } return ""; }).join("");
-        var people = portraits.map(function (item) {
-          if (shownPortraits[item.id] || block.indexOf(item.anchor) < 0) return "";
-          shownPortraits[item.id] = true;
-          return '<figure class="story-person-intro" data-story-person="' + escapeHtml(item.id) + '"><img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.name + '的正式角色立繪') + '" loading="lazy"><figcaption><strong>' + escapeHtml(item.name) + '</strong><span>' + escapeHtml(item.role) + '</span></figcaption></figure>';
-        }).join("");
-        if (people) people = '<div class="story-person-intros" aria-label="本段出場人物">' + people + '</div>';
-        if (/^〔章節CG草稿・待作者確認〕/.test(block)) return people + art;
-        if (/^【[^】]+】$/.test(block)) return '<h4 class="story-location-heading">' + escapeHtml(block.slice(1, -1)) + '</h4>' + people + art;
-        return "<p" + (timeline ? " class=\"story-timeline\"" : "") + ">" + escapeHtml(block).replace(/\n/g, "<br>") + "</p>" + people + art;
-      }).join("");
-      html += images.map(function (item, index) { return used[index] ? "" : sceneArt(item); }).join("");
-      return "<div class=\"" + bodyClass + "\">" + html + "</div>";
-    }
-    function chineseActNumber(value) {
-      var numerals = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十"];
-      return numerals[value] || String(value);
-    }
-    function storySceneDisplayTitle(chapter, scene, index) {
-      var raw = String(scene && scene.title || "").trim();
-      var total = chapter && Array.isArray(chapter.scenes) ? chapter.scenes.length : 0;
-      var isSide = chapter && chapter.type === "side";
-      // 支線統一成連續幕次；原本的「序幕／第一節／終節」只保留標題正文，避免同一章出現兩組序幕。
-      if (isSide) {
-        var bodyTitle = raw.replace(/^(?:序幕|終幕|終節|第[一二三四五六七八九十百]+[幕節])\s*[｜|]?\s*/, "").trim();
-        var label = index === total - 1 ? "終幕" : "第" + chineseActNumber(index + 1) + "幕";
-        return label + (bodyTitle ? "｜" + bodyTitle : "");
-      }
-      // 主線保留已寫好的「序幕／第X幕／終幕」，只為缺少幕次的文件段落補上連續編號。
-      if (/^(?:序幕|終幕|第[一二三四五六七八九十百]+幕)\s*(?:｜|$)/.test(raw)) return raw;
-      var mainLabel = index === total - 1 ? "終幕" : "第" + chineseActNumber(index + 1) + "幕";
-      return mainLabel + (raw ? "｜" + raw : "");
-    }
-    function storyLength(chapter) {
-      if (chapter.fullBody && chapter.sourceStatus !== "document-tab-missing") return String(chapter.fullBody).replace(/\s/g, "").length;
-      return chapter.scenes.reduce(function (sum, scene) { return sum + String(scene.body || "").replace(/\s/g, "").length; }, 0);
-    }
-    function storyGuideMarkup(chapter) {
-      var guide = chapter && chapter.narrativeGuide;
-      if (!guide) return "";
-      return "<section class=\"story-narrative-guide\"><div><span class=\"eyebrow\">CELESIA STORY THREAD</span><strong>" + escapeHtml(guide.focus || "") + "</strong></div><div><span>本章懸念</span><p>" + escapeHtml(guide.hook || "") + "</p></div><div><span>本章收束</span><p>" + escapeHtml(guide.payoff || "") + "</p></div></section>";
-    }
-    function storyMapLocationById(id) {
-      var map = data.storyWorldMap;
-      return map && (map.locations || []).find(function (location) { return location.id === id; });
-    }
-    function storyMapChapterLocationIds(chapter) {
-      var map = data.storyWorldMap;
-      return map && chapter && map.chapterLocations && map.chapterLocations[chapter.id] ? map.chapterLocations[chapter.id] : [];
-    }
-    function storyMapVersionStart(value) {
-      var match = String(value || "").match(/\d+(?:\.\d+)?/);
-      return match ? Number(match[0]) : 99;
-    }
-    function storyMapFilterMatches(location) {
-      if (currentStoryMapFilter === "all") return true;
-      var start = storyMapVersionStart(location.versionRange);
-      if (currentStoryMapFilter === "live") return start <= 1.0;
-      if (currentStoryMapFilter === "next") return start >= 1.1 && start <= 1.3;
-      if (currentStoryMapFilter === "3") return start >= 3 && start < 4;
-      if (currentStoryMapFilter === "4") return start >= 4 && start < 5;
-      if (currentStoryMapFilter === "5") return start >= 5;
-      return true;
-    }
-    function storyMapLocationIsOpen(location) { return storyMapVersionStart(location && location.versionRange) <= 1.0; }
-    function storyMapRegionById(id) {
-      var map = data.storyWorldMap;
-      return map && (map.regions || []).find(function (region) { return region.id === id; });
-    }
-    function storyMapChapterMarkup(location) {
-      var map = data.storyWorldMap;
-      var chapterIds = [];
-      (map && map.chapterLocations ? Object.keys(map.chapterLocations) : []).forEach(function (chapterId) {
-        if ((map.chapterLocations[chapterId] || []).indexOf(location.id) >= 0) chapterIds.push(chapterId);
-      });
-      chapterIds.sort(function (a, b) {
-        var left = storyChapterById(a); var right = storyChapterById(b);
-        return Number(left && left.version || 0) - Number(right && right.version || 0) || (left && left.type === "main" ? -1 : 1);
-      });
-      return chapterIds.slice(0, 6).map(function (chapterId) {
-        var chapter = storyChapterById(chapterId); if (!chapter) return "";
-        var open = chapter.releaseOpen !== false;
-        return "<button class=\"story-map-chapter-link" + (open ? "" : " locked") + "\" data-map-chapter=\"" + escapeHtml(chapter.id) + "\" type=\"button\"" + (open ? "" : " disabled") + "><span>" + escapeHtml(storyVersionLabel(chapter)) + "｜" + escapeHtml(chapter.type === "main" ? "主線" : "支線") + "</span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + (open ? "開放閱讀" : "已建檔，後續版本開放") + "</small></button>";
-      }).join("");
-    }
-    function storyMapRegionLabelMarkup(region) {
-      var positions = {
-        "origin-forest": [120, 170],
-        "tide-west": [700, 170],
-        "inland-forge": [490, 720],
-        "northern-myth": [820, 48],
-        "root-deep": [120, 48]
-      };
-      var position = positions[region.id] || [20, 20];
-      return "<text class=\"story-map-region-label\" x=\"" + position[0] + "\" y=\"" + position[1] + "\"><tspan>" + escapeHtml(region.name) + "</tspan><tspan x=\"" + position[0] + "\" dy=\"16\">" + escapeHtml(region.terrain) + "</tspan></text>";
-    }
-    function storyMapRoutePath(route) {
-      var from = storyMapLocationById(route.from); var to = storyMapLocationById(route.to);
-      if (!from || !to) return "";
-      var midX = Math.round((from.x + to.x) / 2); var midY = Math.round((from.y + to.y) / 2);
-      return "M" + from.x + " " + from.y + " C" + midX + " " + from.y + ", " + to.x + " " + midY + ", " + to.x + " " + to.y;
-    }
-    function renderStoryWorldMap(chapter) {
-      var container = byId("story-world-map"); var map = data.storyWorldMap;
-      if (!container || !map) return;
-      if (globalThis.StarshipInteractiveMap) {
-        container.innerHTML = globalThis.StarshipInteractiveMap.render(currentAtlasMapId, currentAtlasPointId);
-        return;
-      }
-      var chapterLocations = storyMapChapterLocationIds(chapter);
-      if (!currentStoryMapLocationId || !storyMapLocationById(currentStoryMapLocationId) || !storyMapFilterMatches(storyMapLocationById(currentStoryMapLocationId))) {
-        currentStoryMapLocationId = chapterLocations.filter(function (id) { return storyMapFilterMatches(storyMapLocationById(id)); })[0] || (map.locations.filter(storyMapFilterMatches)[0] || map.locations[0]).id;
-      }
-      var selected = storyMapLocationById(currentStoryMapLocationId) || map.locations[0];
-      var visibleIds = {};
-      map.locations.filter(storyMapFilterMatches).forEach(function (location) { visibleIds[location.id] = true; });
-      var terrain = (map.terrainShapes || []).map(function (shape) {
-        var region = storyMapRegionById(shape.regionId) || {};
-        return "<polygon class=\"story-map-terrain\" points=\"" + escapeHtml(shape.points) + "\" style=\"--region-color:" + escapeHtml(region.color || "#78a9ff") + "\"></polygon>";
-      }).join("");
-      var routes = (map.routes || []).map(function (route) {
-        var visible = visibleIds[route.from] && visibleIds[route.to];
-        var planned = !storyMapLocationIsOpen(storyMapLocationById(route.from)) || !storyMapLocationIsOpen(storyMapLocationById(route.to));
-        return "<path class=\"story-map-route" + (visible ? "" : " muted") + (planned ? " planned" : "") + (route.kind === "rift" ? " rift" : "") + "\" d=\"" + escapeHtml(storyMapRoutePath(route)) + "\"><title>" + escapeHtml(route.label + "｜" + route.direction) + "</title></path>";
-      }).join("");
-      var labels = (map.regions || []).map(storyMapRegionLabelMarkup).join("");
-      var nodes = map.locations.map(function (location) {
-        var visible = visibleIds[location.id];
-        var open = storyMapLocationIsOpen(location);
-        var active = selected && selected.id === location.id;
-        var inChapter = chapterLocations.indexOf(location.id) >= 0;
-        return "<g class=\"story-map-location" + (visible ? "" : " filtered") + (open ? " open" : " locked") + (active ? " selected" : "") + (inChapter ? " chapter-current" : "") + "\" data-map-location=\"" + escapeHtml(location.id) + "\" tabindex=\"0\" role=\"button\" aria-label=\"" + escapeHtml(location.name + "，" + (open ? "已開放" : "後續版本")) + "\"><circle cx=\"" + location.x + "\" cy=\"" + location.y + "\" r=\"" + (active ? 13 : 9) + "\"></circle><circle class=\"story-map-location-core\" cx=\"" + location.x + "\" cy=\"" + location.y + "\" r=\"3\"></circle><text x=\"" + (location.x + 14) + "\" y=\"" + (location.y + 4) + "\">" + escapeHtml(location.name) + "</text></g>";
-      }).join("");
-      var selectedRegion = storyMapRegionById(selected && selected.regionId) || {};
-      var selectedChapters = storyMapChapterMarkup(selected || map.locations[0]);
-      var filters = [["all", "全部地點"], ["live", "1.0 已開放"], ["next", "1.1–1.3 建檔"]].map(function (item) {
-        return "<button class=\"story-map-filter" + (currentStoryMapFilter === item[0] ? " active" : "") + "\" data-map-filter=\"" + item[0] + "\" type=\"button\">" + item[1] + "</button>";
-      }).join("");
-      var chapterTitle = chapter ? storyVersionLabel(chapter) + "｜" + chapter.title : "故事航線";
-      var localSites = (selected.localSites || []).map(function (site) { return "<li>" + escapeHtml(site) + "</li>"; }).join("");
-      container.innerHTML = "<div class=\"story-map-heading\"><div><h3 id=\"story-map-title\">" + escapeHtml(map.title) + "</h3><p>" + escapeHtml(map.subtitle) + "；目前章節「" + escapeHtml(chapterTitle) + "」已在地圖上標出。</p></div><span class=\"story-map-version\">1.0 開放 · 後續建檔</span></div><div class=\"story-map-filters\" role=\"group\" aria-label=\"地圖版本篩選\">" + filters + "</div><div class=\"story-map-layout\"><div class=\"story-map-canvas\"><div class=\"story-map-orientation\" aria-label=\"地圖方位：上北、右東、下南、左西\"><span>↑ 北</span><span>← 西　東 →</span><span>↓ 南</span></div><svg class=\"story-map-svg\" viewBox=\"" + escapeHtml(map.viewBox) + "\" role=\"img\" aria-labelledby=\"story-map-title\"><defs><filter id=\"story-map-glow\"><feGaussianBlur stdDeviation=\"5\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs><rect class=\"story-map-water\" x=\"0\" y=\"0\" width=\"1200\" height=\"760\" rx=\"28\"></rect><g class=\"story-map-terrain-layer\">" + terrain + "</g><g class=\"story-map-region-labels\">" + labels + "</g><g class=\"story-map-routes\">" + routes + "</g><g class=\"story-map-locations\">" + nodes + "</g></svg><div class=\"story-map-legend\"><span><i class=\"legend-dot open\"></i>已開放</span><span><i class=\"legend-dot planned\"></i>後續建檔</span><span><i class=\"legend-line\"></i>步行／水路</span><span><i class=\"legend-line rift\"></i>界痕位移</span></div></div><aside class=\"story-map-details\"><h4>" + escapeHtml(selected.name) + "</h4><p class=\"story-map-location-meta\"><b>地形</b>" + escapeHtml(selected.terrain) + "<br><b>版本</b>" + escapeHtml(selected.versionRange) + "<br><b>區域</b>" + escapeHtml(selectedRegion.name || "星界航線") + "</p><p>" + escapeHtml(selected.description) + "</p>" + (localSites ? "<div class=\"story-map-local-sites\"><strong>1.2 現地分區</strong><ul>" + localSites + "</ul></div>" : "") + "<div class=\"story-map-related\"><strong>相關章節</strong>" + (selectedChapters || "<small>此處尚未綁定章節。</small>") + "</div></aside></div><p class=\"story-map-continuity\"><strong>方位與行程</strong> 此圖只標已定的相對方位，非比例地圖。界痕位移不是日常道路；獸靈之村向西兩日到白鐘，白鐘向北三日到霧橋。霧橋到洛汀須先南返白鐘三日，再順流兩日；洛汀相對白鐘的精確羅盤角與斷橋局部幾何仍待核定。</p>";
-    }
-    function renderStoryReader(state, chapter) {
-      if (byId("story-monster-catalog") && window.StarshipStoryMonsterCatalog) {
-        var scene11 = window.StarshipStory11Current && window.StarshipStory11Current.scenes[2];
-        var learned = Boolean(scene11 && state.storyProgress && state.storyProgress.completedScenes && state.storyProgress.completedScenes["main-1-1:" + scene11.id]);
-        byId("story-monster-catalog").innerHTML = window.StarshipStoryMonsterCatalog.render(learned);
-      }
-      if (data.releaseConfig && data.releaseConfig.open11 && window.StarshipStoryReader && chapter) {
-        window.StarshipStoryReader.render({ container: byId("story-reader"), state: state, chapter: chapter, readOnly: true,
-          bodyMarkup: function (scene, index) { return storyBodyMarkup(scene.body, "story-body", index + 1, chapter.id, { authorPreview: true }); },
-          onAction: performLiveStoryAction });
-        return;
-      }
-      var scene = storySceneById(chapter, currentStorySceneId) || chapter.scenes[0];
-      currentStorySceneId = scene.id;
-      var claimed = sceneClaimed(state, chapter.id, scene.id);
-      var sceneIndex = Math.max(0, chapter.scenes.findIndex(function (item) { return item.id === scene.id; }));
-      var finalScene = chapter.id === "main-1-0" && sceneIndex === chapter.scenes.length - 1;
-      var versionClaimed = storyVersionClaimed(state);
-      var priorScenesComplete = chapter.scenes.slice(0, -1).every(function (item) { return sceneClaimed(state, chapter.id, item.id); });
-      var sceneTitle = storySceneDisplayTitle(chapter, scene, sceneIndex);
-      var sceneButtons = chapter.scenes.map(function (item, index) { return "<button class=\"story-scene-button " + (item.id === scene.id ? "active " : "") + (sceneClaimed(state, chapter.id, item.id) ? "claimed" : "") + "\" data-scene-id=\"" + escapeHtml(item.id) + "\" type=\"button\"><span>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</span><small>" + (index === chapter.scenes.length - 1 ? (versionClaimed ? "1.0 版本獎勵已領取" : "讀完五幕可領 1.0 版本獎勵") : (sceneClaimed(state, chapter.id, item.id) ? "已讀完" : "尚未讀完")) + "</small></button>"; }).join("");
-      var fullChapter = chapter.scenes.map(function (item, index) {
-        return "<article class=\"complete-scene-block\"><span class=\"scene-label\">SCENE " + String(index + 1).padStart(2, "0") + "</span><h4>" + escapeHtml(storySceneDisplayTitle(chapter, item, index)) + "</h4>" + storyBodyMarkup(item.body, "story-body story-full-body", index + 1, chapter.id) + "</article>";
-      }).join("");
-      var chapterBody = chapter.scenes.map(function (item) { return item.body || ""; }).join("\n");
-      var npcCount = Object.keys(data.storyCharacters || {}).filter(function (id) { return chapterBody.includes(data.storyCharacters[id].name); }).length;
-      var characterCount = chapter.characters.filter(function (id) { return Boolean(data.cards[id]); }).length + npcCount;
-      var length = storyLength(chapter);
-      var needsLongDraft = chapter.type === "main" && chapter.releaseOpen !== false && length < 10000;
-      var sourceLabel = chapter.sourceStatus === "document-tab-missing" ? "補充正文" : (needsLongDraft ? "現存原稿" : "文件正文");
-      var portraitEntries = Object.keys(data.storyCharacters || {}).map(function (id) { return data.storyCharacters[id]; }).concat(chapter.characters.map(function (id) { return data.cards[id]; }).filter(Boolean));
-      var scenePortraits = portraitEntries.filter(function (entry) { return entry.name && (entry.portrait || entry.image) && String(scene.body || "").includes(entry.name); }).slice(0, 4).map(function (entry) {
-        var source = characterPortraitSource(entry, game && game.getState());
-        return "<figure class=\"story-portrait\"><img src=\"" + escapeHtml(source) + "\" alt=\"" + escapeHtml(entry.name + " 角色立繪") + "\" loading=\"lazy\"><figcaption><strong>" + escapeHtml(entry.name) + "</strong><small>" + escapeHtml(entry.romanizedName || "") + "</small></figcaption></figure>";
-      }).join("");
-      byId("story-reader").innerHTML = "<div class=\"story-reader-kicker\"><span>" + escapeHtml(storyVersionLabel(chapter) + " / " + (chapter.type === "main" ? "主線" : "支線") + " / " + chapter.region) + "</span><span class=\"story-source-badge\">" + sourceLabel + "</span></div><h3>" + escapeHtml(chapter.title) + "</h3><p class=\"story-summary\">" + escapeHtml(chapter.summary) + "</p>" + storyGuideMarkup(chapter) + "<div class=\"story-reader-meta\"><span>正文 <b>" + number(length) + " 字</b></span><span>約 <b>" + Math.max(1, Math.ceil(length / 500)) + " 分鐘</b></span><span><b>" + chapter.scenes.length + " 幕</b></span><span><b>" + characterCount + " 名角色</b></span></div><div class=\"story-character-tags\">" + chapter.characters.map(function (id) { var card = data.cards[id]; return card ? "<span>" + escapeHtml(card.name) + "｜" + escapeHtml(card.element) + "</span>" : ""; }).join("") + "</div><div class=\"story-scene-reader\"><span class=\"scene-label\">SCENE " + escapeHtml(scene.id.toUpperCase()) + "</span><h4>" + escapeHtml(sceneTitle) + "</h4>" + (scenePortraits ? "<div class=\"story-portraits\" aria-label=\"本幕登場角色\">" + scenePortraits + "</div>" : "") + storyBodyMarkup(scene.body, "story-body", sceneIndex + 1, chapter.id) + "<div class=\"story-reward-bar\"><span>1.0 版本獎勵・五幕完成領取一次</span><strong>+1,600 星砂・+3,600 角色經驗・+1 星痕</strong><button class=\"primary-action\" data-complete-scene=\"" + escapeHtml(scene.id) + "\" type=\"button\"" + ((finalScene ? versionClaimed || !priorScenesComplete : claimed) ? " disabled" : "") + ">" + (finalScene ? (versionClaimed ? "版本獎勵已領取" : "完成第五幕並領取版本獎勵") : (claimed ? "已讀完" : "標記本幕已讀完")) + "</button></div></div><div class=\"story-scene-list\"><div class=\"story-scene-heading\"><span>本章幕次導覽</span><small>支線與主線都已依劇情順序編號；最後一幕標為終幕</small></div>" + sceneButtons + "</div><section class=\"story-full-chapter\"><div class=\"story-full-heading\"><span>" + (needsLongDraft ? "目前收錄的劇情" : "本章完整劇情") + "</span><small>" + (needsLongDraft ? "現存原稿尚未達長篇篇幅；以下顯示目前收錄的所有幕次" : "所有幕次內容都會顯示") + "</small></div><div>" + fullChapter + "</div></section>";
-    }
-    function moveStoryPlotToTop() {
-      var reader = byId("story-reader");
-      if (!reader) return;
-      var plot = reader.querySelector(".story-scene-reader");
-      var sceneList = reader.querySelector(".story-scene-list");
-      if (plot && sceneList) reader.insertBefore(plot, sceneList);
-    }
-    function decorateStoryMythic(chapter) {
-      if (!chapter || !chapter.mythicTheme) return;
-      var reader = byId("story-reader");
-      var kicker = reader && reader.querySelector(".story-reader-kicker");
-      if (kicker && !kicker.querySelector(".story-mythic-badge")) {
-        var badge = document.createElement("span");
-        badge.className = "story-mythic-badge";
-        badge.textContent = "北境神話篇｜" + chapter.mythicTheme;
-        kicker.appendChild(badge);
-      }
-      var summary = reader && reader.querySelector(".story-summary");
-      if (summary && chapter.mythicNote && !reader.querySelector(".story-mythic-note")) {
-        var note = document.createElement("div");
-        note.className = "story-mythic-note";
-        note.innerHTML = "<strong>神話意象｜" + escapeHtml(chapter.mythicMotif || chapter.mythicTheme) + "</strong><span>" + escapeHtml(chapter.mythicNote) + "</span>";
-        summary.insertAdjacentElement("afterend", note);
-      }
-    }
-    function decorateStoryRoadmap() {
-      var container = byId("story-chapters");
-      if (!container) return;
-      var locked = lockedStoryChapterList();
-      var cards = container.querySelectorAll(".story-roadmap-card");
-      locked.forEach(function (chapter, index) {
-        if (!chapter.mythicTheme || !cards[index]) return;
-        var small = cards[index].querySelector("small");
-        if (small) small.textContent += " · 北境神話篇｜" + chapter.mythicTheme;
-      });
-      var heading = container.querySelector(".story-roadmap-heading");
-      if (heading && locked.some(function (chapter) { return chapter.mythicTheme; })) heading.textContent = "後續版本檔案｜4.0 起：北境神話篇";
-    }
-    function renderStory() {
-      if (!game) return;
-      var state = game.getState(); var chapters = storyChapterList(); var current = storyChapterById(currentStoryChapterId);
-      if (!chapters.length) {
-        byId("story-chapters").innerHTML = "<div class=\"empty\">這類劇情尚未開放。</div>";
-        byId("story-reader").innerHTML = "<div class=\"empty\">目前可閱讀 1.0 主線；支線仍在製作。</div>";
-        return;
-      }
-      if (!current || current.type !== currentStoryTab || current.releaseOpen === false) { current = chapters[0]; currentStoryChapterId = current.id; currentStorySceneId = current.scenes[0].id; }
-      byId("story-main-tab").classList.toggle("active", currentStoryTab === "main"); byId("story-side-tab").classList.toggle("active", currentStoryTab === "side");
-      var openButtons = chapters.map(function (chapter) { var done = chapter.scenes.filter(function (scene) { return sceneClaimed(state, chapter.id, scene.id); }).length; return "<button class=\"story-chapter-button " + (chapter.id === current.id ? "active" : "") + "\" data-story-id=\"" + escapeHtml(chapter.id) + "\" type=\"button\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><span><strong>" + escapeHtml(chapter.title) + "</strong><small>" + escapeHtml(chapter.region) + " · " + done + "/" + chapter.scenes.length + " 幕 · " + number(storyLength(chapter)) + " 字</small></span></button>"; }).join("");
-      var lockedRoadmap = lockedStoryChapterList().map(function (chapter) { return "<div class=\"story-roadmap-card\"><span class=\"story-version\">" + escapeHtml(storyVersionLabel(chapter)) + "</span><div><strong>" + escapeHtml(chapter.title) + "</strong><small>已建檔 · 版本更新後開放 · " + chapter.scenes.length + " 幕</small></div><span class=\"roadmap-lock\">LOCKED</span></div>"; }).join("");
-      byId("story-chapters").innerHTML = openButtons + (lockedRoadmap ? "<div class=\"story-roadmap-heading\">後續版本檔案</div>" + lockedRoadmap : "");
-      decorateStoryRoadmap();
-      byId("story-view-status").textContent = currentStoryTab === "main" ? "主線 1.0 已開放｜後續章節籌備中" : "支線籌備中";
-      renderStoryReader(state, current);
-      decorateStoryMythic(current);
-      moveStoryPlotToTop();
-      refreshWorldEntries();
-    }
+    function renderLobby(){if(game){hub.render(game.getState(),currentPlayerName);renderMilestoneRewards();}}
+
+
+
+
     function renderCharacters() {
       if (!game) return;
       var state = game.getState(); var owned = rosterCards().filter(function (card) { return (state.collection[card.id] || 0) > 0; }).length;
@@ -1099,19 +531,22 @@
         return matchesFilter && (!searchTerm || searchable.indexOf(searchTerm) >= 0);
       });
       byId("character-list-count").textContent = "顯示 " + visibleCards.length + " / " + rosterCards().length + " 名";
+      if(featureUI && !currentCharacterId && visibleCards.length)currentCharacterId=(visibleCards.find(function(card){return state.collection[card.id]>0;})||visibleCards[0]).id;
       byId("character-list").innerHTML = visibleCards.length ? visibleCards.map(function (card) {
-        var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var portrait = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (portrait ? ";--card-image:url('" + escapeHtml(portrait) + "')" : "");
+        var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var availableBreakthrough = materialAmount + universalAmount; var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var levelCap=window.StarshipStarAscension.levelCap(state,card,api.DEFAULT_RULES.development.maxLevel); var atMax = Boolean(copies && progress.level >= levelCap); var power = characterPower(card.id, state); var animation = characterAnimationFor(card.id); var portrait = characterPortraitSource(card, state, true); var style = "--accent:" + escapeHtml(card.accent || "#9e92ff") + (portrait ? ";--card-image:url('" + escapeHtml(portrait) + "')" : "");
         var growthAction;
+        if(featureUI)return featureUI.tile(card,progress,copies,portrait,currentCharacterId===card.id,state);
         if (!copies) growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\" disabled>" + (Number(card.releaseVersion) > Number(data.updateVersion || "1.0") ? escapeHtml(card.releaseVersion) + " 尚未開放" : "尚未取得") + "</button>";
         else if (needBreakthrough) growthAction = "<button class=\"secondary-action growth-button breakthrough-growth-button\" data-breakthrough-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (availableBreakthrough < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>";
-        else growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (atMax || state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">" + (atMax ? "已達 90 等" : "升級　" + cost.characterExp + " 經驗") + "</button>";
+        else growthAction = "<button class=\"secondary-action growth-button\" data-develop-character=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (atMax || state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">" + (atMax ? "已達 "+levelCap+" 等" : "升級　" + cost.characterExp + " 經驗") + "</button>";
         growthAction += bulkUpgradeButton(card, copies, false);
-        return "<article class=\"character-growth-card compact-character-card " + (copies ? "owned" : "locked") + " rarity-" + card.rarity + "\" data-open-character=\"" + escapeHtml(card.id) + "\" tabindex=\"0\" aria-label=\"查看" + escapeHtml(card.name) + "培養資料\"><div class=\"character-growth-art\" style=\"" + style + "\"><span>" + escapeHtml(card.element) + "</span><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + "</small></div><div class=\"character-growth-body\"><div class=\"compact-character-heading\"><span class=\"rarity-label\">" + "★".repeat(card.rarity) + "</span><span class=\"compact-element\">" + escapeHtml(card.element) + "元素</span></div><h3>" + escapeHtml(card.name) + "</h3><div class=\"growth-stats\"><span>戰力 <b>" + number(power) + "</b></span><span>Lv.<b>" + progress.level + "/90</b></span><span>命座 <b>" + (progress.constellation || 0) + "/6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"growth-actions\">" + growthAction + "</div></div></article>";
+        return "<article class=\"character-growth-card compact-character-card " + (copies ? "owned" : "locked") + " rarity-" + card.rarity + "\" data-open-character=\"" + escapeHtml(card.id) + "\" tabindex=\"0\" aria-label=\"查看" + escapeHtml(card.name) + "培養資料\"><div class=\"character-growth-art\" style=\"" + style + "\"><span>" + escapeHtml(card.element) + "</span><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + "</small></div><div class=\"character-growth-body\"><div class=\"compact-character-heading\"><span class=\"rarity-label\">" + "★".repeat(card.rarity) + "</span><span class=\"compact-element\">" + escapeHtml(card.element) + "元素</span></div><h3>" + escapeHtml(card.name) + "</h3><div class=\"growth-stats\"><span>戰力 <b>" + number(power) + "</b></span><span>Lv.<b>" + progress.level + "/"+levelCap+"</b></span><span>命座 <b>" + (progress.constellation || 0) + "/6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"growth-actions\">" + growthAction + "</div></div></article>";
       }).join("") : "<div class=\"character-list-empty\">找不到符合條件的角色，請調整搜尋或篩選。</div>";
       if (currentCharacterId) { renderCharacterDetail(currentCharacterId); }
     }
     function characterStatsFor(cardId, progress) {
       var progressState = { characterProgress: {} };
+      if(game){var saved=game.getState();progressState.collection=saved.collection;progressState.equipment=saved.equipment;progressState.starAscension=saved.starAscension;progressState.petProgress=saved.petProgress;progressState.petSummon=saved.petSummon;}
       progressState.characterProgress[cardId] = progress || {};
       return window.StarshipBattle && window.StarshipBattle.buildEffectiveStats ? window.StarshipBattle.buildEffectiveStats(data.characterBattleStats, progressState)[cardId] || null : data.characterBattleStats[cardId] || null;
     }
@@ -1165,9 +600,7 @@
       var skins = Array.isArray(config.seasonSkins) ? config.seasonSkins : (config.seasonSkin ? [config.seasonSkin] : []);
       return skins.filter(function (skin) { return skin && skin.characterId === cardId; });
     }
-    function seasonSkinFor(cardId) {
-      return seasonSkinsFor(cardId)[0] || null;
-    }
+
     function characterSkinUnlocked(state, skin) {
       return Boolean(skin && state && state.cosmetics && state.cosmetics.skins && state.cosmetics.skins[skin.id]);
     }
@@ -1183,16 +616,18 @@
     function renderCharacterDetail(cardId) {
       var state = game && game.getState(); var card = data.cards[cardId]; var detail = byId("character-detail");
       if (!state || !card || !detail) return;
-      var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var atMax = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.maxLevel); var stats = characterStatsFor(card.id, progress) || {}; var power = characterPower(card.id, state);
+      var copies = state.collection[card.id] || 0; var progress = state.characterProgress[card.id] || { level: 1, affinity: 0, constellation: 0, constellationCore: 0, breakthrough: false }; var cost = developmentCost(card, progress.level); var requirement = data.characterBreakthroughs[card.id]; var materialAmount = requirement ? Number(state.breakthroughMaterials[requirement.materialId] || 0) : 0; var universalAmount = Number(state.breakthroughMaterials["universal-core"] || 0); var needBreakthrough = Boolean(copies && progress.level >= api.DEFAULT_RULES.development.breakthroughLevel && !progress.breakthrough); var levelCap=window.StarshipStarAscension.levelCap(state,card,api.DEFAULT_RULES.development.maxLevel); var atMax = Boolean(copies && progress.level >= levelCap); var stats = characterStatsFor(card.id, progress) || {}; var power = characterPower(card.id, state);
       // 角色詳情與文件共用乾淨的 portraitImage；識別資訊獨立排在圖片上方，
       // 不再把名片卡疊在角色臉部、武器或服裝上。
       var skins = seasonSkinsFor(card.id); var activeSkin = skins.find(function (item) { return item.id === currentCharacterSkinId; }) || null; var skinActive = Boolean(activeSkin); var image = skinActive && activeSkin.previewImage ? activeSkin.previewImage : characterPortraitSource(card, state, true); var animation = characterAnimationFor(card.id);
-      var portraitHeading = "<div class=\"portrait-heading\"><div><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + " · " + escapeHtml(card.releaseVersion) + " 版本</small></div><span>" + "★".repeat(card.rarity) + "<b>" + escapeHtml(card.element) + "元素</b></span></div>";
-      var developAction = !copies ? "<button class=\"primary-action\" type=\"button\" disabled>尚未取得</button>" : needBreakthrough ? "<button class=\"primary-action\" type=\"button\" disabled>請先完成 80 等突破</button>" : atMax ? "<button class=\"primary-action\" type=\"button\" disabled>已達現行上限 90 等</button>" : "<button class=\"primary-action\" data-detail-develop=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">升級　" + cost.characterExp + " 角色經驗</button>";
+      var developedStars=window.StarshipStarAscension.stars(state,card);
+      var portraitHeading = "<div class=\"portrait-heading\"><div><strong>" + escapeHtml(card.name) + "</strong><small>" + escapeHtml(card.romanizedName) + " · " + escapeHtml(card.releaseVersion) + " 版本</small></div><span>" + "★".repeat(developedStars) + "<b>" + escapeHtml(card.element) + "元素</b></span></div>";
+      var developAction = !copies ? "<button class=\"primary-action\" type=\"button\" disabled>尚未取得</button>" : needBreakthrough ? "<button class=\"primary-action\" type=\"button\" disabled>請先完成 80 等突破</button>" : atMax ? "<button class=\"primary-action\" type=\"button\" disabled>已達現行上限 "+levelCap+" 等</button>" : "<button class=\"primary-action\" data-detail-develop=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (state.resources.characterExp < cost.characterExp ? " disabled" : "") + ">升級　" + cost.characterExp + " 角色經驗</button>";
       var breakthroughAction = needBreakthrough && requirement ? "<button class=\"secondary-action breakthrough-detail-action\" data-detail-breakthrough=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (materialAmount + universalAmount < Number(requirement.cost || 0) ? " disabled" : "") + ">突破　" + escapeHtml(requirement.materialName) + " " + requirement.cost + "（通用 " + universalAmount + "）</button>" : "";
       var animationAction = animation ? "<button class=\"secondary-action character-animation-button\" data-character-animation=\"" + escapeHtml(card.id) + "\" type=\"button\">▶ 角色動畫</button>" : "<span class=\"character-animation-unavailable\"><strong>角色動畫</strong><small>目前尚未收錄</small></span>";
-      var breakthroughNote = requirement ? (progress.breakthrough ? "已完成 80 等突破，可繼續升到 90 等" : "建議 Boss｜" + escapeHtml((bossStageById(requirement.bossId) || {}).name || "未設定") + "　指定材料｜" + escapeHtml(requirement.materialName) + " " + materialAmount + "/" + requirement.cost + "　通用印記｜" + universalAmount + "（可替代）") : "突破材料設定尚未載入";
+      var breakthroughNote = requirement ? (progress.breakthrough ? "已完成 80 等突破，可繼續升到 "+levelCap+" 等" : "建議 Boss｜" + escapeHtml((bossStageById(requirement.bossId) || {}).name || "未設定") + "　指定材料｜" + escapeHtml(requirement.materialName) + " " + materialAmount + "/" + requirement.cost + "　通用印記｜" + universalAmount + "（可替代）") : "突破材料設定尚未載入";
       var ascendedPreview = card.id === "isar" && data.isarAscended ? "<details class=\"character-variant\"><summary>查看伊薩爾 4★ 升格卡面（圖鑑預覽）</summary><img src=\"" + escapeHtml(data.isarAscended.portrait) + "\" alt=\"伊薩爾四星升格卡面\" loading=\"lazy\"><p>升格卡面與三星原稿分開保留，目前不加入召集池。</p></details>" : "";
+      if(hub)ascendedPreview=''; // Star ascension retains the current approved portrait.
       var formControls = card.id === "elorna" && copies ? "<section class=\"character-variant\"><h4>上場型態</h4><p>兩型態共享面板與命座；陸地偏測線，深水偏救援。</p><div class=\"detail-actions\"><button class=\"secondary-action\" data-character-form=\"land\" type=\"button\" aria-pressed=\"" + (progress.activeForm !== "deepwater") + "\">陸地／淺水</button><button class=\"secondary-action\" data-character-form=\"deepwater\" type=\"button\" aria-pressed=\"" + (progress.activeForm === "deepwater") + "\">深水魚尾</button></div></section>" : "";
       var constellationTips = {
         chodan: {
@@ -1221,13 +656,55 @@
       }
       var skillDescription = futurePrototype ? prototypeEffect + " 未來專屬設計方向：" + (stats.skillEffect || "待定") + "（尚未實作，數值待定）。" : stats.skillEffect || "尚未登錄";
       var constellationMarkup = Array.isArray(stats.constellations) ? "<details class=\"character-variant constellation-details\"><summary>查看 C1–C6 命座效果</summary><p class=\"constellation-growth-note\">共通面板成長｜" + escapeHtml(growthNote) + "各命效果累積生效；生命、攻擊、防禦與速度最終取整數。技能面板倍率是展示數值，實戰依下列技能公式計算；護盾最多累積至受盾者最大生命的 28%。</p><ol>" + stats.constellations.map(function (effect, index) { var tip = constellationTips[card.id] && constellationTips[card.id][index + 1]; return "<li><span>" + escapeHtml(effect) + "</span>" + (tip ? "<small class=\"constellation-tip\"><strong>搭配提醒</strong>" + escapeHtml(tip) + "</small>" : "") + "</li>"; }).join("") + "</ol></details>" : "";
-      var explorerSelected = currentExplorerId() === card.id;
-      var explorerControls = "<section class=\"character-variant\"><h4>地圖探索</h4><p>使用已獲得的角色在地圖上探索；劇情對話依原本人物進行。</p><button class=\"secondary-action\" data-select-explorer=\"" + escapeHtml(card.id) + "\" type=\"button\"" + (!copies || explorerSelected ? " disabled" : "") + ">" + (!copies ? "取得角色後可設為探索角色" : explorerSelected ? "目前的探索角色" : "設為探索角色") + "</button></section>";
-      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + bulkUpgradeButton(card, copies, true) + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>" + explorerControls;
-      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(card.rarity) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / 90</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(skillDescription) + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到 80 等後，必須取得指定 Boss 的突破材料才能繼續升到 90 等。</p></div></div>";
+      var upgradeControls = "<div class=\"detail-upgrade\"><div class=\"detail-upgrade-actions\">" + developAction + bulkUpgradeButton(card, copies, true) + breakthroughAction + "</div><small>可用角色經驗 " + number(state.resources.characterExp) + "</small></div>";
+      detail.innerHTML = "<button class=\"detail-close small-button\" data-close-character type=\"button\">× 關閉角色詳情</button><div class=\"character-detail-grid\"><div class=\"character-portrait-column\">" + portraitHeading + "<div class=\"character-portrait-frame " + (skinActive ? "portrait-skin-active" : "") + "\"><img src=\"" + escapeHtml(image || "") + "\" alt=\"" + escapeHtml(card.name + (skinActive && activeSkin ? "「" + activeSkin.name + "」" : "") + " 完整立繪，" + "★".repeat(developedStars) + "，" + card.element) + "\" loading=\"eager\">" + (skinActive && activeSkin ? "<span class=\"portrait-skin-badge\">造型預覽</span>" : "") + "</div></div><div class=\"character-detail-copy\"><p class=\"eyebrow\">CHARACTER DEVELOPMENT / " + escapeHtml(card.romanizedName.toUpperCase()) + "</p><h3>" + escapeHtml(card.name) + "</h3><p class=\"detail-note\">" + escapeHtml(card.note) + "</p><div class=\"detail-progress\"><span>戰力 <b>" + number(power) + "</b></span><span>等級 <b>Lv." + progress.level + " / "+levelCap+"</b></span><span>命座 <b>" + (progress.constellation || 0) + " / 6</b></span><span>持有 <b>×" + copies + "</b></span></div><div class=\"detail-stat-grid\"><span>生命 <b>" + number(stats.maxHp || 0) + "</b></span><span>攻擊 <b>" + number(stats.attack || 0) + "</b></span><span>防禦 <b>" + number(stats.defense || 0) + "</b></span><span>速度 <b>" + number(stats.speed || 0) + "</b></span><span>定位 <b>" + escapeHtml(stats.role || "—") + "</b></span><span>攻擊手段 <b>" + escapeHtml(stats.attackName || "—") + "</b></span></div>" + upgradeControls + "<div class=\"detail-skill\"><span>技能｜" + escapeHtml(stats.skillName || "—") + "</span><p>" + escapeHtml(skillDescription) + "</p></div>" + formControls + constellationMarkup + characterSkinMarkup(card, state, skins, currentCharacterSkinId) + ascendedPreview + "<div class=\"breakthrough-detail-note\">" + breakthroughNote + "</div><div class=\"detail-actions\">" + animationAction + "</div><p class=\"detail-resource-hint\">命座由重複角色自動增加，不需要在這裡再次按提升；三星命座以專屬機制與可靠度成長，滿命仍可上場；同定位滿等四星通常有更高上限，伊薩爾滿命可接近四星前排。角色到80等後須完成Boss材料突破；三星升四星、原生四星升五星後可升95等，六星可升100等。</p></div></div>";
       detail.hidden = false;
+      if(featureUI)featureUI.decorateCharacter(detail,cardId,state);
     }
-    function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId); byId("character-detail").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    function openCharacterDetail(cardId) { currentCharacterId = cardId; currentCharacterSkinId = ""; renderCharacterDetail(cardId);if(featureUI)byId("character-detail").scrollTop=0; if(!featureUI)byId("character-detail").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    function equipmentRequest(request){
+      var owner=currentPlayerName,token=currentPlayerToken;equipmentUI.setBusy(true);
+      var promise=remoteMode?apiRequest('/api/player/equipment',request):Promise.resolve().then(function(){return game.equipmentAction(request);});
+      promise.then(function(result){if(owner!==currentPlayerName||token!==currentPlayerToken)return;updateGameFromState(result.state);if(!remoteMode)saveLocalState();renderCharacters();renderLobby();equipmentUI.message(request.action==='upgrade'?'強化完成，消耗 '+result.cost+' 角色經驗。':request.action==='equip'?'裝備已穿戴，戰鬥加成已更新。':'裝備已卸下。');}).catch(function(error){
+        if(owner!==currentPlayerName||token!==currentPlayerToken)return;
+        if(remoteMode&&error.message.indexOf('已變更')>=0)return apiRequest('/api/player/session',{}).then(function(result){if(owner!==currentPlayerName||token!==currentPlayerToken)return;updateGameFromState(result.state);equipmentUI.message('裝備資料已同步，請確認後再操作。',true);}).catch(function(){equipmentUI.message('同步暫時失敗，請稍後重新登入。',true);});
+        equipmentUI.message(error.message,true);
+      }).finally(function(){equipmentUI.setBusy(false);});
+    }
+    function activitiesRequest(request){
+      var owner=currentPlayerName,token=currentPlayerToken;
+      return (remoteMode?apiRequest('/api/player/activities',request):Promise.resolve().then(function(){return window.StarshipActivities.action(game.getState(),request);})).then(function(result){
+        if(owner!==currentPlayerName||token!==currentPlayerToken)throw new Error('帳號已切換');
+        updateGameFromState(result.state);if(!remoteMode)saveLocalState();renderLobby();return result;
+      }).catch(function(error){if(remoteMode&&owner===currentPlayerName&&token===currentPlayerToken)return apiRequest('/api/player/session',{}).then(function(result){if(owner===currentPlayerName&&token===currentPlayerToken)updateGameFromState(result.state);throw error;});throw error;});
+    }
+    function petSummonRequest(request){
+      var owner=currentPlayerName,token=currentPlayerToken;petBannerUI.setBusy(true);
+      var promise=remoteMode?apiRequest('/api/player/pet-summon',request):Promise.resolve().then(function(){return game.petSummonAction(request);});
+      promise.then(function(result){if(owner!==currentPlayerName||token!==currentPlayerToken)return;updateGameFromState(result.state);if(!remoteMode)saveLocalState();renderCharacters();renderLobby();petBannerUI.outcome(result);}).catch(function(error){
+        if(owner!==currentPlayerName||token!==currentPlayerToken)return;
+        if(remoteMode&&error.message.indexOf('已變更')>=0)return apiRequest('/api/player/session',{}).then(function(result){if(owner!==currentPlayerName||token!==currentPlayerToken)return;updateGameFromState(result.state);petBannerUI.message('星伴資料已同步，請確認後再操作。',true);}).catch(function(){if(owner===currentPlayerName&&token===currentPlayerToken)petBannerUI.message('同步暫時失敗，請稍後重新登入。',true);});
+        petBannerUI.message(error.message,true);
+      }).finally(function(){if(owner===currentPlayerName&&token===currentPlayerToken)petBannerUI.setBusy(false);});
+    }
+    function ascendCharacterRequest(cardId,button){
+      if(starAscensionPending)return;
+      var request={owner:currentPlayerName,token:currentPlayerToken,cardId:cardId},body={cardId:cardId,expectedRevision:game.getState().starAscension.revision};starAscensionPending=request;
+      button.disabled=true;button.textContent='星階合成中…';
+      function active(){return request.owner===currentPlayerName&&request.token===currentPlayerToken;}
+      function message(text,error){if(currentCharacterId!==cardId)return;var node=byId('character-detail').querySelector('.star-ascension-message');if(node){node.textContent=text;node.classList.toggle('error',Boolean(error));}}
+      var promise=remoteMode?apiRequest('/api/player/star-ascension',body):Promise.resolve().then(function(){return game.ascendCharacter(body);});
+      promise.then(function(result){if(!active())return;updateGameFromState(result.state);if(!remoteMode)saveLocalState();renderCharacters();renderLobby();message('已升至 '+result.stars+' 星，消耗 '+result.cost+' 枚'+window.StarshipStarAscension.labels[result.mark]+'。');}).catch(function(error){
+        if(!active())return;
+        if(remoteMode&&error.message.indexOf('已變更')>=0)return apiRequest('/api/player/session',{}).then(function(result){if(!active())return;updateGameFromState(result.state);renderCharacters();message('升星資料已同步，請確認材料後再操作。',true);}).catch(function(){if(active()){renderCharacters();message('同步失敗，請稍後重新登入。',true);}});
+        renderCharacters();message(error.message,true);
+      }).finally(function(){if(starAscensionPending===request)starAscensionPending=null;});
+    }
+    function openPetWorkshop(petId){
+      var owner=currentPlayerName,token=currentPlayerToken,state=game.getState();if(!state.petProgress.pets[petId]||state.petProgress.pets[petId].owned===false){showView('pet-view');return;}
+      petBannerUI.setBusy(true);var promise=remoteMode?apiRequest('/api/player/pet-action',{action:'select',petId:petId}):Promise.resolve().then(function(){return game.petAction({action:'select',petId:petId});});
+      promise.then(function(result){if(owner!==currentPlayerName||token!==currentPlayerToken)return;updateGameFromState(result.state);if(!remoteMode)saveLocalState();showView('pet-view');}).catch(function(error){if(owner===currentPlayerName&&token===currentPlayerToken)petBannerUI.message(error.message,true);}).finally(function(){if(owner===currentPlayerName&&token===currentPlayerToken)petBannerUI.setBusy(false);});
+    }
     function equipCharacterSkin(skinId) {
       var request = { cardId: currentCharacterId, skinId: skinId };
       function finish(result) { updateGameFromState(result.state); currentCharacterSkinId = ""; renderCharacters(); renderCharacterDetail(currentCharacterId); byId("character-skin-message").textContent = "上場立繪已更新，戰鬥圖片也會使用此造型。"; }
@@ -1267,56 +744,7 @@
       if (remoteMode) { apiRequest("/api/player/character-form", { cardId: currentCharacterId, formId: formId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderCharacterDetail(currentCharacterId); showMessage("上場型態已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
       try { game.setCharacterForm({ cardId: currentCharacterId, formId: formId }); saveLocalState(); renderCharacters(); renderCharacterDetail(currentCharacterId); showMessage("上場型態已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
     }
-    function updateStorySelection(chapterId) {
-      var chapter = storyChapterById(chapterId); if (!chapter || chapter.releaseOpen === false) return;
-      currentStoryChapterId = chapterId; currentStorySceneId = chapter.scenes[0].id;
-      var state = game.getState(); storyProgress(state).currentChapter = chapterId;
-      if (remoteMode) { apiRequest("/api/player/story-progress", { action: "select", chapterId: chapterId }).then(function (payload) { updateGameFromState(payload.state); renderStory(); renderLobby(); }).catch(function () { renderStory(); }); }
-      else { updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); }
-    }
-    function performLiveStoryAction(body) {
-      var session = currentPlayerToken;
-      var operation;
-      if (remoteMode) operation = apiRequest("/api/player/story-progress", body);
-      else {
-        try { operation = Promise.resolve(window.StarshipStoryReleaseProgress.apply(game.getState(), storyChapterById(body.chapterId), body)); }
-        catch (error) { operation = Promise.reject(error); }
-      }
-      return operation.then(function (payload) {
-        if (session !== currentPlayerToken) throw new Error("登入帳號已變更，請重新載入劇情");
-        updateGameFromState(payload.state);
-        if (!remoteMode) saveLocalState();
-        renderStory(); renderLobby(); renderCharacters();
-        return payload;
-      });
-    }
-    function completeStoryScene(chapterId, sceneId) {
-      if (remoteMode) {
-        apiRequest("/api/player/story-progress", { action: "complete", chapterId: chapterId, sceneId: sceneId }).then(function (payload) { updateGameFromState(payload.state); renderStory(); renderLobby(); renderCharacters(); showMessage(payload.alreadyClaimed ? "這一幕已讀完。" : (payload.reward && (payload.reward.starSand || payload.reward.characterExp || payload.reward.starMarks) ? "版本獎勵：" + rewardText(payload.reward) + "已存入帳號。" : "本幕已讀完；讀完第五幕可領版本獎勵。"), false); }).catch(function (error) { showMessage(error.message, true); });
-        return;
-      }
-      var chapter = storyChapterById(chapterId); if (!chapter || chapter.releaseOpen === false) { showMessage("這個版本的劇情已建檔，但尚未開放。", true); return; }
-      var state = game.getState(); var progress = storyProgress(state); var key = sceneKey(chapterId, sceneId);
-      progress.claimedVersions = progress.claimedVersions || {};
-      var finalScene = sceneId === chapter.scenes[chapter.scenes.length - 1].id;
-      if (progress.completedScenes[key] && (!finalScene || progress.claimedVersions["1.0"])) { showMessage("這一幕已讀完。", false); return; }
-      if (finalScene && !chapter.scenes.slice(0, -1).every(function (item) { return Boolean(progress.completedScenes[sceneKey(chapterId, item.id)]); })) { showMessage("請先讀完前四幕。", true); return; }
-      var storyReward = { starSand: 0, characterExp: 0, starMarks: 0 };
-      progress.currentChapter = chapterId;
-      if (!progress.completedScenes[key]) progress.completedScenes[key] = { completedAt: new Date().toISOString(), starSand: 0, characterExp: 0 };
-      if (finalScene && !progress.claimedVersions["1.0"]) {
-        var oldClaims = Object.keys(progress.completedScenes).filter(function (oldKey) { return oldKey.indexOf("main-1-0:") === 0; }).map(function (oldKey) { return progress.completedScenes[oldKey]; });
-        var oldSand = oldClaims.reduce(function (sum, item) { return sum + Math.max(0, Number(item.starSand) || 0); }, 0);
-        var oldExp = oldClaims.reduce(function (sum, item) { return sum + Math.max(0, Number(item.characterExp) || 0); }, 0);
-        storyReward.starSand = Math.max(0, data.storyVersionReward.starSand - oldSand);
-        storyReward.characterExp = Math.max(0, data.storyVersionReward.characterExp - oldExp);
-        storyReward.starMarks = data.storyVersionReward.starMarks;
-        state.resources.starSand += storyReward.starSand; state.resources.characterExp += storyReward.characterExp; state.resources.starMarks += storyReward.starMarks;
-        progress.claimedVersions["1.0"] = { claimedAt: new Date().toISOString(), reward: storyReward };
-      }
-      if (chapterId === "main-1-0" && progress.claimedVersions["1.0"] && !state.recruitment.story10ChoiceClaimed) state.recruitment.story10ChoiceAvailable = true;
-      updateGameFromState(state); saveLocalState(); renderStory(); renderLobby(); renderCharacters(); showMessage(finalScene ? "版本獎勵：" + rewardText(storyReward) + "已儲存。" : "本幕已讀完；讀完第五幕可領版本獎勵。", false);
-    }
+
     var characterUpgradePending = false;
     function bulkUpgradeButton(card, copies, fromDetail) {
       if (!copies) return "";
@@ -1338,14 +766,10 @@
     }
     function breakthroughCharacter(cardId) {
       currentCharacterId = cardId;
-      if (remoteMode) { apiRequest("/api/player/character-breakthrough", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderBoss(); renderLobby(); showMessage("角色已完成 80 等突破，可以繼續升到 90 等。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
-      try { game.breakthroughCharacter({ cardId: cardId }); saveLocalState(); renderCharacters(); renderBoss(); renderLobby(); showMessage("角色已完成 80 等突破，可以繼續升到 90 等。", false); } catch (error) { showMessage(error.message, true); }
+      if (remoteMode) { apiRequest("/api/player/character-breakthrough", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderBoss(); renderLobby(); showMessage("角色已完成80等突破，可繼續升至目前星階上限。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
+      try { game.breakthroughCharacter({ cardId: cardId }); saveLocalState(); renderCharacters(); renderBoss(); renderLobby(); showMessage("角色已完成80等突破，可繼續升至目前星階上限。", false); } catch (error) { showMessage(error.message, true); }
     }
-    function enhanceConstellation(cardId) {
-      currentCharacterId = cardId;
-      if (remoteMode) { apiRequest("/api/player/character-constellation", { cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderCharacters(); renderLobby(); showMessage("命座提升完成，進度已儲存。", false); }).catch(function (error) { showMessage(error.message, true); }); return; }
-      try { game.enhanceConstellation({ cardId: cardId }); saveLocalState(); renderCharacters(); renderLobby(); showMessage("命座提升完成，進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); }
-    }
+
     function claimCharacterChoice(rewardKey, cardId) {
       if (remoteMode) {
         apiRequest("/api/player/claim-character", { rewardKey: rewardKey, cardId: cardId }).then(function (payload) { updateGameFromState(payload.state); renderLobby(); renderCharacters(); renderTrial(); showMessage("已取得 " + payload.card.name + "，角色自選獎勵已儲存。", false); }).catch(function (error) { showMessage(error.message, true); });
@@ -1399,6 +823,7 @@
       ({ trial: renderTrial, boss: renderBoss, dispatch: renderDispatch, voyage: renderVoyage })[mode]();
     }
     function enemyArtFor(enemy) {
+      var regional=window.StarshipMonsterCatalog&&window.StarshipMonsterCatalog.find(enemy);if(regional)return regional.image;
       var approvedMonsterArt = {
         "黑晶異變巨獸": "./assets/enemies/black-crystal-beast.webp",
         "黑晶棘背獸": "./assets/enemies/black-crystal-spine-beast.webp",
@@ -1456,7 +881,7 @@
     }
     function battleArenaMarkup(frame, previous, state) {
       if (!frame) return "";
-      var opening = !previous || previous.halfName !== frame.halfName || !frame.actorId;
+      var opening = !previous || previous.halfName !== frame.halfName || (!frame.actorId && !frame.support);
       if (opening) previous = frame;
       var actor = (frame.actorIsEnemy ? frame.enemies : frame.team).find(function (unit) { return String(unit.id) === String(frame.actorId); });
       var eventText = opening ? "雙方就位，準備交戰。" : (frame.events || []).find(function (line) { return /使用|發動|攻擊|回覆|護盾|閃避|失誤/.test(line); }) || (frame.events || [])[0] || "準備交戰";
@@ -1485,8 +910,9 @@
         var acting = !opening && actor && String(unit.id) === String(actor.id) && isEnemy === Boolean(frame.actorIsEnemy);
         var hurt = !opening && old && (unit.hp < old.hp || unit.shield < old.shield);
         var guarded = !opening && old && (unit.hp > old.hp || unit.shield > old.shield);
-        var pose = unit.hp <= 0 ? "down" : acting ? "attack" : hurt ? "hurt" : guarded ? "guard" : "idle";
-        var art = atlas ? "<span class=\"battle-action-sprite " + atlas + " " + pose + "\" aria-hidden=\"true\"></span>" : "<img src=\"" + escapeHtml(image) + "\" alt=\"\">";
+        var pose = unit.hp <= 0 ? "down" : acting ? (frame.actionType === "charge" ? "charge" : frame.actionType === "guard" || frame.actionType === "support" ? "guard" : "attack") : hurt ? "hurt" : guarded ? "guard" : "idle";
+        var monster = isEnemy && typeof window !== "undefined" && window.StarshipMonsterCatalog && window.StarshipMonsterCatalog.find(unit);
+        var art = monster ? window.StarshipMonsterMotion.markup(unit,pose,frame.actionType) : atlas ? "<span class=\"battle-action-sprite " + atlas + " " + pose + "\" aria-hidden=\"true\"></span>" : "<img src=\"" + escapeHtml(image) + "\" alt=\"\">";
         var slot = Math.max(1, Math.min(4, Number(unit.slot || index + 1)));
         return "<div class=\"battle-arena-fighter position-slot-" + slot + (acting ? " acting" : "") + (hurt ? " targeted" : "") + (unit.hp <= 0 ? " down" : "") + "\" aria-label=\"" + escapeHtml(name(unit, isEnemy) + "，生命 " + unit.hp + " / " + unit.maxHp) + "\"><div class=\"battle-arena-figure\">" + art + "</div><strong>" + escapeHtml(name(unit, isEnemy)) + "</strong><div class=\"battle-arena-health\"><i style=\"width:" + battleHealthPercent(unit) + "%\"></i></div></div>";
       }
@@ -1500,7 +926,7 @@
       var actorId = frame && frame.actorId || ""; var actorIsEnemy = frame && frame.actorIsEnemy; var hitIds = [];
       if (frame && previous && frame.halfName === previous.halfName) frame.team.concat(frame.enemies).forEach(function (unit) { var before = previous.team.concat(previous.enemies).find(function (item) { return item.id === unit.id; }); if (before && (before.hp !== unit.hp || before.shield !== unit.shield)) hitIds.push(String(unit.id || unit.name)); });
       var title = stage && stage.name ? stage.name : battle.stageName || "自走棋戰鬥"; var environment = battle.environment || stage && stage.environment || "一般戰鬥"; var rule = battle.enemyTrait || stage && stage.enemyTrait || "一般特性"; var misses = battle.misses || { team: 0, enemy: 0 };
-      return "<section class=\"battle-scene " + resultClass + (timeline.length ? " battle-timeline-active" : "") + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (frame ? "LIVE ACTION" : battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>戰鬥演出 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」 · 我方失誤 " + number(misses.team || 0) + " 次／敵方失誤 " + number(misses.enemy || 0) + " 次</small></div><span class=\"battle-round-badge\">" + (frame ? (frame.halfName ? escapeHtml(frame.halfName) + " · " : "") + "第 " + number(frame.round) + " 回合 · 行動 " + (frameIndex + 1) + "/" + timeline.length : "第 " + number(battle.rounds || 0) + " 回合") + "</span></div>" + battleArenaMarkup(frame, previous, state) + "<div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit, index) { return battleUnitMarkup(unit, state, false, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>" + (frame ? "正在交戰" : "自動演算") + "</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit, index) { return battleUnitMarkup(unit, state, true, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>" + (frame ? escapeHtml(frame.actorName || "戰況更新") + " 的行動" : "戰鬥事件") + "</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div>" + (timeline.length ? "<div class=\"battle-replay-controls\"><button class=\"small-button\" type=\"button\" data-trial-playback-toggle>" + (trialPlaybackTimer ? "暫停" : trialPlaybackPaused ? "繼續播放" : frameIndex >= timeline.length - 1 ? "重新播放" : "播放") + "</button><button class=\"small-button\" type=\"button\" data-trial-playback-skip>顯示結果</button><span data-trial-playback-status>逐行動同步顯示 HP、護盾與戰鬥事件</span></div>" : "") + "</section>";
+      return "<section class=\"battle-scene " + resultClass + (timeline.length ? " battle-timeline-active" : "") + "\"><div class=\"battle-scene-head\"><div><span class=\"eyebrow\">" + escapeHtml(mode || "AUTO CHESS") + " / " + (frame ? "LIVE ACTION" : battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "LIVE RESULT") + "</span><strong>戰鬥演出 · " + escapeHtml(title) + "</strong><small>環境「" + escapeHtml(environment) + "」 · 敵方特性「" + escapeHtml(rule) + "」 · 我方失誤 " + number(misses.team || 0) + " 次／敵方失誤 " + number(misses.enemy || 0) + " 次</small></div><span class=\"battle-round-badge\">" + (frame ? (frame.halfName ? escapeHtml(frame.halfName) + " · " : "") + "第 " + number(frame.round) + " 回合 · 行動 " + (frameIndex + 1) + "/" + timeline.length : "第 " + number(battle.rounds || 0) + " 回合") + "</span></div>" + window.StarshipPetBannerUI.battleBar(battle.companions || [], data.petDefinitions, data.cards) + battleArenaMarkup(frame, previous, state) + "<div class=\"battle-scene-board\"><div class=\"battle-side ally-side\"><div class=\"battle-side-heading\"><span>YOUR SQUAD</span><strong>我方編隊 <b>" + team.length + " 人</b></strong></div><div class=\"battle-unit-grid\">" + (team.length ? team.map(function (unit, index) { return battleUnitMarkup(unit, state, false, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">沒有參戰角色</p>") + "</div></div><div class=\"battle-versus\"><span>VS</span><i></i><small>" + (frame ? "正在交戰" : "自動演算") + "</small></div><div class=\"battle-side enemy-side\"><div class=\"battle-side-heading\"><span>ENEMY FORMATION</span><strong>敵方編隊 <b>" + enemies.length + " 體</b></strong></div><div class=\"battle-unit-grid\">" + (enemies.length ? enemies.map(function (unit, index) { return battleUnitMarkup(unit, state, true, index, actorId, actorIsEnemy, hitIds); }).join("") : "<p class=\"battle-empty\">敵方已全數撤退</p>") + "</div></div></div><div class=\"battle-scene-feed\"><div><span class=\"eyebrow\">TACTICAL FEED</span><strong>" + (frame ? escapeHtml(frame.actorName || "戰況更新") + " 的行動" : "戰鬥事件") + "</strong></div><div class=\"battle-feed-list\">" + (highlights.length ? highlights.map(function (line, index) { return "<p><b>" + String(index + 1).padStart(2, "0") + "</b>" + escapeHtml(battleLogText(line, team)) + "</p>"; }).join("") : "<p><b>—</b>本次戰鬥沒有額外事件。</p>") + "</div></div>" + (timeline.length ? "<div class=\"battle-replay-controls\"><button class=\"small-button\" type=\"button\" data-trial-playback-toggle>" + (trialPlaybackTimer ? "暫停" : trialPlaybackPaused ? "繼續播放" : frameIndex >= timeline.length - 1 ? "重新播放" : "播放") + "</button><button class=\"small-button\" type=\"button\" data-trial-playback-skip>顯示結果</button><span data-trial-playback-status>逐行動同步顯示 HP、護盾與戰鬥事件</span></div>" : "") + "</section>";
     }
     function decorateTrialMythic(stage) {
       if (!stage || !stage.mythicTheme) return;
@@ -1537,6 +963,7 @@
       var reward = battle.won ? "本次獎勵：+" + number(Number(stage.reward && stage.reward.starSand || data.trialReward && data.trialReward.starSand || 0)) + " 星砂、+" + number(rewardExp) + " 角色經驗" : timedOut || !halvesComplete ? "本次未完成上下半場，未扣挑戰次數" : stage.maxChallengeAttempts ? "上下半場已結算一次挑戰，剩餘 " + Math.max(0, attemptLimit - usedAttempts) + " 次" : "本次未通關，不會扣除挑戰次數";
       var halfSummary = stage.halves && Array.isArray(battle.halfResults) ? "｜" + battle.halfResults.map(function (half) { return half.name + (half.won ? "通過" : half.status === "timeout" ? "未完成" : "未通過"); }).join("／") : "";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
+
       var environment = battle.environment ? "環境「" + battle.environment + "」" : "";
       var referencePower = Number(stage.recommendedPower || battle.recommendedPower || 0);
       var benchmarkPower = Number(stage.targetPower || referencePower);
@@ -1658,7 +1085,7 @@
         if (stage.halves) {
           var halfBattles = stage.halves.map(function (half, index) { return window.StarshipBattle.simulateBattle({ team: index === 0 ? currentTrialUpperTeam : currentTrialLowerTeam, stats: effectiveStats, stage: Object.assign({}, stage, { name: stage.name + "・" + half.name, enemies: half.enemies }), captureTimeline: true }); });
           var allWon = halfBattles.every(function (result) { return result.won; });
-          battle = Object.assign({}, halfBattles[0], { won: allWon, status: allWon ? "won" : halfBattles.some(function (result) { return result.status === "timeout"; }) ? "timeout" : "defeat", timedOut: halfBattles.some(function (result) { return result.timedOut; }), challengeComplete: halfBattles.length === stage.halves.length && halfBattles.every(function (result) { return result.status !== "timeout"; }), stageId: stage.id, stageName: stage.name, rounds: halfBattles.reduce(function (sum, result) { return sum + result.rounds; }, 0), teamPower: halfBattles.reduce(function (sum, result) { return sum + result.teamPower; }, 0), team: halfBattles.reduce(function (all, result) { return all.concat(result.team); }, []), enemies: halfBattles.reduce(function (all, result) { return all.concat(result.enemies); }, []), logs: halfBattles.reduce(function (all, result, index) { return all.concat(["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"], result.logs); }, []), halfResults: halfBattles.map(function (result, index) { return { name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds }; }), timeline: halfBattles.reduce(function (all, result, index) { return all.concat((result.timeline || []).map(function (frame) { return Object.assign({}, frame, { halfName: stage.halves[index].name }); })); }, []) });
+          battle = Object.assign({}, halfBattles[0], { won: allWon, status: allWon ? "won" : halfBattles.some(function (result) { return result.status === "timeout"; }) ? "timeout" : "defeat", timedOut: halfBattles.some(function (result) { return result.timedOut; }), challengeComplete: halfBattles.length === stage.halves.length && halfBattles.every(function (result) { return result.status !== "timeout"; }), stageId: stage.id, stageName: stage.name, rounds: halfBattles.reduce(function (sum, result) { return sum + result.rounds; }, 0), teamPower: halfBattles.reduce(function (sum, result) { return sum + result.teamPower; }, 0), team: halfBattles.reduce(function (all, result) { return all.concat(result.team); }, []), companions: halfBattles.reduce(function (all, result) { return all.concat(result.companions || []); }, []), enemies: halfBattles.reduce(function (all, result) { return all.concat(result.enemies); }, []), logs: halfBattles.reduce(function (all, result, index) { return all.concat(["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"], result.logs); }, []), halfResults: halfBattles.map(function (result, index) { return { name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds }; }), timeline: halfBattles.reduce(function (all, result, index) { return all.concat((result.timeline || []).map(function (frame) { return Object.assign({}, frame, { halfName: stage.halves[index].name }); })); }, []) });
         } else battle = window.StarshipBattle.simulateBattle({ team: battleTeam, stats: effectiveStats, stage: stage, captureTimeline: true });
         progress.selectedTeam = battleTeam.slice(); if (stage.halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } progress.lastBattle = battle;
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; state.recruitment.trial10ChoiceAvailable = false; }
@@ -1680,6 +1107,8 @@
       var stage = bossStageById(battle.stageId) || {}; var reward = stage.reward || {}; var timedOut = battle.status === "timeout" || battle.timedOut === true;
       var rewardCopy = battle.won ? "本次獎勵：+" + number(reward.amount || 0) + " " + escapeHtml(reward.materialName || "突破材料") + "、+" + number(reward.universalAmount || 1) + " 星界通用突破印記、+" + number(reward.characterExp || 0) + " 角色經驗" : timedOut ? "本次戰鬥超過演算上限，未判定通關，不會取得突破材料" : "本次未通關，不會取得突破材料";
       var synergy = battle.synergy === undefined ? "—" : Math.round(Number(battle.synergy) * 100) + "%";
+      if(battle.equipmentDrop)rewardCopy+='｜掉落 '+window.StarshipEquipment.name(battle.equipmentDrop)+'（'+battle.equipmentDrop.rarity+'★）';
+
       container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">BOSS REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "Boss 挑戰成功" : timedOut ? "Boss 戰鬥超時" : "Boss 挑戰失敗") + " · " + escapeHtml(stage.name || "Boss") + " · " + battle.rounds + " 回合</strong><small>" + rewardCopy + "｜隊伍協同 " + escapeHtml(synergy) + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "BOSS") + "<details><summary>查看完整 Boss 自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function renderBoss() {
@@ -1693,6 +1122,7 @@
       byId("boss-view-status").textContent = current.name + " · " + attempts + " / " + maxRewards + " 次";
       byId("boss-stages").innerHTML = bosses.map(function (stage) { var count = bossAttempts(state, stage.id); return "<button class=\"trial-stage-button boss-stage-button " + (stage.id === current.id ? "active " : "") + (count >= maxRewards ? "cleared" : "") + "\" data-boss-stage=\"" + escapeHtml(stage.id) + "\" type=\"button\"><span class=\"trial-stage-number\">" + escapeHtml(stage.bossLevel ? "L" + stage.bossLevel : "♢") + "</span><span><strong>" + escapeHtml(stage.name) + "</strong><small>" + escapeHtml(stage.region) + " · Boss Lv." + number(stage.bossLevel || 1) + " · 參考 " + number(stage.recommendedPower) + "</small></span><em>" + count + "/" + maxRewards + "</em></button>"; }).join("");
       byId("boss-stage-details").innerHTML = "<div class=\"trial-stage-kicker\"><span>BOSS LEVEL " + number(current.bossLevel || 1) + "</span><span>" + escapeHtml(current.region) + "</span></div><h3>" + escapeHtml(current.name) + "</h3><p>" + escapeHtml(current.description || "挑戰 Boss 取得角色突破材料。") + "</p><div class=\"trial-rule-callout\"><strong>獎勵檔位｜Boss Lv." + number(current.bossLevel || 1) + "</strong><span>等級越高，專屬材料、通用突破印記與角色經驗越多；參考戰力不是突破門檻。</span><strong>環境｜" + escapeHtml(current.environment || "一般 Boss 戰") + "</strong><span>" + escapeHtml(current.environmentEffect || "觀察首領特性並安排隊伍。") + "</span><strong>敵方特性｜" + escapeHtml(current.enemyTrait || "一般") + "</strong><span>" + escapeHtml(current.enemyTraitEffect || "沒有額外特性。") + "</span></div><div class=\"trial-detail-stats\"><span>參考戰力 <b>" + number(current.recommendedPower) + "</b></span><span>勝利獎勵 <b>" + number(reward.amount || 0) + " " + escapeHtml(reward.materialName || "突破材料") + " + " + number(reward.universalAmount || 1) + " 通用印記 + " + number(reward.characterExp || 0) + " 經驗</b></span><span>本版本挑戰 <b>" + attempts + " / " + maxRewards + " 次</b></span></div>";
+      byId('boss-stage-details').insertAdjacentHTML('beforeend','<p class="boss-equipment-rates">裝備掉落：每次有效勝利 1 件｜'+window.StarshipEquipment.getRates(current.bossLevel).map(function(rate,index){return (index+1)+'★ '+rate+'%';}).join(' ／ ')+'</p>');
       if (byId("boss-enemy-intel")) byId("boss-enemy-intel").innerHTML = "<div class=\"enemy-intel-heading\"><div><span class=\"eyebrow\">BOSS INTEL</span><strong>首領情報</strong></div><small>不同角色需要的突破材料，來自不同 Boss</small></div><div class=\"enemy-intel-grid\">" + renderEnemyIntel(current) + "</div>";
       var materials = "<span>星界通用突破印記 <b>" + number(state.breakthroughMaterials["universal-core"] || 0) + "</b></span>" + (data.bossStages || []).map(function (stage) { var item = stage.reward || {}; return "<span>" + escapeHtml(item.materialName || "突破材料") + " <b>" + number(state.breakthroughMaterials[item.materialId] || 0) + "</b></span>"; }).filter(function (value, index, list) { return list.indexOf(value) === index; }).join("");
       if (byId("boss-material-inventory")) byId("boss-material-inventory").innerHTML = materials;
@@ -1717,7 +1147,7 @@
       var boss = bossStageById(currentBossStageId); if (!boss) return;
       var maxRewards = data.bossMaxRewards || 10;
       if (remoteMode) {
-        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : timedOut ? "Boss 戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam, requestId: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : "boss-"+Date.now()+"-"+Math.random().toString(36).slice(2) }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : timedOut ? "Boss 戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
@@ -1725,6 +1155,7 @@
         if (currentBossTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
         var battle = window.StarshipBattle.simulateBattle({ team: currentBossTeam, stats: effectiveBattleStats(state), stage: boss }); progress.selectedBossId = boss.id; progress.selectedTeam = currentBossTeam.slice(); progress.lastBattle = battle;
         if (battle.won) { progress.attempts[boss.id] = attempts + 1; state.breakthroughMaterials[boss.reward.materialId] = Number(state.breakthroughMaterials[boss.reward.materialId] || 0) + Number(boss.reward.amount || 0); state.breakthroughMaterials["universal-core"] = Number(state.breakthroughMaterials["universal-core"] || 0) + Number(boss.reward.universalAmount || 1); state.resources.characterExp += Number(boss.reward.characterExp || 0); }
+        if(battle.won)battle.equipmentDrop=window.StarshipEquipment.grantBossDrop(state,boss,Math.random);
         updateGameFromState(state); saveLocalState(); renderBoss(); renderCharacters(); renderLobby(); showMessage(battle.won ? "Boss 挑戰成功：已獲得 " + boss.reward.amount + " " + boss.reward.materialName + " 與 " + boss.reward.characterExp + " 角色經驗。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !battle.won);
       } catch (error) { showMessage(error.message, true); }
     }
@@ -1989,7 +1420,7 @@
     function petDefinitionById(id) { return (data.petDefinitions || []).find(function (item) { return item.id === id; }); }
     function petOutfitById(id) { return (data.petOutfits || []).find(function (item) { return item.id === id; }); }
     function petEffectById(id) { return (data.petEffects || []).find(function (item) { return item.id === id; }); }
-    function petChallengeById(id) { return (data.petChallenges || []).find(function (item) { return item.id === id; }); }
+
     function petResourceLabel(id) { return ({ petFood: "飼料", petToys: "玩具", petTokens: "星伴代幣", showcaseToken: "展示徽章" })[id] || id; }
     function petActionMessage(text, isError) { var target = byId("pet-action-message"); if (target) { target.textContent = text; target.className = isError ? "message error" : "message"; } }
     var PET_ART_VERSION = "pet-customization-20260920";
@@ -2055,6 +1486,7 @@
       return "<svg class=\"" + svgClass + "\" viewBox=\"0 0 220 180\" role=\"img\" aria-label=\"" + escapeHtml(definition.name || "星伴") + "的專屬外觀\" style=\"--pet-art-base:" + escapeHtml(definition.accent || "#b897e8") + ";--pet-art-outfit:" + escapeHtml(outfit.accent || definition.accent || "#9e92ff") + ";--pet-art-effect:" + escapeHtml(effect.color || "#f4c66b") + "\"><ellipse class=\"pet-art-shadow\" cx=\"111\" cy=\"164\" rx=\"58\" ry=\"8\"/>" + art + outfitMarkup + "<circle class=\"pet-art-spark\" cx=\"180\" cy=\"124\" r=\"4\"/><circle class=\"pet-art-spark\" cx=\"48\" cy=\"44\" r=\"3\"/></svg>";
     }
     function petCardMarkup(definition, pet, selected) {
+      if(selected && window.StarshipPetGrowthUI) return window.StarshipPetGrowthUI.markup(game.getState(),definition,window.StarshipPetSystem,Object.values(data.cards),petArtMarkup(definition,petOutfitById(currentPetOutfitId)||{},petEffectById(currentPetEffectId)||{},false));
       var petState = petProgressState(game.getState());
       var outfit = petOutfitById(currentPetOutfitId || petState.selectedOutfitId || (petState.showcase || {}).outfitId) || (data.petOutfits || [])[0] || {};
       var effect = petEffectById(currentPetEffectId || petState.selectedEffectId || (petState.showcase || {}).effectId) || (data.petEffects || [])[0] || {};
@@ -2081,17 +1513,18 @@
       byId("pet-view-status").textContent = (progress.showcase.isPublic ? "公開展示中" : "私人收藏") + " · " + selected.name;
       byId("pet-food").textContent = number(progress.resources.petFood); byId("pet-toys").textContent = number(progress.resources.petToys); byId("pet-tokens").textContent = number(progress.resources.petTokens); byId("pet-showcase-reward").textContent = number(progress.resources.showcaseToken || 0);
       var daily = progress.daily || { challengeCount: 0, groomed: false };
-      var challengeMarkup = "<section class=\"pet-challenge-panel\"><div class=\"pet-panel-heading\"><div><p class=\"eyebrow\">COMPANION ACTIVITIES</p><h3>星伴挑戰</h3></div><span>" + Number(daily.challengeCount || 0) + " / 3 今日挑戰</span></div><p class=\"pet-challenge-copy\">每天可完成三種不同的小任務，消耗的是寵物專用資源；完成後會給大量寵物經驗與回饋，不會動用星砂或角色資源。</p><div class=\"pet-challenge-grid\">" + (data.petChallenges || []).map(function (challenge) { var challengeReward = challenge.reward || {}; return "<button class=\"pet-challenge-button\" data-pet-action=\"challenge\" data-pet-id=\"" + escapeHtml(selected.id) + "\" data-pet-challenge=\"" + escapeHtml(challenge.id) + "\" type=\"button\"><strong>" + escapeHtml(challenge.name) + "</strong><small>" + escapeHtml(challenge.description) + "</small><em>消耗 " + Number(challenge.costAmount || 1) + " " + escapeHtml(petResourceLabel(challenge.cost)) + " · +" + Number(challengeReward.petExp || 0) + " 寵物經驗</em></button>"; }).join("") + "</div></section>";
+      var challengeMarkup = "<section class=\"pet-challenge-panel\"><div class=\"pet-panel-heading\"><div><p class=\"eyebrow\">COMPANION ACTIVITIES</p><h3>星伴挑戰</h3></div><span>" + Number(daily.challengeCount || 0) + " / 3 今日挑戰</span></div><p class=\"pet-challenge-copy\">每天可完成三次小任務，消耗的是寵物專用資源；完成後會給大量寵物經驗與回饋，不會動用星砂或角色資源。</p><div class=\"pet-challenge-grid\">" + (data.petChallenges || []).map(function (challenge) { var challengeReward = challenge.reward || {}; return "<button class=\"pet-challenge-button\" data-pet-action=\"challenge\" data-pet-id=\"" + escapeHtml(selected.id) + "\" data-pet-challenge=\"" + escapeHtml(challenge.id) + "\" type=\"button\"><strong>" + escapeHtml(challenge.name) + "</strong><small>" + escapeHtml(challenge.description) + "</small><em>消耗 " + Number(challenge.costAmount || 1) + " " + escapeHtml(petResourceLabel(challenge.cost)) + " · +" + Number(challengeReward.petExp || 0) + " 寵物經驗</em></button>"; }).join("") + "</div></section>";
       byId("pet-selected-card").innerHTML = petCardMarkup(selected, pet, true) + "<div class=\"pet-action-row\"><button class=\"primary-action\" data-pet-action=\"feed\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">餵食　1 飼料</button><button class=\"secondary-action\" data-pet-action=\"play\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">玩耍　1 玩具</button><button class=\"secondary-action\" data-pet-action=\"groom\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">" + (daily.groomed ? "今日已梳理" : "梳理　每日一次") + "</button><button class=\"secondary-action\" data-pet-action=\"explore\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">外出探索（本期 " + Number(progress.exploreCount || 0) + " / 3）</button></div><div class=\"pet-training-row\"><span>訓練方向</span><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"care\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">照護　1 代幣</button><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"play\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">玩耍　1 代幣</button><button class=\"secondary-action\" data-pet-action=\"train\" data-pet-focus=\"focus\" data-pet-id=\"" + escapeHtml(selected.id) + "\" type=\"button\">專注　1 代幣</button></div>" + challengeMarkup;
       byId("pet-public-toggle").checked = progress.showcase.isPublic === true;
       byId("pet-outfit-list").innerHTML = "<div class=\"pet-option-heading\">裝扮｜會加入可見的獨立配件圖層</div>" + (data.petOutfits || []).map(function (outfit) { return "<button class=\"pet-option-button " + (currentPetOutfitId === outfit.id ? "active" : "") + "\" data-pet-outfit=\"" + escapeHtml(outfit.id) + "\" type=\"button\"><span class=\"pet-option-swatch\" style=\"--option-accent:" + escapeHtml(outfit.accent || "#9e92ff") + "\">" + escapeHtml(outfit.icon || "✦") + "</span><strong>" + escapeHtml(outfit.name) + "</strong><small>" + escapeHtml(outfit.description) + "</small></button>"; }).join("");
       byId("pet-effect-list").innerHTML = "<div class=\"pet-option-heading\">出場特效｜只增加展示層，不改變寵物立繪畫質</div>" + (data.petEffects || []).map(function (effect) { return "<button class=\"pet-option-button " + (currentPetEffectId === effect.id ? "active" : "") + "\" data-pet-effect=\"" + escapeHtml(effect.id) + "\" type=\"button\"><span class=\"pet-option-swatch\" style=\"--option-accent:" + escapeHtml(effect.color || "#f4c66b") + "\">" + escapeHtml(effect.icon || "✦") + "</span><strong>" + escapeHtml(effect.name) + "</strong><small>" + escapeHtml(effect.description) + "</small></button>"; }).join("");
       byId("pet-catalog-count").textContent = Object.keys(progress.pets).filter(function (id) { return progress.pets[id] && progress.pets[id].owned; }).length + " / " + definitions.length;
-      byId("pet-catalog-list").innerHTML = definitions.map(function (definition) { var saved = progress.pets[definition.id]; var owned = saved && saved.owned; return "<button class=\"pet-catalog-card " + (owned ? "owned" : "locked") + (definition.id === selected.id ? " selected" : "") + "\" data-pet-select=\"" + escapeHtml(definition.id) + "\" type=\"button\"><span class=\"pet-catalog-icon\" style=\"--pet-accent:" + escapeHtml(definition.accent || "#9e92ff") + "\">" + escapeHtml(definition.icon) + "</span><span><strong>" + escapeHtml(definition.name) + "</strong><small>" + escapeHtml(definition.temperament) + (owned ? " · Lv." + saved.level : " · 尚未領養") + "</small></span><em>" + (owned ? "選擇" : "領養 3 代幣") + "</em></button>"; }).join("");
+      byId("pet-catalog-list").innerHTML = definitions.map(function (definition) { var saved = progress.pets[definition.id]; var owned = saved && saved.owned; return "<button class=\"pet-catalog-card " + (owned ? "owned" : "locked") + (definition.id === selected.id ? " selected" : "") + "\" data-pet-select=\"" + escapeHtml(definition.id) + "\" "+(!owned&&definition.rarity===4?"disabled":"")+" type=\"button\"><span class=\"pet-catalog-icon\" style=\"--pet-accent:" + escapeHtml(definition.accent || "#9e92ff") + "\">" + '<img src="'+escapeHtml(definition.image)+'" alt="" loading="lazy">' + "</span><span><strong>" + escapeHtml(definition.name) + "</strong><small>" + escapeHtml(definition.temperament) + (owned ? " · Lv." + saved.level : " · 尚未領養") + "</small></span><em>" + (owned ? "選擇" : definition.rarity===4?"限定池取得":"領養 3 代幣") + "</em></button>"; }).join("");
       renderPetShowcases();
     }
     function runPetAction(action, petId, focus, challengeId) {
       if (!game || !currentPlayerName) { showGate(); return; }
+      if(runPetAction.busy)return;
       var request = { action: action, petId: petId || currentPetId, focus: focus || "focus", challengeId: challengeId || "" };
       function successMessage(result, local) {
         var reward = result && result.reward || {};
@@ -2104,7 +1537,7 @@
         var suffix = parts.length ? "（" + parts.join("、") + "）" : "";
         return action === "adopt" ? "寵物已加入星伴工坊。" : action === "select" ? "已切換出場寵物。" : (reward.challengeName ? "完成「" + reward.challengeName + "」" : "寵物培育完成") + suffix + (local ? "，進度已儲存到這個瀏覽器。" : "，進度已儲存。");
       }
-      if (remoteMode) { apiRequest("/api/player/pet-action", request).then(function (payload) { updateGameFromState(payload.state); renderPets(); renderLobby(); petActionMessage(successMessage(payload, false), false); }).catch(function (error) { petActionMessage(error.message, true); }); return; }
+      if (remoteMode) { runPetAction.busy=true;renderPets();apiRequest("/api/player/pet-action", request).then(function (payload) { updateGameFromState(payload.state); renderPets(); renderLobby(); petActionMessage(successMessage(payload, false), false); }).catch(function (error) { petActionMessage(error.message, true); }); return; }
       try { var result = game.petAction(request); updateGameFromState(result.state); saveLocalState(); renderPets(); petActionMessage(successMessage(result, true), false); } catch (error) { petActionMessage(error.message, true); }
     }
     function savePetShowcase() {
@@ -2121,11 +1554,16 @@
       if (!remoteMode) { petActionMessage("本機存檔模式沒有其他玩家展示；部署到線上網址後才能評分。", true); return; }
       apiRequest("/api/player/pet-showcase", { action: "rate", targetKey: targetKey, rating: Number(rating) }).then(function (payload) { updateGameFromState(payload.state); renderPets(); loadPetShowcases(); petActionMessage("評分完成：獲得 +1 飼料。作品擁有者也會收到小獎勵。", false); }).catch(function (error) { petActionMessage(error.message, true); });
     }
+    function ascensionRewardsText(results){
+      var counts={lower:0,upper:0};(Array.isArray(results)?results:[]).forEach(function(item){var mark=item&&item.duplicateReward&&item.duplicateReward.ascensionMark;if(mark&&Object.prototype.hasOwnProperty.call(counts,mark.key)&&Number.isSafeInteger(mark.amount)&&mark.amount>0)counts[mark.key]+=mark.amount;});
+      return ['lower','upper'].filter(function(key){return counts[key]>0;}).map(function(key){return window.StarshipStarAscension.labels[key]+' +'+counts[key];}).join('、');
+    }
     function rewardText(reward) {
       var parts = [];
       if (reward && reward.starSand) { parts.push("+" + reward.starSand + " 星砂"); }
       if (reward && reward.starMarks) { parts.push("+" + reward.starMarks + " 星痕"); }
       if (reward && reward.characterExp) { parts.push("+" + reward.characterExp + " 角色經驗"); }
+      if(reward&&reward.ascensionMark){parts.push('+'+reward.ascensionMark.amount+' '+window.StarshipStarAscension.labels[reward.ascensionMark.key]);}
       if (reward && reward.constellationCore) { parts.push("+" + reward.constellationCore + " 該角色命座晶核"); }
       if (reward && reward.petFood) { parts.push("+" + reward.petFood + " 寵物飼料"); }
       if (reward && reward.petToys) { parts.push("+" + reward.petToys + " 寵物玩具"); }
@@ -2148,11 +1586,12 @@
       var imageStyle = "--accent:" + escapeHtml(card.accent || "#8f7cff");
       var cardImage = characterPortraitSource(card, game && game.getState());
       if (cardImage) { imageStyle += ";--card-image:url('" + escapeHtml(cardImage) + "')"; }
-      return "<article class=\"result-card rarity-" + card.rarity + (item.featured ? " featured" : "") + "\"><div class=\"card-art\" style=\"" + imageStyle + "\"><div class=\"card-watermark\">星律</div><div class=\"card-element\">" + escapeHtml(card.element) + "</div><div class=\"card-stars\">" + "★".repeat(card.rarity) + "</div><div class=\"card-name\"><strong>" + escapeHtml(card.name) + "</strong><span>" + escapeHtml(card.romanizedName) + "</span></div></div><div class=\"result-meta\"><span>第 " + item.pityPullNumber + " 抽判定</span>" + tag + "</div><div class=\"result-note\">" + escapeHtml(card.note) + "</div>" + duplicateLine + compensationLine + "</article>";
+      return "<article class=\"result-card rarity-" + card.rarity + (item.featured ? " featured" : "") + "\"><div class=\"card-art\" style=\"" + imageStyle + "\"><div class=\"card-watermark\">星律</div><div class=\"card-element\">" + escapeHtml(card.element) + "</div><div class=\"card-stars\">原生 " + "★".repeat(card.rarity) + "</div><div class=\"card-name\"><strong>" + escapeHtml(card.name) + "</strong><span>" + escapeHtml(card.romanizedName) + "</span></div></div><div class=\"result-meta\"><span>第 " + item.pityPullNumber + " 抽判定</span>" + tag + "</div><div class=\"result-note\">" + escapeHtml(card.note) + "</div>" + duplicateLine + compensationLine + "</article>";
     }
     function renderResults(outcome) {
       var summary = outcome.summary;
       var rewardSummary = (summary.bonusStarSand || summary.compensationStarSand) ? "｜額外星砂 " + number((summary.bonusStarSand || 0) + (summary.compensationStarSand || 0)) : "";
+      var starRewards=ascensionRewardsText(outcome.results);if(starRewards)rewardSummary+='｜'+escapeHtml(starRewards);
       byId("results").innerHTML = "<div class=\"result-summary\"><strong>本次召集完成</strong><span>" + summary.total + " 格｜4★ " + summary.fourStar + "｜3★ " + summary.threeStar + "｜一般回響 " + (summary.resource || 0) + "｜精選 " + summary.featured + rewardSummary + "</span></div><div class=\"result-grid\">" + outcome.results.map(cardMarkup).join("") + "</div>";
       byId("results").scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -2160,7 +1599,7 @@
       var container = byId("collection");
       container.innerHTML = rosterCards().map(function (card) {
         var copies = state.collection[card.id] || 0;
-        return "<div class=\"collection-item " + (copies ? "owned" : "locked") + "\"><span class=\"collection-rarity\">" + "★".repeat(card.rarity) + "</span><span class=\"collection-name\">" + escapeHtml(card.name) + " <small>" + escapeHtml(card.element) + "</small></span><span class=\"collection-count\">" + (copies ? "×" + copies : "未取得") + "</span></div>";
+        return "<div class=\"collection-item " + (copies ? "owned" : "locked") + "\"><span class=\"collection-rarity\">" + "★".repeat(window.StarshipStarAscension.stars(state,card)) + "</span><span class=\"collection-name\">" + escapeHtml(card.name) + " <small>" + escapeHtml(card.element) + "</small></span><span class=\"collection-count\">" + (copies ? "×" + copies : "未取得") + "</span></div>";
       }).join("");
       byId("collection-count").textContent = Object.keys(state.collection).filter(function (id) { return state.collection[id] > 0; }).length + " / " + rosterCards().length;
     }
@@ -2168,6 +1607,7 @@
       var entries = state.history.slice().reverse().slice(0, 8);
       byId("history").innerHTML = entries.length ? entries.map(function (entry) {
         var banner = bannerById(entry.bannerId); var title = banner ? banner.name : entry.bannerId; var payment = number(entry.cost || api.DEFAULT_RULES.singleCost) + " 星砂";
+        var starRewards=ascensionRewardsText(entry.results);if(starRewards)payment+='｜'+starRewards;
         return "<div class=\"history-row\"><span>" + escapeHtml(title) + "</span><span>" + entry.count + " 格｜4★ " + entry.summary.fourStar + "｜3★ " + entry.summary.threeStar + "｜" + escapeHtml(payment) + "</span></div>";
       }).join("") : "<div class=\"empty\">尚未有召集紀錄。</div>";
     }
@@ -2188,6 +1628,7 @@
       var bannerSelect = byId("banner-select"); bannerSelect.innerHTML = data.banners.filter(function (item) { return item.active !== false; }).map(function (item) { return "<option value=\"" + escapeHtml(item.id) + "\">" + escapeHtml(item.name) + "</option>"; }).join(""); bannerSelect.value = selectedBannerId;
       var featuredSelect = byId("featured-select"); featuredSelect.innerHTML = banner.type === "standard" ? "<option value=\"\">常駐池不選精選</option>" : banner.featured4Stars.map(function (candidate) { return "<option value=\"" + escapeHtml(candidate.id) + "\">" + escapeHtml(candidate.name) + "｜" + escapeHtml(candidate.element) + "｜4★</option>"; }).join(""); featuredSelect.disabled = banner.type === "standard"; if (pity.selectedFeaturedId) { featuredSelect.value = pity.selectedFeaturedId; }
       byId("featured-card").innerHTML = pity.selectedFeatured ? cardMarkup({ card: pity.selectedFeatured, pityPullNumber: "－", duplicateReward: {}, featured: true, isHardPity: false }) : "<div class=\"standard-featured\">常駐回音召集：無當期精選</div>";
+      if(featureUI)byId('featured-card').innerHTML=featureUI.featured(pity.selectedFeatured,pity.selectedFeatured?characterPortraitSource(pity.selectedFeatured,state,true):'');
       renderBackdrop(pity.selectedFeatured);
       byId("pull-one").disabled = state.resources.starSand < api.DEFAULT_RULES.singleCost; byId("pull-ten").disabled = state.resources.starSand < api.DEFAULT_RULES.tenCost; byId("exchange-featured").disabled = banner.type === "standard" || state.resources.starMarks < 10 || Boolean(state.bannerExchanges[banner.id]); byId("exchange-featured").textContent = state.bannerExchanges[banner.id] ? "本檔精選已兌換" : "10 星痕兌換精選";
       renderCollection(state); renderHistory(state);
@@ -2214,6 +1655,7 @@
       });
     }
 
+    byId('open-story').addEventListener('click',function(){showView('storybook-view');});
     byId("known-player-button").addEventListener("click", function () { setAuthMode("login"); });
     byId("new-player-button").addEventListener("click", function () { setAuthMode("register"); });
     byId("auth-back").addEventListener("click", showAuthChoice);
@@ -2234,56 +1676,17 @@
       if (remoteMode) { apiRequest("/api/player/exchange-featured", request).then(function (payload) { updateGameFromState(payload.state); byId("results").innerHTML = "<div class=\"result-summary\"><strong>兌換完成</strong><span>取得 " + escapeHtml(payload.card.name) + "（4★｜" + escapeHtml(payload.card.element) + "）</span></div>"; render(); showMessage("已使用 10 枚星痕；進度已儲存到後端。", false); }).catch(function (error) { showMessage(error.message, true); }); }
       else { try { var exchanged = game.exchangeFeatured({ bannerId: selectedBannerId }); saveLocalState(); byId("results").innerHTML = "<div class=\"result-summary\"><strong>兌換完成</strong><span>取得 " + escapeHtml(exchanged.card.name) + "（4★｜" + escapeHtml(exchanged.card.element) + "）</span></div>"; render(); showMessage("已使用 10 枚星痕；進度已儲存到這個瀏覽器。", false); } catch (error) { showMessage(error.message, true); } }
     });
-    byId("open-story").addEventListener("click", function () { showView("story-view"); });
-    byId("open-author-preview").addEventListener("click", function () { showView("author-preview-view"); });
-    byId("author-preview-story-scenes").addEventListener("click", function (event) { var button = event.target.closest("[data-author-choice]"); if (button && !button.disabled) loadAuthorPreview("answer", Number(button.getAttribute("data-author-choice"))); });
-    document.querySelector(".author-preview-story-tabs").addEventListener("click", function (event) { var button = event.target.closest("[data-author-story-version]"); if (button) showAuthorStoryVersion(button.getAttribute("data-author-story-version")); });
-    document.querySelector(".author-preview-story").addEventListener("click", function (event) {
-      var narrationButton = event.target.closest("[data-narration-action]");
-      if (narrationButton) {
-        if (!authorNarration || narrationButton.disabled || playerKey(currentPlayerName) !== "happycow") return;
-        var toolbar = narrationButton.closest("[data-narration-key]");
-        var key = toolbar.getAttribute("data-narration-key");
-        var action = narrationButton.getAttribute("data-narration-action");
-        if (action === "stop") authorNarration.stop();
-        else if (action === "pause") authorNarration.togglePause();
-        else {
-          var parts = key.split(":");
-          var source = parts[0] === "1.0" ? window.StarshipStory10Current : window.StarshipStory11Current;
-          var scene = source && source.scenes[Number(parts[1])];
-          if (scene) authorNarration.play(key, scene.title + "。\n" + scene.body, toolbar.querySelector("[data-narration-voice]").value, toolbar.querySelector("[data-narration-rate]").value);
-        }
-        return;
-      }
-      var button = event.target.closest("[data-author-preview-claim]");
-      if (!button || button.disabled) return;
-      var version = button.getAttribute("data-author-preview-claim");
-      authorPreviewRewardDemo[version] = true;
-      button.disabled = true;
-      button.textContent = "已試按領獎位置";
-      var note = button.parentElement.querySelector("small");
-      if (note) note.textContent = "版面試用完成；正式角色、進度與資源均未變動。";
-    });
-    byId("author-preview-reset").addEventListener("click", function () { if (authorNarration) authorNarration.stop(); authorPreviewLastAct = null; authorPreviewRewardDemo["1.1"] = false; loadAuthorPreview("reset"); });
-    if (window.speechSynthesis && typeof window.speechSynthesis.addEventListener === "function") window.speechSynthesis.addEventListener("voiceschanged", refreshAuthorNarrationVoices);
-    window.addEventListener("pagehide", function () { if (authorNarration) authorNarration.stop(); });
-    byId("author-preview-map-reset").addEventListener("click", function () { authorAtlasMapId = "W-001"; authorAtlasPointId = ""; renderAuthorMapPreview(); });
-    byId("author-preview-map").addEventListener("click", function (event) {
-      var target = event.target.closest("[data-map-go]");
-      if (!target || !globalThis.StarshipInteractiveMap) return;
-      var id = target.getAttribute("data-map-go");
-      if (id.charAt(0) === "#") authorAtlasPointId = id;
-      else if (globalThis.StarshipInteractiveMap.maps[id]) { authorAtlasMapId = id; authorAtlasPointId = ""; }
-      else return;
-      authorAtlasVisited.add(authorAtlasMapId + authorAtlasPointId);
-      renderAuthorMapPreview();
-      if (event.detail === 0 && id.charAt(0) === "#") { var authorFocus = Array.from(byId("author-preview-map").querySelectorAll("[data-map-go]")).find(function (button) { return button.getAttribute("data-map-go") === id; }); if (authorFocus) authorFocus.focus(); }
-    });
-    byId("author-preview-2x-setup").addEventListener("click", function (event) { if (event.target.closest("#author-preview-2x-run")) runAuthorBattlePreview(); });
-    byId('world-home-button').addEventListener('click',enterWorldHome);
-    byId('world-menu-toggle').addEventListener('click',function(){renderLobby();pauseWorld();byId('world-main-menu').showModal();byId('world-menu-close').focus();});
+
+
+    byId('world-home-button').addEventListener('click',enterLobby);
+    document.querySelectorAll('[data-hub-view]').forEach(function(button){button.addEventListener('click',function(){
+      var target=button.getAttribute('data-hub-view');
+      if(target==='map-view')openWorldMap('world-home');else showView(target);
+      var heading=byId(target).querySelector('h2');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+    });});
+    byId('world-menu-toggle').addEventListener('click',function(){renderLobby();byId('world-main-menu').showModal();byId('world-menu-close').focus();});
     byId('world-menu-close').addEventListener('click',function(){byId('world-main-menu').close();});
-    byId('world-main-menu').addEventListener('close',function(){if(document.body.classList.contains('world-exploring'))resumePausedWorld();});
+
     byId('world-main-menu').addEventListener('click',function(e){if(e.target===this)this.close();});
     byId("open-gacha").addEventListener("click", function () { showView("gacha-hall"); });
      byId("open-characters").addEventListener("click", function () { showView("character-view"); });
@@ -2306,135 +1709,23 @@
     byId("open-shop").addEventListener("click", function () { showView("shop-view"); });
     byId("shop-view").addEventListener("click", function (event) { var button = event.target.closest("[data-shop-kind]"); if (button && !button.disabled) shopAction(button.getAttribute("data-shop-kind"), button.getAttribute("data-shop-id"), button.getAttribute("data-shop-payment")); });
     byId("open-pets").addEventListener("click", function () { showView("pet-view"); });
+    byId('open-pet-summon').addEventListener('click',function(){showView('pet-banner-view');});
     byId("open-tutorial").addEventListener("click", function () { showView("tutorial-view"); });
     byId("open-announcements").addEventListener("click", function () { showView("announcement-view"); });
     byId("open-star-law-test").addEventListener("click", function () { setStarLawTestPanelVisible(!starLawTestPanelOpen); });
     byId("claim-star-law-test-reward").addEventListener("click", claimStarLawTestReward);
-    byId("continue-story").addEventListener("click", enterWorldHome);
-    function explorerStorageKey() { return 'starship-explorer:' + encodeURIComponent(playerKey(currentPlayerName)); }
-    function currentExplorerId() {
-      var saved; try { saved = window.localStorage.getItem(explorerStorageKey()); } catch (error) { /* storage may be unavailable */ }
-      var state = game && game.getState();
-      return rosterCards().some(function (card) { return card.id === saved && state && state.collection[card.id] > 0; }) ? saved : 'celesia';
-    }
-    function selectExplorer(cardId) {
-      var state = game && game.getState();
-      if (!state || !rosterCards().some(function (card) { return card.id === cardId && state.collection[card.id] > 0; })) return;
-      try { window.localStorage.setItem(explorerStorageKey(), cardId); } catch (error) { showMessage('無法儲存探索角色，請檢查瀏覽器儲存設定後重試。', true); return; }
-      [firstActGame, exploration, firstMajorWorld].forEach(function (controller) { if (controller && controller.setPlayer) controller.setPlayer(cardId); });
-      renderCharacters(); showMessage('已將 ' + data.cards[cardId].name + ' 設為探索角色。', false);
-    }
-    function applyExplorerSelection(controller) {
-      if (controller.setPlayer) controller.setPlayer(currentExplorerId());
-    }
-    function firstActKey() { return "starship-first-act-game-v2:" + encodeURIComponent(playerKey(currentPlayerName)); }
-    function loadFirstAct() { try { return JSON.parse(window.localStorage.getItem(firstActKey())); } catch (error) { return null; } }
-    function saveFirstAct(value) { try { window.localStorage.setItem(firstActKey(), JSON.stringify(value)); } catch (error) {} rememberWorld("opening",value); }
-    byId("play-first-act").addEventListener("click", function () {
-      if (!firstActGame) firstActGame = window.StarshipFirstActGame.create({ canvas: byId("first-act-canvas"), panel: byId("first-act-panel"), zone: byId("first-act-zone"), objective: byId("first-act-objective"), distance: byId("first-act-distance"), interact: byId("first-act-interact"), dialog: byId("first-act-dialog"), dialogTitle: byId("first-act-dialog-title"), dialogText: byId("first-act-dialog-text"), dialogNext: byId("first-act-dialog-next"), reset: byId("first-act-reset"), enter: byId("first-act-enter-village"), pad: byId("first-act-panel"), load: loadFirstAct, save: saveFirstAct, onEnterVillage:function(){showVillageExploration(true);},onRestart: function () { var village = window.StarshipExploration.normalize(loadExploration()); village.arrived = false; village.storyStep = 0; saveExploration(village); if (exploration) exploration.reload(); } });
-      applyExplorerSelection(firstActGame);
-      showView("first-act-view"); worldMounted("opening");firstActGame.open();rememberWorld("opening",firstActGame.state());
-    });
-    byId("first-act-back").addEventListener("click", function () { showView("story-view"); byId("play-first-act").focus({ preventScroll: true }); });
-    byId("first-act-enter-village").addEventListener("click", function () { if (firstActGame && firstActGame.state().index >= window.StarshipFirstActGame.steps.length) showVillageExploration(true); });
-    function openWorldMap(fromViewId) { mapReturnViewId = fromViewId; byId("map-view-back").textContent = fromViewId === "story-view" ? "← 回到劇情" : "← 回到大世界"; showView("map-view");byId("first-major-panel").hidden=true;byId("exploration-panel").hidden=true;byId("story-world-map").hidden=false;byId("first-major-entry").hidden=false;byId("open-exploration").closest(".explore-entry").hidden=false; byId("map-view-back").focus({ preventScroll: true }); }
-    function explorationKey() { return "starship-exploration-test-v1:" + encodeURIComponent(playerKey(currentPlayerName)); }
-    function loadExploration() { try { return JSON.parse(window.localStorage.getItem(explorationKey())); } catch (error) { return null; } }
-    function saveExploration(state) { try { window.localStorage.setItem(explorationKey(), JSON.stringify(state)); } catch (error) {} rememberWorld("village",state); }
-    function showVillageExploration(fromStory) {
-      if (firstMajorWorld) firstMajorWorld.close();
-      byId("first-major-panel").hidden = true;
-      byId("first-major-entry").hidden = false;
-      mapReturnViewId = "world-home";showView("map-view",true);worldMounted("village");
-      if (!exploration) exploration = window.StarshipExploration.create({ canvas: byId("exploration-canvas"), panel: byId("exploration-panel"), status: byId("exploration-status"), position: byId("exploration-position"), discoveries: byId("exploration-discoveries"), objective: byId("exploration-objective"), distance: byId("exploration-distance"), interact: byId("exploration-interact"), reset: byId("exploration-reset"), dialog: byId("exploration-dialog"), dialogTitle: byId("exploration-dialog-title"), dialogText: byId("exploration-dialog-text"), dialogNext: byId("exploration-dialog-next"), read: byId("exploration-story-read"), pad: byId("exploration-panel"), load: loadExploration, save: saveExploration, onExit:function(map,x,y){showFirstMajorWorld(2,map,x,y);},onStoryComplete: function () { completeStoryScene("main-1-0", "signal"); } });
-      applyExplorerSelection(exploration);
-      exploration.reload(); if (fromStory) exploration.enterStory();
-      byId("story-world-map").hidden = true; byId("exploration-panel").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = true; exploration.open();rememberWorld("village",exploration.state());
-    }
-    byId("open-exploration").addEventListener("click", function () { showVillageExploration(false); });
-    byId("exploration-continue-act-2").addEventListener("click",function(){showFirstMajorWorld(2);});
-    function canStartWorldAct(act) { return Boolean(game && worldStoryStatus[act] && worldStoryStatus[act].unlocked); }
-    function refreshWorldEntries() {
-      worldStoryStatus={};
-      var world=window.StarshipFirstMajorWorld,state=game&&game.getState(),workflow=window.StarshipStoryReleaseProgress,missions=window.StarshipStory11Missions;
-      if(world&&state&&workflow)world.storyOrder.forEach(function(act){var meta=world.storyMeta(act),chapter=storyChapterById(meta.chapterId),p=workflow.progress(state),read=sceneClaimed(state,meta.chapterId,meta.sceneId),task=meta.missions&&read&&p.act===meta.index?missions.acts[meta.index].steps[p.step]:null;
-        worldStoryStatus[act]={unlocked:Boolean(chapter&&chapter.releaseOpen!==false&&workflow.unlocked(state,chapter,meta.index)),read:read,missionComplete:!meta.missions||p.act>meta.index,step:p.step,task:task,totalSteps:meta.missions?missions.acts[meta.index].steps.length:0,claimed:Boolean(state.storyProgress.claimedVersions[meta.version]),canClaim:Boolean(meta.missions&&p.act===5&&chapter.scenes.every(function(scene){return sceneClaimed(state,chapter.id,scene.id);}))};});
-      [2,3].forEach(function (act) { var button=byId("open-world-act-"+act); if(button){button.disabled=!canStartWorldAct(act);button.title=button.disabled?"先完成第"+(act-1)+"幕主線":"進入第"+act+"幕可探索場景";} });
-      if(byId("exploration-continue-act-2"))byId("exploration-continue-act-2").disabled=!canStartWorldAct(2);
-      var select=byId("world-story-select");if(select&&world){var selected=select.value||'1';select.innerHTML='<option value="1">1.0・第一幕｜南驛與入村</option>'+world.storyOrder.map(function(act){var meta=world.storyMeta(act);return '<option value="'+act+'"'+(canStartWorldAct(act)?'':' disabled')+'>'+escapeHtml(meta.label+'｜'+meta.title.replace(/^第.+?幕[｜・]/,''))+(canStartWorldAct(act)?'':'（待解鎖）')+'</option>';}).join('');select.value=selected;byId("open-world-campaign").disabled=selected!=='1'&&!canStartWorldAct(Number(selected));}
-    }
-    function worldCampaignAction(act,action,choice,step){var meta=window.StarshipFirstMajorWorld.storyMeta(act),body={action:action,chapterId:meta.chapterId,sceneId:meta.sceneId};if(action==='answer'){body.choice=choice;body.act=meta.index;body.step=step;}return performLiveStoryAction(body).then(function(payload){refreshWorldEntries();if(Object.keys(payload.reward||{}).some(function(k){return payload.reward[k]>0;}))showExplorationReward(payload.reward);return recoverExplorationReward().then(function(){return payload;});});}
-    var explorationRewardBusy = false;
-    function showExplorationReward(reward) {
-      if(!document.body.classList.contains('world-exploring'))return;
-      var text=reward ? Object.keys(reward).filter(function(k){return reward[k]>0;}).map(function(k){return ({starSand:'星砂',characterExp:'角色經驗',starMarks:'星痕'}[k]||k)+' × '+reward[k];}).join(' · ') : '';
-      if(text)byId('world-reward-receipt').textContent='已自動發放：'+text;
-      renderMilestoneRewards();pauseWorld();var dialog=byId('world-reward-dialog');if(!dialog.open)dialog.showModal();
-    }
-    function recoverExplorationReward() {
-      if(!game||explorationRewardBusy||!document.body.classList.contains('world-exploring'))return Promise.resolve();
-      var state=game.getState(),chapter=storyChapterById('main-1-1'),p=state.storyProgress;
-      if(!p.claimedVersions['1.1']&&p.missions11&&p.missions11.act===5&&chapter.scenes.every(function(scene){return p.completedScenes[chapter.id+':'+scene.id];})){
-        explorationRewardBusy=true;
-        return performLiveStoryAction({action:'claim',chapterId:chapter.id,sceneId:chapter.scenes[chapter.scenes.length-1].id}).then(function(payload){refreshWorldEntries();showExplorationReward(payload.reward);}).catch(function(error){showMessage('獎勵尚未同步，請使用探索畫面的領取按鈕重試：'+error.message,true);}).finally(function(){explorationRewardBusy=false;});
-      }
-      return Promise.resolve();
-    }
-    function worldSaveKey(act) { return "starship-first-major-world-v1:" + encodeURIComponent(playerKey(currentPlayerName)) + ":" + act; }
-    function loadFirstMajorWorld(act) { try { return JSON.parse(window.localStorage.getItem(worldSaveKey(act || 2))); } catch(error) { return null; } }
-    function saveFirstMajorWorld(state) { rememberWorld("world",state);try { window.localStorage.setItem(worldSaveKey(state.act), JSON.stringify(state)); } catch(error) { byId("first-major-status").textContent="瀏覽器未能保存探索位置，離開後可能需要重走此段。"; } }
-    function waypointSaveKey(){return "starship-world-waypoints-v1:"+encodeURIComponent(playerKey(currentPlayerName));}
-    function cleanWorldWaypoints(ids){return window.StarshipFirstMajorWorld.knownWaypoints(ids);}
-    function loadWorldWaypoints(){var saved=[];try{saved=JSON.parse(window.localStorage.getItem(waypointSaveKey()))||[];}catch(error){}return cleanWorldWaypoints(saved.concat(game&&game.state&&game.state.worldWaypoints||[]));}
-    function saveWorldWaypoints(ids){var before=loadWorldWaypoints(),merged=cleanWorldWaypoints(before.concat(ids));if(game&&game.state)game.state.worldWaypoints=merged;try{window.localStorage.setItem(waypointSaveKey(),JSON.stringify(merged));}catch(error){byId("first-major-status").textContent="傳送點暫時無法保存；請確認瀏覽器儲存空間。";}if(remoteMode&&currentPlayerToken&&merged.length!==before.length)apiRequest('/api/player/world-waypoints',{waypoints:merged}).then(function(payload){if(game&&game.state)game.state.worldWaypoints=cleanWorldWaypoints(merged.concat(payload.waypoints));}).catch(function(){byId("first-major-status").textContent="傳送點已留在此裝置；連線恢復後重新登入會同步。";});}
-    function syncWorldWaypointsOnLogin(state){var cloud=cleanWorldWaypoints(state&&state.worldWaypoints||[]),local=[];try{local=JSON.parse(window.localStorage.getItem(waypointSaveKey()))||[];}catch(error){}var merged=cleanWorldWaypoints(cloud.concat(local));if(game&&game.state)game.state.worldWaypoints=merged;try{window.localStorage.setItem(waypointSaveKey(),JSON.stringify(merged));}catch(error){}if(remoteMode&&merged.length)apiRequest('/api/player/world-waypoints',{waypoints:merged}).then(function(payload){var latest=cleanWorldWaypoints(merged.concat(payload.waypoints));if(game&&game.state)game.state.worldWaypoints=latest;try{window.localStorage.setItem(waypointSaveKey(),JSON.stringify(latest));}catch(error){}}).catch(function(){});}
+    byId("continue-story").addEventListener("click", function(){if(hub)showView('storybook-view');else enterLobby();});
 
-    function showFirstMajorWorld(act,terrainMap,terrainX,terrainY) {
-      if(!terrainMap&&!canStartWorldAct(act)) return;
-      if(exploration) exploration.close();
-      showView("map-view",true);
-      if(!firstMajorWorld) firstMajorWorld=window.StarshipFirstMajorWorld.create({canvas:byId("first-major-canvas"),stop:byId("first-major-stop"),minimap:byId("first-major-minimap"),regionTag:byId("first-major-region-tag"),compass:byId("first-major-compass"),scene:byId("first-major-scene"),banner:byId("first-major-banner"),loading:byId("first-major-loading"),tools:byId("first-major-tools"),toolsToggle:byId("first-major-tools-toggle"),fullscreen:byId("first-major-fullscreen"),sprint:byId("first-major-sprint"),portrait:byId("first-major-portrait"),dialogLocation:byId("first-major-dialog-location"),dialogCount:byId("first-major-dialog-count"),destination:byId("first-major-destination"),activate:byId("first-major-activate"),travelList:byId("first-major-travel-list"),travel:byId("first-major-travel"),travelHint:byId("first-major-travel-hint"),loadWaypoints:loadWorldWaypoints,saveWaypoints:saveWorldWaypoints,panel:byId("first-major-panel"),zone:byId("first-major-zone"),status:byId("first-major-status"),objective:byId("first-major-objective"),distance:byId("first-major-distance"),position:byId("first-major-position"),interact:byId("first-major-interact"),dialog:byId("first-major-dialog"),dialogTitle:byId("first-major-dialog-title"),dialogText:byId("first-major-dialog-text"),dialogNext:byId("first-major-dialog-next"),reset:byId("first-major-reset"),sync:byId("first-major-sync"),next:byId("first-major-next"),pad:byId("first-major-panel"),load:loadFirstMajorWorld,save:saveFirstMajorWorld,loadRoam:function(){return loadFirstMajorWorld("roam");},saveRoam:function(state){rememberWorld("world",state);try{localStorage.setItem(worldSaveKey("roam"),JSON.stringify(state));}catch(e){}},guild:byId("first-major-guild"),loadGuild:function(){try{return JSON.parse(localStorage.getItem(worldSaveKey("white-bell-guild-sample-v1")));}catch(e){return null;}},saveGuild:function(progress){try{localStorage.setItem(worldSaveKey("white-bell-guild-sample-v1"),JSON.stringify(progress));}catch(e){byId("first-major-status").textContent="協會試玩進度暫時無法保存。";}},guildRoster:function(){var state=game.getState();return rosterCards().filter(function(card){return state.collection[card.id]>0&&data.characterBattleStats[card.id];}).map(function(card){return {id:card.id,name:card.name};});},guildBattle:function(team){return window.StarshipBattle.simulateBattle({team:team,stats:effectiveBattleStats(game.getState()),stage:data.trialStages.find(function(stage){return stage.id===11;})});},atlas:byId("first-major-atlas"),canStart:canStartWorldAct,task:byId("first-major-task"),claim:byId("first-major-claim"),storyStatus:function(act){return worldStoryStatus[act]||{};},onAnswer:function(act,choice,step){return worldCampaignAction(act,"answer",choice,step);},onClaim:function(act){return worldCampaignAction(act,"claim");},onComplete:function(act){return worldCampaignAction(act,"complete");}});
 
-      byId("exploration-panel").hidden=true;byId("story-world-map").hidden=true;byId("open-exploration").closest(".explore-entry").hidden=true;byId("first-major-entry").hidden=true;byId("first-major-panel").hidden=false;
-      worldMounted("world");applyExplorerSelection(firstMajorWorld);
-      if(terrainMap)firstMajorWorld.openTerrain(terrainMap,terrainX,terrainY);else firstMajorWorld.open(act);rememberWorld("world",firstMajorWorld.state());
-    }
-    byId("open-free-world").addEventListener("click",function(){showFirstMajorWorld(2,"resume");});
-    [2,3].forEach(function(act){byId("open-world-act-"+act).addEventListener("click",function(){showFirstMajorWorld(act);});});
-    byId("world-story-select").addEventListener("change",function(){byId("open-world-campaign").disabled=this.value!=='1'&&!canStartWorldAct(Number(this.value));});
-    byId("open-world-campaign").addEventListener("click",function(){var act=Number(byId("world-story-select").value);if(act===1)byId("play-first-act").click();else showFirstMajorWorld(act);});
-    byId("close-first-major").addEventListener("click",function(){if(firstMajorWorld)firstMajorWorld.close();byId("first-major-panel").hidden=true;byId("first-major-entry").hidden=false;byId("story-world-map").hidden=false;byId("open-exploration").closest(".explore-entry").hidden=false;refreshWorldEntries();byId("open-world-act-2").focus({preventScroll:true});});
-    byId("close-exploration").addEventListener("click", function () { if (exploration) exploration.close(); byId("exploration-panel").hidden = true; byId("story-world-map").hidden = false; byId("open-exploration").closest(".explore-entry").hidden = false; byId("open-exploration").focus({ preventScroll: true }); });
+
+
+    function openWorldMap(){showView('map-view');}
+
     byId("open-world-map").addEventListener("click", function () { openWorldMap("world-home"); });
-    byId("map-view-back").addEventListener("click", function () { var returnViewId = mapReturnViewId;if(returnViewId==="world-home"){enterWorldHome();return;}showView(returnViewId); byId(returnViewId === "story-view" ? "story-main-tab" : "open-world-map").focus({ preventScroll: true }); });
+
     byId("tutorial-reward").addEventListener("click", function (event) { if (event.target.closest("#complete-tutorial")) completeTutorial(); });
     document.querySelectorAll(".back-lobby").forEach(function (button) { button.addEventListener("click", function () { showView("game-lobby"); }); });
-    byId("story-main-tab").addEventListener("click", function () { currentStoryTab = "main"; currentStoryChapterId = "main-1-0"; currentStorySceneId = ""; renderStory(); });
-    byId("story-side-tab").addEventListener("click", function () { currentStoryTab = "side"; currentStoryChapterId = "side-1-0-village"; currentStorySceneId = ""; renderStory(); });
-    byId("story-chapters").addEventListener("click", function (event) { var button = event.target.closest("[data-story-id]"); if (button) updateStorySelection(button.getAttribute("data-story-id")); });
-    byId("story-reader").addEventListener("click", function (event) { var sceneButton = event.target.closest("[data-scene-id]"); if (sceneButton) { currentStorySceneId = sceneButton.getAttribute("data-scene-id"); renderStory(); return; } var completeButton = event.target.closest("[data-complete-scene]"); if (completeButton) completeStoryScene(currentStoryChapterId, completeButton.getAttribute("data-complete-scene")); });
-    byId("story-world-map").addEventListener("click", function (event) {
-      var atlasTarget = event.target.closest("[data-map-go]");
-      if (atlasTarget && globalThis.StarshipInteractiveMap) {
-        var atlasId = atlasTarget.getAttribute("data-map-go");
-        if (atlasId.charAt(0) === "#") currentAtlasPointId = atlasId;
-        else { currentAtlasMapId = atlasId; currentAtlasPointId = ""; }
-        renderStoryWorldMap(storyChapterById(currentStoryChapterId));
-        if (event.detail === 0 && atlasId.charAt(0) === "#") { var mapFocus = Array.from(byId("story-world-map").querySelectorAll("[data-map-go]")).find(function (button) { return button.getAttribute("data-map-go") === atlasId; }); if (mapFocus) mapFocus.focus(); }
-        return;
-      }
-      var filter = event.target.closest("[data-map-filter]");
-      if (filter) { currentStoryMapFilter = filter.getAttribute("data-map-filter") || "all"; renderStoryWorldMap(storyChapterById(currentStoryChapterId)); return; }
-      var location = event.target.closest("[data-map-location]");
-      if (location) { currentStoryMapLocationId = location.getAttribute("data-map-location"); renderStoryWorldMap(storyChapterById(currentStoryChapterId)); return; }
-      var chapterButton = event.target.closest("[data-map-chapter]");
-      if (chapterButton && !chapterButton.disabled) { var chapter = storyChapterById(chapterButton.getAttribute("data-map-chapter")); if (chapter) { currentStoryTab = chapter.type; updateStorySelection(chapter.id); } }
-    });
-    byId("story-world-map").addEventListener("keydown", function (event) {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      var location = event.target.closest("[data-map-location]");
-      if (location) { event.preventDefault(); currentStoryMapLocationId = location.getAttribute("data-map-location"); renderStoryWorldMap(storyChapterById(currentStoryChapterId)); }
-    });
+
      byId("character-list").addEventListener("click", function (event) {
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { event.stopPropagation(); openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        var bulkButton = event.target.closest("[data-bulk-develop]"); if (bulkButton) { event.stopPropagation(); if (!bulkButton.disabled) developCharacter(bulkButton.getAttribute("data-bulk-develop"), bulkButton.getAttribute("data-bulk-detail") === "true", true); return; }
@@ -2446,7 +1737,10 @@
     byId("character-search").addEventListener("input", function () { characterSearchTerm = this.value; renderCharacters(); });
     byId("character-filter").addEventListener("change", function () { characterListFilter = this.value; renderCharacters(); });
     byId("character-detail").addEventListener("click", function (event) {
-       var explorerButton = event.target.closest('[data-select-explorer]'); if (explorerButton) { if (!explorerButton.disabled) selectExplorer(explorerButton.getAttribute('data-select-explorer')); return; }
+       var ascensionButton=event.target.closest('[data-star-ascend]');if(ascensionButton){if(!ascensionButton.disabled)ascendCharacterRequest(ascensionButton.dataset.starAscend,ascensionButton);return;}
+       var companionLink=event.target.closest('[data-character-companion]');if(companionLink){petBannerUI.selectCharacter(companionLink.dataset.characterCompanion);showView('pet-banner-view');return;}
+       var equipmentLink=event.target.closest('[data-character-equipment]');if(equipmentLink){equipmentUI.selectCharacter(equipmentLink.dataset.characterEquipment);showView('equipment-view');return;}
+       var paneButton=event.target.closest('[data-character-pane]');if(paneButton&&featureUI){featureUI.selectPane(byId('character-detail'),paneButton.getAttribute('data-character-pane'));return;}
        var formButton = event.target.closest("[data-character-form]"); if (formButton) { selectCharacterForm(formButton.getAttribute("data-character-form")); return; }
        var animationButton = event.target.closest("[data-character-animation]"); if (animationButton) { openCharacterAnimation(animationButton.getAttribute("data-character-animation")); return; }
        if (event.target.closest("[data-close-character]")) { closeCharacterAnimation(); byId("character-detail").hidden = true; currentCharacterId = ""; currentCharacterSkinId = ""; return; }
@@ -2459,9 +1753,7 @@
     byId("close-character-animation").addEventListener("click", closeCharacterAnimation);
     byId("character-animation-dialog").addEventListener("close", resetCharacterAnimationVideo);
     byId("character-animation-dialog").addEventListener("click", function (event) { if (event.target === this) closeCharacterAnimation(); });
-    byId('world-story-rewards').addEventListener('click',function(){showExplorationReward();});
-    byId('world-reward-close').addEventListener('click',function(){byId('world-reward-dialog').close();});
-    byId('world-reward-dialog').addEventListener('close',function(){if(document.body.classList.contains('world-exploring'))resumePausedWorld();});
+
     byId("milestone-rewards").addEventListener("click", function (event) { var button = event.target.closest("[data-reward-key]"); if (button) claimCharacterChoice(button.getAttribute("data-reward-key"), button.getAttribute("data-card-id")); });
       byId("trial-stages").addEventListener("click", function (event) { var button = event.target.closest("[data-trial-stage]"); if (button && !button.disabled) { if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; currentTrialStageId = Number(button.getAttribute("data-trial-stage")); renderTrial(); } });
       byId("trial-stage-details").addEventListener("click", chooseTrialHalf);
@@ -2513,7 +1805,3 @@
 
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }
 }());
-
-
-
-

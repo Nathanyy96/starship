@@ -11,8 +11,9 @@ test('Postgres sessions survive another instance and restart; concurrent saves a
 }, async () => {
   const require = createRequire(import.meta.url);
   const {Pool}=require('pg');
+  if(new URL(process.env.STARSHIP_TEST_DATABASE_URL).hostname.includes('-pooler.'))throw Error('Schema-isolated tests require the direct database endpoint; production pooled connections remain unchanged');
   const schema='vercel_test_'+crypto.randomBytes(8).toString('hex');
-  const pool=new Pool({connectionString:process.env.STARSHIP_TEST_DATABASE_URL,max:1});
+  const pool=new Pool({connectionString:process.env.STARSHIP_TEST_DATABASE_URL,max:1,connectionTimeoutMillis:12000,ssl:{rejectUnauthorized:false}});
   const url=new URL(process.env.STARSHIP_TEST_DATABASE_URL);
   url.searchParams.set('options','-c search_path='+schema);
   const children=[];
@@ -41,24 +42,20 @@ test('Postgres sessions survive another instance and restart; concurrent saves a
   }
   try {
     await pool.query('CREATE SCHEMA '+schema);
-    const a=await launch(),b=await launch();
+    const a=await launch();const b=await launch();
     const account=await post(a,'register',{name:'isolated-vercel',password:'isolated-vercel-123'});
     assert.ok(account.token);
     const token=account.token;
     assert.deepEqual((await post(b,'session',{token})).state.resources,account.state.resources);
-    const position={version:1,kind:'world',state:{map:'city',x:3454,y:858,roaming:true}};
-    await post(a,'world-position',{token,position,sequence:2});
-    const stale={version:1,kind:'opening',state:{zone:'valley',index:0,x:10.5,y:8.5}};
-    assert.equal((await post(b,'world-position',{token,position:stale,sequence:1})).position.state.map,'city');
-    await Promise.all([
-      post(a,'world-waypoints',{token,waypoints:['city-plaza']}),
-      post(b,'world-waypoints',{token,waypoints:['village-anchor']})
-    ]);
+    const retired=await fetch(a.origin+'/api/player/world-position',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token})});
+    assert.equal(retired.status,410);
+    const simultaneous=await Promise.all([post(a,'session',{token}),post(b,'session',{token})]);
+    simultaneous.forEach(v=>assert.deepEqual(v.state.resources,account.state.resources));
     const exited=new Promise(r=>b.child.once('exit',r));b.child.kill();await exited;
     const c=await launch();
     const resumed=await post(c,'session',{token});
-    assert.equal(resumed.state.worldPosition.state.map,'city');
-    assert.deepEqual(resumed.state.worldWaypoints.slice().sort(),['city-plaza','village-anchor']);
+    assert.equal(resumed.state.worldPosition,undefined);
+    assert.equal(resumed.state.worldWaypoints,undefined);
     assert.deepEqual(resumed.state.resources,account.state.resources);
     const raw=await pool.query('SELECT token_hash FROM '+schema+'.starship_sessions');
     assert.equal(raw.rows.length,1);

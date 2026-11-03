@@ -1,0 +1,2651 @@
+{
+  "scope": "18 characters, C0-C6, three seeds, one trial stage, companion-free synthetic teams; replay/invariants only, not individual constellation or balance acceptance",
+  "rows": [
+    {
+      "character": "celesia",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "celesia",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "celesia",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "celesia",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "celesia",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "celesia",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "celesia",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "celesia",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "celesia",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "celesia",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "celesia",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "celesia",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "celesia",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "celesia",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "reyn",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 12
+    },
+    {
+      "character": "reyn",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "reyn",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "reyn",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "reyn",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "reyn",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "reyn",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "reyn",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "reyn",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "reyn",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "reyn",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "reyn",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "reyn",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "reyn",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "reyn",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "reyn",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "reyn",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "reyn",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "reyn",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "reyn",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "reyn",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "lia",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 11
+    },
+    {
+      "character": "lia",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "lia",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "lia",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "lia",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "lia",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "lia",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "lia",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "lia",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "lia",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "lia",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "lia",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "lia",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "lia",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "lia",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "lia",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "isar",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "isar",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "isar",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "isar",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "isar",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "isar",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "isar",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "isar",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "isar",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "isar",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "isar",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "isar",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "isar",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "isar",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rena",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "rena",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "rena",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "rena",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "rena",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rena",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "rena",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "rena",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rena",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rena",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "rena",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rena",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "rena",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rena",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rena",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rena",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "eda",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 11
+    },
+    {
+      "character": "eda",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "eda",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "eda",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "eda",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "eda",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "eda",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "eda",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "eda",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "eda",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "eda",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "eda",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "eda",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "eda",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "eda",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "veyra",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "veyra",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "veyra",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "veyra",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "veyra",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "veyra",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "veyra",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "veyra",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "veyra",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "veyra",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "veyra",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "veyra",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "veyra",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "veyra",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "veyra",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "harlow",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 11
+    },
+    {
+      "character": "harlow",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "harlow",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "harlow",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "harlow",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "harlow",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "harlow",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "harlow",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "harlow",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "harlow",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "harlow",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "harlow",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "harlow",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "harlow",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "harlow",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "elorna",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "elorna",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "elorna",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "elorna",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "elorna",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "elorna",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "elorna",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "elorna",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "elorna",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "elorna",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "elorna",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "elorna",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "elorna",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "elorna",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "elorna",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "elorna",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "elorna",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "elorna",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "elorna",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "elorna",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "elorna",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "chodan",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "chodan",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "chodan",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "chodan",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "chodan",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "chodan",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "chodan",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "chodan",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "chodan",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "chodan",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "chodan",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "chodan",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "chodan",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "magenta",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "magenta",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "magenta",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "magenta",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "magenta",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "magenta",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "magenta",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "magenta",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "magenta",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "magenta",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "magenta",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "magenta",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "magenta",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "magenta",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "hina",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "hina",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "hina",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "hina",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "hina",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "hina",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "hina",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "hina",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "hina",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "hina",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "hina",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "hina",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "hina",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "hina",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "siyeon",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "siyeon",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "siyeon",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "siyeon",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "siyeon",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "siyeon",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "siyeon",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "siyeon",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "siyeon",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "siyeon",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "siyeon",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "siyeon",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "siyeon",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "siyeon",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "mave",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "mave",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "mave",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "mave",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "mave",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "mave",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "mave",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "mave",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "mave",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "mave",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "mave",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "mave",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "mave",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "mave",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "mave",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "mave",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "cenwu",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 11
+    },
+    {
+      "character": "cenwu",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "cenwu",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "cenwu",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "cenwu",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "cenwu",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "cenwu",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "cenwu",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "cenwu",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "cenwu",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "cenwu",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "cenwu",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "cenwu",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "cenwu",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "cenwu",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "cenwu",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "cenwu",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "cenwu",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "cenwu",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "cenwu",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "cenwu",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "ruida",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 12
+    },
+    {
+      "character": "ruida",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "ruida",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 11
+    },
+    {
+      "character": "ruida",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "ruida",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "ruida",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "ruida",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "ruida",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "ruida",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "ruida",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "ruida",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "ruida",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "ruida",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "ruida",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "ruida",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "yuan",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "yuan",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "yuan",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "yuan",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 10
+    },
+    {
+      "character": "yuan",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "yuan",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 9
+    },
+    {
+      "character": "yuan",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "yuan",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "yuan",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "yuan",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "yuan",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "yuan",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "yuan",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "yuan",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "yuan",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "yuan",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 0,
+      "seed": 7,
+      "status": "won",
+      "rounds": 8
+    },
+    {
+      "character": "rovienne",
+      "constellation": 0,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 0,
+      "seed": 731,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rovienne",
+      "constellation": 1,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "rovienne",
+      "constellation": 1,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 1,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 2,
+      "seed": 7,
+      "status": "won",
+      "rounds": 7
+    },
+    {
+      "character": "rovienne",
+      "constellation": 2,
+      "seed": 73,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 2,
+      "seed": 731,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 3,
+      "seed": 7,
+      "status": "won",
+      "rounds": 6
+    },
+    {
+      "character": "rovienne",
+      "constellation": 3,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 3,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 4,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 4,
+      "seed": 73,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 4,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 5,
+      "seed": 7,
+      "status": "won",
+      "rounds": 5
+    },
+    {
+      "character": "rovienne",
+      "constellation": 5,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "rovienne",
+      "constellation": 5,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 6,
+      "seed": 7,
+      "status": "won",
+      "rounds": 4
+    },
+    {
+      "character": "rovienne",
+      "constellation": 6,
+      "seed": 73,
+      "status": "won",
+      "rounds": 3
+    },
+    {
+      "character": "rovienne",
+      "constellation": 6,
+      "seed": 731,
+      "status": "won",
+      "rounds": 4
+    }
+  ]
+}

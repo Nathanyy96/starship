@@ -1,3 +1,5 @@
+> 文件用途（2026-11-02整理）：歷史工程／方案紀錄，非目前玩法要求。最新狀態見工作區 `CURRENT_PROJECT_STATUS.md`；不從下方舊「現行／未完成／已完成」文字推論今日狀態。
+
 # Story interaction release — 2026-10-16
 
 Six interludes use exact published story anchors in versions 1.0–1.1:

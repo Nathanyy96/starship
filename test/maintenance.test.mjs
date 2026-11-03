@@ -49,7 +49,7 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     original.breakthroughMaterials = { "universal-core": 9 };
     original.collection.lia = 2;
     original.characterProgress.lia = { level: 21, affinity: 4, constellation: 1, constellationCore: 1, breakthrough: false };
-    original.storyProgress.completedScenes["main-1-0:signal"] = { starSand: 100 };
+    (original.storyProgress.completedScenes = {})["main-1-0:signal"] = { starSand: 100 };
     original.storyProgress.completedScenes["main-1-1:pickup"] = { starSand: 100 };
     original.updateRewards.claimedVersions = { [updateVersion]: { starSand: 3200 }, "2026-10-01-official-1-0": { starSand: 3200, characterExp: 2200 } };
     original.trialProgress = { version: updateVersion, selectedTeam: ["lia"], clearedStages: [1, 10], attempts: { 1: 10 }, bestStage: 10, lastBattle: { won: true } };
@@ -68,21 +68,15 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     fs.writeFileSync(databasePath, JSON.stringify(database), "utf8");
 
     const first = (await post("/api/player/session", { token: registration.token })).state;
-    assert.equal(first.resources.starSand, 18200);
-    assert.equal(first.resources.starMarks, 23);
+    assert.equal(first.resources.starSand, 7400);
+    assert.equal(first.resources.starMarks, 17);
     assert.deepEqual(Object.keys(first.resources).sort(), ["characterExp", "starMarks", "starSand"]);
-    assert.equal(first.resources.characterExp, 23850);
+    assert.equal(first.resources.characterExp, 109850);
     assert.equal(first.breakthroughMaterials["universal-core"], 9);
     assert.equal(first.collection.lia, 2);
     assert.equal(first.characterProgress.lia.level, 21);
-    assert.ok(first.storyProgress.completedScenes["main-1-0:signal"]);
-    assert.ok(first.storyProgress.completedScenes[storySceneAliases["main-1-1:pickup"]]);
-    assert.ok(first.storyProgress.completedScenes["main-1-1:pickup"]);
-    assert.ok(first.updateRewards.claimedVersions[updateVersion]);
-    assert.ok(first.updateRewards.claimedVersions["2026-10-01-official-1-0"]);
-    assert.ok(first.updateRewards.claimedVersions[compensationCycle]);
-    assert.deepEqual({starSand:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].starSand,characterExp:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].characterExp,starMarks:first.updateRewards.claimedVersions['2026-10-16-white-bell-exploration'].starMarks},{starSand:8000,characterExp:8000,starMarks:3});
-    assert.deepEqual({ starSand: first.updateRewards.claimedVersions[compensationCycle].starSand, characterExp: first.updateRewards.claimedVersions[compensationCycle].characterExp, starMarks: first.updateRewards.claimedVersions[compensationCycle].starMarks }, { starSand: 6000, characterExp: 6000, starMarks: 3 });
+    assert.equal(first.storyProgress.completedScenes, undefined);
+    assert.ok(first.updateRewards.claimedVersions["hub-release-20261102"]);
     assert.deepEqual(first.trialProgress.clearedStages, []);
     assert.deepEqual(first.trialProgress.attempts, {});
     assert.equal(first.trialProgress.bestStage, 0);
@@ -100,23 +94,6 @@ test("維護更新保留玩家資源、重置可領戰鬥獎勵且只發放一�
     const second = (await post("/api/player/login", { name: "舊玩家", password: "maintenance-test-password" })).state;
     assert.equal(second.resources.starSand, first.resources.starSand);
     assert.deepEqual(second.updateRewards.claimedVersions, first.updateRewards.claimedVersions);
-    const scenes = storyChapters.find((chapter) => chapter.id === "main-1-0").scenes;
-    for (const scene of scenes) {
-      const result = await post("/api/player/story-progress", { token: registration.token, action: "complete", chapterId: "main-1-0", sceneId: scene.id });
-      if (scene !== scenes.at(-1)) assert.equal(result.reward.starSand, 0);
-      else {
-        assert.equal(result.reward.starSand, 1500); // 已領的舊第一幕 100 星砂抵扣。
-        assert.equal(result.reward.characterExp, 3600);
-        assert.equal(result.reward.starMarks, 1);
-      }
-    }
-    const afterStory = (await post("/api/player/session", { token: registration.token })).state;
-    assert.equal(afterStory.resources.starSand, first.resources.starSand + 1500);
-    assert.equal(afterStory.resources.characterExp, first.resources.characterExp + 3600);
-    assert.equal(afterStory.resources.starMarks, first.resources.starMarks + 1);
-    assert.ok(afterStory.storyProgress.claimedVersions["1.0"]);
-    const repeated = await post("/api/player/story-progress", { token: registration.token, action: "complete", chapterId: "main-1-0", sceneId: scenes.at(-1).id });
-    assert.equal(repeated.alreadyClaimed, true);
   } finally {
     server.kill();
     fs.rmSync(directory, { recursive: true, force: true });

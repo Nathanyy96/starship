@@ -1,0 +1,205 @@
+{
+  "scope": "synthetic baseline; no equipment/pets; not balance acceptance",
+  "seedRange": [
+    0,
+    29
+  ],
+  "rows": [
+    {
+      "level": 1,
+      "constellation": 0,
+      "stage": 1,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 3,
+        "median": 3,
+        "max": 4
+      }
+    },
+    {
+      "level": 1,
+      "constellation": 0,
+      "stage": 2,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 7,
+        "median": 8,
+        "max": 10
+      }
+    },
+    {
+      "level": 1,
+      "constellation": 0,
+      "stage": 3,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 10,
+        "median": 11,
+        "max": 13
+      }
+    },
+    {
+      "level": 1,
+      "constellation": 0,
+      "stage": 4,
+      "samples": 30,
+      "wins": 29,
+      "timeouts": 0,
+      "rounds": {
+        "min": 19,
+        "median": 25,
+        "max": 39
+      }
+    },
+    {
+      "level": 1,
+      "constellation": 0,
+      "stage": 5,
+      "samples": 30,
+      "wins": 1,
+      "timeouts": 0,
+      "rounds": {
+        "min": 24,
+        "median": 26,
+        "max": 47
+      }
+    },
+    {
+      "level": 45,
+      "constellation": 0,
+      "stage": 1,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 1,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "level": 45,
+      "constellation": 0,
+      "stage": 2,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 3,
+        "median": 3,
+        "max": 4
+      }
+    },
+    {
+      "level": 45,
+      "constellation": 0,
+      "stage": 3,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 4,
+        "median": 5,
+        "max": 6
+      }
+    },
+    {
+      "level": 45,
+      "constellation": 0,
+      "stage": 4,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 7,
+        "median": 8,
+        "max": 10
+      }
+    },
+    {
+      "level": 45,
+      "constellation": 0,
+      "stage": 5,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 10,
+        "median": 12,
+        "max": 14
+      }
+    },
+    {
+      "level": 90,
+      "constellation": 6,
+      "stage": 1,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "level": 90,
+      "constellation": 6,
+      "stage": 2,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 1,
+        "median": 1,
+        "max": 2
+      }
+    },
+    {
+      "level": 90,
+      "constellation": 6,
+      "stage": 3,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 1,
+        "median": 2,
+        "max": 3
+      }
+    },
+    {
+      "level": 90,
+      "constellation": 6,
+      "stage": 4,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 3,
+        "median": 3,
+        "max": 4
+      }
+    },
+    {
+      "level": 90,
+      "constellation": 6,
+      "stage": 5,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "rounds": {
+        "min": 4,
+        "median": 4,
+        "max": 5
+      }
+    }
+  ],
+  "timeoutReplays": []
+}

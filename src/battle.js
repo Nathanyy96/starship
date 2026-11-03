@@ -6,6 +6,9 @@
   }
 }(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
+  var equipment = typeof module === 'object' && module.exports && typeof require === 'function' ? require('./equipment.js') : globalThis.StarshipEquipment;
+  var petSystem = typeof module === 'object' && module.exports && typeof require === 'function' ? require('./pet-system.js') : globalThis.StarshipPetSystem;
+  var starAscension = typeof module === 'object' && module.exports && typeof require === 'function' ? require('./star-ascension.js') : globalThis.StarshipStarAscension;
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
   function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
@@ -33,6 +36,7 @@
   function afterHit(source, target, skill, dealt) {
     if (!combat || combat.followup || !source || source.isEnemy || !target || !target.isEnemy) return;
     var round = combat.round;
+    if(dealt>0)combat.team.forEach(function(owner){if(owner!==source&&owner.hp>0&&hasMark(target,owner.id)&&['celesia','reyn','hina','magenta','orivelle'].includes(owner.id)){var rate=petSystem.trigger(owner,'mark-echo',round);if(rate&&target.hp>0){coreFollowup(owner,target,rate);combat.logs.push(owner.companion.name+' 星伴標記協同。');}}});
     ["celesia", "hina", "magenta", "risan", "mirea", "veyra"].forEach(function (id) {
       var owner = replaced(id), mark = target.coreMarks && target.coreMarks[id];
       if (!owner || !mark || mark.until < round || owner === source || dealt <= 0) return;
@@ -64,6 +68,8 @@
       if (reaction.reactionRound !== round) { reaction.reactionRound = round; reaction.reactionCount = 0; }
       if (reaction.reactionCount < maxTriggers) {
         reaction.reactionCount += 1;
+        [magenta,source].filter(function(u,i,list){return list.indexOf(u)===i;}).forEach(function(owner){var rate=petSystem.trigger(owner,'reaction-buff',round);if(rate){owner.petAttackBonus=rate;combat.logs.push(owner.companion.name+' 交鳴應援已準備。');}});
+        var windPet=petSystem.trigger(source,'wind-echo',round);if(windPet&&target.hp>0){coreFollowup(source,target,windPet);combat.logs.push(source.companion.name+' 交鳴追音。');}
         coreFollowup(magenta, target, magenta.constellation >= 2 ? .5625 : .45);
         combat.logs.push("交鳴觸發：" + displayName(source) + " 引爆 " + displayName(magenta) + " 的灼印。");
         var hinaSupport = replaced("hina");
@@ -203,6 +209,8 @@
           id: "enemy-" + groupIndex + "-" + index,
           name: template.name + (template.count > 1 ? " " + (index + 1) : ""),
           image: template.image || "",
+          speciesId: template.speciesId || "",
+          animationProfile: template.animationProfile || "",
           maxHp: template.maxHp,
           hp: template.maxHp,
           attack: template.attack,
@@ -277,7 +285,9 @@
       base.activeForm = progress.activeForm === "deepwater" ? "deepwater" : "land";
       result[id] = base;
     });
-    return result;
+    if(starAscension)starAscension.apply(result,state);
+    var effective=equipment ? equipment.apply(result,state) : result;
+    return petSystem ? petSystem.apply(effective,state) : effective;
   }
 
   function synergyScore(teamIds, stats) {
@@ -326,6 +336,7 @@
       if (target.nextAllyBonus && attacking.id !== "rena") { rawDamage *= 1 + target.nextAllyBonus; target.nextAllyBonus = 0; }
     }
     if (combat && combat.activeActor && !combat.activeActor.isEnemy && target.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) rawDamage *= 1 + combat.beat.bonus;
+    if(combat&&combat.activeActor&&!combat.activeActor.isEnemy&&target.isEnemy&&!combat.followup&&combat.activeActor.petAttackBonus){rawDamage*=1+combat.activeActor.petAttackBonus;combat.activeActor.petAttackBonus=0;}
     var defense = target.defense * effectValue(target, "defenseMultiplier", 1);
     var damage = Math.max(1, Math.round(rawDamage * effectValue(target, "damageTaken", 1) * (1 - damageReductionForDefense(defense))));
     if (hasEffect(target, "marked")) {
@@ -341,7 +352,7 @@
       target.shield -= absorbed;
       damage -= absorbed;
       var remainingAbsorb = absorbed;
-      (target.replacementShields || []).forEach(function (entry) { var taken = Math.min(entry.amount, remainingAbsorb); entry.amount -= taken; remainingAbsorb -= taken; });
+      (target.replacementShields || []).forEach(function (entry) { var taken = Math.min(entry.amount, remainingAbsorb); entry.amount -= taken; remainingAbsorb -= taken;if(taken>0&&combat&&!entry.pet){var owner=coreAlly(entry.by),rate=petSystem.trigger(owner,'shield-echo',combat.round);if(rate){giveShield(target,owner.maxHp*rate);combat.logs.push(owner.companion.name+' 護盾吸收應援。');}} });
       if (combat && absorbed > 0 && !target.isEnemy) combat.logs.push(displayName(target) + " 的護盾吸收 " + absorbed + " 傷害。");
       if (combat && !target.isEnemy && target.shield === 0 && target.shieldBreakHeal && !target.shieldBreakHeal.used) {
         var shieldHealer = replaced(target.shieldBreakHeal.by);
@@ -455,6 +466,7 @@
   }
 
   function heal(target, rawAmount) {
+    var petHealer=combat&&combat.activeActor;if(petHealer&&petHealer.companion&&petHealer.companion.kind==='position-heal'&&petHealer.row==='front'&&target.row==='back')rawAmount*=1.1;
     if (combat && combat.activeActor && !combat.activeActor.isEnemy && combat.beat && combat.beat.remaining > 0 && combat.beat.until >= combat.round && combat.beat.owner !== combat.activeActor) {
       rawAmount *= 1 + combat.beat.bonus;
       if (combat.beat.owner.constellation >= 2) { addEffect(target, "damageTaken", .92, 2); combat.logs.push(displayName(combat.beat.owner) + " 的防護合拍讓 " + displayName(target) + " 短暫減傷。"); }
@@ -878,6 +890,7 @@
   }
 
   function useEnemySkill(actor, allies, enemies, logs, stage) {
+    actor.visualAction = "skill";
     var rule = actor.traitKey || stage.trialRule || "basic";
     // Each monster uses its own skill; support beasts do not inherit the boss skill.
     var target = chooseTarget(actor, enemies);
@@ -895,6 +908,7 @@
       }
     }
     if (rule === "shell" && !actor.shellUsed) {
+      actor.visualAction = "guard";
       actor.shellUsed = true; actor.shield = Math.round(actor.maxHp * .12);
       logs.push(displayName(actor) + " 重整一次晶殼，獲得 " + actor.shield + " 護盾。"); return true;
     }
@@ -909,7 +923,7 @@
     if (rule === "hunt") target = actor.huntHighAttack ? alive(enemies).slice().sort(function (a, b) { return b.attack - a.attack; })[0] : weakest(alive(enemies).filter(function (unit) { return unit.row === "back"; })) || weakest(enemies);
     if (rule === "charge") {
       actor.chargeActions = (actor.chargeActions || 0) + 1;
-      if (actor.chargeActions < 3) { actor.shield = Math.max(actor.shield || 0, Math.round(actor.maxHp * .06)); logs.push(displayName(actor) + " 預充（" + actor.chargeActions + "/2），下一次蓄滿後攻擊兩人；破盾可降低爆發傷害。"); return true; }
+      if (actor.chargeActions < 3) { actor.visualAction = "charge"; actor.shield = Math.max(actor.shield || 0, Math.round(actor.maxHp * .06)); logs.push(displayName(actor) + " 預充（" + actor.chargeActions + "/2），下一次蓄滿後攻擊兩人；破盾可降低爆發傷害。"); return true; }
       actor.chargeActions = 0;
       var chargeFactor = actor.shield > 0 ? 1.6 : 1.2;
       alive(enemies).slice(0, 2).forEach(function (unit) { var dealt = hit(unit, actor.attack * chargeFactor); logs.push(displayName(actor) + " 預充爆發對 " + displayName(unit) + " 造成 " + dealt + " 傷害。"); }); return true;
@@ -1048,11 +1062,13 @@
     var logs = ["第 " + stage.id + " 關：「" + stage.name + "」自走棋戰鬥開始。", "環境：「" + (stage.environment || "一般試煉") + "」｜" + (stage.environmentEffect || "沒有額外環境效果。"), "敵方特性：「" + (stage.enemyTrait || "一般") + "」｜" + (stage.enemyTraitEffect || "沒有額外特性。"), "隊伍協同 " + Math.round(synergy * 100) + "%，本局變動 " + Math.round(luck * 100) + "%。"];
     combat.logs = logs;
     applyStageOpening(stage, team, enemies, logs);
+    if(petSystem)petSystem.opening(team,logs,giveShield);
     var timeline = options.captureTimeline ? [] : null;
-    function captureFrame(actor, logStart) {
+    function captureFrame(actor, logStart, support, actionType) {
       if (!timeline) return;
-      function unitFrame(unit) { return { id: unit.id, name: unit.name, image: unit.image || "", hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield || 0, skillUses: unit.skillUses || 0, isEnemy: Boolean(unit.isEnemy), slot: unit.slot || 0, row: unit.row || "front", effects: (unit.effects || []).map(function (effect) { return { name: effect.name, value: effect.value, turns: effect.turns }; }) }; }
-      timeline.push({ round: combat.round, actorId: actor && actor.id || "", actorName: actor ? displayName(actor) : "", actorIsEnemy: Boolean(actor && actor.isEnemy), events: typeof logStart === "number" ? logs.slice(logStart).slice(-8) : logs.slice(-4), team: team.map(unitFrame), enemies: enemies.map(unitFrame) });
+      function unitFrame(unit) { return { id: unit.id, name: unit.name, image: unit.image || "", speciesId: unit.speciesId || "", animationProfile: unit.animationProfile || "", hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield || 0, skillUses: unit.skillUses || 0, isEnemy: Boolean(unit.isEnemy), slot: unit.slot || 0, row: unit.row || "front", effects: (unit.effects || []).map(function (effect) { return { name: effect.name, value: effect.value, turns: effect.turns }; }) }; }
+      timeline.push({ actionType: actionType || (support ? "support" : actor ? "basic" : "ready"), round: combat.round, actorId: actor && actor.id || "", actorName: actor ? displayName(actor) : "", actorIsEnemy: Boolean(actor && actor.isEnemy), events: typeof logStart === "number" ? logs.slice(logStart).slice(-8) : logs.slice(-4), team: team.map(unitFrame), enemies: enemies.map(unitFrame) });
+      if(support){timeline[timeline.length-1].support=true;timeline[timeline.length-1].actorName='星伴支援';}
     }
     captureFrame(null);
     var round = 0;
@@ -1063,6 +1079,7 @@
     while (alive(team).length && alive(enemies).length && round < maxRounds) {
       round += 1;
       combat.round = round;
+      if(petSystem){var petLogStart=logs.length,previousPetActor=combat.activeActor;combat.activeActor=null;petSystem.round(team,round,logs,heal);combat.activeActor=previousPetActor;if(logs.length>petLogStart)captureFrame(null,petLogStart,true);}
       if (stage.trialRule === "phase") enemies.forEach(function (enemy) {
         if (!enemy.isBoss || enemy.hp <= 0 || round <= enemy.phaseUntil) return;
         if (enemy.phase === "shell") {
@@ -1122,7 +1139,7 @@
             actor.skillUses += 1;
             actor.skillCooldown = actor.skillCooldownMax;
             if (isTeam && stage.trialRule === "phase") updateApexPhase(combat, logs, true);
-            captureFrame(actor, actionLogStart);
+            captureFrame(actor, actionLogStart, false, !isTeam && actor.visualAction ? actor.visualAction : "skill");
             return;
           }
         }
@@ -1182,8 +1199,9 @@
       synergy: synergy,
       luck: luck,
       misses: misses,
+      companions:team.filter(function(u){return Boolean(u.companion);}).map(function(u){return {cardId:u.id,petId:u.companion.id,name:u.companion.name,rank:u.companion.rank,level:u.companion.level,resonance:u.companion.resonance};}),
       team: team.map(function (unit) { return { id: unit.id, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield || 0, skillUses: unit.skillUses, slot: unit.slot, row: unit.row }; }),
-      enemies: enemies.map(function (unit) { return { name: unit.name, image: unit.image, hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
+      enemies: enemies.map(function (unit) { return { id: unit.id, name: unit.name, image: unit.image, speciesId: unit.speciesId || "", animationProfile: unit.animationProfile || "", hp: unit.hp, maxHp: unit.maxHp, shield: unit.shield }; }),
       logs: logs.slice(-100),
       timeline: timeline,
       reward: won ? clone(stage.reward || {}) : { starSand: 0, characterExp: 0 }

@@ -6,6 +6,8 @@ import { createRequire } from 'node:module';
 // credentials, player files, tests, or project documents.
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, 'public');
+if (path.dirname(output) !== root || path.basename(output) !== 'public') throw Error('Invalid build output');
+fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
 for (const name of fs.readdirSync(root)) {
   if (name === 'index.html' || name === 'admin.html' || name.endsWith('.css')) {

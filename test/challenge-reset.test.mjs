@@ -58,7 +58,7 @@ test('four challenge cycles reset once while all other account state remains ide
     fs.writeFileSync(file,JSON.stringify(database));
     const migrated = (await post('session',{token:account.token})).state;
     assert.deepEqual(withoutChallenges(migrated),withoutChallenges(before));
-    for (const key of resetKeys) assert.equal(migrated[key].version,data.trialVersion);
+    for (const key of resetKeys) assert.equal(migrated[key].version,key === "trialProgress" ? data.trialVersion : data.releaseConfig.challengeCycle);
     assert.deepEqual(migrated.trialProgress.attempts,{});
     assert.deepEqual(migrated.trialProgress.clearedStages,[]);
     assert.equal(migrated.trialProgress.bestStage,0);

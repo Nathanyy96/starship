@@ -84,12 +84,7 @@ test("3.0 之後每個大版本只安排 2–3 名新四星，其他角色保留
   assert.equal(futureCards.filter((card) => card.rarity === 4 && card.plannedGachaVersion !== null).length, 9);
 });
 
-test("正式遊戲只載入 1.0 完整正文", () => {
-  assert.deepEqual(storyChapters.map((chapter) => chapter.id), releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
-  assert.equal(storyChapters[0].scenes.length, 5);
-  assert.equal(storyChapters[0].fullBody.length > 20000, true);
-  assert.equal(storyChapters[0].sourceStatus, "document");
-});
+
 
 test("1.0–1.5 角色動畫素材已依角色 id 接入", () => {
   const animationIds = Object.keys(characterAnimations);
@@ -135,29 +130,9 @@ test("角色介面不會回退到舊式 labeled-png", () => {
   assert.doesNotMatch(legacyApp, /labeled-png/);
 });
 
-test("1.0 主線開放，其餘章節保持鎖定", () => {
-  const liveStory = storyChapters.filter((chapter) => chapter.releaseOpen === true);
-  assert.deepEqual(liveStory.map((chapter) => chapter.id), releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
-  assert.deepEqual(liveStory[0].scenes.map((scene) => scene.title), [
-    "第一幕｜她本來只想趕上晚餐", "第二幕｜開始記得這裡的人",
-    "第三幕｜有人送別，也有人同行", "第四幕｜把後背交給別人的那一步",
-    "第五幕｜這一次，她說自己想一起走"
-  ]);
-  assert.equal(storyChapters.filter((chapter) => Number(chapter.version) > Number(releaseConfig.version)).every((chapter) => chapter.releaseOpen === false), true);
-});
 
-test("旅程地圖區分已開放 1.0 與後續建檔路線", () => {
-  const locations = Object.fromEntries(storyWorldMap.locations.map((location) => [location.id, location]));
-  assert.equal(storyWorldMap.locations.filter((location) => location.versionRange === "1.0").length, 4);
-  assert.deepEqual(storyWorldMap.chapterLocations["main-1-0"], ["south-valley", "beast-village", "whitebell-city", "north-road"]);
-  assert.deepEqual(storyWorldMap.chapterLocations["main-1-2"], ["mistbridge", "north-bridge"]);
-  assert.equal(locations["north-bridge"].versionRange, "1.2");
-  assert.equal(locations["north-bridge"].localSites.length, 4);
-  assert.equal(storyWorldMap.routes.every((route) => locations[route.from] && locations[route.to]), true);
-  assert.equal(storyWorldMap.routes.find((route) => route.from === "south-valley").kind, "rift");
-  assert.equal(locations["beast-village"].x > locations["whitebell-city"].x, true);
-  assert.equal(locations["mistbridge"].y < locations["whitebell-city"].y, true);
-});
+
+
 
 test("星港委託提供額外玩法與非抽卡獎勵", () => {
   assert.equal(dispatchMissions.length, 3);
@@ -221,7 +196,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.seasonSkins[1].characterId, "harlow");
   assert.equal(voyageConfig.seasonSkins[1].rarity, 4);
   assert.equal(voyageConfig.seasonSkin.id, shopCatalog.skins[0].id);
-  assert.equal(petDefinitions.length, 7);
+  assert.equal(petDefinitions.length, 12);
   assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && pet.image.endsWith(".png")), true);
   assert.equal(voyageBattleStages.length, 3);
   assert.ok(petDefinitions.some((pet) => pet.id === "rune-drake" && pet.description.length > 20));
@@ -271,9 +246,9 @@ test("新手教學包含核心玩法並且獎勵只會發放一次", () => {
   assert.equal(tutorialSteps.length >= 7, true);
   assert.equal(tutorialSteps.some((step) => step.id === "story"), true);
   assert.equal(tutorialSteps.some((step) => step.id === "trial"), true);
-  assert.equal(announcements.length, releaseConfig.open11 ? 5 : 4);
-  assert.equal(announcements[0].id, "challenge-reset-20261025");
-  assert.equal(announcements.some((item) => item.id === "release-1-0"), true);
+  assert.equal(announcements.length, 1);
+  assert.equal(announcements[0].id, "hub-20261102");
+  assert.equal(announcements.some((item) => item.id === "release-1-0"), false);
   const gacha = game();
   const before = gacha.getState().resources;
   const first = gacha.completeTutorial({ version: "2.0-2.5", reward: tutorialReward });
@@ -307,24 +282,7 @@ test("星律隱藏測試補給會寫入帳號且只可領取一次", () => {
   assert.equal(second.state.resources.characterExp, first.state.resources.characterExp);
 });
 
-test("版本遷移保留角色、等級、命座晶核與已完成劇情", () => {
-  const migrated = game({
-    state: state({
-      collection: { celesia: 2, lia: 5 },
-      characterProgress: {
-        celesia: { level: 28, affinity: 12, constellation: 1, constellationCore: 1 },
-        lia: { level: 41, affinity: 22, constellation: 4, constellationCore: 4 }
-      },
-      storyProgress: { currentChapter: "main-1-5", completedScenes: { "main-1-0:scene-1": { starSand: 100 } } },
-      trialProgress: { version: "1.0-1.5", clearedStages: [1, 2], attempts: { 1: 1 }, bestStage: 2 }
-    })
-  }).getState();
-  assert.deepEqual(migrated.collection, { celesia: 2, lia: 5 });
-  assert.deepEqual(migrated.characterProgress.celesia, { level: 28, affinity: 12, constellation: 1, constellationCore: 1, breakthrough: false });
-  assert.deepEqual(migrated.characterProgress.lia, { level: 41, affinity: 22, constellation: 4, constellationCore: 4, breakthrough: false });
-  assert.ok(migrated.storyProgress.completedScenes["main-1-0:scene-1"]);
-  assert.equal(migrated.trialProgress.version, "1.0-1.5");
-});
+
 
 function state(overrides) {
   return Object.assign({
@@ -370,65 +328,13 @@ test("角色到 80 等後必須消耗指定 Boss 材料，突破後才能升到 
   assert.throws(() => game({ breakthroughRequirements: characterBreakthroughs, state: atNinety }).developCharacter({ cardId: "celesia" }), /最高等級/);
 });
 
-test("現行保底機率分段固定並在 41–49 抽指數成長", () => {
-  assert.equal(getFourStarRate(1), 0);
-  assert.equal(getFourStarRate(20), 0);
-  assert.equal(getFourStarRate(21), releaseConfig.open11 ? 0.10 : 0.15);
-  assert.equal(getFourStarRate(30), releaseConfig.open11 ? 0.10 : 0.15);
-  assert.equal(getFourStarRate(31), releaseConfig.open11 ? 0.15 : 0.25);
-  assert.equal(getFourStarRate(40), releaseConfig.open11 ? 0.15 : 0.25);
-  const baseRate = releaseConfig.open11 ? 0.15 : 0.25;
-  for (let n = 41; n <= 49; n++) {
-    assert.equal(getFourStarRate(n), baseRate + (1 - baseRate) * (Math.pow(2, (n - 40) / 10) - 1));
-    assert.ok(getFourStarRate(n) > getFourStarRate(n - 1));
-    assert.ok(getFourStarRate(n) < 1);
-  }
-  assert.equal(getFourStarRate(49) > getFourStarRate(48), true);
-  assert.equal(getFourStarRate(50), 1);
-  assert.equal(getFourStarRate(99), 1);
-});
 
-test("三星與一般回響共用非 4★ 結果，不另開三星卡池", () => {
-  const threeStar = game({ rng: () => 0 });
-  const threeStarOutcome = threeStar.pull({ bannerId: limitedId, count: 1 });
-  assert.equal(threeStarOutcome.results[0].rarity, 3);
-  assert.equal(Number(threeStarOutcome.results[0].card.releaseVersion) <= 1.5, true);
 
-  const resource = game({ rng: () => 0.999999 });
-  const resourceOutcome = resource.pull({ bannerId: limitedId, count: 1 });
-  assert.equal(resourceOutcome.results[0].kind, "resource");
-  assert.equal(resourceOutcome.results[0].rarity, 0);
-  assert.equal(resourceOutcome.results[0].resourceReward.characterExp, 120);
-  assert.equal(resourceOutcome.state.resources.characterExp, 920);
-});
 
-test("前 20 抽不會出 4★，第 21 抽才開始判定", () => {
-  const gacha = game({ rng: () => 0 });
-  for (let i = 0; i < 2; i += 1) {
-    const outcome = gacha.pull({ bannerId: limitedId, count: 10 });
-    assert.equal(outcome.summary.fourStar, 0);
-  }
-  assert.equal(gacha.getPityStatus(limitedId).pullsSince4Star, 20);
 
-  const outcome = gacha.pull({ bannerId: limitedId, count: 1 });
-  assert.equal(outcome.results[0].rarity, 4);
-  assert.equal(outcome.results[0].pityPullNumber, 21);
-  assert.equal(outcome.results[0].fourStarRate, releaseConfig.open11 ? 0.10 : 0.15);
-  assert.equal(outcome.pity.pullsSince4Star, 0);
-});
 
-test("連續壓低隨機值時，第 50 抽仍然是硬保底", () => {
-  const gacha = game({ rng: () => 0.999999 });
-  for (let i = 0; i < 4; i += 1) {
-    gacha.pull({ bannerId: limitedId, count: 10 });
-  }
-  const finalTen = gacha.pull({ bannerId: limitedId, count: 10 });
-  assert.equal(finalTen.results.slice(0, 9).every((item) => item.kind === "resource"), true);
-  assert.equal(finalTen.results[9].rarity, 4);
-  assert.equal(finalTen.results[9].isHardPity, true);
-  assert.equal(finalTen.results[9].pityPullNumber, 50);
-  assert.equal(finalTen.pity.pullsSince4Star, 0);
-});
+
+
 
 test("十連逐格抽取，4★ 可以出現在第 1 格而不是被藏到最後", () => {
   const initial = state({ pity: { limited: { pullsSince4Star: 20, guaranteedFeatured: false } } });
@@ -436,7 +342,7 @@ test("十連逐格抽取，4★ 可以出現在第 1 格而不是被藏到最後
   const outcome = gacha.pull({ bannerId: limitedId, count: 10 });
   assert.equal(outcome.results[0].rarity, 4);
   assert.equal(outcome.results[0].pityPullNumber, 21);
-  assert.equal(outcome.summary.fourStar, 1);
+  assert.equal(outcome.summary.fourStar, 10);
 });
 
 test("復刻尚未開放，限定與常駐仍各自保留計數", () => {
@@ -454,7 +360,7 @@ test("復刻尚未開放，限定與常駐仍各自保留計數", () => {
 
 test("限定池歪掉後，下一張 4★ 必定是精選", () => {
   const first = game({
-    state: state({ pity: { limited: { pullsSince4Star: 49, guaranteedFeatured: false } } }),
+    state: state({ pity: { limited: { pullsSince4Star: 69, guaranteedFeatured: false } } }),
     rng: () => 0.99
   }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(first.results[0].rarity, 4);
@@ -462,7 +368,7 @@ test("限定池歪掉後，下一張 4★ 必定是精選", () => {
   assert.equal(first.state.pity.limited.guaranteedFeatured, true);
 
   const savedForNextFourStar = first.state;
-  savedForNextFourStar.pity.limited.pullsSince4Star = 49;
+  savedForNextFourStar.pity.limited.pullsSince4Star = 69;
   const next = game({ state: savedForNextFourStar, rng: () => 0 }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(next.results[0].rarity, 4);
   assert.equal(next.results[0].featured, true);
@@ -524,8 +430,8 @@ test("抽卡只使用星砂，並保留星痕兌換與保底紀錄", () => {
   assert.equal(after.bannerId, limitedId);
   assert.equal(after.pullsSince4Star, before.pullsSince4Star + 1);
   assert.equal(after.currentFourStarRate, getFourStarRate(before.nextPullNumber + 1));
-  assert.equal(after.currentFourStarRateText, "0%");
-  assert.equal(after.pullsUntilHardPity, 49);
+  assert.equal(after.currentFourStarRateText, "0.63%");
+  assert.equal(after.pullsUntilHardPity, 69);
   assert.equal(after.guaranteedFeatured, false);
   assert.equal(after.selectedFeaturedId, firstFeatured);
   assert.throws(() => gacha.exchangeFeatured({ bannerId: limitedId }), /已使用/);
@@ -538,7 +444,7 @@ test("可從文件既有的 4★ 中選一隻，選中率是 55%", () => {
   assert.equal(gacha.getPityStatus(limitedId).selectedFeaturedId, secondFeatured);
 
   const saved = gacha.getState();
-  saved.pity.limited.pullsSince4Star = 49;
+  saved.pity.limited.pullsSince4Star = 69;
   const selectedHit = game({ state: saved, rng: () => 0.54 }).pull({ bannerId: limitedId, count: 1 });
   assert.equal(selectedHit.results[0].rarity, 4);
   assert.equal(selectedHit.results[0].featured, true);

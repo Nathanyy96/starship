@@ -1,0 +1,37 @@
+[
+  {
+    "file": "assets/ui/scenes/archive-library-v1.jpg",
+    "bytes": 543284,
+    "sha256": "a9d7be03620ec4c2f59533ba40f5e17a4a9d06e3440ac4d2245db34f4cb2dffc"
+  },
+  {
+    "file": "assets/ui/scenes/challenge-sanctum-v1.jpg",
+    "bytes": 508656,
+    "sha256": "07fec63b3be52766d2535911e16cba6131c674e3d835e8896fb396bf5ab7364f"
+  },
+  {
+    "file": "assets/ui/scenes/companion-garden-v1.jpg",
+    "bytes": 565453,
+    "sha256": "f86bb0dadf91af717abc511e0ca35b1d9652f2e1cda954ae5f4bbc75226b91a5"
+  },
+  {
+    "file": "assets/ui/scenes/harbor-concourse-v1.jpg",
+    "bytes": 515853,
+    "sha256": "badfe690d6af27ad2ac0cd7105d272c3c32c41f5fd1372e92720cf5f3e32f9ba"
+  },
+  {
+    "file": "assets/ui/scenes/lobby-starport-v1.jpg",
+    "bytes": 524207,
+    "sha256": "5111e2109c577a5931acd89b1bd9bd4e52d31b0190119875f1295f1f3f46c84c"
+  },
+  {
+    "file": "assets/ui/scenes/relic-workshop-v1.jpg",
+    "bytes": 456590,
+    "sha256": "0ee0fc0847bb09c227610b680f9ab72b4dce9fa0a89205ceb6750bb47ea10494"
+  },
+  {
+    "file": "assets/ui/scenes/summon-observatory-v1.jpg",
+    "bytes": 538202,
+    "sha256": "0ba394a008b9e8a0dc5af4defe48c1745c5cbd48f5880dd4f2bb7b2722466a7d"
+  }
+]

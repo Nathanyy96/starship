@@ -1,11 +1,6 @@
 data/players.json
 data/players.json.tmp
 data/players.json.bak
-node_modules/
-public/
-.vercel/
-.env
-.env.local
 _docx_qa_*/
 tools/__pycache__/
 # Local roster and document render experiments.
@@ -17,3 +12,7 @@ docx-qa-*/
 docx-render-*/
 # Kaggle/video experiments and render outputs remain local until curated.
 video/
+
+public/
+.vercel/
+local-*-data/

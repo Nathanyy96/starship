@@ -1,0 +1,95 @@
+{
+  "scope": "QWER anchor sample; not all formations or art acceptance",
+  "rows": [
+    {
+      "max": false,
+      "floor": 1,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 1,
+      "maxRounds": 1
+    },
+    {
+      "max": false,
+      "floor": 25,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 9,
+      "maxRounds": 11
+    },
+    {
+      "max": false,
+      "floor": 50,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 20,
+      "maxRounds": 25
+    },
+    {
+      "max": false,
+      "floor": 90,
+      "samples": 30,
+      "wins": 0,
+      "timeouts": 0,
+      "minRounds": 8,
+      "maxRounds": 9
+    },
+    {
+      "max": false,
+      "floor": 100,
+      "samples": 30,
+      "wins": 0,
+      "timeouts": 0,
+      "minRounds": 6,
+      "maxRounds": 7
+    },
+    {
+      "max": true,
+      "floor": 1,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 1,
+      "maxRounds": 1
+    },
+    {
+      "max": true,
+      "floor": 25,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 4,
+      "maxRounds": 5
+    },
+    {
+      "max": true,
+      "floor": 50,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 8,
+      "maxRounds": 9
+    },
+    {
+      "max": true,
+      "floor": 90,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 27,
+      "maxRounds": 33
+    },
+    {
+      "max": true,
+      "floor": 100,
+      "samples": 30,
+      "wins": 30,
+      "timeouts": 0,
+      "minRounds": 35,
+      "maxRounds": 43
+    }
+  ]
+}

@@ -1,0 +1,6062 @@
+{
+  "characters": [
+    {
+      "id": "celesia",
+      "name": "瑟蕾雅",
+      "tags": [
+        "mark"
+      ]
+    },
+    {
+      "id": "reyn",
+      "name": "雷恩",
+      "tags": [
+        "mark",
+        "escort"
+      ]
+    },
+    {
+      "id": "lia",
+      "name": "莉亞",
+      "tags": [
+        "heal",
+        "shield-C2"
+      ]
+    },
+    {
+      "id": "isar",
+      "name": "伊薩爾",
+      "tags": []
+    },
+    {
+      "id": "rena",
+      "name": "蕾娜",
+      "tags": []
+    },
+    {
+      "id": "eda",
+      "name": "艾妲",
+      "tags": [
+        "shield",
+        "cleanse",
+        "attack-buff"
+      ]
+    },
+    {
+      "id": "veyra",
+      "name": "薇珂",
+      "tags": [
+        "defense-down"
+      ]
+    },
+    {
+      "id": "harlow",
+      "name": "赫洛",
+      "tags": [
+        "shield",
+        "escort",
+        "heal"
+      ]
+    },
+    {
+      "id": "elorna",
+      "name": "艾洛娜",
+      "tags": [
+        "summon",
+        "heal-form"
+      ]
+    },
+    {
+      "id": "chodan",
+      "name": "Chodan",
+      "tags": [
+        "shield",
+        "cleanse-C4"
+      ]
+    },
+    {
+      "id": "magenta",
+      "name": "Magenta",
+      "tags": [
+        "mark",
+        "burn-mark",
+        "reaction"
+      ]
+    },
+    {
+      "id": "hina",
+      "name": "Hina",
+      "tags": [
+        "mark",
+        "wind-reaction"
+      ]
+    },
+    {
+      "id": "siyeon",
+      "name": "Siyeon",
+      "tags": [
+        "heal",
+        "cleanse",
+        "shielded-heal"
+      ]
+    },
+    {
+      "id": "mave",
+      "name": "梅芙",
+      "tags": [
+        "delay"
+      ]
+    },
+    {
+      "id": "cenwu",
+      "name": "岑霧",
+      "tags": [
+        "wind-reaction"
+      ]
+    },
+    {
+      "id": "ruida",
+      "name": "芮妲",
+      "tags": [
+        "shield",
+        "escort"
+      ]
+    },
+    {
+      "id": "yuan",
+      "name": "榆安",
+      "tags": [
+        "heal",
+        "summon",
+        "shield-C2",
+        "cleanse-C4"
+      ]
+    },
+    {
+      "id": "rovienne",
+      "name": "羅薇恩",
+      "tags": [
+        "self-cost",
+        "shield-C2"
+      ]
+    },
+    {
+      "id": "risan",
+      "name": "璃珊",
+      "tags": [
+        "mark",
+        "accuracy"
+      ]
+    },
+    {
+      "id": "yaoze",
+      "name": "曜澤",
+      "tags": [
+        "shield"
+      ]
+    },
+    {
+      "id": "maro",
+      "name": "瑪洛",
+      "tags": [
+        "heal",
+        "cleanse"
+      ]
+    },
+    {
+      "id": "evelyn",
+      "name": "伊芙琳",
+      "tags": [
+        "dispel"
+      ]
+    },
+    {
+      "id": "mirea",
+      "name": "澪歌",
+      "tags": [
+        "zone",
+        "defense-down"
+      ]
+    },
+    {
+      "id": "ferye",
+      "name": "菲芮",
+      "tags": [
+        "tailwind"
+      ]
+    },
+    {
+      "id": "noreia",
+      "name": "諾芮亞",
+      "tags": [
+        "attack-buff",
+        "shield"
+      ]
+    },
+    {
+      "id": "orivelle",
+      "name": "奧薇拉",
+      "tags": [
+        "mark",
+        "snake-mark",
+        "snake-poison",
+        "summon"
+      ]
+    }
+  ],
+  "pets": 25,
+  "combinations": 650,
+  "scope": "not a test result; all equip allowed, event classification needs individual review",
+  "rows": [
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "celesia",
+      "characterName": "瑟蕾雅",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "reyn",
+      "characterName": "雷恩",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "lia",
+      "characterName": "莉亞",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "isar",
+      "characterName": "伊薩爾",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rena",
+      "characterName": "蕾娜",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "eda",
+      "characterName": "艾妲",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "veyra",
+      "characterName": "薇珂",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "harlow",
+      "characterName": "赫洛",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "elorna",
+      "characterName": "艾洛娜",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "chodan",
+      "characterName": "Chodan",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "magenta",
+      "characterName": "Magenta",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "hina",
+      "characterName": "Hina",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "siyeon",
+      "characterName": "Siyeon",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mave",
+      "characterName": "梅芙",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "cenwu",
+      "characterName": "岑霧",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ruida",
+      "characterName": "芮妲",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yuan",
+      "characterName": "榆安",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "rovienne",
+      "characterName": "羅薇恩",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "risan",
+      "characterName": "璃珊",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "yaoze",
+      "characterName": "曜澤",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "maro",
+      "characterName": "瑪洛",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "evelyn",
+      "characterName": "伊芙琳",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "mirea",
+      "characterName": "澪歌",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "ferye",
+      "characterName": "菲芮",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "noreia",
+      "characterName": "諾芮亞",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "star-fox",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "tide-otter",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "wind-bird",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "mirror-sprout",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "aurora-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "rune-drake",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "cloud-whale",
+      "equipAllowed": true,
+      "requiredEvent": "passive",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "celesia-white-cat",
+      "equipAllowed": true,
+      "requiredEvent": "mark",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "chodan-puppy",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "magenta-fox",
+      "equipAllowed": true,
+      "requiredEvent": "reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "hina-cat",
+      "equipAllowed": true,
+      "requiredEvent": "wind-reaction",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "siyeon-hamster",
+      "equipAllowed": true,
+      "requiredEvent": "position",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "veyra-ray",
+      "equipAllowed": true,
+      "requiredEvent": "defense-down",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "harlow-badger",
+      "equipAllowed": true,
+      "requiredEvent": "escort",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "elorna-jellyfish",
+      "equipAllowed": true,
+      "requiredEvent": "summon",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "eda-cat",
+      "equipAllowed": true,
+      "requiredEvent": "cleanse",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "mave-moth",
+      "equipAllowed": true,
+      "requiredEvent": "delay",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "rovienne-fawn",
+      "equipAllowed": true,
+      "requiredEvent": "self-cost",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "risan-butterfly",
+      "equipAllowed": true,
+      "requiredEvent": "accuracy",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "yaoze-bear",
+      "equipAllowed": true,
+      "requiredEvent": "shield",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "evelyn-ferret",
+      "equipAllowed": true,
+      "requiredEvent": "dispel",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "mirea-seal",
+      "equipAllowed": true,
+      "requiredEvent": "zone",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "ferye-swallow",
+      "equipAllowed": true,
+      "requiredEvent": "tailwind-party",
+      "expected": "general-or-party-condition",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "noreia-dove",
+      "equipAllowed": true,
+      "requiredEvent": "attack-buff",
+      "expected": "no-native-trigger-unless-compatible-party-effect",
+      "reviewStatus": "design-spec-not-tested"
+    },
+    {
+      "characterId": "orivelle",
+      "characterName": "奧薇拉",
+      "petId": "orivelle-newt",
+      "equipAllowed": true,
+      "requiredEvent": "snake-poison",
+      "expected": "potential-capability-check-skill-version",
+      "reviewStatus": "design-spec-not-tested"
+    }
+  ]
+}

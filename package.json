@@ -1,13 +1,14 @@
 {
   "name": "starship-response-gacha",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "星界之律｜回覆召集的可測試抽卡核心與瀏覽器試玩介面",
   "scripts": {
-    "test": "node --test test/challenge-reset.test.mjs test/gacha.test.js test/bulk-development.test.js test/battle.test.js test/battle-arena.test.js test/trial-1-2.test.js test/trial-half-attempts.test.mjs test/voyage-continuation.test.mjs test/first-major-mechanics.test.js test/maintenance.test.mjs test/skin-migration.test.js test/author-preview.test.mjs test/story-narration.test.js test/shop.test.js test/browser-data-parity.test.js test/map-integrity.test.js test/exploration.test.js test/exploration-dialogue.test.js test/first-major-world.test.js test/guild-commissions.test.js test/first-act-game.test.js test/release-1-1-prep.test.js test/story-1-1-missions.test.js test/story-visual-review.test.js test/player-backup.test.mjs test/release-1-1-live.test.mjs test/story-monster-catalog.test.js test/exploration-renderer.test.js test/character-motion.test.js test/story-interactions.test.js test/exploration-characters.test.js test/explorer-selection.test.js test/story-map-entry.test.js test/terrain-navigation.test.js test/workshop-scene-sample.test.js test/exploration-story-art.test.js test/native-terrain.test.js test/world-home.test.js test/world-home-server.test.mjs test/resident-art.test.js",
+    "test": "node --test test/challenge-reset.test.mjs test/gacha.test.js test/bulk-development.test.js test/battle.test.js test/battle-arena.test.js test/trial-1-2.test.js test/trial-half-attempts.test.mjs test/voyage-continuation.test.mjs test/first-major-mechanics.test.js test/maintenance.test.mjs test/skin-migration.test.js test/shop.test.js test/browser-data-parity.test.js test/player-backup.test.mjs test/equipment.test.js test/equipment-api.test.mjs test/pet-api.test.mjs test/game-scene-shell.test.js test/star-ascension.test.js test/star-ascension-api.test.mjs test/battle-replay.test.cjs test/static-boundary.test.mjs test/pet-growth-ui.test.cjs test/hub-release.test.cjs test/equipment-pet-v2.test.cjs test/serverless-postgres.test.mjs test/vercel-handler.test.mjs",
     "test:reset": "node --test test/challenge-reset.test.mjs",
     "serve": "node serve.mjs",
-    "start": "node serve.mjs"
+    "start": "node serve.mjs",
+    "test:monster-visuals": "node --test test/monster-visuals.test.cjs test/battle-arena.test.js"
   },
   "dependencies": {
     "pg": "^8.16.3",

@@ -1,0 +1,342 @@
+{
+  "status": "draft",
+  "generator": "built-in imagegen",
+  "specs": [
+    {
+      "id": "BE-001",
+      "name": "草脊跳獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-001.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 草脊跳獸。生態：陸。出沒：暮穗晨麥原；鑄曜琥珀果原；織庭根谷外圍。普攻：短距跳咬。技能造型線索：下次跳擊瞄準後排，提前顯示目標。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-002",
+      "name": "薄翅掠蟲",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-002.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 薄翅掠蟲。生態：空。出沒：六國低地、港口與農野；不在密封地下廊。普攻：俯衝啄刺。技能造型線索：薄翼振動使自身下一次普攻增傷15%。戰術定位：突襲；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-003",
+      "name": "濕苔殼螺",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-003.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 濕苔殼螺。生態：兩棲。出沒：暮穗河岸；澄環淺灘；望門潮池。普攻：殼緣碰撞。技能造型線索：縮殼一回合減傷20%，期間不攻擊。戰術定位：防護；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-004",
+      "name": "岩背伏蜥",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-004.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 岩背伏蜥。生態：陸。出沒：暮穗北丘；鑄曜石灰岩；織庭高原；望門崖岸。普攻：尾掃前排。技能造型線索：保護一名後排，分攤一次盾後傷害20%。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-005",
+      "name": "潮牙獵魚",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-005.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 潮牙獵魚。生態：海。出沒：澄環航道；暮穗河口；寂雪南灣；織庭及望門近岸。普攻：單體咬擊。技能造型線索：每三回合標記最低生命比例目標供同伴集火。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-006",
+      "name": "漂囊浮母",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-006.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 漂囊浮母。生態：海。出沒：澄環深水；寂雪峽灣外海；望門外島。普攻：觸鬚脈衝。技能造型線索：每三回合為最低血同伴提供自身生命5%的盾。戰術定位：支援；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-007",
+      "name": "鉤翼夜蝠",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-007.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 鉤翼夜蝠。生態：空。出沒：六國洞口與夜間林地；只在通風洞穴深處出現。普攻：聲波單體。技能造型線索：每三回合標示一名角色，下次對其主動攻擊增傷10%。戰術定位：突襲；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-008",
+      "name": "遷潮翼鰭",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-008.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 遷潮翼鰭。生態：海空。出沒：澄環、寂雪、織庭、望門外海季節遷徙帶。普攻：掠水翼擊。技能造型線索：俯衝前一回合預告；命中兩名最低防禦角色。戰術定位：突襲；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-009",
+      "name": "麥穗啃甲",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-009.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 麥穗啃甲。生態：陸。出沒：晨麥原田埂與倉外。普攻：短顎啃咬。技能造型線索：護甲張開使自身防禦提高10%一回合。戰術定位：防護；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-010",
+      "name": "桑枝黏蛛",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-010.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 桑枝黏蛛。生態：陸。出沒：桑枝樹冠與林下。普攻：蛛絲刺擊。技能造型線索：使一名角色速度降低5%一回合。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-011",
+      "name": "河汀泡蛙",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-011.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 河汀泡蛙。生態：兩棲。出沒：穗燈城上游濕地與河洲。普攻：泡團撞擊。技能造型線索：向兩名前排噴泡，各造成低倍率傷害。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-012",
+      "name": "攀枝獵猿",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-012.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 攀枝獵猿。生態：陸。出沒：桑枝外圍林谷。普攻：枝間撲擊。技能造型線索：鎖定上回合造成最高直接傷害的角色。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-013",
+      "name": "幕穴回聲蛾",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-013.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 幕穴回聲蛾。生態：空。出沒：山腹古劇場通風洞廊。普攻：振翼幻粉。技能造型線索：蓄力後讓一名角色下一次技能傷害降低10%。戰術定位：突襲；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-014",
+      "name": "河根護獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-014.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 河根護獸。生態：陸。出沒：穗燈城郊古河根區。普攻：根角撞擊。技能造型線索：兩回合替兩名同伴各擋一次攻擊的15%傷害。戰術定位：防護；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-015",
+      "name": "暮帆鉤鰭",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-015.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 暮帆鉤鰭。生態：海。出沒：暮帆港外河海交界。普攻：鉤鰭切擊。技能造型線索：命中已被標示的角色後附小額兩回合傷害。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-016",
+      "name": "穗原巨角",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-016.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 穗原巨角。生態：陸。出沒：晨麥原北緣季節活動區。普攻：巨角橫頂。技能造型線索：先蓄力一回合再衝兩名前排；蓄力盾被打破時衝撞減傷40%。戰術定位：攻擊；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-017",
+      "name": "鹽灘彈蟹",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-017.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 鹽灘彈蟹。生態：兩棲。出沒：浮庭港外鹽灘。普攻：螯擊。技能造型線索：橫移後下一次普攻改打另一名前排。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-018",
+      "name": "果島刺蜥",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-018.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 果島刺蜥。生態：陸。出沒：乾燥牧島、紅土果園。普攻：短尾刺擊。技能造型線索：反擊一次近身直接攻擊，低倍率。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-019",
+      "name": "礁鳴海葵",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-019.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 礁鳴海葵。生態：海。出沒：月蝕礁與沉珊外緣。普攻：觸手音刺。技能造型線索：下回合使同伴單體攻擊提高6%。戰術定位：支援；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-020",
+      "name": "浮帆翼魚",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-020.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 浮帆翼魚。生態：海空。出沒：競渡水域。普攻：翼鰭掠擊。技能造型線索：一回合後俯衝後排，之後速度降低10%一回合。戰術定位：突襲；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-021",
+      "name": "伏礁鉗獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-021.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 伏礁鉗獸。生態：海。出沒：月蝕礁裂溝。普攻：重鉗壓擊。技能造型線索：連續保護最低血同伴兩回合，自身下一擊減傷15%。戰術定位：防護；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-022",
+      "name": "沉珊燈鰻",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-022.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 沉珊燈鰻。生態：海。出沒：沉珊海民城外廢棄礁帶。普攻：電狀淨式脈衝。技能造型線索：每三回合攻兩人並清除各一小段護盾。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-023",
+      "name": "鯨路附潮獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-023.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 鯨路附潮獸。生態：海。出沒：巨鯨背聚落季節航道外圍。普攻：腹鰭撞擊。技能造型線索：追蹤最高生命目標，命中後給自己5%生命盾。戰術定位：攻擊；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-024",
+      "name": "環礁冠魟",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-024.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 環礁冠魟。生態：海。出沒：月蝕礁深部。普攻：環翼橫切。技能造型線索：雙階段：翼展蓄力群攻；收翼時防禦降低15%一回合。戰術定位：攻擊；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-025",
+      "name": "琥珀食果蠹",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-025.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 琥珀食果蠹。生態：陸。出沒：琥珀果原。普攻：顎刺。技能造型線索：啃食一次果囊回復自身生命4%。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-026",
+      "name": "白崖滾甲",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-026.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 白崖滾甲。生態：陸。出沒：匠鎮外石灰岩坡。普攻：滾撞。技能造型線索：蓄勢一回合，下次傷害提高15%。戰術定位：防護；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-027",
+      "name": "窯縫灰翅",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-027.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 窯縫灰翅。生態：空。出沒：自由匠鎮外廢窯與荒地。普攻：灰翼切風。技能造型線索：對一名角色附一回合受療降低10%。戰術定位：突襲；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-028",
+      "name": "礦脈鏨獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-028.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 礦脈鏨獸。生態：陸。出沒：地下萬作廊側洞。普攻：晶齒鑿擊。技能造型線索：每三回合下一擊部分忽略防禦，護盾仍有效。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-029",
+      "name": "廊頂懸蛛",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-029.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 廊頂懸蛛。生態：陸。出沒：萬作廊通風高廊。普攻：垂絲刺擊。技能造型線索：對上回合放大招者施加小額傷害標記。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-030",
+      "name": "鳴瓷聚殼",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-030.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 鳴瓷聚殼。生態：陸。出沒：曜京外廢棄試作場。普攻：瓷片擲擊。技能造型線索：每三回合為兩同伴給4%生命盾，盾破後自身露出弱點。戰術定位：支援；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-031",
+      "name": "岬風刃鷗",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-031.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 岬風刃鷗。生態：空。出沒：鑄曜東岬海岸。普攻：俯衝刃翼。技能造型線索：攻擊當前護盾最低者。戰術定位：突襲；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-032",
+      "name": "萬作廊複殼體",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-032.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 萬作廊複殼體。生態：陸。出沒：地下萬作廊封存試驗區。普攻：複殼重擊。技能造型線索：複寫一項可複寫增益兩回合，之後散殼蓄力。戰術定位：防護；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-033",
+      "name": "暖泉絨蠑",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-033.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 暖泉絨蠑。生態：兩棲。出沒：暖泉聚落外溪谷。普攻：尾拍。技能造型線索：溫泉護膜提供自身3%生命盾。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-034",
+      "name": "松針背鼠",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-034.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 松針背鼠。生態：陸。出沒：黑松墓林邊緣。普攻：針背碰撞。技能造型線索：被直接命中後下一次普攻增傷10%。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-035",
+      "name": "湖冰滑鰭",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-035.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 湖冰滑鰭。生態：海。出沒：白夜湖岸及未凍水道。普攻：滑鰭切擊。技能造型線索：兩回合一次改攻後排。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-036",
+      "name": "黑松巡獵獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-036.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 黑松巡獵獸。生態：陸。出沒：黑松墓林。普攻：短距撲咬。技能造型線索：對有負面目標傷害提高10%。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-037",
+      "name": "霧翅灰鴞",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-037.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 霧翅灰鴞。生態：空。出沒：離歌殿外林崖。普攻：羽刃點擊。技能造型線索：為一名角色施加受傷提高6%一回合。戰術定位：支援；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-038",
+      "name": "峽灣甲鰭",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-038.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 峽灣甲鰭。生態：海。出沒：北陸峽灣。普攻：甲鰭撞擊。技能造型線索：收甲時減傷20%，下回合展甲兩目標攻擊。戰術定位：防護；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-039",
+      "name": "雪線巨足",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-039.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 雪線巨足。生態：陸。出沒：內陸高地與夏季牧道外緣。普攻：重踏。技能造型線索：連續兩回合前排壓力後休整一回合。戰術定位：防護；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-040",
+      "name": "白夜角冠",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-040.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 白夜角冠。生態：陸。出沒：白夜湖高岸。普攻：角冠重刺。技能造型線索：標記前後排各一人，下回合按順序攻擊；標記淨化則改低倍率普攻。戰術定位：攻擊；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-041",
+      "name": "根谷啃芽蟲",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-041.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 根谷啃芽蟲。生態：陸。出沒：根海階地農圃外緣。普攻：顎咬。技能造型線索：每場一次啃根回復3%生命。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-042",
+      "name": "砂橋躍蜥",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-042.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 砂橋躍蜥。生態：陸。出沒：彩穹城外砂岩橋谷。普攻：躍擊。技能造型線索：換側攻擊另一名前排。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-043",
+      "name": "繭絲浮蛾",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-043.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 繭絲浮蛾。生態：空。出沒：劇院外林帶與染園。普攻：鱗粉彈。技能造型線索：給一個同伴下一次受擊減傷8%。戰術定位：支援；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-044",
+      "name": "根谷搬殼獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-044.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 根谷搬殼獸。生態：陸。出沒：根海階地。普攻：殼角頂撞。技能造型線索：替後排承擔一次20%傷害，承擔後自身防禦降低5%。戰術定位：防護；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-045",
+      "name": "倒湖鏡鰭",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-045.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 倒湖鏡鰭。生態：海。出沒：倒懸湖局部水域。普攻：鰭刃。技能造型線索：以兩回合姿態交替選擇前排或後排。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-046",
+      "name": "種庫伏藤",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-046.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 種庫伏藤。生態：陸。出沒：初芽庫外失養洞園。普攻：藤鞭。技能造型線索：兩回合一次纏住一人，使其下一次普攻傷害降低15%。戰術定位：攻擊；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-047",
+      "name": "斷灣巡翼",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-047.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 斷灣巡翼。生態：空。出沒：近岸斷島風口。普攻：翼爪橫掃。技能造型線索：蓄力後對兩人攻擊，身上可驅散增益使此招提高10%。戰術定位：突襲；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-048",
+      "name": "根海盤巢母",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-048.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 根海盤巢母。生態：陸。出沒：根海階地下層洞園。普攻：長肢刺擊。技能造型線索：每兩回合選擇育殼或攻擊；每場最多召兩隻低階啃芽蟲。戰術定位：攻擊；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-049",
+      "name": "階崖鉤蜥",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-049.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 階崖鉤蜥。生態：陸。出沒：上下層階城外崖道。普攻：鉤爪。技能造型線索：先標示一名前排，再以低倍率追加段攻擊。戰術定位：攻擊；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-050",
+      "name": "潮池鼓蟹",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-050.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 潮池鼓蟹。生態：兩棲。出沒：門港外潮池。普攻：螯拍。技能造型線索：下回合給一名同伴防禦提高8%。戰術定位：支援；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-051",
+      "name": "島風絮翼",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-051.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 島風絮翼。生態：空。出沒：主島草坡與外島農地。普攻：絮翼切擊。技能造型線索：給自己下一次受擊減傷10%。戰術定位：突襲；等階：低。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-052",
+      "name": "崖洞盲蠍",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-052.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 崖洞盲蠍。生態：陸。出沒：主島崖洞。普攻：尾刺。技能造型線索：蓄力後施加兩回合小額持續傷害。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-053",
+      "name": "長階游鰻",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-053.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 長階游鰻。生態：海。出沒：長階海短渡水域。普攻：游鰻咬擊。技能造型線索：攻擊有標記對象，無標記時正常選敵。戰術定位：攻擊；等階：中。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-054",
+      "name": "外島折羽獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-054.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 外島折羽獸。生態：空。出沒：外側島鏈風崖。普攻：斜翼突擊。技能造型線索：準備一回合後兩段攻擊不同對象，落地一回合降防10%。戰術定位：突襲；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-055",
+      "name": "門隙甲獸",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-055.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 門隙甲獸。生態：陸。出沒：外島通路入口的穩定台地。普攻：甲刃撞擊。技能造型線索：每三回合交換自身攻擊／防護姿態，不改地圖或空間。戰術定位：防護；等階：高。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    },
+    {
+      "id": "BE-056",
+      "name": "階潮雙棲王",
+      "path": "D:/Codex work/Starship/project/update-release-20261025/assets/enemies/regional-20261102/be-056.png",
+      "prompt": "Use case: stylized-concept. Asset: ONE original fantasy RPG enemy full-body cutout, part of a cohesive bestiary. Design this creature literally following its Chinese animal name and anatomy: 階潮雙棲王。生態：兩棲。出沒：外島洞口潮間台地。普攻：甲爪與潮撞。技能造型線索：陸態護前排、潮態群攻，轉態前一回合預告；殘留護盾不跨態刷新。戰術定位：攻擊；等階：首領。Japanese anime fantasy game monster illustration, beautiful detailed but clean cel shading, natural ecological colors, readable silhouette, believable creature anatomy, threatening wild monster not a cute pet. Full body including all limbs wings fins tail, centered three-quarter view facing left, 10 percent transparent padding. Regional identity from habitat not compulsory elemental colors. No humans, no text, no numbers, no card, no border, no scenery, no background, no floor. Genuine transparent background."
+    }
+  ]
+}

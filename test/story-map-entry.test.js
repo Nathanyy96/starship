@@ -1,2 +1,0 @@
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-test('article archive no longer offers a world map jump',()=>{const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8'),app=fs.readFileSync(path.join(__dirname,'..','src/player-app.js'),'utf8');assert.doesNotMatch(html,/story-open-world-map/);assert.doesNotMatch(app,/story-open-world-map/);assert.match(html,/<section id="map-view"[^>]*hidden/);assert.match(html,/id="play-first-act"/);});

@@ -10,7 +10,7 @@ const source = fs.readFileSync(require.resolve("../src/battle.js"), "utf8").repl
   "    simulateBattle: simulateBattle,",
   "    audit: { setCombat: function(value){combat=value;}, useSignatureSkill: useSignatureSkill, afterHit: afterHit, hit: hit, tickUnit: tickUnit }, simulateBattle: simulateBattle,"
 );
-const sandbox = { module: { exports: {} } };
+const sandbox = { module: { exports: {} }, StarshipPetSystem: require("../src/pet-system.js") };
 vm.runInNewContext(source, sandbox);
 const audit = sandbox.module.exports.audit;
 

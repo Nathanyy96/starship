@@ -1,0 +1,3426 @@
+{
+  "status": "draft",
+  "note": "difficultyBudget is monotone encounter budget index, not stat multiplier; reference-level stats must be calibrated separately; mixed habitats are trial projections only",
+  "stages": [
+    {
+      "floor": 1,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 2,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0101010101010102,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 3,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.02020202020202,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 4,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0303030303030303,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 5,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-042",
+          "name": "砂橋躍蜥",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0404040404040404,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 6,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-050",
+          "name": "潮池鼓蟹",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0505050505050506,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 7,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-011",
+          "name": "河汀泡蛙",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0606060606060606,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 8,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0707070707070707,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 9,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-027",
+          "name": "窯縫灰翅",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0808080808080809,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 10,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-035",
+          "name": "湖冰滑鰭",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.0909090909090908,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 11,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-042",
+          "name": "砂橋躍蜥",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-043",
+          "name": "繭絲浮蛾",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.101010101010101,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 12,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-050",
+          "name": "潮池鼓蟹",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-051",
+          "name": "島風絮翼",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1111111111111112,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 13,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-011",
+          "name": "河汀泡蛙",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.121212121212121,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 14,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1313131313131313,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 15,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-027",
+          "name": "窯縫灰翅",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1414141414141414,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 16,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-035",
+          "name": "湖冰滑鰭",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1515151515151516,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 17,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-043",
+          "name": "繭絲浮蛾",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1616161616161615,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 18,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-051",
+          "name": "島風絮翼",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1717171717171717,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 19,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1818181818181819,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 20,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.1919191919191918,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 21,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.202020202020202,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 22,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2121212121212122,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 23,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-042",
+          "name": "砂橋躍蜥",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2222222222222223,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 24,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-050",
+          "name": "潮池鼓蟹",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2323232323232323,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 25,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "mid-tier-anchor-variant",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        },
+        {
+          "speciesId": "BE-011",
+          "name": "河汀泡蛙",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2424242424242424,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv80 C0; initial three-star pets; six Lv0 items per character",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 26,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2525252525252526,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 27,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2626262626262625,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 28,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2727272727272727,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 29,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-042",
+          "name": "砂橋躍蜥",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2828282828282829,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 30,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-050",
+          "name": "潮池鼓蟹",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.2929292929292928,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 31,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-011",
+          "name": "河汀泡蛙",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.303030303030303,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 32,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3131313131313131,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 33,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-027",
+          "name": "窯縫灰翅",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3232323232323233,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 34,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-035",
+          "name": "湖冰滑鰭",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3333333333333333,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 35,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-043",
+          "name": "繭絲浮蛾",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3434343434343434,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 36,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-051",
+          "name": "島風絮翼",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3535353535353536,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 37,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3636363636363638,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 38,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3737373737373737,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 39,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.3838383838383839,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 40,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.393939393939394,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 41,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-046",
+          "name": "種庫伏藤",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.404040404040404,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 42,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-054",
+          "name": "外島折羽獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4141414141414141,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 43,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4242424242424243,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 44,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-023",
+          "name": "鯨路附潮獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4343434343434343,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 45,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4444444444444444,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 46,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-039",
+          "name": "雪線巨足",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4545454545454546,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 47,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-047",
+          "name": "斷灣巡翼",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-042",
+          "name": "砂橋躍蜥",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4646464646464645,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 48,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-055",
+          "name": "門隙甲獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-050",
+          "name": "潮池鼓蟹",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4747474747474747,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 49,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-011",
+          "name": "河汀泡蛙",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.4848484848484849,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 50,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-021",
+          "name": "伏礁鉗獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.494949494949495,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 51,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-027",
+          "name": "窯縫灰翅",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5050505050505052,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 52,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-038",
+          "name": "峽灣甲鰭",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-035",
+          "name": "湖冰滑鰭",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5151515151515151,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 53,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-046",
+          "name": "種庫伏藤",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-043",
+          "name": "繭絲浮蛾",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5252525252525253,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 54,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-054",
+          "name": "外島折羽獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-051",
+          "name": "島風絮翼",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5353535353535355,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 55,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5454545454545454,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 56,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-023",
+          "name": "鯨路附潮獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5555555555555556,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 57,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5656565656565657,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 58,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-039",
+          "name": "雪線巨足",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5757575757575757,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 59,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-047",
+          "name": "斷灣巡翼",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.5858585858585859,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 60,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-055",
+          "name": "門隙甲獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.595959595959596,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 61,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.606060606060606,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 62,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-021",
+          "name": "伏礁鉗獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6161616161616161,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 63,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6262626262626263,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 64,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-038",
+          "name": "峽灣甲鰭",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6363636363636362,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 65,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-046",
+          "name": "種庫伏藤",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6464646464646466,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 66,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-054",
+          "name": "外島折羽獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6565656565656566,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 67,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6666666666666665,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 68,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-023",
+          "name": "鯨路附潮獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.676767676767677,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 69,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.6868686868686869,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 70,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-039",
+          "name": "雪線巨足",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.696969696969697,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 71,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-047",
+          "name": "斷灣巡翼",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7070707070707072,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 72,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-055",
+          "name": "門隙甲獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7171717171717171,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 73,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7272727272727273,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 74,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-021",
+          "name": "伏礁鉗獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7373737373737375,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 75,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7474747474747474,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 76,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-038",
+          "name": "峽灣甲鰭",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7575757575757576,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 77,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-046",
+          "name": "種庫伏藤",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7676767676767677,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 78,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-054",
+          "name": "外島折羽獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7777777777777777,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 79,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.7878787878787878,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 80,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-023",
+          "name": "鯨路附潮獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.797979797979798,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 81,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.808080808080808,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 82,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-039",
+          "name": "雪線巨足",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8181818181818183,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 83,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-047",
+          "name": "斷灣巡翼",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8282828282828283,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 84,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-055",
+          "name": "門隙甲獸",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8383838383838382,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 85,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-014",
+          "name": "河根護獸",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-015",
+          "name": "暮帆鉤鰭",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8484848484848486,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 86,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-021",
+          "name": "伏礁鉗獸",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-022",
+          "name": "沉珊燈鰻",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8585858585858586,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 87,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-030",
+          "name": "鳴瓷聚殼",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-031",
+          "name": "岬風刃鷗",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8686868686868687,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 88,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-038",
+          "name": "峽灣甲鰭",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.878787878787879,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 89,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-046",
+          "name": "種庫伏藤",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "高"
+        },
+        {
+          "speciesId": "BE-044",
+          "name": "根谷搬殼獸",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        }
+      ],
+      "difficultyBudget": 1.8888888888888888,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "progressive-development",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 90,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-056",
+          "name": "階潮雙棲王",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-052",
+          "name": "崖洞盲蠍",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-051",
+          "name": "島風絮翼",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.898989898989899,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 91,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-016",
+          "name": "穗原巨角",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-012",
+          "name": "攀枝獵猿",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-009",
+          "name": "麥穗啃甲",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9090909090909092,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 92,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-024",
+          "name": "環礁冠魟",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-019",
+          "name": "礁鳴海葵",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-018",
+          "name": "果島刺蜥",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9191919191919191,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 93,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-032",
+          "name": "萬作廊複殼體",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-028",
+          "name": "礦脈鏨獸",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-025",
+          "name": "琥珀食果蠹",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9292929292929293,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 94,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-040",
+          "name": "白夜角冠",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-037",
+          "name": "霧翅灰鴞",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-033",
+          "name": "暖泉絨蠑",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9393939393939394,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 95,
+      "regionTheme": "織庭諸城",
+      "enemies": [
+        {
+          "speciesId": "BE-048",
+          "name": "根海盤巢母",
+          "slot": 0,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-045",
+          "name": "倒湖鏡鰭",
+          "slot": 1,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-041",
+          "name": "根谷啃芽蟲",
+          "slot": 2,
+          "sourceRegion": "織庭諸城",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9494949494949494,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 96,
+      "regionTheme": "望門共同體",
+      "enemies": [
+        {
+          "speciesId": "BE-056",
+          "name": "階潮雙棲王",
+          "slot": 0,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-053",
+          "name": "長階游鰻",
+          "slot": 1,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-049",
+          "name": "階崖鉤蜥",
+          "slot": 2,
+          "sourceRegion": "望門共同體",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9595959595959596,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 97,
+      "regionTheme": "暮穗聯邦",
+      "enemies": [
+        {
+          "speciesId": "BE-016",
+          "name": "穗原巨角",
+          "slot": 0,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-013",
+          "name": "幕穴回聲蛾",
+          "slot": 1,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-010",
+          "name": "桑枝黏蛛",
+          "slot": 2,
+          "sourceRegion": "暮穗聯邦",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9696969696969697,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 98,
+      "regionTheme": "澄環海盟",
+      "enemies": [
+        {
+          "speciesId": "BE-024",
+          "name": "環礁冠魟",
+          "slot": 0,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-020",
+          "name": "浮帆翼魚",
+          "slot": 1,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-017",
+          "name": "鹽灘彈蟹",
+          "slot": 2,
+          "sourceRegion": "澄環海盟",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.9797979797979797,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 99,
+      "regionTheme": "鑄曜共和國",
+      "enemies": [
+        {
+          "speciesId": "BE-032",
+          "name": "萬作廊複殼體",
+          "slot": 0,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-029",
+          "name": "廊頂懸蛛",
+          "slot": 1,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-026",
+          "name": "白崖滾甲",
+          "slot": 2,
+          "sourceRegion": "鑄曜共和國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 1.98989898989899,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    },
+    {
+      "floor": 100,
+      "regionTheme": "寂雪王國",
+      "enemies": [
+        {
+          "speciesId": "BE-040",
+          "name": "白夜角冠",
+          "slot": 0,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "首領"
+        },
+        {
+          "speciesId": "BE-036",
+          "name": "黑松巡獵獸",
+          "slot": 1,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "中"
+        },
+        {
+          "speciesId": "BE-034",
+          "name": "松針背鼠",
+          "slot": 2,
+          "sourceRegion": "寂雪王國",
+          "variant": "trial-projection",
+          "biologicalTier": "低"
+        }
+      ],
+      "difficultyBudget": 2,
+      "statCalibration": "pending-author-review-and-combat-simulation",
+      "anchor": "4 native-four-star Lv100 C6 six-star; four-star pets Lv25 C4; cherished set Lv20",
+      "maxSummons": 2,
+      "source": "draft-not-connected-to-activities.js"
+    }
+  ]
+}

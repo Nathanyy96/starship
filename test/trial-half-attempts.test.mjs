@@ -46,13 +46,13 @@ test("trial charges only victories, refunds provable legacy defeat charges, and 
     assert.equal(result.battle.challengeComplete, true);
     assert.equal(result.battle.won, false);
     assert.equal(result.reward.attemptsUsed, 0);
-    assert.equal(result.reward.attemptsRemaining, 3);
+    assert.equal(result.reward.attemptsRemaining, 2);
     assert.equal(result.reward.starSand, 0);
     assert.equal(result.state.trialProgress.attempts[1], 2);
     const failedSingle = await post("/api/player/trial-battle", { token: registration.token, stageId: 10, team: ["celesia"] });
     assert.equal(failedSingle.battle.won, false);
     assert.equal(failedSingle.reward.attemptsUsed, 0);
-    assert.equal(failedSingle.reward.attemptsRemaining, 3);
+    assert.equal(failedSingle.reward.attemptsRemaining, 2);
     const improved = JSON.parse(fs.readFileSync(file, "utf8"));
     for (const id of teamUpper.concat(teamLower)) improved.players.halftester.state.characterProgress[id] = { level: 90, constellation: 3 };
     fs.writeFileSync(file, JSON.stringify(improved));
@@ -63,7 +63,7 @@ test("trial charges only victories, refunds provable legacy defeat charges, and 
     assert.equal(result.battle.won, true);
     assert.equal(result.state.trialProgress.attempts[11], 1);
     assert.equal(result.reward.attemptsUsed, 1);
-    assert.equal(result.reward.attemptsRemaining, 2);
+    assert.equal(result.reward.attemptsRemaining, 1);
     assert.equal(result.battle.won, result.battle.halfResults.every(half => half.won));
     assert.equal(result.state.trialProgress.attempts[1], 2);
     result = await post("/api/player/trial-battle", { token: registration.token, stageId: 11, teamUpper: ["harlow"], teamLower: ["celesia"] });

@@ -8,10 +8,10 @@ const teams = [["magenta", "siyeon", "chodan", "hina"], ["mave", "harlow", "elor
 const progress = Object.fromEntries(teams.flat().map(id => [id, { level: 90, constellation: 3 }]));
 const stats = battle.buildEffectiveStats(data.characterBattleStats, { characterProgress: progress });
 function seeded(seed) { return () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296); }
-test("1.2 exposes only 1–15 with complete rewards, three attempts and real monster art", () => {
+test("1.2 exposes only 1–15 with complete rewards, two rewarded victories and real monster art", () => {
   assert.deepEqual(data.trialStages.map(s => s.id), Array.from({length:15}, (_,i)=>i+1));
   for (const stage of data.trialStages) {
-    assert.equal(stage.maxChallengeAttempts, 3);
+    assert.equal(stage.maxChallengeAttempts, 2);
     assert.ok(stage.reward.starSand > 0 && stage.reward.characterExp > 0);
     assert.ok(stage.teamHint && stage.counterplay);
     for (const enemy of stage.enemies) assert.ok(fs.existsSync(require("node:path").resolve(__dirname,"..",enemy.image)));

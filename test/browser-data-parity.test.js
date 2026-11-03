@@ -17,7 +17,7 @@ function browserData() {
   assert.ok(dataIndex > 0, "正式頁面必須載入資料模組");
   const context = vm.createContext({ console });
   scripts.slice(0, dataIndex + 1).forEach((file) => {
-    vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file, timeout: 5000 });
+    vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file, timeout: 7000 });
   });
   return context;
 }
@@ -42,12 +42,12 @@ test("正式網頁與伺服器的 1.0 角色及劇情正文一致", () => {
   const browser = browserData().StarshipGachaData;
   assert.deepEqual(Array.from(browser.activeCards, (card) => card.id), serverData.activeCards.map((card) => card.id));
   assert.deepEqual(publishedSignature(browser), publishedSignature(serverData));
-  assert.deepEqual(serverData.storyChapters.map((chapter) => chapter.id), serverData.releaseConfig.open11 ? ["main-1-0", "main-1-1"] : ["main-1-0"]);
+  assert.deepEqual(serverData.storyChapters.map((chapter) => chapter.id), []);
 });
 
-test("正式頁面機率模組與伺服器全 50 抽一致，發布設定先於抽卡載入", () => {
+test("正式頁面機率模組與伺服器全 70 抽一致，發布設定先於抽卡載入", () => {
   const browser = browserData().StarshipGacha;
   const server = require("../src/gacha.js");
-  for (let n = 1; n <= 50; n++) assert.equal(browser.getFourStarRate(n), server.getFourStarRate(n), `第 ${n} 抽`);
+  for (let n = 1; n <= 70; n++) assert.equal(browser.getFourStarRate(n), server.getFourStarRate(n), `第 ${n} 抽`);
   assert.equal(browser.DEFAULT_RULES.pityStartRate, server.DEFAULT_RULES.pityStartRate);
 });

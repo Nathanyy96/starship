@@ -10,6 +10,9 @@
   var release = typeof module === "object" && module.exports ? require("./release-config.js") : rootRelease();
   function rootRelease() { return typeof globalThis !== "undefined" ? globalThis.StarshipReleaseConfig : null; }
   var revisedRates = Boolean(release && release.open11);
+  var equipment = typeof module === 'object' && module.exports ? require('./equipment.js') : globalThis.StarshipEquipment;
+  var petSystem = typeof module === 'object' && module.exports ? require('./pet-system.js') : globalThis.StarshipPetSystem;
+  var starAscension = typeof module === 'object' && module.exports ? require('./star-ascension.js') : globalThis.StarshipStarAscension;
 
   /**
    * 星界之律｜回覆召集的現行規則。
@@ -18,19 +21,20 @@
    * 都可以使用同一份抽卡核心，不會因為動畫或十連按鈕而產生另一套機率。
    */
   var DEFAULT_RULES = Object.freeze({
-    hardPity: 50,
-    noEarlyFourStarPulls: 20,
-    pityStartPull: 21,
-    pityStartRate: revisedRates ? 0.10 : 0.15,
+    hardPity: 70,
+    noEarlyFourStarPulls: 0,
+    pityStartPull: 1,
+    pityStartRate: 0.006,
+    pityGrowth: 1.05,
     pityStep: 0,
     featuredRate: 0.55,
-    threeStarRate: 0.20,
+    threeStarRate: 1,
     bonusStarSandRate: 0.08,
     bonusStarSandAmount: 40,
     nonCharacterReward: Object.freeze({ characterExp: 120 }),
     development: Object.freeze({
-      // 80 等後先進行角色專屬突破；現行版本最高開放到 90 等。
-      // 100 等保留給後續版本的第二階段玩法，現在不會出現在玩家介面。
+      // 80 等保留角色專屬材料突破；原星階上限90，升星另開95／100。
+      // 星階等級上限由 star-ascension 的角色路線決定。
       maxLevel: 90,
       breakthroughLevel: 80,
       futureMaxLevel: 100,
@@ -77,6 +81,7 @@
     assert(rules.noEarlyFourStarPulls < rules.hardPity, "前段禁止出 4★ 的抽數必須小於硬保底");
     assert(Number.isInteger(rules.pityStartPull) && rules.pityStartPull === rules.noEarlyFourStarPulls + 1, "pityStartPull 必須接在前段保護之後");
     assert(rules.pityStartRate >= 0 && rules.pityStartRate <= 1, "pityStartRate 必須介於 0 與 1 之間");
+    assert(Number.isFinite(rules.pityGrowth) && rules.pityGrowth >= 1, "pityGrowth 必須是大於等於1的有限數");
     assert(rules.pityStep >= 0 && rules.pityStep <= 1, "pityStep 必須介於 0 與 1 之間");
     assert(rules.featuredRate >= 0 && rules.featuredRate <= 1, "featuredRate 必須介於 0 與 1 之間");
     assert(rules.threeStarRate >= 0 && rules.threeStarRate <= 1, "threeStarRate 必須介於 0 與 1 之間");
@@ -117,16 +122,7 @@
       return 1;
     }
 
-    // 保留一格真正的硬保底：前一抽不會因為機率先到 100% 而被誤標成硬保底。
-    // 第 50 抽由 _rollOne 的 isHardPity 直接保證，讓 UI 能清楚區分軟保底與硬保底。
-    var earlyRate = revisedRates ? 0.10 : 0.15;
-    var middleRate = revisedRates ? 0.15 : 0.25;
-    if (pullNumber <= 30) return earlyRate;
-    if (pullNumber <= 40) return middleRate;
-    // 41–49 抽以指數曲線加速；第 50 抽仍由硬保底保證。
-    var progress = (pullNumber - 40) / (rules.hardPity - 40);
-    var rate = middleRate + (1 - middleRate) * (Math.pow(2, progress) - 1);
-    return Math.min(0.99, Math.max(0, rate));
+    return Math.min(0.99,rules.pityStartRate*Math.pow(rules.pityGrowth,pullNumber-1));
   }
 
   function formatPercent(value) {
@@ -188,6 +184,9 @@
   function initialState() {
     return {
       version: 1,
+      equipment: equipment.initial(),
+      petSummon: petSystem.initial(),
+      starAscension: starAscension.initial(),
       resources: {
         starSand: 160,
         starMarks: 0,
@@ -291,14 +290,13 @@
     var source = isPlainObject(input) ? clone(input) : initialState();
     var state = initialState();
     state.version = source.version || 1;
-    state.worldPosition = isPlainObject(source.worldPosition) ? clone(source.worldPosition) : null;
-    state.worldWaypoints = Array.isArray(source.worldWaypoints) ? Array.from(new Set(source.worldWaypoints.filter(function (id) { return typeof id === "string"; }))).slice(0, 40) : [];
     var savedResources = isPlainObject(source.resources) ? source.resources : {};
     ["starSand", "starMarks", "characterExp"].forEach(function (key) {
       if (Object.prototype.hasOwnProperty.call(savedResources, key)) state.resources[key] = savedResources[key];
     });
     state.selectedFeatured = isPlainObject(source.selectedFeatured) ? source.selectedFeatured : {};
     state.collection = isPlainObject(source.collection) ? source.collection : {};
+    state.equipment = equipment.normalize(source.equipment,state.collection);
     state.characterProgress = isPlainObject(source.characterProgress) ? source.characterProgress : {};
     Object.keys(state.characterProgress).forEach(function (id) {
       var progress = isPlainObject(state.characterProgress[id]) ? state.characterProgress[id] : {};
@@ -442,6 +440,10 @@
     state.petProgress.showcase.ratedBy = isPlainObject(state.petProgress.showcase.ratedBy) ? state.petProgress.showcase.ratedBy : {};
     state.petProgress.ratedShowcases = isPlainObject(state.petProgress.ratedShowcases) ? state.petProgress.ratedShowcases : {};
     state.petProgress.lastAction = isPlainObject(state.petProgress.lastAction) ? state.petProgress.lastAction : null;
+    state.activities = (typeof require==='function'?require('./tower-system.js'):globalThis.StarshipActivities).normalize(source.activities);
+    state.petSummon = petSystem.normalize(source.petSummon,state);
+    var ascensionCards={};banners.forEach(function(b){b.featured4Stars.concat(b.standard4Stars,b.standard3Stars).forEach(function(c){ascensionCards[c.id]=c;});});
+    state.starAscension=starAscension.normalize(source.starAscension,state.collection,ascensionCards);
     state.bannerExchanges = isPlainObject(source.bannerExchanges) ? source.bannerExchanges : {};
     state.totalPulls = Number.isInteger(source.totalPulls) && source.totalPulls >= 0 ? source.totalPulls : 0;
     state.history = Array.isArray(source.history) ? source.history.slice(-50).map(function (entry) {
@@ -475,7 +477,7 @@
       }
     });
 
-    return state;
+    return (typeof require==='function'?require('./save-migration.js'):globalThis.StarshipSaveMigration).apply(state);
   }
 
   function validateRandomValue(value) {
@@ -540,6 +542,11 @@
   GachaGame.prototype.getState = function () {
     return clone(this.state);
   };
+  GachaGame.prototype.equipmentAction = function(options){
+    var result=equipment.action(this.state,options);result.state=this.getState();return result;
+  };
+  GachaGame.prototype.petSummonAction = function(options){var result=petSystem.action(this.state,options,this.rng,this.now);this.state=result.state;result.state=this.getState();return result;};
+  GachaGame.prototype.ascendCharacter = function(options){var result=starAscension.action(this.state,options,this.cardById);this.state=result.state;result.state=this.getState();return result;};
 
   GachaGame.prototype.shopAction = function (options) {
     options = options || {};
@@ -666,7 +673,7 @@
     assert((this.state.collection[cardId] || 0) > 0, "尚未取得這名角色，無法培養");
     var progress = this.getCharacterProgress(cardId);
     var rules = this.rules.development;
-    var cap = progress.breakthrough ? rules.maxLevel : rules.breakthroughLevel;
+    var cap = progress.breakthrough ? starAscension.levelCap(this.state,card,rules.maxLevel) : rules.breakthroughLevel;
     var level = progress.level, total = 0, available = this.state.resources.characterExp;
     while (level < cap) {
       var cost = (card.rarity === 4 ? rules.fourStarBaseCharacterExp : rules.threeStarBaseCharacterExp) + (level - 1) * (card.rarity === 4 ? rules.fourStarCharacterExpStep : rules.threeStarCharacterExpStep);
@@ -683,7 +690,7 @@
     assert((this.state.collection[card.id] || 0) > 0, "尚未取得這名角色，無法培養");
     var progress = this.getCharacterProgress(card.id);
     var level = Number.isInteger(progress.level) && progress.level >= 1 ? progress.level : 1;
-    assert(level < this.rules.development.maxLevel, "角色已達目前最高等級");
+    assert(level < starAscension.levelCap(this.state,card,this.rules.development.maxLevel), "角色已達目前最高等級");
     if (level >= this.rules.development.breakthroughLevel && !progress.breakthrough) {
       var requirement = this.getBreakthroughRequirement(card.id);
       assert(false, "角色已達 " + this.rules.development.breakthroughLevel + " 等，請先到 Boss 選單取得 " + requirement.materialName + " 或星界通用突破印記並完成突破");
@@ -849,6 +856,7 @@
     this.state.totalPulls += 1;
     var previousCopies = card ? (this.state.collection[card.id] || 0) : 0;
     var isFirstAcquisition = Boolean(card) && previousCopies === 0;
+    var ascensionWasMax=Boolean(card&&previousCopies>0&&this.getCharacterProgress(card.id).constellation>=this.rules.constellation.max);
     var copy = card ? this._grantCardCopy(card) : null;
     var duplicateReward = makeEmptyReward();
 
@@ -871,6 +879,8 @@
     }
 
     // 只有「出了 4★ 但歪到其他 4★」才發放補償，避免普通未出金時變成無限資源。
+    var overflowMark=starAscension.grantOverflow(this.state,card,ascensionWasMax);
+    if(overflowMark)duplicateReward.ascensionMark=overflowMark;
     if (banner.poolKey === "limited" && card && card.rarity === 4 && !isFeatured) {
       compensationReward.starSand = 1000;
     }
@@ -1192,6 +1202,7 @@
     var daily = refreshPetDaily(progress, this.now());
     var reward = { petFood: 0, petToys: 0, petTokens: 0, showcaseToken: 0, petExp: 0 };
     if (action === "adopt") {
+      assert(definition.rarity!==4,"限定四星星伴只能透過卡池取得");
       assert(!progress.pets[petId] || !progress.pets[petId].owned, "這隻寵物已經在你的工坊");
       assert(resources.petTokens >= 3, "星伴代幣不足，需要 3 枚才能領養");
       resources.petTokens -= 3;
@@ -1253,7 +1264,7 @@
         throw new Error("找不到寵物活動");
       }
       if (action !== "select") {
-        var maxLevel = Number(definition.maxLevel || 30);
+        var maxLevel = Math.min(25, Number(definition.maxLevel || 25));
         var levelUps = 0;
         while (pet.level < maxLevel && pet.exp >= 80 + pet.level * 40) {
           pet.exp -= 80 + pet.level * 40;
