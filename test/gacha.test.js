@@ -99,6 +99,12 @@ test("所有角色共用乾淨完整立繪，名稱與元素由版面文字顯�
   assert.equal(portraitIds.length, 47);
   assert.equal(portraitIds.every((id) => {
     const card = cards[id];
+    const adopted = require("../src/character-atlas.js").byId[id];
+    if (adopted) {
+      assert.equal(card.portraitImage, adopted.image);
+      assert.equal(card.image, adopted.image);
+      return fs.existsSync(path.join(__dirname, "..", adopted.image));
+    }
     assert.equal(card.portraitImage, `./assets/cards/complete/${id}.svg`);
     assert.equal(fs.existsSync(path.join(__dirname, "..", card.image)), true);
     const svg = fs.readFileSync(path.join(__dirname, "..", "assets", "cards", "complete", id + ".svg"), "utf8");

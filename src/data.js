@@ -11,6 +11,7 @@
   var coreKits = typeof require === "function" ? require("./core-kits.js") : globalThis.StarshipCoreKits;
   var replacementKits = typeof require === "function" ? require("./replacement-kits.js") : globalThis.StarshipReplacementKits;
   var release = typeof require === "function" ? require("./release-config.js") : globalThis.StarshipReleaseConfig;
+  var characterAtlas = typeof require === "function" ? require("./character-atlas.js") : globalThis.StarshipCharacterAtlas;
 
   // Node 端必須完整載入已納入資料合併的劇情檔；缺檔或語法錯誤應直接讓啟動與測試失敗。
   // 瀏覽器目前只預載公開版所需來源，未預載的未開放擴充稿保持 null。
@@ -43,6 +44,8 @@
 
   function card(id, name, romanizedName, rarity, element, accent, releaseVersion, note, image, backgroundImage) {
     var futurePlan = futureCharacterPlan[id] || {};
+    var adoptedArt = characterAtlas.byId[id];
+    if (adoptedArt) { image = adoptedArt.image; backgroundImage = image; }
     return Object.freeze({
       id: id,
       name: name,
@@ -58,7 +61,7 @@
       backgroundImage: backgroundImage || image || null,
       // portraitImage 是只包住原始立繪的乾淨 SVG；名稱、星級、元素由
       // 遊戲與文件在圖片上方排版，避免舊式名片卡遮住角色，也讓兩端共用同一來源。
-      portraitImage: image ? (String(image).toLowerCase().endsWith(".svg") ? image : "./assets/cards/complete/" + id + ".svg") : null
+      portraitImage: adoptedArt ? image : image ? (String(image).toLowerCase().endsWith(".svg") ? image : "./assets/cards/complete/" + id + ".svg") : null
     });
   }
 
@@ -129,20 +132,22 @@
   ];
   // 劇情人物依「角色圖鑑｜單人完整立繪」分頁的圖像順序建檔；不進入卡池。
   var storyCharacters = Object.freeze({
+    lifan: { name: "黎帆", romanizedName: "Lifan", portrait: characterAtlas.byId.lifan.image },
+    weina: { name: "葦娜", romanizedName: "Weina", portrait: characterAtlas.byId.weina.image },
     sevin: { name: "塞維恩", romanizedName: "Sevin", portrait: "./assets/story-characters/sevin.png" },
-    seifra: { name: "賽芙拉", romanizedName: "Seifra", portrait: "./assets/story-characters/seifra.png" },
-    noyas: { name: "諾亞斯", romanizedName: "Noyas", portrait: "./assets/story-characters/noyas.png" },
-    kailin: { name: "凱琳", romanizedName: "Kailin", portrait: "./assets/story-characters/kailin.png" },
-    oun: { name: "奧恩", romanizedName: "Oun", portrait: "./assets/story-characters/oun.png" },
-    mila: { name: "米菈", romanizedName: "Mila", portrait: "./assets/story-characters/mila.png" },
-    vark: { name: "老瓦克", romanizedName: "Vark", portrait: "./assets/story-characters/vark.png" },
-    cenwu: { name: "岑霧", romanizedName: "Cenwu", portrait: "./assets/cards/cenwu.png", firstAppearance: "1.1", role: "山腰驛站站長" },
-    ruida: { name: "芮妲", romanizedName: "Ruida", portrait: "./assets/cards/ruida.png", firstAppearance: "1.1", role: "迴音谷車夫" },
-    yuan: { name: "榆安", romanizedName: "Yuan", portrait: "./assets/cards/yuan.png", firstAppearance: "1.1", role: "隨車藥師" },
-    musa: { name: "穆莎", romanizedName: "Musa", portrait: "./assets/story-characters/musa.png", firstAppearance: "1.2", role: "橋北林聚落採集者", artStatus: "第一版設計稿" },
-    kerida: { name: "珂芮妲", romanizedName: "Kerida", portrait: "./assets/story-characters/kerida.png", firstAppearance: "1.2", role: "半退休資深外勤測量師", artStatus: "第二版待作者確認" },
-    dori: { name: "朵梨", romanizedName: "Dori", portrait: "./assets/story-characters/dori.png", firstAppearance: "1.3", role: "洛汀港補給船工", artStatus: "第一版設計稿" },
-    wenlan: { name: "溫藍", romanizedName: "Wenlan", portrait: "./assets/story-characters/wenlan.png", firstAppearance: "1.4", role: "鐘庭物資管事", artStatus: "第一版設計稿" }
+    seifra: { name: "賽芙拉", romanizedName: "Seifra", portrait: characterAtlas.byId.seifra.image },
+    noyas: { name: "諾亞斯", romanizedName: "Noyas", portrait: characterAtlas.byId.noyas.image },
+    kailin: { name: "凱琳", romanizedName: "Kailin", portrait: characterAtlas.byId.kailin.image },
+    oun: { name: "奧恩", romanizedName: "Oun", portrait: characterAtlas.byId.oun.image },
+    mila: { name: "米菈", romanizedName: "Mila", portrait: characterAtlas.byId.mila.image },
+    vark: { name: "老瓦克", romanizedName: "Vark", portrait: characterAtlas.byId.vark.image },
+    cenwu: { name: "岑霧", romanizedName: "Cenwu", portrait: characterAtlas.byId.cenwu.image, firstAppearance: "1.1", role: "山腰驛站站長" },
+    ruida: { name: "芮妲", romanizedName: "Ruida", portrait: characterAtlas.byId.ruida.image, firstAppearance: "1.1", role: "迴音谷車夫" },
+    yuan: { name: "榆安", romanizedName: "Yuan", portrait: characterAtlas.byId.yuan.image, firstAppearance: "1.1", role: "隨車藥師" },
+    musa: { name: "穆莎", romanizedName: "Musa", portrait: characterAtlas.byId.musa.image, firstAppearance: "1.2", role: "橋北林聚落採集者", artStatus: "03M自然站姿採用圖20261103" },
+    kerida: { name: "珂芮妲", romanizedName: "Kerida", portrait: characterAtlas.byId.kerida.image, firstAppearance: "1.2", role: "半退休資深外勤測量師", artStatus: "03M自然站姿採用圖20261103" },
+    dori: { name: "朵梨", romanizedName: "Dori", portrait: characterAtlas.byId.dori.image, firstAppearance: "1.3", role: "洛汀港補給船工", artStatus: "03M自然站姿採用圖20261103" },
+    wenlan: { name: "溫藍", romanizedName: "Wenlan", portrait: characterAtlas.byId.wenlan.image, firstAppearance: "1.4", role: "鐘庭物資管事", artStatus: "03M自然站姿採用圖20261103" }
   });
   var characterAssets = Object.freeze(Object.fromEntries(Object.values(cards).map(function (entry) {
     var currentRelease = Number(entry.releaseVersion) <= 2.5;
@@ -398,11 +403,11 @@
   var maveSummerSkin = { id: "skin-mave-summer-beach-party", characterId: "mave", characterName: "梅芙", rarity: 4, name: "梅芙｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "採用正式新版的金色眼睛與黑紫長髮，搭配夏日服裝和完整海灘立繪；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；舊版已取得者保留", previewImage: "./assets/cards/skins/mave-summer-beach-party.png", accent: "#f2a8d6" };
   var harlowSummerSkin = { id: "skin-harlow-summer-beach-party", characterId: "harlow", characterName: "赫洛", rarity: 4, name: "赫洛｜夏日海灘派對", themeLabel: "SUMMER BEACH PARTY", previewTitle: "夏日海灘派對", description: "保留赫洛的臉部特徵與金色眼睛，改變服裝、動作、姿勢與完整展示立繪，不改變戰鬥數值。", source: "大廳商店購買；角色開放後可選為上場造型", previewImage: "./assets/cards/skins/harlow-summer-beach-party.png", accent: "#f5c36d" };
   var newSeasonSkins = [
-    { id: "skin-celesia-fluffy-white-cat", characterId: "celesia", characterName: "瑟蕾雅", name: "瑟蕾雅｜綿綿白貓", themeLabel: "FLUFFY WHITE CAT", previewTitle: "綿綿白貓", previewImage: "./assets/cards/skins/celesia-new.png", accent: "#d9c6ef" },
-    { id: "skin-chodan-qwer", characterId: "chodan", characterName: "Chodan", name: "Chodan｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/chodan-new.png", accent: "#d4b7f7" },
-    { id: "skin-magenta-qwer", characterId: "magenta", characterName: "Magenta", name: "Magenta｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/magenta-new.png", accent: "#efb8d9" },
-    { id: "skin-hina-qwer", characterId: "hina", characterName: "Hina", name: "Hina｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/hina-new.png", accent: "#a5d6ee" },
-    { id: "skin-siyeon-qwer", characterId: "siyeon", characterName: "Siyeon", name: "Siyeon｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: "./assets/cards/skins/siyeon-new.png", accent: "#e4b6c8" }
+    { id: "skin-celesia-fluffy-white-cat", characterId: "celesia", characterName: "瑟蕾雅", name: "瑟蕾雅｜綿綿白貓", themeLabel: "FLUFFY WHITE CAT", previewTitle: "綿綿白貓", previewImage: characterAtlas.byId["skin-celesia-fluffy-white-cat"].image, accent: "#d9c6ef" },
+    { id: "skin-chodan-qwer", characterId: "chodan", characterName: "Chodan", name: "Chodan｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: characterAtlas.byId["skin-chodan-qwer"].image, accent: "#d4b7f7" },
+    { id: "skin-magenta-qwer", characterId: "magenta", characterName: "Magenta", name: "Magenta｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: characterAtlas.byId["skin-magenta-qwer"].image, accent: "#efb8d9" },
+    { id: "skin-hina-qwer", characterId: "hina", characterName: "Hina", name: "Hina｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: characterAtlas.byId["skin-hina-qwer"].image, accent: "#a5d6ee" },
+    { id: "skin-siyeon-qwer", characterId: "siyeon", characterName: "Siyeon", name: "Siyeon｜QWER", themeLabel: "QWER", previewTitle: "QWER", previewImage: characterAtlas.byId["skin-siyeon-qwer"].image, accent: "#e4b6c8" }
   ].map(function (skin) { return Object.assign({ rarity: 4, description: "第一大版本角色圖鑑正式造型；只改變外觀，不改變戰鬥數值。", source: "大廳商店購買；取得角色後可選為上場造型" }, skin); });
   var voyageConfig = {
     version: voyageVersion,
@@ -626,6 +631,7 @@
   return {
     cards: cards,
     characterAssets: characterAssets,
+    characterAtlas: characterAtlas,
     storyCharacters: storyCharacters,
     isarAscended: isarAscended,
     activeCards: activeCards,

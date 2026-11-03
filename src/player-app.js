@@ -78,14 +78,14 @@
     // All character surfaces must use the same clean portrait source as the
     // design documents.  The version query is intentional: deployed browsers
     // may still have an older labeled card cached at the same asset URL.
-    var characterPortraitAssetVersion = "first-major-author-art-20261017";
+    var characterPortraitAssetVersion = "standing-20261103";
     function characterPortraitSource(card, state, useEquippedSkin) {
       // SVG wrappers reference sibling PNGs; browsers do not load those external
       // references when the SVG is used as a CSS background or an <img> source.
       var progress = card && state && state.characterProgress && state.characterProgress[card.id];
       var equippedId = useEquippedSkin && state && state.cosmetics && state.cosmetics.equippedSkins && card && state.cosmetics.equippedSkins[card.id];
       var equipped = equippedId && state.cosmetics.skins && state.cosmetics.skins[equippedId] && (data.shopCatalog.skins || []).find(function (item) { return item.id === equippedId && item.characterId === card.id; });
-      var source = equipped ? equipped.image : card && card.id === "elorna" && progress && progress.activeForm === "deepwater" ? "./assets/cards/elorna-deepwater.webp" : card && (card.image || card.backgroundImage || card.portraitImage) || "";
+      var source = equipped ? equipped.image : card && card.id === "elorna" && progress && progress.activeForm === "deepwater" ? data.characterAtlas.byId["elorna-deepwater"].image : card && (card.image || card.backgroundImage || card.portraitImage) || "";
       if (!source || /^(data|blob):/i.test(source) || /[?&]v=/.test(source)) return source;
       return source + (source.indexOf("?") >= 0 ? "&" : "?") + "v=" + characterPortraitAssetVersion;
     }
@@ -556,6 +556,9 @@ function renderMilestoneRewards() {
       return window.StarshipBattle && stats[cardId] ? window.StarshipBattle.teamPower([cardId], stats) : 0;
     }
     function characterAnimationFor(cardId) {
+      // Legacy rendered clips depict retired outfits; keep their files for history,
+      // but do not present them as animation of the newly adopted standing art.
+      if (data.characterAtlas.byId[cardId]) return null;
       return data.characterAnimations && data.characterAnimations[cardId] || null;
     }
     function resetCharacterAnimationVideo() {
@@ -630,6 +633,7 @@ function renderMilestoneRewards() {
       var ascendedPreview = card.id === "isar" && data.isarAscended ? "<details class=\"character-variant\"><summary>查看伊薩爾 4★ 升格卡面（圖鑑預覽）</summary><img src=\"" + escapeHtml(data.isarAscended.portrait) + "\" alt=\"伊薩爾四星升格卡面\" loading=\"lazy\"><p>升格卡面與三星原稿分開保留，目前不加入召集池。</p></details>" : "";
       if(hub)ascendedPreview=''; // Star ascension retains the current approved portrait.
       var formControls = card.id === "elorna" && copies ? "<section class=\"character-variant\"><h4>上場型態</h4><p>兩型態共享面板與命座；陸地偏測線，深水偏救援。</p><div class=\"detail-actions\"><button class=\"secondary-action\" data-character-form=\"land\" type=\"button\" aria-pressed=\"" + (progress.activeForm !== "deepwater") + "\">陸地／淺水</button><button class=\"secondary-action\" data-character-form=\"deepwater\" type=\"button\" aria-pressed=\"" + (progress.activeForm === "deepwater") + "\">深水魚尾</button></div></section>" : "";
+      if (card.id === "elorna") formControls += "<details class=\"character-variant\"><summary>圖鑑造型預覽（尚未開放取得）</summary>" + ["skin-elorna-purple-jellyfish", "skin-elorna-jellyfish-gown"].map(function(id){var art=data.characterAtlas.byId[id];return "<figure><img src=\""+escapeHtml(art.image)+"\" alt=\""+escapeHtml(art.name)+"\" loading=\"lazy\"><figcaption>"+escapeHtml(art.name)+"</figcaption></figure>";}).join("") + "</details>";
       var constellationTips = {
         chodan: {
           1: "Chodan 施放「月式鼓點」後，由其他隊友施放技能消耗合拍；普通攻擊不算。C1 可讓合拍從 2 次增加為 3 次。",
@@ -910,7 +914,7 @@ function renderMilestoneRewards() {
       function portrait(unit, isEnemy) { var card = !isEnemy && battleCharacterById(unit.id); return isEnemy ? enemyArtFor(unit) : card && characterPortraitSource(card, state, true); }
       function name(unit, isEnemy) { var card = !isEnemy && battleCharacterById(unit.id); return isEnemy ? unit.name : card ? card.name : unit.id; }
       var atlases = {"black-crystal-beast.webp":"crystal-beast", "black-crystal-spine-beast.webp":"spine-beast", "folding-shadow-beast.webp":"folding-shadow", "spider-mother.webp":"spider-mother", "resonant-spider.webp":"resonant-spider"};
-      function atlasFor(unit, image, isEnemy) { if (!isEnemy && /\/skins\//.test(image)) return ["celesia","magenta","hina","chodan","siyeon"].indexOf(unit.id) >= 0 && image.indexOf("/" + unit.id + "-new.png") >= 0 ? unit.id + "-skin" : ""; if (!isEnemy) return ["magenta","siyeon","chodan","hina","celesia","reyn","lia","isar","cenwu","ruida","yuan","veyra","harlow","rena","elorna","eda","mave","rovienne","risan","yaoze","maro"].indexOf(unit.id) >= 0 ? unit.id : ""; return Object.keys(atlases).find(function (path) { return image.indexOf(path) >= 0; }) ? atlases[Object.keys(atlases).find(function (path) { return image.indexOf(path) >= 0; })] : ""; }
+      function atlasFor(unit, image, isEnemy) { if (!isEnemy && /\/standing-20261103\//.test(image)) return ""; if (!isEnemy && /\/skins\//.test(image)) return ["celesia","magenta","hina","chodan","siyeon"].indexOf(unit.id) >= 0 && image.indexOf("/" + unit.id + "-new.png") >= 0 ? unit.id + "-skin" : ""; if (!isEnemy) return ["magenta","siyeon","chodan","hina","celesia","reyn","lia","isar","cenwu","ruida","yuan","veyra","harlow","rena","elorna","eda","mave","rovienne","risan","yaoze","maro"].indexOf(unit.id) >= 0 ? unit.id : ""; return Object.keys(atlases).find(function (path) { return image.indexOf(path) >= 0; }) ? atlases[Object.keys(atlases).find(function (path) { return image.indexOf(path) >= 0; })] : ""; }
       function fighter(unit, isEnemy, index) {
         var image = portrait(unit, isEnemy) || "", atlas = atlasFor(unit, image, isEnemy);
         var old = previousUnit(unit, isEnemy);
@@ -919,7 +923,7 @@ function renderMilestoneRewards() {
         var guarded = !opening && old && (unit.hp > old.hp || unit.shield > old.shield);
         var pose = unit.hp <= 0 ? "down" : acting ? (frame.actionType === "charge" ? "charge" : frame.actionType === "guard" || frame.actionType === "support" ? "guard" : "attack") : hurt ? "hurt" : guarded ? "guard" : "idle";
         var monster = isEnemy && typeof window !== "undefined" && window.StarshipMonsterCatalog && window.StarshipMonsterCatalog.find(unit);
-        var art = monster ? window.StarshipMonsterMotion.markup(unit,pose,frame.actionType) : atlas ? "<span class=\"battle-action-sprite " + atlas + " " + pose + "\" aria-hidden=\"true\"></span>" : "<img src=\"" + escapeHtml(image) + "\" alt=\"\">";
+        var art = monster ? window.StarshipMonsterMotion.markup(unit,pose,frame.actionType) : atlas ? "<span class=\"battle-action-sprite " + atlas + " " + pose + "\" aria-hidden=\"true\"></span>" : "<img class=\"battle-standing-portrait\" src=\"" + escapeHtml(image) + "\" alt=\"\" decoding=\"async\">";
         var slot = Math.max(1, Math.min(4, Number(unit.slot || index + 1)));
         var row=unit.row==='back'?'back':unit.row==='front'?'front':index<2?'front':'back',members=isEnemy?frame.enemies:frame.team,rowIndex=members.slice(0,index).filter(function(u,i){return (u.row==='back'?'back':u.row==='front'?'front':i<2?'front':'back')===row;}).length;
         var formation=' data-row="'+row+'"'+(isEnemy?' style="grid-column:'+(row==='front'?1:2)+';grid-row:'+(rowIndex+1)+'"':'');

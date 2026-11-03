@@ -1542,6 +1542,7 @@ body:has(#player-gate:not([hidden])) .topbar .eyebrow, body:has(#game-lobby:not(
 .battle-arena-fighter { display: flex; align-items: center; flex-direction: column; min-width: 0; padding: 4px 2px 3px; border-radius: 8px; transition: background .2s ease, opacity .2s ease; }
 .battle-arena-fighter.acting { background: rgba(255,221,133,.1); }.battle-arena-fighter.targeted { background: rgba(255,126,126,.12); }.battle-arena-fighter.down { opacity: .46; filter: grayscale(.75); }
 .battle-arena-figure { display: grid; place-items: end center; width: 100%; height: 195px; }
+.battle-arena .battle-standing-portrait { height: 100%; max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 4px 8px #0005); }
 .battle-arena .battle-action-sprite, .battle-arena-fighter img { display: block; width: min(100%,190px); height: auto; aspect-ratio: 1; object-fit: contain; object-position: center bottom; }
 .enemy-formation .battle-arena-fighter { display: grid; grid-template-columns: 160px minmax(0,1fr); align-items: center; column-gap: 12px; }.enemy-formation .battle-arena-figure { grid-row: span 2; height: 154px; }.enemy-formation .battle-action-sprite, .enemy-formation .battle-arena-fighter img { width: min(100%,150px); }
 .battle-arena .battle-action-sprite.attack { animation: combat-attack-frames .62s steps(1,end) both, battle-arena-advance .62s ease-out both; }
