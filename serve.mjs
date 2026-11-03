@@ -742,6 +742,7 @@ function bossStageById(bossId) {
   return stage;
 }
 
+function battleSummary(battle){if(!battle)return battle;const copy={...battle};delete copy.timeline;return copy;}
 function runBoss(currentState, body) {
   const state = ensurePlayerMilestones(currentState);
   const stage = bossStageById(body.bossId);
@@ -756,10 +757,10 @@ function runBoss(currentState, body) {
   const attempts = Number(state.bossProgress.attempts[stage.id] || 0);
   if (attempts >= bossMaxRewards) throw new Error("這個 Boss 在目前版本已完成 " + bossMaxRewards + " 次，請等待下次更新重置挑戰次數");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
-  const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random });
+  const battle = simulateBattle({ team, stats: effectiveStats, stage, rng: Math.random, captureTimeline:true });
   state.bossProgress.selectedBossId = stage.id;
   state.bossProgress.selectedTeam = team;
-  state.bossProgress.lastBattle = battle;
+  state.bossProgress.lastBattle = battleSummary(battle);
   const reward = stage.reward || {};
   if (battle.won) {
     state.bossProgress.attempts[stage.id] = attempts + 1;
@@ -795,9 +796,9 @@ function runDispatch(currentState, body) {
   if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
   if (state.dispatchProgress.claimed[mission.id]) throw new Error("這份委託本版本已完成，請等待下次版本更新");
   const effectiveStats = buildEffectiveStats(characterBattleStats, state);
-  const battle = simulateBattle({ team, stats: effectiveStats, stage: mission, rng: Math.random });
+  const battle = simulateBattle({ team, stats: effectiveStats, stage: mission, rng: Math.random, captureTimeline:true });
   state.dispatchProgress.selectedTeam = team;
-  state.dispatchProgress.lastMission = { missionId: mission.id, battle };
+  state.dispatchProgress.lastMission = { missionId: mission.id, battle: battleSummary(battle) };
   const reward = {};
   Object.keys(mission.reward || {}).forEach((key) => {
     const amount = Number(mission.reward[key] || 0);
@@ -843,10 +844,10 @@ function runVoyage(currentState, body) {
     if (!team.length) throw new Error("至少派出 1 名角色才能進行星海迷航戰鬥");
     if (team.some((id) => !characterBattleStats[id] || !(state.collection[id] > 0))) throw new Error("只能派出已取得且已開放的角色");
     const stage = voyageStageByNode(node);
-    battle = simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, state), stage, rng: Math.random });
+    battle = simulateBattle({ team, stats: buildEffectiveStats(characterBattleStats, state), stage, rng: Math.random, captureTimeline:true });
   }
-  const result = game.advanceVoyage({ nodeId: node.id, choice: body.choice, team, battle });
-  return Object.assign({ state: result.state, node: result.node, nextNode: result.nextNode, battle: result.battle, reward: result.reward, ending: result.ending }, { voyageVersion });
+  const result = game.advanceVoyage({ nodeId: node.id, choice: body.choice, team, battle: battleSummary(battle) });
+  return Object.assign({ state: result.state, node: result.node, nextNode: result.nextNode, battle: battle || result.battle, reward: result.reward, ending: result.ending }, { voyageVersion });
 }
 
 function petAction(currentState, body) {

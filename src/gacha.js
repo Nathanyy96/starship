@@ -29,8 +29,8 @@
     pityGrowth: 1.05,
     pityStep: 0,
     featuredRate: 0.55,
-    threeStarRate: 1,
-    bonusStarSandRate: 0.08,
+    threeStarRate: 0.2,
+    bonusStarSandRate: 0,
     bonusStarSandAmount: 40,
     nonCharacterReward: Object.freeze({ characterExp: 120 }),
     development: Object.freeze({
@@ -847,7 +847,7 @@
       card = pick(banner.standard3Stars, this.rng.bind(this));
       pity.pullsSince4Star = pityPullNumber;
     } else {
-      // 非角色結果提供養成經驗；另有 8% 小機率掉落少量星砂。
+      // 非角色結果提供120角色經驗；正式設定不額外返還星砂。
       resourceReward.characterExp = this.rules.nonCharacterReward.characterExp;
       if (validateRandomValue(this.rng()) < this.rules.bonusStarSandRate) {
         resourceReward.starSand = this.rules.bonusStarSandAmount;

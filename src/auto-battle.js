@@ -1,0 +1,10 @@
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.StarshipAutoBattle=factory();}(typeof globalThis!=='undefined'?globalThis:this,function(){'use strict';
+var active=new WeakMap();
+function mount(host,battle,render,options){if(!host||!battle?.timeline?.length)return;options=options||{};var prior=active.get(host);if(prior)prior.stop();var frames=battle.timeline,index=0,timer=null,owner=options.owner,focused=false;
+function stop(){if(timer)clearInterval(timer);timer=null;}
+function valid(){return host.isConnected&&!host.closest('[hidden]')&&!document.hidden&&(!options.getOwner||options.getOwner()===owner);}
+function draw(){host.innerHTML='<div class="auto-battle-stage">'+render(frames[index],frames[index-1])+'</div><div class="auto-battle-controls"><button class="small-button" data-auto-play>'+(timer?'暫停':index===frames.length-1?'重新播放':'繼續播放')+'</button><button class="small-button" data-auto-end>跳過至結算</button><button class="small-button" data-auto-focus>'+(focused?'返回頁面':'戰鬥全景')+'</button><span role="status">行動 '+(index+1)+' / '+frames.length+'</span></div>';}
+function play(){stop();if(index===frames.length-1)index=0;timer=setInterval(function(){if(!valid()){stop();focused=false;host.classList.remove('battle-stage-focused');var button=host.querySelector('[data-auto-play]');if(button)button.textContent='繼續播放';return;}if(index<frames.length-1)index++;if(index===frames.length-1)stop();draw();},680);draw();}
+host.onclick=function(event){if(event.target.closest('[data-auto-play]')){if(timer){stop();draw();}else play();}if(event.target.closest('[data-auto-end]')){stop();index=frames.length-1;draw();}if(event.target.closest('[data-auto-focus]')){focused=!focused;host.classList.toggle('battle-stage-focused',focused);draw();}};
+host.classList.add('automatic-battle-replay');active.set(host,{stop:stop});play();if(options.scroll!==false)host.scrollIntoView({block:'start',behavior:'smooth'});return {stop:stop};}
+return {mount:mount};}));

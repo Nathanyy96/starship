@@ -1,0 +1,21 @@
+const test=require('node:test'),assert=require('node:assert/strict'),data=require('../src/data'),{GachaGame}=require('../src/gacha'),pets=require('../src/pet-system');
+function game(rng){return new GachaGame({banners:data.banners,petDefinitions:data.petDefinitions,rng,state:{collection:{celesia:1},resources:{starSand:100000,characterExp:10000}}});}
+function pet(g,count=1){return g.petSummonAction({bannerId:pets.banner.id,action:'draw',count,expectedRevision:g.getState().petSummon.revision});}
+function sequence(values){let i=0;return ()=>{assert.ok(i<values.length,'unexpected extra RNG call');return values[i++];};}
+test('both pools use 20% three-star / 80% materials conditional on missing four-star, and material pulls advance pity',()=>{
+ let role=0,companion=0;for(let i=0;i<100;i++){const n=(i+.5)/100,g=game(sequence([.99,n,0])),b=data.banners.find(b=>b.active!==false),before=g.getState(),r=g.pull({bannerId:b.id,count:1});role+=r.results[0].rarity===3;if(r.results[0].kind==='resource'){assert.equal(r.state.resources.characterExp,before.resources.characterExp+120);assert.equal(r.state.resources.starSand,before.resources.starSand-160);assert.deepEqual(r.state.collection,before.collection);}assert.equal(r.pity.pullsSince4Star,1);
+ const p=game(sequence(n<.2?[.99,n,0]:[.99,n])),s=p.getState(),out=pet(p);companion+=out.results[0].rarity===3;if(out.results[0].kind==='material'){assert.equal(out.results[0].petId,null);assert.equal(out.state.petProgress.resources.petFood,s.petProgress.resources.petFood+1);assert.deepEqual(out.state.petProgress.pets,s.petProgress.pets);assert.deepEqual(out.state.petSummon.constellations,s.petSummon.constellations);assert.deepEqual(out.state.petSummon.marks,s.petSummon.marks);}assert.equal(out.state.petSummon.pityGroups[pets.banner.poolKey],1);}
+ assert.equal(role,20);assert.equal(companion,20);
+});
+test('mixed pet ten-pull never reuses a previous pet for a material slot; all ten entries survive normalization',()=>{
+ const rolls=[.99,.1,0,.99,.9,0,0,0,...Array.from({length:7},()=>[.99,.9]).flat()],g=game(sequence(rolls)),before=g.getState(),out=pet(g,10);
+ assert.deepEqual(out.results.map(r=>r.kind),['pet','material','pet',...Array(7).fill('material')]);assert.equal(out.state.petProgress.resources.petFood,before.petProgress.resources.petFood+8);assert.equal(out.state.petSummon.totalPulls,10);assert.equal(out.state.petSummon.pityGroups[pets.banner.poolKey],7);assert.equal(out.state.petSummon.constellations['star-fox'],1);assert.equal(out.state.petSummon.constellations['celesia-white-cat'],0);assert.equal(out.state.resources.starSand,before.resources.starSand-1200);assert.deepEqual(out.state.pity,before.pity);assert.deepEqual(out.state.collection,before.collection);
+ assert.deepEqual(new GachaGame({banners:data.banners,petDefinitions:data.petDefinitions,state:out.state}).getState().petSummon,out.state.petSummon);
+});
+test('all-material tens have no hidden three-star guarantee, preserve featured guarantees, and cannot bypass hard pity',()=>{
+ const g=game(()=>.99),before=g.getState(),b=data.banners.find(b=>b.active!==false);g.state.pity[b.poolKey].guaranteedFeatured=true;g.state.petSummon.guaranteed=true;
+ const p=pet(g,10);assert.ok(p.results.every(r=>r.kind==='material'));assert.equal(p.state.petSummon.guaranteed,true);assert.equal(p.state.petProgress.resources.petFood,before.petProgress.resources.petFood+10);
+ const r=g.pull({bannerId:b.id,count:10});assert.ok(r.results.every(r=>r.kind==='resource'));assert.equal(r.state.pity[b.poolKey].guaranteedFeatured,true);assert.equal(r.state.resources.characterExp,before.resources.characterExp+1200);
+ g.state.petSummon.pityGroups[pets.banner.poolKey]=49;assert.equal(pet(g).results[0].rarity,4);g.state.pity[b.poolKey].pullsSince4Star=69;assert.equal(g.pull({bannerId:b.id,count:1}).results[0].rarity,4);
+});
+test('invalid material RNG and stale requests cannot spend, feed, add a pet or alter counters',()=>{const g=game(sequence([.99,1])),before=g.getState();assert.throws(()=>pet(g),/隨機值/);assert.deepEqual(g.getState(),before);g.rng=()=>.99;pet(g);const saved=g.getState();assert.throws(()=>g.petSummonAction({action:'draw',bannerId:pets.banner.id,count:10,expectedRevision:0}),/已變更/);assert.deepEqual(g.getState(),saved);});

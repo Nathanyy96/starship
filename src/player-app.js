@@ -921,12 +921,16 @@ function renderMilestoneRewards() {
         var monster = isEnemy && typeof window !== "undefined" && window.StarshipMonsterCatalog && window.StarshipMonsterCatalog.find(unit);
         var art = monster ? window.StarshipMonsterMotion.markup(unit,pose,frame.actionType) : atlas ? "<span class=\"battle-action-sprite " + atlas + " " + pose + "\" aria-hidden=\"true\"></span>" : "<img src=\"" + escapeHtml(image) + "\" alt=\"\">";
         var slot = Math.max(1, Math.min(4, Number(unit.slot || index + 1)));
-        return "<div class=\"battle-arena-fighter position-slot-" + slot + (acting ? " acting" : "") + (hurt ? " targeted" : "") + (unit.hp <= 0 ? " down" : "") + "\" aria-label=\"" + escapeHtml(name(unit, isEnemy) + "，生命 " + unit.hp + " / " + unit.maxHp) + "\"><div class=\"battle-arena-figure\">" + art + "</div><strong>" + escapeHtml(name(unit, isEnemy)) + "</strong><div class=\"battle-arena-health\"><i style=\"width:" + battleHealthPercent(unit) + "%\"></i></div></div>";
+        var row=unit.row==='back'?'back':unit.row==='front'?'front':index<2?'front':'back',members=isEnemy?frame.enemies:frame.team,rowIndex=members.slice(0,index).filter(function(u,i){return (u.row==='back'?'back':u.row==='front'?'front':i<2?'front':'back')===row;}).length;
+        var formation=' data-row="'+row+'"'+(isEnemy?' style="grid-column:'+(row==='front'?1:2)+';grid-row:'+(rowIndex+1)+'"':'');
+        return "<div"+formation+" class=\"battle-arena-fighter position-slot-" + slot + (acting ? " acting" : "") + (hurt ? " targeted" : "") + (unit.hp <= 0 ? " down" : "") + "\" aria-label=\"" + escapeHtml(name(unit, isEnemy) + "，生命 " + unit.hp + " / " + unit.maxHp) + "\"><div class=\"battle-arena-figure\">" + art + "</div><strong>" + escapeHtml(name(unit, isEnemy)) + "</strong><small class=\"battle-row-label\">"+(row==='front'?'前排':'後排')+"</small><div class=\"battle-arena-health\"><i style=\"width:" + battleHealthPercent(unit) + "%\"></i></div></div>";
       }
       var effect = kind === "bass" ? "bass" : kind === "beat" ? "beat" : kind === "string" ? "string" : kind === "echo" ? "echo" : kind === "heal" ? "heal" : kind === "guard" || kind === "barrier" ? "ward" : kind === "survey" ? "survey" : kind === "dagger" ? "dagger" : kind === "calibration" ? "calibration" : kind === "index" ? "index" : kind === "unload" ? "unload" : kind === "tidechart" ? "tidechart" : kind === "beacon" ? "beacon" : kind === "clinic" ? "clinic" : kind === "bow" ? "bow" : kind === "star" ? "star" : kind === "heavy" ? "heavy" : kind === "staff" ? "staff" : "strike";
       var cue = opening ? "VS" : support ? recovery ? "+" + number(recovery) : "增益" : damage ? "−" + number(damage) : action === "guard" ? "護盾" : "交鋒";
-      return "<div class=\"battle-arena " + (frame.actorIsEnemy ? "enemy-turn " : "ally-turn ") + action + " effect-" + effect + "\" aria-label=\"" + escapeHtml(battleLogText(eventText, frame.team)) + "\"><div class=\"battle-arena-side ally-formation\"><span>我方 · 後排／前排</span><div class=\"battle-arena-roster\">" + frame.team.map(function (unit, index) { return fighter(unit, false, index); }).join("") + "</div></div><div class=\"battle-arena-center\"><i></i><b>" + cue + "</b></div><div class=\"battle-arena-side enemy-formation\"><span>敵方</span><div class=\"battle-arena-roster\">" + frame.enemies.map(function (unit, index) { return fighter(unit, true, index); }).join("") + "</div></div><p>" + escapeHtml(battleLogText(eventText, frame.team)) + "</p></div>";
+      return "<div style=\"--enemy-rows:"+Math.max(2,frame.enemies.filter(function(u,i){return u.row==='back'||!u.row&&i>=2;}).length,frame.enemies.filter(function(u,i){return u.row==='front'||!u.row&&i<2;}).length)+"\" class=\"battle-arena " + (frame.actorIsEnemy ? "enemy-turn " : "ally-turn ") + action + " effect-" + effect + "\" aria-label=\"" + escapeHtml(battleLogText(eventText, frame.team)) + "\"><div class=\"battle-arena-side ally-formation\"><span>我方 · 後排／前排</span><div class=\"battle-arena-roster\">" + frame.team.map(function (unit, index) { return fighter(unit, false, index); }).join("") + "</div></div><div class=\"battle-arena-center\"><i></i><b>" + cue + "</b></div><div class=\"battle-arena-side enemy-formation\"><span>敵方 · 前排／後排</span><div class=\"battle-arena-roster\">" + frame.enemies.map(function (unit, index) { return fighter(unit, true, index); }).join("") + "</div></div><p>" + escapeHtml(battleLogText(eventText, frame.team)) + "</p></div>";
     }
+    function battleSummary(battle){if(!battle)return battle;var copy=Object.assign({},battle);delete copy.timeline;return copy;}
+    function playSecondaryBattle(id,battle){var container=byId(id);if(!container||!battle||!battle.timeline?.length)return;var host=container.querySelector('.battle-scene');if(!host){host=document.createElement('section');host.className='battle-scene';container.appendChild(host);}window.StarshipAutoBattle.mount(host,battle,function(frame,previous){return battleArenaMarkup(frame,previous,game.getState());},{owner:currentPlayerName,getOwner:function(){return currentPlayerName;}});}
     function battleSceneMarkup(battle, state, stage, mode) {
       if (!battle) return "";
       var timedOut = battle.status === "timeout" || battle.timedOut === true; var resultClass = battle.won ? "battle-clear" : timedOut ? "battle-timeout" : "battle-failed"; var timeline = Array.isArray(battle.timeline) ? battle.timeline : []; var frameIndex = timeline.length ? Math.min(trialPlaybackIndex, timeline.length - 1) : -1; var frame = frameIndex >= 0 ? timeline[frameIndex] : null; var previous = frameIndex > 0 ? timeline[frameIndex - 1] : null; var team = frame ? frame.team : Array.isArray(battle.team) ? battle.team : []; var enemies = frame ? frame.enemies : Array.isArray(battle.enemies) ? battle.enemies : []; var highlights = frame && frame.events && frame.events.length ? frame.events : (battle.logs || []).filter(function (line) { return /使用|發動|回覆|離場|通關|失敗|上限|超時/.test(line); }).slice(-6); if (!highlights.length) highlights = (battle.logs || []).slice(-6);
@@ -978,6 +982,7 @@ function renderMilestoneRewards() {
       container.innerHTML = "<div class=\"trial-result-header " + (battle.won ? "won" : timedOut ? "timeout" : "lost") + "\"><div><span class=\"eyebrow\">BATTLE REPORT / " + (battle.won ? "CLEAR" : timedOut ? "TIMEOUT" : "RETRY") + "</span><strong>" + (battle.won ? "試煉通關" : timedOut ? "戰鬥超時" : "試煉未通關") + " · " + battle.rounds + " 回合</strong><small>" + escapeHtml(reward + halfSummary) + "｜" + escapeHtml(powerNote) + "｜隊伍協同 " + escapeHtml(synergy) + (environment ? "｜" + escapeHtml(environment) : "") + "</small></div><span class=\"battle-power\">隊伍戰力 " + number(battle.teamPower) + "</span></div>" + battleSceneMarkup(battle, state, stage, "TRIAL") + "<details><summary>查看完整自走棋戰鬥紀錄</summary><div class=\"battle-log\">" + (battle.logs || []).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") + "</div></details>";
     }
     function advanceTrialPlayback() {
+      if(byId("trial-view").hidden||!currentPlayerName){if(trialPlaybackTimer)window.clearInterval(trialPlaybackTimer);trialPlaybackTimer=null;return;}
       var currentState = game && game.getState(); var battle = currentState && currentState.trialProgress && currentState.trialProgress.lastBattle;
       if (!battle || !Array.isArray(battle.timeline) || trialPlaybackIndex >= battle.timeline.length - 1) { if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer); trialPlaybackTimer = null; trialPlaybackPaused = false; renderTrialBattleResult(currentState); return; }
       trialPlaybackIndex += 1; renderTrialBattleResult(currentState);
@@ -987,7 +992,7 @@ function renderMilestoneRewards() {
       if (trialPlaybackTimer) window.clearInterval(trialPlaybackTimer);
       trialPlaybackTimer = null; trialPlaybackIndex = 0; trialPlaybackPaused = false;
       if (!battle || !Array.isArray(battle.timeline) || battle.timeline.length < 2) return;
-      renderTrialBattleResult(game.getState()); trialPlaybackTimer = window.setInterval(advanceTrialPlayback, 680);
+      renderTrialBattleResult(game.getState()); byId("trial-battle-result").querySelector(".battle-arena")?.scrollIntoView({block:"start",behavior:"smooth"}); trialPlaybackTimer = window.setInterval(advanceTrialPlayback, 680);
     }
     function handleTrialPlaybackControl(event) {
       var toggle = event.target.closest("[data-trial-playback-toggle]");
@@ -1094,7 +1099,7 @@ function renderMilestoneRewards() {
           var allWon = halfBattles.every(function (result) { return result.won; });
           battle = Object.assign({}, halfBattles[0], { won: allWon, status: allWon ? "won" : halfBattles.some(function (result) { return result.status === "timeout"; }) ? "timeout" : "defeat", timedOut: halfBattles.some(function (result) { return result.timedOut; }), challengeComplete: halfBattles.length === stage.halves.length && halfBattles.every(function (result) { return result.status !== "timeout"; }), stageId: stage.id, stageName: stage.name, rounds: halfBattles.reduce(function (sum, result) { return sum + result.rounds; }, 0), teamPower: halfBattles.reduce(function (sum, result) { return sum + result.teamPower; }, 0), team: halfBattles.reduce(function (all, result) { return all.concat(result.team); }, []), companions: halfBattles.reduce(function (all, result) { return all.concat(result.companions || []); }, []), enemies: halfBattles.reduce(function (all, result) { return all.concat(result.enemies); }, []), logs: halfBattles.reduce(function (all, result, index) { return all.concat(["【" + stage.halves[index].name + (result.won ? "通過" : "未通過") + "】"], result.logs); }, []), halfResults: halfBattles.map(function (result, index) { return { name: stage.halves[index].name, won: result.won, status: result.status, rounds: result.rounds }; }), timeline: halfBattles.reduce(function (all, result, index) { return all.concat((result.timeline || []).map(function (frame) { return Object.assign({}, frame, { halfName: stage.halves[index].name }); })); }, []) });
         } else battle = window.StarshipBattle.simulateBattle({ team: battleTeam, stats: effectiveStats, stage: stage, captureTimeline: true });
-        progress.selectedTeam = battleTeam.slice(); if (stage.halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } progress.lastBattle = battle;
+        progress.selectedTeam = battleTeam.slice(); if (stage.halves) { progress.selectedTeamUpper = currentTrialUpperTeam.slice(); progress.selectedTeamLower = currentTrialLowerTeam.slice(); } progress.lastBattle = battleSummary(battle);
         if (battle.won) { progress.attempts[stage.id] = attempts + 1; if (progress.clearedStages.indexOf(stage.id) < 0) progress.clearedStages.push(stage.id); progress.bestStage = Math.max(progress.bestStage || 0, stage.id); state.resources.starSand += trialStarSand; state.resources.characterExp += trialCharacterExp; state.recruitment.trial10ChoiceAvailable = false; }
         updateGameFromState(state); saveLocalState(); renderTrial(); renderLobby(); renderCharacters(); startTrialPlayback(battle); showMessage(battle.won ? "星界試煉通關：已獲得 " + trialStarSand + " 星砂與 " + trialCharacterExp + " 角色經驗。" : battle.status === "timeout" ? "本次戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "本次試煉未通關，不扣次數，可以調整編隊後再次挑戰。", battle.status === "defeat");
       } catch (error) { showMessage(error.message, true); }
@@ -1153,15 +1158,15 @@ function renderMilestoneRewards() {
       var boss = bossStageById(currentBossStageId); if (!boss) return;
       var maxRewards = data.bossMaxRewards || 10;
       if (remoteMode) {
-        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam, requestId: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : "boss-"+Date.now()+"-"+Math.random().toString(36).slice(2) }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : timedOut ? "Boss 戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/boss-battle", { bossId: boss.id, team: currentBossTeam, requestId: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : "boss-"+Date.now()+"-"+Math.random().toString(36).slice(2) }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderBoss(); renderCharacters(); renderLobby(); playSecondaryBattle("boss-battle-result",payload.battle); showMessage(payload.battle.won ? "Boss 挑戰成功：已獲得 " + payload.reward.amount + " " + payload.reward.materialName + " 與 " + payload.reward.characterExp + " 角色經驗。" : timedOut ? "Boss 戰鬥超過演算上限，未判定通關，不會扣除挑戰次數。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
         var state = game.getState(); var progress = bossProgress(state); var attempts = bossAttempts(state, boss.id); if (attempts >= maxRewards) throw new Error("這個 Boss 在目前版本已完成 " + maxRewards + " 次"); if (!currentBossTeam.length) throw new Error("至少派出 1 名角色才能挑戰 Boss");
         if (currentBossTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
-        var battle = window.StarshipBattle.simulateBattle({ team: currentBossTeam, stats: effectiveBattleStats(state), stage: boss }); progress.selectedBossId = boss.id; progress.selectedTeam = currentBossTeam.slice(); progress.lastBattle = battle;
+        var battle = window.StarshipBattle.simulateBattle({ team: currentBossTeam, stats: effectiveBattleStats(state), stage: boss, captureTimeline:true }); progress.selectedBossId = boss.id; progress.selectedTeam = currentBossTeam.slice(); progress.lastBattle = battleSummary(battle);
         if (battle.won) { progress.attempts[boss.id] = attempts + 1; state.breakthroughMaterials[boss.reward.materialId] = Number(state.breakthroughMaterials[boss.reward.materialId] || 0) + Number(boss.reward.amount || 0); state.breakthroughMaterials["universal-core"] = Number(state.breakthroughMaterials["universal-core"] || 0) + Number(boss.reward.universalAmount || 1); state.resources.characterExp += Number(boss.reward.characterExp || 0); }
-        updateGameFromState(state); saveLocalState(); renderBoss(); renderCharacters(); renderLobby(); showMessage(battle.won ? "Boss 挑戰成功：已獲得 " + boss.reward.amount + " " + boss.reward.materialName + " 與 " + boss.reward.characterExp + " 角色經驗。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !battle.won);
+        updateGameFromState(state); saveLocalState(); renderBoss(); renderCharacters(); renderLobby(); playSecondaryBattle("boss-battle-result",battle); showMessage(battle.won ? "Boss 挑戰成功：已獲得 " + boss.reward.amount + " " + boss.reward.materialName + " 與 " + boss.reward.characterExp + " 角色經驗。" : "Boss 挑戰失敗，可以調整編隊後再次挑戰。", !battle.won);
       } catch (error) { showMessage(error.message, true); }
     }
     function dispatchProgress(state) {
@@ -1208,7 +1213,7 @@ function renderMilestoneRewards() {
       if (!game || !currentPlayerName) { showGate(); return; }
       var mission = dispatchMissionById(currentDispatchMissionId); if (!mission) return;
       if (remoteMode) {
-        apiRequest("/api/player/dispatch", { missionId: mission.id, team: currentDispatchTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderDispatch(); renderLobby(); renderCharacters(); showMessage(payload.battle.won ? "星港委託完成：已獲得 " + rewardText(payload.reward) + "。" : timedOut ? "委託戰鬥超過演算上限，未判定完成，不會扣除獎勵。" : "委託未完成，可以調整隊伍後再次嘗試。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
+        apiRequest("/api/player/dispatch", { missionId: mission.id, team: currentDispatchTeam }).then(function (payload) { var timedOut = payload.battle && (payload.battle.status === "timeout" || payload.battle.timedOut === true); updateGameFromState(payload.state); renderDispatch(); renderLobby(); renderCharacters(); playSecondaryBattle("dispatch-result",payload.battle); showMessage(payload.battle.won ? "星港委託完成：已獲得 " + rewardText(payload.reward) + "。" : timedOut ? "委託戰鬥超過演算上限，未判定完成，不會扣除獎勵。" : "委託未完成，可以調整隊伍後再次嘗試。", !payload.battle.won && !timedOut); }).catch(function (error) { showMessage(error.message, true); });
         return;
       }
       try {
@@ -1216,9 +1221,9 @@ function renderMilestoneRewards() {
         if (progress.claimed[mission.id]) throw new Error("這份委託本版本已完成，請等待下次版本更新");
         if (!currentDispatchTeam.length) throw new Error("至少派出 1 名角色才能執行委託");
         if (currentDispatchTeam.some(function (id) { return !(state.collection[id] > 0) || !data.characterBattleStats[id]; })) throw new Error("只能派出已取得且已開放的角色");
-        var battle = window.StarshipBattle.simulateBattle({ team: currentDispatchTeam, stats: effectiveBattleStats(state), stage: mission }); progress.selectedTeam = currentDispatchTeam.slice(); progress.lastMission = { missionId: mission.id, battle: battle };
+        var battle = window.StarshipBattle.simulateBattle({ team: currentDispatchTeam, stats: effectiveBattleStats(state), stage: mission, captureTimeline:true }); progress.selectedTeam = currentDispatchTeam.slice(); progress.lastMission = { missionId: mission.id, battle: battleSummary(battle) };
         if (battle.won) { progress.claimed[mission.id] = { completedAt: new Date().toISOString() }; Object.keys(mission.reward || {}).forEach(function (key) { if (Object.prototype.hasOwnProperty.call(state.resources, key)) state.resources[key] += Number(mission.reward[key] || 0); }); }
-        updateGameFromState(state); saveLocalState(); renderDispatch(); renderLobby(); renderCharacters(); showMessage(battle.won ? "星港委託完成：已獲得 " + rewardText(mission.reward) + "。" : "委託未完成，可以調整隊伍後再次嘗試。", !battle.won);
+        updateGameFromState(state); saveLocalState(); renderDispatch(); renderLobby(); renderCharacters(); playSecondaryBattle("dispatch-result",battle); showMessage(battle.won ? "星港委託完成：已獲得 " + rewardText(mission.reward) + "。" : "委託未完成，可以調整隊伍後再次嘗試。", !battle.won);
       } catch (error) { showMessage(error.message, true); }
     }
     function voyageProgress(state) {
@@ -1366,11 +1371,13 @@ function renderMilestoneRewards() {
       var clientGame = game;
       function isCurrent() { return voyagePending === request && request.name === currentPlayerName && request.token === currentPlayerToken; }
       voyagePending = request; voyageFeedback = { text: loading, error: false }; renderVoyageFeedback();
+      var playbackBattle=null;
       var promise = remoteMode ? apiRequest(syncing ? "/api/player/session" : "/api/player/voyage", body) : Promise.resolve().then(function () { return isCurrent() ? localAction(clientGame) : null; });
       promise.then(function (payload) {
         if (!isCurrent() || !payload) return;
         if (!payload.state || !payload.state.voyageProgress) throw new Error("航程回應不完整，請同步進度");
         updateGameFromState(payload.state); if (!remoteMode) saveLocalState();
+        playbackBattle=payload.battle;
         voyageNeedsSync = false;
         voyageFeedback = { text: success(payload), error: false };
         renderLobby(); renderCharacters();
@@ -1381,7 +1388,7 @@ function renderMilestoneRewards() {
         voyageFeedback = { text: voyageNeedsSync ? "操作結果尚未確認，請先同步航程進度再繼續。" : error.message, error: true };
       }).finally(function () {
         if (!isCurrent()) return;
-        voyagePending = null; renderVoyage();
+        voyagePending = null; renderVoyage();if(playbackBattle)playSecondaryBattle("voyage-result",playbackBattle);
       });
     }
     function voyageOutcome(payload) {
@@ -1406,7 +1413,7 @@ function renderMilestoneRewards() {
       var body = { action: "resolve", nodeId: node.id, choice: choice || undefined, team: team };
       voyageRequest(body, function (client) {
         var battle = null;
-        if (stage) battle = window.StarshipBattle.simulateBattle({ team: team, stats: effectiveBattleStats(state), stage: stage });
+        if (stage) battle = window.StarshipBattle.simulateBattle({ team: team, stats: effectiveBattleStats(state), stage: stage, captureTimeline:true });
         return client.advanceVoyage({ nodeId: node.id, choice: choice, team: team, battle: battle });
       }, stage ? "正在結算戰鬥並保存結果，請勿重複送出……" : "正在保存事件選擇……", voyageOutcome);
     }

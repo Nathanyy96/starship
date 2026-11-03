@@ -224,6 +224,8 @@
           guard: 0,
           shield: 0,
           effects: [],
+          slot: result.length + 1,
+          row: template.row === "back" ? "back" : template.row === "front" ? "front" : result.length < 2 ? "front" : "back",
           isEnemy: true,
           isBoss: false,
           skillCooldown: 0,

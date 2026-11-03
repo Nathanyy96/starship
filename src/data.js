@@ -562,7 +562,7 @@
     Object.freeze({ id: "voyage", icon: "✹", title: "星海迷航與特殊結局", copy: "這是獨立於主線的短局航程。選擇事件、商店與休整方式，找出一般、隱藏和協鳴特殊結局；本期特殊四星裝扮藏在特殊結局獎勵裡。" }),
     Object.freeze({ id: "pet", icon: "◌", title: "星伴培育與玩家展示", copy: "寵物有獨立的飼料、玩具和星伴代幣，可餵食、玩耍、訓練、探索、換裝與特效。你可以選擇私人收藏或公開給其他玩家評分，評分只給小額寵物獎勵。" })
   ]);
-  var announcements=Object.freeze([{id:"equipment-dungeon-20261102",badge:"1.1.2更新",date:"2026-11-02",title:"獨立裝備秘境與每日體力",copy:"裝備改由獨立秘境取得；Boss保留突破材料與經驗。技能升級已列入後續老角色補強規劃，現在不開放。",reward:"每日台北00:00體力補滿100，成功挑戰10點掉落5–8件裝備。1.1.1更新／回歸補償不重發。",highlights:["三檔難度，普通／稀有／珍藏裝備，0級掉落、20級上限","失敗／超時不扣體力、不掉落；不影響Boss或試煉次數","本次版本重置試煉與100層塔；塔迭代前期1%至後期15%調整","既有裝備、角色、星伴、資源、保底保留；技能升級關閉"]}]);
+  var announcements=Object.freeze([{id:"equipment-dungeon-20261102",badge:"1.1.2更新",date:"2026-11-02",title:"獨立裝備秘境與召集機率修正",copy:"裝備改由獨立秘境取得；Boss保留突破材料與經驗。技能升級已列入後續老角色補強規劃，現在不開放。",reward:"每日台北00:00體力補滿100，成功挑戰10點掉落5–8件裝備。1.1.1更新／回歸補償不重發。",highlights:["手機橫向版與雙方前後排自動戰鬥，支援暫停及重播","角色與星伴非四星結果20%三星、80%培養素材，不再每抽必出；既有保底及收藏保留","三檔難度，普通／稀有／珍藏裝備，0級掉落、20級上限","失敗／超時不扣體力、不掉落；不影響Boss或試煉次數","1.1.2主更新已重置試煉與塔；本次介面修正不再重置","既有裝備、角色、星伴、資源、保底保留；技能升級關閉"]}]);
   var storySource=null,futureStoryRevision=null,storyReplan=null,storyWorldMap=null;
   var storyChapters=[],version3StoryChapters=[],version2StoryChapters=[],version4StoryChapters=[],version5StoryChapters=[],northernMythArc=[];
   var banners = [

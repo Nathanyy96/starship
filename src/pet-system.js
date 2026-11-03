@@ -11,7 +11,7 @@
  ];
  configs.forEach(function(c){c.rarity=3;});
  var fourStarDefinitions=[['celesia-white-cat','星紗白貓','celesia','mark-echo',['attack'],.04],['chodan-puppy','月拍小犬','chodan','shield-echo',['maxHp'],.01],['magenta-fox','緋音狐','magenta','reaction-buff',['attack'],.03],['hina-cat','風弦灰貓','hina','wind-echo',['attack'],.04],['siyeon-hamster','暖歌倉鼠','siyeon','position-heal',['maxHp'],.06]].map(function(v){var d={id:v[0],name:v[1],rarity:4,maxLevel:25,image:'./assets/pets/'+v[0]+'.png',temperament:'同行',description:({ 'mark-echo':'隊友主動命中裝備者建立的標記後，追加裝備者攻擊4%的星伴傷害。','shield-echo':'裝備者給予的護盾實際吸收敵傷後，為原受盾者補充裝備者生命1%的盾。','reaction-buff':'裝備者灼印或主動風傷觸發交鳴後，下次主動命中增傷3%。','wind-echo':'裝備者主動風傷觸發交鳴後，追加裝備者攻擊4%的星伴傷害。','position-heal':'後排每3回合治療最低血前排，回復裝備者生命6%；前排時對後排治療提高10%。'})[v[3]]};configs.push({id:v[0],name:v[1],rarity:4,stats:v[4],partner:v[2],skill:v[1]+'同行',kind:v[3],rate:v[5],description:d.description});return d;});
- var banner={id:'legacy-pets-1',name:'限定｜星紗與合奏',poolKey:'companion-shared',cost:120,hardPity:50,members:configs.map(function(c){return c.id;}),featured:fourStarDefinitions.map(function(c){return c.id;}),baseRate:.01,growth:1.06,featuredRate:.55},labels={maxHp:'生命',attack:'攻擊',defense:'防禦',speed:'速度'};
+ var banner={id:'legacy-pets-1',name:'限定｜星紗與合奏',poolKey:'companion-shared',cost:120,hardPity:50,members:configs.map(function(c){return c.id;}),featured:fourStarDefinitions.map(function(c){return c.id;}),baseRate:.01,growth:1.06,featuredRate:.55,threeStarRate:.2,materialReward:1},labels={maxHp:'生命',attack:'攻擊',defense:'防禦',speed:'速度'};
  function clone(v){return JSON.parse(JSON.stringify(v));}function assert(ok,message){if(!ok)throw new Error(message);}function config(id){return configs.find(function(c){return c.id===id;});}
  function initial(){return {version:1,revision:0,totalPulls:0,pityGroups:{'companion-shared':0},targets:{'legacy-pets-1':'celesia-white-cat'},guaranteed:false,constellations:{},marks:{lower:0,upper:0},fragments:{},ranks:{},assignments:{},history:[]};}
  function normalize(input,state){
@@ -25,7 +25,7 @@
    out.fragments[c.id]=Number.isSafeInteger(fragments)&&fragments>=0?fragments:0;
    if(pets[c.id]&&pets[c.id].owned!==false){out.ranks[c.id]=Number.isInteger(rank)&&rank>=1&&rank<=5?rank:1;if(typeof cardId==='string'&&state.collection&&state.collection[cardId]>0&&!occupied.has(cardId)){out.assignments[c.id]=cardId;occupied.add(cardId);}}
   });
-  out.history=(Array.isArray(input.history)?input.history:[]).filter(function(h){return h&&config(h.petId)&&Number.isSafeInteger(h.pull)&&h.pull>0;}).slice(-100).map(function(h){return {petId:h.petId,pull:h.pull,duplicate:Boolean(h.duplicate),hardPity:Boolean(h.hardPity),rarity:config(h.petId).rarity,featured:Boolean(h.featured),constellation:Number(h.constellation)||0,at:typeof h.at==='string'?h.at:''};});return out;
+  out.history=(Array.isArray(input.history)?input.history:[]).filter(function(h){return h&&(config(h.petId)||(h.kind==='material'&&h.materialId==='pet-food'))&&Number.isSafeInteger(h.pull)&&h.pull>0;}).slice(-100).map(function(h){if(h.kind==='material'&&h.materialId==='pet-food')return {kind:'material',materialId:'pet-food',name:'星伴飼料',amount:1,reward:{petFood:1},petId:null,pull:h.pull,duplicate:false,hardPity:false,rarity:0,featured:false,constellation:null,at:typeof h.at==='string'?h.at:''};return {kind:'pet',petId:h.petId,pull:h.pull,duplicate:Boolean(h.duplicate),hardPity:Boolean(h.hardPity),rarity:config(h.petId).rarity,featured:Boolean(h.featured),constellation:Number(h.constellation)||0,at:typeof h.at==='string'?h.at:''};});return out;
  }
  function owned(state,id){return Boolean(state.petProgress&&state.petProgress.pets&&state.petProgress.pets[id]&&state.petProgress.pets[id].owned!==false);}
  function action(original,options,rng,now){
@@ -36,16 +36,18 @@
    assert(state.resources&&Number.isSafeInteger(state.resources.starSand)&&state.resources.starSand>=spent,'星砂不足，需要 '+spent);
    state.resources.starSand-=spent;
    for(var i=0;i<options.count;i++){
-    var counter=s.pityGroups[banner.poolKey],hard=counter>=banner.hardPity-1,target=s.targets[banner.id],petId;
+    var counter=s.pityGroups[banner.poolKey],hard=counter>=banner.hardPity-1,target=s.targets[banner.id],petId=null;
     function random(){var n=(rng||Math.random)();assert(Number.isFinite(n)&&n>=0&&n<1,'星伴隨機值無效');return n;}
     var gold=hard||random()<getRate(counter+1),featured=false;
     if(gold){featured=s.guaranteed||random()<banner.featuredRate;var pool=featured?[target]:banner.featured.filter(function(id){return id!==target;});petId=pool[Math.floor(random()*pool.length)];s.guaranteed=!featured;s.pityGroups[banner.poolKey]=0;}
-    else{var pool=configs.filter(function(c){return c.rarity===3;});petId=pool[Math.floor(random()*pool.length)].id;s.pityGroups[banner.poolKey]=counter+1;}
-    var duplicate=owned(state,petId),constellation=s.constellations[petId]||0;
-    if(duplicate){if(constellation<4)s.constellations[petId]=constellation+1;else s.marks[config(petId).rarity===4?'upper':'lower']++;}
-    else{state.petProgress.pets[petId]={owned:true,level:1,exp:0,bond:0,mood:80,training:{care:0,play:0,focus:0}};s.ranks[petId]=1;s.constellations[petId]=0;}
-    s.totalPulls++;
-    var result={petId:petId,pull:s.totalPulls,duplicate:duplicate,rarity:config(petId).rarity,featured:featured,constellation:s.constellations[petId],hardPity:hard,at:typeof now==='function'?now():new Date().toISOString()};s.history.push(result);results.push(clone(result));
+    else{if(random()<banner.threeStarRate){var pool=configs.filter(function(c){return c.rarity===3;});petId=pool[Math.floor(random()*pool.length)].id;}s.pityGroups[banner.poolKey]=counter+1;}
+    s.totalPulls++;var result;
+    if(petId){var duplicate=owned(state,petId),constellation=s.constellations[petId]||0;
+      if(duplicate){if(constellation<4)s.constellations[petId]=constellation+1;else s.marks[config(petId).rarity===4?'upper':'lower']++;}
+      else{state.petProgress.pets[petId]={owned:true,level:1,exp:0,bond:0,mood:80,training:{care:0,play:0,focus:0}};s.ranks[petId]=1;s.constellations[petId]=0;}
+      result={kind:'pet',petId:petId,pull:s.totalPulls,duplicate:duplicate,rarity:config(petId).rarity,featured:featured,constellation:s.constellations[petId],hardPity:hard,at:typeof now==='function'?now():new Date().toISOString()};
+    }else{var food=state.petProgress.resources.petFood;assert(Number.isSafeInteger(food)&&food>=0&&food<Number.MAX_SAFE_INTEGER,'星伴飼料數量無效');state.petProgress.resources.petFood+=banner.materialReward;result={kind:'material',materialId:'pet-food',name:'星伴飼料',amount:1,reward:{petFood:1},petId:null,pull:s.totalPulls,duplicate:false,rarity:0,featured:false,constellation:null,hardPity:false,at:typeof now==='function'?now():new Date().toISOString()};}
+    s.history.push(result);results.push(clone(result));
    }
   }else if(options.action==='target'){
    assert(config(options.petId)&&config(options.petId).rarity===4,'請選擇限定四星星伴');s.targets[banner.id]=options.petId;
