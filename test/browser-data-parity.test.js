@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, "..");
 
 function browserData() {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  const scripts = [...html.matchAll(/<script\s+src="\.\/([^"]+)"/g)].map((match) => match[1].split("?")[0]);
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="\.\/([^"]+)"/g)].map((match) => match[1].split("?")[0]);
   const dataIndex = scripts.indexOf("src/data.js");
   assert.ok(dataIndex > 0, "正式頁面必須載入資料模組");
   const context = vm.createContext({ console });

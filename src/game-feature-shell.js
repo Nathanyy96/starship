@@ -13,7 +13,7 @@
   }
   function tile(card,progress,copies,portrait,selected,state){
     var stars=root.StarshipStarAscension.stars(state,card);
-    return '<button type="button" class="roster-tile rarity-'+Number(card.rarity)+(copies?' owned':' locked')+(selected?' selected':'')+'" data-open-character="'+esc(card.id)+'" aria-pressed="'+Boolean(selected)+'" aria-label="查看'+esc(card.name)+'培養資料"><span class="roster-face">'+(portrait?'<img src="'+esc(portrait)+'" alt="" loading="lazy">':'<i>✦</i>')+'</span><span class="roster-tile-copy"><strong>'+esc(card.name)+'</strong><small class="roster-stars">'+'★'.repeat(stars)+'</small><small>'+esc(card.element)+' · '+(copies?'Lv.'+progress.level+' · C'+(progress.constellation||0):'尚未取得')+'</small></span></button>';
+    return '<button type="button" class="trial-team-card roster-tile rarity-'+Number(card.rarity)+(copies?' owned':' locked')+(selected?' selected':'')+'" data-open-character="'+esc(card.id)+'" aria-pressed="'+Boolean(selected)+'" aria-label="查看'+esc(card.name)+'培養資料"><span class="trial-team-art roster-face">'+(portrait?'<img src="'+esc(portrait)+'" alt="" loading="lazy">':'<i>✦</i>')+'</span><span class="trial-team-copy roster-tile-copy"><strong>'+esc(card.name)+'</strong><small class="roster-stars">'+'★'.repeat(stars)+'</small><small>'+esc(card.element)+' · '+(copies?'Lv.'+progress.level+' · C'+(progress.constellation||0):'尚未取得')+'</small></span></button>';
   }
   function selectPane(detail,pane){
     activePane=pane;
@@ -29,13 +29,13 @@
     var start=false;
     children.forEach(function(child){
       if(child===headerEnd){start=true;return;}if(!start)return;
-      var pane=child.matches('.constellation-details')?'constellation':child.matches('.character-skin-list,.character-skin-panel')?'outfits':child.matches('.detail-skill,.detail-actions,.character-variant')?'skills':'growth';
+      var pane=child.matches('.growth-companion')?'companion':child.matches('.constellation-details')?'constellation':child.matches('.character-skin-list,.character-skin-panel')?'outfits':child.matches('.detail-skill,.detail-actions,.character-variant')?'skills':'growth';
       if(child.matches('details'))child.open=true;panels[pane].appendChild(child);
     });
     var eq=root.StarshipEquipment,items=eq.normalize(state&&state.equipment).items;
     panels.equipment.innerHTML='<div class="character-relic-preview">'+eq.slots.map(function(slot){var item=items.find(function(i){return i.equippedBy===cardId&&i.slot===slot.id;});return '<span><b>'+slot.name+'</b><small>'+(item?'★'.repeat(item.rarity)+' ＋'+item.level:'尚未裝備')+'</small></span>';}).join('')+'</div><button type="button" class="secondary-action" data-character-equipment="'+esc(cardId)+'">搭配六格裝備 →</button>';
     var petSystem=root.StarshipPetSystem,petState=petSystem.normalize(state.petSummon,state),petId=Object.keys(petState.assignments).find(function(id){return petState.assignments[id]===cardId;}),support=petId?petSystem.support(state,petId,cardId):null;
-    panels.companion.innerHTML=(support?'<h4>'+esc(support.name)+' · Lv.'+support.level+' · '+support.rank+'階</h4><p>'+esc(support.skill)+(support.resonance?'（專屬共鳴）':'')+'</p><p>'+support.stats.map(function(key){return petSystem.statLabels[key]+' +'+(support.statRate*100).toFixed(1)+'%';}).join(' ／ ')+'</p>':'<p class="feature-empty">目前尚未配屬星伴。</p>')+'<button type="button" class="secondary-action" data-character-companion="'+esc(cardId)+'">星伴召集與配屬 →</button>';
+    panels.companion.insertAdjacentHTML('beforeend',(support?'<h4>'+esc(support.name)+' · Lv.'+support.level+' · '+support.rank+'階</h4><p>'+esc(support.skill)+(support.resonance?'（專屬共鳴）':'')+'</p><p>'+support.stats.map(function(key){return petSystem.statLabels[key]+' +'+(support.statRate*100).toFixed(1)+'%';}).join(' ／ ')+'</p>':'<p class="feature-empty">目前尚未配屬星伴。</p>') );
     tabs.forEach(function(tab){if(!panels[tab[0]].children.length)panels[tab[0]].innerHTML='<p class="feature-empty">目前尚未登錄此項資料。</p>';copy.appendChild(panels[tab[0]]);});
     var upgrade=panels.growth.querySelector('.detail-upgrade');if(upgrade)panels.growth.prepend(upgrade);
     if(upgrade)upgrade.insertAdjacentHTML('afterend',root.StarshipStarAscensionUI.panel(root.StarshipGachaData.cards[cardId],state));else panels.growth.insertAdjacentHTML('afterbegin',root.StarshipStarAscensionUI.panel(root.StarshipGachaData.cards[cardId],state));
