@@ -10,7 +10,7 @@
   var test11 = typeof process !== "undefined" && process.env.NODE_ENV === "test" && process.env.STARSHIP_RELEASE_11_TEST === "true";
   var open11 = approved11 || test11;
   return Object.freeze({
-    approved11: approved11, open11: open11, version: open11 ? "1.1" : "1.0", appVersion: appVersion, build: "visual-performance-20261103", playMode: "hub", towerCycle: "tower-"+appVersion, towerIteration: 1, trialCycle: "trial-"+appVersion,
+    approved11: approved11, open11: open11, version: open11 ? "1.1" : "1.0", appVersion: appVersion, build: "story-chapter-1-0-20261103", playMode: "hub", towerCycle: "tower-"+appVersion, towerIteration: 1, trialCycle: "trial-"+appVersion,
     cycle: open11 ? "release-1-1" : "2026-10-05-major-combat-repair-1-0",
     // Author-approved reset of trial, Boss, commissions and voyage only.
     challengeCycle: "challenge-reset-20261025",

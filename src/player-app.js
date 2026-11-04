@@ -5,6 +5,7 @@
     try{window.StarshipSaveMigration.cleanBrowser(window.localStorage);}catch(error){}
     var hub = window.StarshipHub;
     if (hub) hub.mount();
+    if(window.StarshipStorybook)window.StarshipStorybook.mount();
     var featureUI = hub && window.StarshipFeatureShell;
     if (featureUI) featureUI.mount();
     var equipmentUI=window.StarshipEquipmentUI.create({getState:function(){return game&&game.getState();},getCards:rosterCards,onHome:enterLobby,onDungeon:function(){showView('equipment-dungeon-view');},onAction:equipmentRequest});
