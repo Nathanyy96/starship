@@ -21,7 +21,7 @@ test('one inventory item cannot occupy two characters or duplicate a slot; all s
  const s=state();for(let i=0;i<6;i++){let n=0;const item=eq.grantBossDrop(s,{id:'boss'},()=>[0,(i+.1)/6,0][n++]);act(s,{action:'equip',itemId:item.id,cardId:'celesia'});}
  assert.equal(new Set(s.equipment.items.map(i=>i.slot)).size,6);
  assert.equal(eq.bonuses(s,'celesia').sets[0].count,6);
- assert.equal(eq.bonuses(s,'celesia').percent.attack,.02);assert.equal(eq.bonuses(s,'celesia').percent.maxHp,.03);assert.equal(eq.bonuses(s,'celesia').percent.defense,.04);
+ assert.equal(eq.bonuses(s,'celesia').percent.attack,.12);assert.equal(eq.bonuses(s,'celesia').percent.maxHp,0);assert.equal(eq.bonuses(s,'celesia').percent.defense,0);
  act(s,{action:'equip',itemId:'relic-1',cardId:'lia'});assert.equal(s.equipment.items.filter(i=>i.equippedBy==='celesia').length,5);assert.equal(eq.bonuses(s,'celesia').percent.defense,0);
  let n=0;const replacement=eq.grantBossDrop(s,{id:'boss'},()=>[0,0,0][n++]);act(s,{action:'equip',itemId:replacement.id,cardId:'lia'});assert.equal(s.equipment.items[0].equippedBy,null);
  act(s,{action:'unequip',itemId:replacement.id});assert.equal(eq.bonuses(s,'lia').flat.maxHp,0);

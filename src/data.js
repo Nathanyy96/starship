@@ -608,12 +608,12 @@
     },
     {
       id: "standard-echo",
-      name: "常駐｜回音召集（" + release.version + "）",
+      name: "第一大版本角色混池",
       type: "standard",
       poolKey: "standard",
-      description: "常駐池獨立計數；只收錄目前已開放的 1.0 角色，沒有精選保證。",
+      description: "已結束限定檔期的角色累積加入本大版本混池；當期限角不入池。四星角色等機率，沒有心願或歪後指定保證；沿用原常駐池保底。",
       featured4Stars: [],
-      standard4Stars: activeFour,
+      standard4Stars: release.open11 ? [cards.chodan, cards.magenta] : activeFour,
       standard3Stars: activeThree
     }
   ];

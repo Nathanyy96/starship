@@ -1216,6 +1216,10 @@
       if (action === "select") {
         progress.selectedPetId = petId;
         progress.showcase.featuredPetId = petId;
+      } else if (action === "upgrade-max") {
+        assert(pet.level<25, '星伴已達25級');var needed=0;for(var lv=pet.level;lv<25;lv++)needed+=80+lv*40;
+        var food=Math.min(resources.petFood,Math.ceil(Math.max(0,needed-pet.exp)/45));assert(food>0,'寵物飼料不足');
+        resources.petFood-=food;reward.petExp=food*45;pet.exp+=reward.petExp;pet.bond=Math.min(100,pet.bond+food*2);pet.mood=Math.min(100,pet.mood+food*5);
       } else if (action === "feed") {
         assert(resources.petFood >= 1, "寵物飼料不足");
         resources.petFood -= 1;

@@ -1,7 +1,7 @@
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.StarshipEquipment=factory();}(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   var slots=[{id:'core',name:'星核',stat:'maxHp',base:48,icon:'✦'},{id:'plume',name:'羽飾',stat:'attack',base:6,icon:'❧'},{id:'dial',name:'時輪',stat:'defense',base:5,icon:'◷'},{id:'chalice',name:'聖杯',stat:'maxHp',base:48,icon:'♜'},{id:'crown',name:'冠冕',stat:'attack',base:6,icon:'♛'},{id:'sigil',name:'徽印',stat:'speed',base:1,icon:'◇'}];
-  var sets=[{id:'voyager',name:'遠行者',bonuses:[{stat:'attack',rate:.02},{stat:'maxHp',rate:.03},{stat:'defense',rate:.04}]},{id:'sentinel',name:'守望者',bonuses:[{stat:'maxHp',rate:.02},{stat:'defense',rate:.03},{stat:'attack',rate:.04}]},{id:'swift',name:'疾行者',bonuses:[{stat:'defense',rate:.02},{stat:'attack',rate:.03},{stat:'speed',rate:.04}]}];
+  var sets=[{id:'voyager',name:'遠行者',bonuses:[{stat:'attack',rate:.02},{stat:'attack',rate:.04},{stat:'attack',rate:.06}]},{id:'sentinel',name:'守望者',bonuses:[{stat:'maxHp',rate:.02},{stat:'defense',rate:.06},{stat:'maxHp',rate:.08}]},{id:'swift',name:'疾行者',bonuses:[{stat:'speed',rate:.02},{stat:'speed',rate:.03},{stat:'speed',rate:.04}]}];
   var rates=[[65,28,7],[45,40,15],[25,50,25]],names=['普通','稀有','珍藏'],labels={maxHp:'生命',attack:'攻擊',defense:'防禦',speed:'速度'};
   function assert(ok,message){if(!ok)throw new Error(message);}
   function initial(){return {version:2,revision:0,nextId:1,items:[],lastDrop:null,bossReceipts:[]};}
@@ -40,17 +40,22 @@
   function action(state,options){
     options=options||{};var next=normalize(state.equipment,state.collection);
     assert(Number.isSafeInteger(options.expectedRevision)&&options.expectedRevision===next.revision,'裝備資料已變更，請同步後重試');
+    if(options.action==='auto-equip'){
+      assert(state.collection&&state.collection[options.cardId]>0,'只能為已取得的角色裝備');
+      slots.forEach(function(slot){var candidates=next.items.filter(function(i){return i.slot===slot.id&&(!i.equippedBy||i.equippedBy===options.cardId);});candidates.sort(function(a,b){return value(b)-value(a)||a.id.localeCompare(b.id);});if(candidates.length){next.items.forEach(function(i){if(i.slot===slot.id&&i.equippedBy===options.cardId)i.equippedBy=null;});candidates[0].equippedBy=options.cardId;}});
+      next.revision++;state.equipment=next;return {cost:0};
+    }
     var item=next.items.find(function(i){return i.id===options.itemId;});assert(item,'找不到這件裝備');
     if(options.action==='equip'){
       assert(typeof options.cardId==='string'&&state.collection&&state.collection[options.cardId]>0,'只能為已取得的角色裝備');
       next.items.forEach(function(other){if(other.slot===item.slot&&other.equippedBy===options.cardId)other.equippedBy=null;});item.equippedBy=options.cardId;
     }else if(options.action==='unequip'){assert(item.equippedBy,'這件裝備尚未穿戴');item.equippedBy=null;
-    }else if(options.action==='upgrade'){
+    }else if(options.action==='upgrade'||options.action==='upgrade-max'){
       var price=cost(item);assert(price!==null,'裝備已達強化上限');assert(state.resources&&Number.isSafeInteger(state.resources.characterExp)&&state.resources.characterExp>=price,'角色經驗不足，需要 '+price);
-      state.resources.characterExp-=price;item.level++;
+      state.resources.characterExp-=price;item.level++;if(options.action==='upgrade-max'){while(cost(item)!==null&&state.resources.characterExp>=cost(item)){var extra=cost(item);state.resources.characterExp-=extra;price+=extra;item.level++;}}
     }else throw new Error('找不到裝備操作');
     if(next.lastDrop){var latest=next.items.find(function(i){return i.id===next.lastDrop.id;});next.lastDrop=latest?Object.assign({},latest):null;}
-    next.revision++;state.equipment=next;return {item:Object.assign({},item),cost:options.action==='upgrade'?price:0};
+    next.revision++;state.equipment=next;return {item:Object.assign({},item),cost:(options.action==='upgrade'||options.action==='upgrade-max')?price:0};
   }
   function bonuses(state,cardId){
     var result={flat:{maxHp:0,attack:0,defense:0,speed:0},percent:{maxHp:0,attack:0,defense:0,speed:0},sets:[]};
