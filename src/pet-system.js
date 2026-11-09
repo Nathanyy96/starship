@@ -11,14 +11,19 @@
  ];
  configs.forEach(function(c){c.rarity=3;});
  var fourStarDefinitions=[['celesia-white-cat','星紗白貓','celesia','mark-echo',['attack'],.04],['chodan-puppy','月拍小犬','chodan','shield-echo',['maxHp'],.01],['magenta-fox','緋音狐','magenta','reaction-buff',['attack'],.03],['hina-cat','風弦灰貓','hina','wind-echo',['attack'],.04],['siyeon-hamster','暖歌倉鼠','siyeon','position-heal',['maxHp'],.06]].map(function(v){var d={id:v[0],name:v[1],rarity:4,maxLevel:25,image:'./assets/pets/'+v[0]+'.png',temperament:'同行',description:({ 'mark-echo':'隊友主動命中裝備者建立的標記後，追加裝備者攻擊4%的星伴傷害。','shield-echo':'裝備者給予的護盾實際吸收敵傷後，為原受盾者補充裝備者生命1%的盾。','reaction-buff':'裝備者灼印或主動風傷觸發交鳴後，下次主動命中增傷3%。','wind-echo':'裝備者主動風傷觸發交鳴後，追加裝備者攻擊4%的星伴傷害。','position-heal':'後排每3回合治療最低血前排，回復裝備者生命6%；前排時對後排治療提高10%。'})[v[3]]};configs.push({id:v[0],name:v[1],rarity:4,stats:v[4],partner:v[2],skill:v[1]+'同行',kind:v[3],rate:v[5],description:d.description});return d;});
- var banner={id:'legacy-pets-1',name:'限定｜星紗與合奏',poolKey:'companion-shared',cost:120,hardPity:50,members:configs.map(function(c){return c.id;}),featured:fourStarDefinitions.map(function(c){return c.id;}),baseRate:.01,growth:1.06,featuredRate:.55,threeStarRate:.2,materialReward:1},labels={maxHp:'生命',attack:'攻擊',defense:'防禦',speed:'速度'};
+ var newPets=[{id:'veyra-ray',name:'潮紋魟',rarity:4,maxLevel:25,image:'./assets/pets/veyra-ray.png',temperament:'同行',description:'提升配屬角色的攻擊與防禦。'},{id:'harlow-badger',name:'岩背獾',rarity:4,maxLevel:25,image:'./assets/pets/harlow-badger.png',temperament:'同行',description:'提升配屬角色的生命與防禦。'}];
+ newPets.forEach(function(p,i){configs.push({id:p.id,name:p.name,rarity:4,stats:i?['maxHp','defense']:['attack','defense'],partner:i?'harlow':'veyra',skill:p.name+'同行',kind:'stats',description:p.description});fourStarDefinitions.push(p);});
+ var banner={id:'legacy-pets-1',name:'限定｜1.2 潮紋魟與岩背獾',poolKey:'companion-shared',cost:120,hardPity:50,members:configs.map(function(c){return c.id;}),featured:['veyra-ray','harlow-badger'],baseRate:.01,growth:1.06,featuredRate:.55,threeStarRate:.2,materialReward:1},labels={maxHp:'生命',attack:'攻擊',defense:'防禦',speed:'速度'};
+ var exportsBanner=banner;
+ var mixedBanner=Object.assign({},banner,{id:'major-one-pets',name:'第一大版本寵物混池',poolKey:'companion-mixed',featured:['celesia-white-cat','chodan-puppy','magenta-fox','hina-cat','siyeon-hamster'],mixed:true});
  function clone(v){return JSON.parse(JSON.stringify(v));}function assert(ok,message){if(!ok)throw new Error(message);}function config(id){return configs.find(function(c){return c.id===id;});}
- function initial(){return {version:1,revision:0,totalPulls:0,pityGroups:{'companion-shared':0},targets:{'legacy-pets-1':'celesia-white-cat'},guaranteed:false,constellations:{},marks:{lower:0,upper:0},fragments:{},ranks:{},assignments:{},history:[]};}
+ function initial(){return {version:1,revision:0,totalPulls:0,pityGroups:{'companion-shared':0,'companion-mixed':0},targets:{'legacy-pets-1':'veyra-ray'},guaranteed:false,constellations:{},marks:{lower:0,upper:0},fragments:{},ranks:{},assignments:{},history:[]};}
  function normalize(input,state){
   input=input&&typeof input==='object'?input:{};state=state||{};var out=initial(),pets=state.petProgress&&state.petProgress.pets||{},occupied=new Set();
   out.revision=Number.isSafeInteger(input.revision)&&input.revision>=0?input.revision:0;out.totalPulls=Number.isSafeInteger(input.totalPulls)&&input.totalPulls>=0?input.totalPulls:0;
   var pity=input.pityGroups&&input.pityGroups[banner.poolKey];out.pityGroups[banner.poolKey]=Number.isInteger(pity)&&pity>=0&&pity<banner.hardPity?pity:0;
-  var target=input.targets&&input.targets[banner.id];if(config(target)&&config(target).rarity===4)out.targets[banner.id]=target;out.guaranteed=input.guaranteed===true;['lower','upper'].forEach(function(k){out.marks[k]=Number.isSafeInteger(input.marks&&input.marks[k])?Math.max(0,input.marks[k]):0;});
+  var mixedPity=input.pityGroups&&input.pityGroups['companion-mixed'];out.pityGroups['companion-mixed']=Number.isInteger(mixedPity)&&mixedPity>=0&&mixedPity<50?mixedPity:0;
+  var target=input.targets&&input.targets[banner.id];if(banner.featured.includes(target))out.targets[banner.id]=target;out.guaranteed=input.guaranteed===true;['lower','upper'].forEach(function(k){out.marks[k]=Number.isSafeInteger(input.marks&&input.marks[k])?Math.max(0,input.marks[k]):0;});
   configs.forEach(function(c){
    var constellation=input.constellations&&input.constellations[c.id];out.constellations[c.id]=Number.isInteger(constellation)&&constellation>=0&&constellation<=4?constellation:0;
    var fragments=input.fragments&&input.fragments[c.id],rank=input.ranks&&input.ranks[c.id],cardId=input.assignments&&input.assignments[c.id];
@@ -29,6 +34,7 @@
  }
  function owned(state,id){return Boolean(state.petProgress&&state.petProgress.pets&&state.petProgress.pets[id]&&state.petProgress.pets[id].owned!==false);}
  function action(original,options,rng,now){
+  var banner=options&&options.bannerId===mixedBanner.id?mixedBanner:exportsBanner;
   options=options||{};assert(options.action!=='awaken'&&options.action!=='breakthrough','星伴覺醒與突破尚未開放');var current=normalize(original.petSummon,original);assert(Number.isSafeInteger(options.expectedRevision)&&options.expectedRevision===current.revision,'星伴資料已變更，請同步後重試');
   assert(options.bannerId===banner.id,'星伴召集池尚未開放');var state=clone(original),s=normalize(current,state),results=[],spent=0;
   if(options.action==='draw'){
@@ -39,7 +45,7 @@
     var counter=s.pityGroups[banner.poolKey],hard=counter>=banner.hardPity-1,target=s.targets[banner.id],petId=null;
     function random(){var n=(rng||Math.random)();assert(Number.isFinite(n)&&n>=0&&n<1,'星伴隨機值無效');return n;}
     var gold=hard||random()<getRate(counter+1),featured=false;
-    if(gold){featured=s.guaranteed||random()<banner.featuredRate;var pool=featured?[target]:banner.featured.filter(function(id){return id!==target;});petId=pool[Math.floor(random()*pool.length)];s.guaranteed=!featured;s.pityGroups[banner.poolKey]=0;}
+    if(gold){featured=!banner.mixed&&(s.guaranteed||random()<banner.featuredRate);var pool=banner.mixed?banner.featured:featured?[target]:configs.filter(function(c){return c.rarity===4&&c.id!==target;}).map(function(c){return c.id;});petId=pool[Math.floor(random()*pool.length)];if(!banner.mixed)s.guaranteed=!featured;s.pityGroups[banner.poolKey]=0;}
     else{if(random()<banner.threeStarRate){var pool=configs.filter(function(c){return c.rarity===3;});petId=pool[Math.floor(random()*pool.length)].id;}s.pityGroups[banner.poolKey]=counter+1;}
     s.totalPulls++;var result;
     if(petId){var duplicate=owned(state,petId),constellation=s.constellations[petId]||0;
@@ -50,7 +56,7 @@
     s.history.push(result);results.push(clone(result));
    }
   }else if(options.action==='target'){
-   assert(config(options.petId)&&config(options.petId).rarity===4,'請選擇限定四星星伴');s.targets[banner.id]=options.petId;
+   assert(!banner.mixed&&banner.featured.includes(options.petId),'請選擇當期限定四星星伴');s.targets[banner.id]=options.petId;
   }else if(options.action==='assign'){
    assert(config(options.petId)&&owned(state,options.petId),'尚未擁有這隻星伴');assert(typeof options.cardId==='string'&&state.collection&&state.collection[options.cardId]>0,'只能配屬已取得的角色');
    Object.keys(s.assignments).forEach(function(id){if(s.assignments[id]===options.cardId)delete s.assignments[id];});s.assignments[options.petId]=options.cardId;
@@ -86,5 +92,5 @@
  }
  function getRate(pull){return pull>=50?1:Math.min(.99,banner.baseRate*Math.pow(banner.growth,Math.max(0,pull-1)));}
  function trigger(owner,kind,round){var p=owner&&owner.companion;if(!p||owner.hp<=0||p.kind!==kind||owner.petTriggerRound===round)return 0;owner.petTriggerRound=round;return p.skillRate;}
- return {trigger:trigger,fourStarDefinitions:fourStarDefinitions,getRate:getRate,configs:configs,banner:banner,statLabels:labels,initial:initial,normalize:normalize,action:action,support:support,apply:apply,opening:opening,round:round};
+ return {trigger:trigger,fourStarDefinitions:fourStarDefinitions,getRate:getRate,configs:configs,banner:banner,banners:[banner,mixedBanner],statLabels:labels,initial:initial,normalize:normalize,action:action,support:support,apply:apply,opening:opening,round:round};
 }));

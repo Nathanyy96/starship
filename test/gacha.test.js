@@ -6,9 +6,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { GachaGame, getFourStarRate } = require("../src/gacha.js");
 const releaseConfig = require("../src/release-config.js");
-const limitedId = releaseConfig.open11 ? "limited-1-1" : "limited-1-0-to-2-0";
-const firstFeatured = releaseConfig.open11 ? "hina" : "chodan";
-const secondFeatured = releaseConfig.open11 ? "siyeon" : "magenta";
+const limitedId = "limited-1-2";
+const firstFeatured = "veyra";
+const secondFeatured = "harlow";
 const { cards, banners, activeCards, futureCards, futureCharacterReleasePlan, futureStoryRevision, storyReplan, storyWorldMap, storySceneAliases, storyChapters, version2Cards, version3Cards, version4Cards, version5Cards, characterBattleStats, characterAnimations, dispatchMissions, bossStages, bossMaxRewards, characterBreakthroughs, updateReward, tutorialSteps, tutorialReward, announcements, trialReward, voyageConfig, voyageBattleStages, shopCatalog, petDefinitions, petOutfits, petEffects, petChallenges, talentRules, talentDefinitions, northernMythArc } = require("../src/data.js");
 
 test("正式版只開放 1.0 角色與 QW 卡池", () => {
@@ -202,7 +202,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.seasonSkins[1].characterId, "harlow");
   assert.equal(voyageConfig.seasonSkins[1].rarity, 4);
   assert.equal(voyageConfig.seasonSkin.id, shopCatalog.skins[0].id);
-  assert.equal(petDefinitions.length, 12);
+  assert.equal(petDefinitions.length, 14);
   assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && pet.image.endsWith(".png")), true);
   assert.equal(voyageBattleStages.length, 3);
   assert.ok(petDefinitions.some((pet) => pet.id === "rune-drake" && pet.description.length > 20));

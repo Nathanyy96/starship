@@ -571,8 +571,10 @@
   var storySource=null,futureStoryRevision=null,storyReplan=null,storyWorldMap=null;
   var storyChapters=[],version3StoryChapters=[],version2StoryChapters=[],version4StoryChapters=[],version5StoryChapters=[],northernMythArc=[];
   var banners = [
+    {id:"limited-1-2",name:"限定｜1.2 薇珂與赫洛",type:"limited",poolKey:"limited",defaultFeaturedId:"veyra",description:"當期薇珂、赫洛；承接限定池保底，QWER已加入第一大版本角色混池。",featured4Stars:[cards.veyra,cards.harlow],standard4Stars:[cards.chodan,cards.magenta,cards.hina,cards.siyeon],standard3Stars:activeThree},
     {
       id: release.open11 ? "limited-1-1" : "limited-1-0-to-2-0",
+      active:false,
       name: release.open11 ? "限定｜1.1 QWER 合奏召集" : "限定｜1.0 QW 回覆召集",
       type: "limited",
       poolKey: "limited",
@@ -613,7 +615,7 @@
       poolKey: "standard",
       description: "已結束限定檔期的角色累積加入本大版本混池；當期限角不入池。四星角色等機率，沒有心願或歪後指定保證；沿用原常駐池保底。",
       featured4Stars: [],
-      standard4Stars: release.open11 ? [cards.chodan, cards.magenta] : activeFour,
+      standard4Stars: release.open11 ? [cards.chodan, cards.magenta,cards.hina,cards.siyeon] : activeFour,
       standard3Stars: activeThree
     }
   ];

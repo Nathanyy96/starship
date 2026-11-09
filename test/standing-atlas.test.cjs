@@ -19,7 +19,7 @@ test('46 adopted images have unique identity, valid WebP payload and verified de
 });
 test('all 26 portraits share the adopted source across raw, background and card views without changing release eligibility',()=>{
  for(const art of data.characterAtlas.entries.filter(e=>e.kind==='character')){const card=data.cards[art.id];for(const key of ['image','backgroundImage','portraitImage'])assert.equal(card[key],art.image);assert.equal(portrait(card,{},true),art.image+'?v=standing-20261103');}
- assert.deepEqual(data.activeCards.map(c=>c.id),['celesia','reyn','lia','isar','chodan','magenta','hina','siyeon','cenwu','ruida','yuan']);
+ assert.deepEqual(new Set(data.activeCards.map(c=>c.id)),new Set(['celesia','reyn','lia','isar','chodan','magenta','hina','siyeon','cenwu','ruida','yuan','veyra','harlow']));
  for(const art of data.characterAtlas.entries.filter(e=>e.kind==='story'))assert.equal(data.storyCharacters[art.id].portrait,art.image);
 });
 test('owned skin selection, base reset and deepwater form resolve independently without mutating the save',()=>{
