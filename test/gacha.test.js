@@ -203,7 +203,7 @@ test("星海迷航、星伴培育與後續天賦資料已接入且資源彼此�
   assert.equal(voyageConfig.seasonSkins[1].rarity, 4);
   assert.equal(voyageConfig.seasonSkin.id, shopCatalog.skins[0].id);
   assert.equal(petDefinitions.length, 14);
-  assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && pet.image.endsWith(".png")), true);
+  assert.equal(petDefinitions.every((pet) => typeof pet.image === "string" && pet.image.indexOf("./assets/pets/") === 0 && /\.(png|webp)$/.test(pet.image)), true);
   assert.equal(voyageBattleStages.length, 3);
   assert.ok(petDefinitions.some((pet) => pet.id === "rune-drake" && pet.description.length > 20));
   assert.ok(petOutfits.length >= 8 && petEffects.length >= 8);

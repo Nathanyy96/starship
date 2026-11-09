@@ -1,0 +1,33 @@
+.battle-arena .battle-drawn-frames { display:block; position:absolute; top:0; left:50%; transform:translateX(-38%); width:auto; aspect-ratio:2; height:100%; max-height:100%; flex-shrink:0; background-size:600% 400%; background-repeat:no-repeat; background-position:0 0; }
+.battle-drawn-frames.celesia-basic-right { background-image:url('./assets/combat/frames-20261108/celesia-basic-right-v1.webp'); }
+.battle-drawn-frames.playing { animation:celesia-drawn-basic 624ms steps(1,end) both; }
+@keyframes celesia-drawn-basic {
+0.00000% { background-position: 0% 0%; }
+4.16667% { background-position: 20% 0%; }
+8.33333% { background-position: 40% 0%; }
+12.50000% { background-position: 60% 0%; }
+16.66667% { background-position: 80% 0%; }
+20.83333% { background-position: 100% 0%; }
+25.00000% { background-position: 0% 33.333333333333336%; }
+29.16667% { background-position: 20% 33.333333333333336%; }
+33.33333% { background-position: 40% 33.333333333333336%; }
+37.50000% { background-position: 60% 33.333333333333336%; }
+41.66667% { background-position: 80% 33.333333333333336%; }
+45.83333% { background-position: 100% 33.333333333333336%; }
+50.00000% { background-position: 0% 66.66666666666667%; }
+54.16667% { background-position: 20% 66.66666666666667%; }
+58.33333% { background-position: 40% 66.66666666666667%; }
+62.50000% { background-position: 60% 66.66666666666667%; }
+66.66667% { background-position: 80% 66.66666666666667%; }
+70.83333% { background-position: 100% 66.66666666666667%; }
+75.00000% { background-position: 0% 100%; }
+79.16667% { background-position: 20% 100%; }
+83.33333% { background-position: 40% 100%; }
+87.50000% { background-position: 60% 100%; }
+91.66667% { background-position: 80% 100%; }
+95.83333% { background-position: 100% 100%; }
+100% {background-position:100% 100%;}
+}
+@media(prefers-reduced-motion:reduce) { .battle-drawn-frames.playing {animation:none;} }
+
+.hub-mode .battle-arena .battle-arena-figure.drawn-action {overflow:visible;z-index:1;}

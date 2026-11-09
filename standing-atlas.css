@@ -14,3 +14,11 @@
 .hub-mode .battle-arena .battle-arena-figure>img,.hub-mode .battle-arena .monster-figure img{height:100%;max-height:100%;width:auto;max-width:100%;object-fit:contain}
 @media(orientation:landscape) and (max-height:600px){.hub-mode .battle-arena{height:clamp(180px,55dvh,260px);max-height:260px}.hub-mode .battle-arena .battle-arena-figure{height:clamp(30px,12dvh,65px);max-height:65px}.hub-mode .battle-arena-roster{height:100%}}
 .hub-mode .battle-stage-focused .battle-arena{height:100%;max-height:none}.hub-mode .battle-stage-focused .battle-arena .battle-arena-figure{height:clamp(40px,18dvh,140px);max-height:140px}
+/* Constrain both formation rows before sizing artwork; reserve space for names and HP. */
+.hub-mode .battle-arena{display:grid;grid-template-columns:minmax(0,1fr) clamp(24px,4vw,52px) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.hub-mode .battle-arena-side{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0}
+.hub-mode .battle-arena-roster{height:auto!important;grid-template-rows:repeat(var(--enemy-rows,2),minmax(0,1fr));align-content:stretch}
+.hub-mode .battle-arena .battle-arena-fighter{display:flex;flex-direction:column;min-height:0;padding:2px}
+.hub-mode .battle-arena .battle-arena-figure{flex:1 1 0;min-height:0;height:auto;max-height:120px;width:100%;overflow:hidden}
+.hub-mode .battle-arena-fighter>strong,.hub-mode .battle-row-label,.hub-mode .battle-arena-health,.hub-mode .battle-arena-hp-value{flex-shrink:0}
+.hub-mode .battle-arena-side{align-self:stretch;height:100%}

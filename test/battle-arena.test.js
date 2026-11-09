@@ -65,7 +65,7 @@ test("future cast uses distinct normal proportion action atlases without changin
     const team = [{ id, hp: 100, maxHp: 100, shield: 0, slot: 3 }];
     const enemies = [{ id: "enemy-0", name: "敵人", image: data.trialStages[9].enemies[0].image, hp: 100, maxHp: 100, shield: 0 }];
     const html = battleArenaMarkup({ team, enemies, actorId: id, actorIsEnemy: false, events: [`${id}攻擊敵人`] }, { team: structuredClone(team), enemies: structuredClone(enemies) }, {});
-    assert.ok(html.includes(`battle-action-sprite ${id} attack`), id);
+    assert.equal(html.includes(`battle-action-sprite ${id} attack`), data.cards[id].rarity === 4, id);
   }
 });
 
@@ -82,8 +82,10 @@ test("2.0 cast previews use their own skill effects and action atlases", () => {
     else team[0].shield = 20;
     const event = `${id}使用「${data.characterBattleStats[id].skillName}」`;
     const html = battleArenaMarkup({ team, enemies, actorId: id, actorIsEnemy: false, events: [event] }, previous, {});
-    assert.ok(html.includes(`battle-action-sprite ${id} attack`), id);
+    assert.equal(html.includes(`battle-action-sprite ${id} attack`), data.cards[id].rarity === 4, id);
     assert.ok(html.includes(`effect-${effect}`), id);
     assert.equal(Number(data.cards[id].releaseVersion), 2);
   }
 });
+
+ test('native three-star characters keep card combat even when promoted to six stars',()=>{for(const card of Object.values(data.cards).filter(c=>c.rarity===3)){const team=[{id:card.id,hp:100,maxHp:100,shield:0,slot:1,stars:6}],enemies=[{id:'enemy',name:'enemy',image:'',hp:100,maxHp:100,shield:0}];const previous={team:structuredClone(team),enemies:structuredClone(enemies)};enemies[0].hp=80;const html=battleArenaMarkup({team,enemies,actorId:card.id,actorIsEnemy:false,actionType:'basic',events:['attack']},previous,{});assert.equal(html.includes('battle-action-sprite '+card.id+' '),false,card.id);assert.ok(html.includes('battle-standing-portrait'),card.id);}});
